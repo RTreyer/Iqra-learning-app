@@ -23,6 +23,8 @@ Goal: enable children to independently learn all primary-school subjects — wit
 
 Requires Node.js 24 and pnpm (`corepack enable pnpm`).
 
+**Windows quick start:** after `pnpm install`, double-click `Start-Browser.cmd` (opens the app in the browser) or `Start-Handy.cmd` (shows a QR code for Expo Go).
+
 - `pnpm install` — install dependencies
 - `pnpm --filter @workspace/learn-app run dev` — start Expo; scan the QR code with Expo Go on an Android phone
 - `pnpm --filter @workspace/learn-app run web` — run the app in the browser
