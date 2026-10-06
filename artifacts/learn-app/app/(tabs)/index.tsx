@@ -1,13 +1,11 @@
 /**
  * Home screen — grade selector (Klasse 1–6).
  * Children tap their grade to see available books.
- * Shows a login gate if the user is not authenticated.
  */
 
 import { router } from "expo-router";
 import React from "react";
 import {
-  ActivityIndicator,
   Platform,
   Pressable,
   StyleSheet,
@@ -19,7 +17,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ScreenBackground } from "@/components/ScreenBackground";
 import { grades } from "@/constants/grades";
 import { useProgress } from "@/context/ProgressContext";
-import { useAuth } from "@/lib/auth";
 import { UiText } from "@/components/UiText";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
 import { useLanguage } from "@/context/LanguageContext";
@@ -28,45 +25,9 @@ export default function HomeScreen() {
   const { t } = useLanguage();
   const insets = useSafeAreaInsets();
   const { progress } = useProgress();
-  const { user, isLoading, isAuthenticated, login, logout, loginError } = useAuth();
 
   const topPad = Platform.OS === "web" ? Math.max(insets.top, 67) : insets.top;
   const botPad = Platform.OS === "web" ? Math.max(insets.bottom, 34) : insets.bottom;
-
-  if (isLoading) {
-    return (
-      <ScreenBackground
-        variant="home"
-        style={[styles.container, { paddingTop: topPad + 8, paddingBottom: botPad + 16 }]}
-      >
-        <ActivityIndicator size="large" color="#D97706" style={{ marginTop: 80 }} />
-        <UiText style={styles.loadingText}>جاري التحميل...</UiText>
-      </ScreenBackground>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <ScreenBackground
-        variant="home"
-        style={[styles.container, { paddingTop: topPad + 8, paddingBottom: botPad + 16 }]}
-      >
-        <LanguageSwitch />
-        <Text style={styles.appTitle}>أَقْرَأُ وَأَتَعَلَّمُ</Text>
-        <Text style={styles.loginEmoji}>📚✨</Text>
-        <UiText style={styles.loginWelcome}>مرحباً بك!</UiText>
-        <UiText style={styles.loginSubtitle}>سجِّل دخولك لتبدأ رحلة التعلّم</UiText>
-        <Pressable
-          style={({ pressed }) => [styles.loginButton, pressed && styles.loginButtonPressed]}
-          onPress={login}
-          accessibilityLabel={t("تسجيل الدخول")}
-        >
-          <UiText style={styles.loginButtonText}>ابدأِ التَّعَلُّم 🚀</UiText>
-        </Pressable>
-        {loginError ? <UiText role="alert" style={styles.loginError}>{loginError}</UiText> : null}
-      </ScreenBackground>
-    );
-  }
 
   return (
     <ScreenBackground
@@ -81,11 +42,8 @@ export default function HomeScreen() {
           <Text style={styles.starsCount}>{progress.totalStars}</Text>
         </View>
         <View style={styles.userRow}>
-          <Pressable onPress={logout} style={styles.logoutBtn}>
-            <UiText style={styles.logoutText}>خروج</UiText>
-          </Pressable>
           <Text style={styles.userName} numberOfLines={1}>
-            {user?.firstName ?? t("أهلاً")}
+            {t("أهلاً")}
           </Text>
           <Text style={styles.appTitle}>أَقْرَأُ وَأَتَعَلَّمُ</Text>
         </View>
@@ -125,63 +83,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     alignItems: "center",
   },
-  loadingText: {
-    fontSize: 18,
-    color: "#78350F",
-    marginTop: 16,
-    fontWeight: "700",
-    textAlign: "center",
-  },
   appTitle: {
     fontSize: 24,
     fontWeight: "800",
     color: "#1E293B",
     textAlign: "right",
-  },
-  loginEmoji: {
-    fontSize: 80,
-    textAlign: "center",
-    marginTop: 30,
-    marginBottom: 10,
-  },
-  loginWelcome: {
-    fontSize: 36,
-    fontWeight: "900",
-    color: "#92400E",
-    textAlign: "center",
-    marginBottom: 8,
-  },
-  loginSubtitle: {
-    fontSize: 18,
-    color: "#78350F",
-    textAlign: "center",
-    marginBottom: 40,
-    fontWeight: "600",
-  },
-  loginButton: {
-    backgroundColor: "#D97706",
-    borderRadius: 32,
-    paddingHorizontal: 48,
-    paddingVertical: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.25,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  loginButtonPressed: { opacity: 0.85, transform: [{ scale: 0.97 }] },
-  loginButtonText: {
-    fontSize: 26,
-    fontWeight: "900",
-    color: "#fff",
-    textAlign: "center",
-  },
-  loginError: {
-    color: "#9F1239",
-    fontSize: 16,
-    textAlign: "center",
-    marginTop: 16,
-    fontWeight: "700",
   },
   header: {
     width: "100%",
@@ -211,17 +117,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#1E293B",
     maxWidth: 80,
-  },
-  logoutBtn: {
-    backgroundColor: "rgba(255,255,255,0.6)",
-    borderRadius: 14,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-  },
-  logoutText: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: "#92400E",
   },
   subtitle: {
     fontSize: 16,

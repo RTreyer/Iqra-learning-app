@@ -21,16 +21,20 @@ Goal: enable children to independently learn all primary-school subjects — wit
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
-- `pnpm run typecheck` — full typecheck across all packages
-- `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
+Requires Node.js 24 and pnpm (`corepack enable pnpm`).
+
+- `pnpm install` — install dependencies
+- `pnpm --filter @workspace/learn-app run dev` — start Expo; scan the QR code with Expo Go on an Android phone
+- `pnpm --filter @workspace/learn-app run web` — run the app in the browser
+- `pnpm --filter @workspace/learn-app run typecheck` — typecheck the app
+- `pnpm --filter @workspace/learn-app run test:language` — UI translation tests
+- `eas build -p android --profile preview` (in `artifacts/learn-app`) — build an installable APK via Expo EAS
 
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
 - Mobile: Expo SDK (expo-router, expo-speech, expo-haptics, AsyncStorage)
-- API: Express 5 (for future use)
+- API: Express 5 + Postgres in `artifacts/api-server` / `lib/db` — **not used by the app**, kept for a possible future sync feature
 
 ## Where things live
 
@@ -42,6 +46,8 @@ Goal: enable children to independently learn all primary-school subjects — wit
 - `artifacts/learn-app/components/` — shared UI components (BackButton, ScreenBackground, etc.)
 
 ## Architecture decisions
+
+- **No server, no login:** progress is stored on the device only (AsyncStorage key `@kidlearn_progress_v1`). Progress from older per-account builds is migrated automatically on first start.
 
 - **Route structure:** `/(tabs)/grade/[grade]` → `/(tabs)/book/[grade]/[bookId]` → subject module index → lesson screen
 - **Lesson IDs:** `r1–r28` (Part 1 reading), `p2r1–p2r20` (Part 2 reading), `w1–w28` (writing), `m1–m3` (math)

@@ -32,12 +32,7 @@
     },
     "plugins": [
       "expo-updates",
-      [
-        "expo-router",
-        {
-          "origin": "https://replit.com/"
-        }
-      ],
+      "expo-router",
       "expo-font",
       "expo-web-browser"
     ],
