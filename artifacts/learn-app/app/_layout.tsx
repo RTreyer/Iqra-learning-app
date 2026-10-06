@@ -8,6 +8,7 @@ import {
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
+import { Platform, StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
@@ -18,11 +19,27 @@ import { LanguageProvider } from "@/context/LanguageContext";
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
+/** Widest the app gets in a browser — keeps the phone-portrait layout intact. */
+const WEB_MAX_WIDTH = 480;
+
 function RootLayoutNav() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(tabs)" />
     </Stack>
+  );
+}
+
+/**
+ * On web, render the app as a centered phone-width column so screens
+ * designed for portrait phones don't stretch across wide desktop windows.
+ */
+function WebFrame({ children }: { children: React.ReactNode }) {
+  if (Platform.OS !== "web") return <>{children}</>;
+  return (
+    <View style={styles.webBackdrop}>
+      <View style={styles.webApp}>{children}</View>
+    </View>
   );
 }
 
@@ -48,7 +65,9 @@ export default function RootLayout() {
       <ErrorBoundary>
         <ProgressProvider>
           <GestureHandlerRootView style={{ flex: 1 }}>
-            <RootLayoutNav />
+            <WebFrame>
+              <RootLayoutNav />
+            </WebFrame>
           </GestureHandlerRootView>
         </ProgressProvider>
       </ErrorBoundary>
@@ -56,3 +75,18 @@ export default function RootLayout() {
     </SafeAreaProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  webBackdrop: {
+    flex: 1,
+    alignItems: "center",
+    backgroundColor: "#E8DDBE",
+  },
+  webApp: {
+    flex: 1,
+    width: "100%",
+    maxWidth: WEB_MAX_WIDTH,
+    overflow: "hidden",
+    boxShadow: "0 0 24px rgba(0,0,0,0.15)",
+  },
+});
