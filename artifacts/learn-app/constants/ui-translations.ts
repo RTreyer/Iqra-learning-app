@@ -1,0 +1,128 @@
+export type UiLanguage = "ar" | "en";
+
+// Interface copy only. Lesson data, instructions, quiz answers and speech
+// deliberately stay Arabic, even when the interface is English.
+const english: Record<string, string> = {
+  "جاري التحميل...": "Loading...",
+  "مرحباً بك!": "Welcome!",
+  "سجِّل دخولك لتبدأ رحلة التعلّم": "Sign in to start learning",
+  "تسجيل الدخول": "Sign in",
+  "ابدأِ التَّعَلُّم 🚀": "Start learning 🚀",
+  "خروج": "Sign out",
+  "أهلاً": "Hello",
+  "اختَر صفّك": "Choose your grade",
+  "اختَر الكتاب": "Choose a book",
+  "أنت رائع! 🌟": "You're doing great! 🌟",
+  "رجوع": "Back",
+  "العودة": "Back",
+  "العودة إلى القائمة": "Back to the list",
+  "الدرس التالي": "Next lesson",
+  "إعادة الدرس": "Repeat lesson",
+  "إعادة الوحدة": "Repeat unit",
+  "الحرف التالي": "Next letter",
+  "التالي ←": "Next →",
+  "‹": "›",
+  "مسح": "Clear",
+  "أنهيتُ": "Done",
+  "مرة أخرى": "Try again",
+  "حاول مرة أخرى": "Try again",
+  "هيّا نختبر!": "Start quiz",
+  "تابع 🌟": "Continue 🌟",
+  "أَحْسَنْت! 🌟 تابع": "Continue 🌟",
+  "تَتَبَّعْتُ الْخَط ✓": "Done tracing ✓",
+  "اِضغط للاستماع": "Tap to listen",
+  "اضغط للاستماع": "Tap to listen",
+  "الكتاب غير موجود": "Book not found",
+  "الصف غير موجود": "Grade not found",
+  "الوحدة غير موجودة": "Unit not found",
+  "الدرس غير موجود": "Lesson not found",
+  "الصفحة غير موجودة": "Page not found",
+  "العودة إلى الرئيسية": "Back to home",
+  "حدث خطأ": "Something went wrong",
+  "أعد تحميل التطبيق للمتابعة.": "Please reload the app to continue.",
+  "تفاصيل الخطأ": "Error details",
+  "إغلاق تفاصيل الخطأ": "Close error details",
+  "عرض تفاصيل الخطأ": "View error details",
+  "قريباً": "Coming soon",
+  "قريباً!": "Coming soon!",
+  "سيتوفر محتوى هذا الكتاب قريباً، تابع معنا!": "This book's content is coming soon!",
+  "سيتوفر محتوى هذا الصف قريباً، تابع معنا!": "Content for this grade is coming soon!",
+  "اختَر ماذا تريد أن تتعلّم اليوم": "Choose what to learn today",
+  "هيّا نتعلّم! 🌟": "Let's learn! 🌟",
+  "تعذّر تسجيل الدخول. حاول مرة أخرى.": "Sign-in failed. Please try again.",
+  "تعذّر بدء تسجيل الدخول. حاول مرة أخرى.": "Couldn't start sign-in. Please try again.",
+  "قِرَاءَة": "Reading",
+  "قراءة": "Reading",
+  "القراءة": "Reading",
+  "كِتَابَة": "Writing",
+  "كتابة": "Writing",
+  "حِسَاب": "Math",
+  "حساب": "Math",
+  "إسلامية": "Islamic education",
+  "الرياضيات": "Math",
+  "العلوم": "Science",
+  "اللغة العربية": "Arabic",
+  "التربية الإسلامية": "Islamic education",
+  "القرآن الكريم وعلومه": "Quran and Quranic studies",
+  "القرآن والتربية الإسلامية": "Quran and Islamic education",
+  "القرآن الكريم وعلومه والتربية الإسلامية": "Quranic studies and Islamic education",
+  "لغتي العربية": "My Arabic language",
+  "لُغَتِي الجَمِيلَة": "My beautiful language",
+  "أقرأ وأتعلم": "Iqra – Read and learn",
+  "الجُزْء الأَوَّل": "Part 1",
+  "الجُزْء الثَّانِي": "Part 2",
+  "الجزء الأول": "Part 1",
+  "الجزء الثاني": "Part 2",
+  "الصف الأول": "Grade 1",
+  "الصف الثاني": "Grade 2",
+  "الصف الثالث": "Grade 3",
+  "الصف الرابع": "Grade 4",
+  "الصف الخامس": "Grade 5",
+  "الصف السادس": "Grade 6",
+  "الوحدة الأولى": "Unit 1",
+  "الوحدة الثانية": "Unit 2",
+  "الوحدة الثالثة": "Unit 3",
+  "الوحدة الرابعة": "Unit 4",
+  "الوحدة الخامسة": "Unit 5",
+  "الوحدة السادسة": "Unit 6",
+  "الوحدة السابعة": "Unit 7",
+  "الوحدة الثامنة": "Unit 8",
+  "الْوَحْدَةُ الأُولَى": "Unit 1",
+  "الْوَحْدَةُ الثَّانِيَة": "Unit 2",
+  "مراجعة": "Review",
+  "تَمْهِيدِيَّة": "Introduction",
+  "تَسْمِيَة الصُّوَر": "Picture naming",
+  "اسْتِمَاع وَاخْتِيَار": "Listen and choose",
+  "السُّلُوك": "Behavior",
+  "مُطَابَقَة": "Matching",
+  "رَسْم الْخُطُوط": "Drawing lines",
+  "قِرَاءَة الْقِصَّة": "Story reading",
+  "الْمُفْرَدَات": "Vocabulary",
+  "الْحُرُوف": "Letters",
+  "الْحَرْف ب": "Letter ب",
+  "حَرْف ب": "Letter ب",
+  "قِرَاءَة الْكَلِمَات": "Word reading",
+  "الْفَهْم وَالاسْتِيعَاب": "Comprehension",
+  "عدّ": "Counting",
+  "جمع": "Addition",
+  "طرح": "Subtraction",
+};
+
+export function translateUi(text: string, language: UiLanguage): string {
+  if (language === "ar") return text;
+  const value = text.trim();
+  if (english[value]) return english[value];
+  // Dynamic navigation labels preserve the Arabic lesson title.
+  if (value.startsWith("النشاط التالي: ")) return `Next activity: ${value.slice("النشاط التالي: ".length).replace(/\s*←$/, "")} →`;
+  const completed = value.match(/^(\d+)\s*\/\s*(\d+)\s+مكتمل$/);
+  if (completed) return `${completed[1]} / ${completed[2]} complete`;
+  const scoredContinue = value.match(/^أَحْسَنْت!\s*(\d+\/\d+)\s*🌟 تابع$/);
+  if (scoredContinue) return `${scoredContinue[1]} 🌟 Continue`;
+  const behaviorContinue = value.match(/^أَحْسَنْت!\s*(\d+\/\d+)\s*صحيح 🌟 تابع$/);
+  if (behaviorContinue) return `${behaviorContinue[1]} correct 🌟 Continue`;
+  const unitComplete = value.match(/^🎉 أتممت (.+)!$/);
+  if (unitComplete) return `🎉 Completed ${translateUi(unitComplete[1], language)}!`;
+  // Book metadata is translated for navigation without modifying its source.
+  if (value.includes(" — ")) return value.split(" — ").map((part) => translateUi(part, language)).join(" — ");
+  return text;
+}
