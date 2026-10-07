@@ -1,0 +1,14 @@
+# Netlify: build the Expo app as a static website.
+[build]
+  command = "pnpm --filter @workspace/learn-app run build"
+  publish = "artifacts/learn-app/dist"
+
+[build.environment]
+  NODE_VERSION = "24"
+
+# The app is a single-page app: every path (e.g. /grade/1) is served by
+# index.html and resolved by expo-router in the browser.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
