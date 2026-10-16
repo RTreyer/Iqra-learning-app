@@ -6,8 +6,10 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { VoiceHintBanner } from "@/components/VoiceHintBanner";
 import { ProgressProvider } from "@/context/ProgressContext";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { useVoiceHint } from "@/hooks/useVoiceHint";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -16,10 +18,14 @@ SplashScreen.preventAutoHideAsync();
 const WEB_MAX_WIDTH = 480;
 
 function RootLayoutNav() {
+  const { visible, dismiss } = useVoiceHint();
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(tabs)" />
-    </Stack>
+    <>
+      {visible && <VoiceHintBanner onDismiss={dismiss} />}
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" />
+      </Stack>
+    </>
   );
 }
 
