@@ -67,15 +67,15 @@ To make it self-resuming after a usage limit reset, run inside the session (loca
 | 5.5 Home guidance | done | 05149de, 947e0eb | review passed; Arabic dual/plural labels via lib/labels.ts |
 | 5.6 Docs refresh | done | 51fe5ab, f26925e | README 72 lines, APP_OVERVIEW rewritten, UI_PROPOSALS paths fixed |
 | 6.1 Accessibility | done | f77b8e8, 84c3bc8 | review passed; roles/labels/48 px everywhere, 4.5:1 via `readableFill` darkened fills (white text kept), RTL headers, instruction strings translatable, a11y jest test |
-| 6.2 Performance pass | in progress | | APK/meminfo numbers need a device, record web bundle only |
+| 6.2 Performance pass | done | a9eb7a2 | all shadows via tokens, decos ≤ 4 per screen, docs/PERFORMANCE.md (web JS 1.56 MB, 18 deps); APK size and meminfo pending |
 | 6.3 E2E suite on new routes | done | ce8c14d, c3861f5 | 18 passed, 1 skipped (no unavailable book), 82 s wall; axe icon font heuristic skips Arabic text, test uses its own node filter; unit page contrast mostly "incomplete" in axe (gradients), checked by hand in 6.1 |
-| 6.4 Android device check | ready for build | | EAS login verified 2026-10-16 (primary account `cj8181`; a second account `cj818181` also exists, use `cj8181` for `eas init` unless the owner says otherwise). Device testing still needs the owner's phone |
+| 6.4 Android device check | build running, device test waiting for owner | 4fbf558 | EAS project @cj8181/learn-app (id d7c231c8-0185-4618-ac32-75b0a79261dc), build b28ab03b-d4c9-44e2-9bf4-f83335a557ac, logs https://expo.dev/accounts/cj8181/projects/learn-app/builds/b28ab03b-d4c9-44e2-9bf4-f83335a557ac. Owner: install the APK, verify TTS, haptics, finger tracing without page scroll, progress after force stop, launch in airplane mode |
 | 6.5 UI proposals doc | done (path check in 5.6) | 0fb8b9c | 13 proposals + tracing roadmap; file paths referencing app/(tabs) must be updated in 5.6 after 4.4 |
 | 6.6 Flatten to root | owner | | optional, separate PR, owner decides |
 
-## Owner inputs still open (none block Tasks 1.2 to 6.5)
+## Owner inputs still open (nothing else blocks)
 
-- An Android phone to verify TTS, haptics, tracing, persistence (Task 6.4).
+- An Android phone to verify TTS, haptics, tracing, persistence (Task 6.4): APK from the EAS build above once FINISHED. Then record APK size and `adb shell dumpsys meminfo com.iqra.yemenlearn` in docs/PERFORMANCE.md.
 - Science textbook material to align the Science placeholder content (after 5.1; tracked in `docs/CONTENT_REVIEW.md`).
 - Math textbooks received 2026-10-16 (Grade 1, Sanaa, Part 1 ed. 2026 and Part 2 ed. 2022), Arabic PDFs, about 11 MB and 8 MB:
   - `/Users/start/Downloads/OneDrive_1_10-16-2026/كتاب_الرياضيات_الجزء_الأول_الطبعة_2026_الصف_الأول_صنعاء_اليمن.pdf`
@@ -104,6 +104,8 @@ To make it self-resuming after a usage limit reset, run inside the session (loca
 - 2026-10-16: Model policy (owner: "use the appropriate models to stay efficient"). Implementers: sonnet for config, deletion and data tasks (1.2, 1.3, 2.x, 3.2, 3.4, 5.1, 5.2, 5.6, 6.5); opus for multi file code tasks (3.1, 3.3, 4.x, 5.3 to 5.5, 6.1 to 6.4). Spec reviewers: sonnet. Code quality reviewers: opus. Config only tasks get spec review only.
 - 2026-10-16: u1-5 trace guides use ـــ | / ◯ 〰 (the existing five shapes: horizontal, vertical, diagonal, circle, zigzag); the plan's "arc" did not exist in the content, so no new shape was invented.
 - 2026-10-16: `allowImportingTsExtensions` enabled so Node type stripping can run data tests directly on the TS content; content modules import each other with `.ts` extensions and must stay free of react-native imports. `SUBJECT_COLORS` lives in `content/types.ts`, `theme/tokens.ts` re-exports it.
+- 2026-10-17: Final verification on a9eb7a2: typecheck OK, lint 0/0, jest 37 suites / 220 tests, data tests 21/21, e2e 18 passed / 1 skipped (1.3 min), expo-doctor 18/18. EAS keystore generated remotely by EAS for @cj8181/learn-app (preview profile, APK). `android.versionCode` stays in app.json for expo-constants although version source is remote.
+- 2026-10-17: Accessibility approach (owner constraint: keep the UI style): white text stays, button and card fills are darkened at render time with `readableFill` only where white text falls below 4.5:1; content colours untouched.
 - 2026-10-16: Leitner rule (code review): a correct answer promotes only when the item is due; a wrong answer always resets to box 1. Due dates are local midnight, compared by day key, so an item seen in the evening is due the next morning. Items with dueAt more than 14 days ahead count as due (clock skew).
 - 2026-10-16: Lesson open sequence: the title is spoken first and the activity mounts after the title finishes (or after 1.5 s), so the activity's own prompt is not cut off.
 - 2026-10-16: Math content scope (owner: exemplary, not a full year): 3 units / 11 lessons mapped to textbook Part 1 units 2, 3+4 and 5. Science stays placeholder until the owner provides the textbook. Shape emoji: 🔲 for square (Emoji 1), ▬ text glyph for rectangle, to be replaced by inline SVG shapes (UI proposals).

@@ -116,7 +116,7 @@ The ten defects of the earlier prototype are fixed or removed (stars ignored sco
 1. Device verification pending: TTS, haptics, tracing and persistence are not yet checked on a real Android phone (Task 6.4).
 2. Science content is a placeholder until the owner provides the textbook.
 3. Native Arabic speaker review of all authored content is pending.
-4. The Playwright suite still targets the old routes and is rewritten in Task 6.3.
+4. Playwright covers navigation, scoring, tracing, math, science, English mode, axe contrast and the spaced repetition loop (18 tests); device verification of the APK is pending.
 5. Accessibility pass pending (Task 6.1): back link colour on gradients, header rows mirrored in Arabic, activity instruction strings in `UiText`.
 6. Backlog from `docs/superpowers/plans/PROGRESS.md`: speech `onDone` guard, title fallback by text length, stop speech before `router.replace`, `withAlpha` dev assertion, a shared `useChoiceRound`, retry hydration when both storage reads fail, one rewrite of a v2 blob per launch.
 7. Arabic dual and plural wording for review and streak counts was fixed in the last commits. Keep using the shared label helper (`lib/labels.ts`).

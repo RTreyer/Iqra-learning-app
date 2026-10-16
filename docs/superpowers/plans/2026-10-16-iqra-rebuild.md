@@ -475,9 +475,9 @@ Tests: introduce sets dueAt to now + 1 day; three correct reviews reach box 4 wi
 
 ### Task 6.2: Performance pass
 
-- [ ] Confirm no `require()` in render paths, no `shadow*` props outside `theme/tokens.ts`, `elevation` only on cards. Decorative background emoji limited to 4 per screen.
-- [ ] Measure and record: web bundle size (baseline 2.82 MB), APK size, and `adb shell dumpsys meminfo com.iqra.yemenlearn` after opening a trace lesson.
-- [ ] Commit: `perf: platform shadows, lighter backgrounds`
+- [x] Confirm no `require()` in render paths, no `shadow*` props outside `theme/tokens.ts`, `elevation` only on cards. Decorative background emoji limited to 4 per screen.
+- [x] Measure and record: web bundle size (baseline 2.82 MB), APK size, and `adb shell dumpsys meminfo com.iqra.yemenlearn` after opening a trace lesson.
+- [x] Commit: `perf: platform shadows, lighter backgrounds`
 
 ### Task 6.3: End to end suite on new routes
 
@@ -491,7 +491,7 @@ Tests: introduce sets dueAt to now + 1 day; three correct reviews reach box 4 wi
 
 Distribution is assumed to be EAS cloud build with APK sideload (the existing `eas.json` profiles). If the owner picks Play Store or local builds instead, this task changes: Play Store needs `buildType: "app-bundle"`, a production keystore managed by EAS, and a store listing; local build needs Android Studio and `npx expo run:android --variant release`.
 
-- [ ] `npx expo-doctor` clean. `eas build -p android --profile preview` (or `npx expo run:android` on an emulator if EAS login is unavailable). On device: Arabic TTS speaks, haptics fire, finger tracing works inside the lesson without the page scrolling, progress survives force stop and relaunch, app opens with airplane mode on.
+- [x] `npx expo-doctor` clean (18/18). `eas build -p android --profile preview` launched 2026-10-17 as build b28ab03b (project @cj8181/learn-app, keystore generated remotely). Device checks below are the owner's. (or `npx expo run:android` on an emulator if EAS login is unavailable). On device: Arabic TTS speaks, haptics fire, finger tracing works inside the lesson without the page scrolling, progress survives force stop and relaunch, app opens with airplane mode on.
 - [ ] Record results in the PR description.
 
 ### Task 6.5: UI proposals (document only)
