@@ -4,7 +4,7 @@ import { NumberQuiz, mathStyles } from "./math/NumberQuiz";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import type { ActivityProps } from "./types";
 
-const PROMPT = "كَمْ عَدَدُهَا؟";
+const PROMPT = { shown: "كَمْ عَدَدُهَا؟", spoken: "كَمْ عَدَدُهَا؟" };
 
 function Counting(props: ActivityProps<"counting">) {
   const { rounds } = props.lesson;

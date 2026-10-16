@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import { Text, View } from "react-native";
 import type { ArithmeticRound } from "@/content/types";
-import { toArabicDigits } from "@/lib/arabicNumbers";
+import { numberToArabicWord, toArabicDigits } from "@/lib/arabicNumbers";
 import { NumberQuiz, mathStyles } from "./math/NumberQuiz";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import type { ActivityProps } from "./types";
@@ -21,9 +21,15 @@ function DotGroup({ count, color }: { count: number; color: string }) {
 function Arithmetic(props: ActivityProps<"arithmetic">) {
   const { rounds } = props.lesson;
   const roundOf = useCallback((i: number) => ({ options: rounds[i].options, answer: answerOf(rounds[i]) }), [rounds]);
-  // Digits are spoken as written; reading numbers as Arabic words is out of scope.
+  // Shown with digits and symbols; spoken as the textbook reads it, e.g. "ثَلاثَة زَائِد اثْنَان يُسَاوِي كَمْ؟".
   const promptOf = useCallback(
-    (i: number) => `${toArabicDigits(rounds[i].a)} ${rounds[i].op} ${toArabicDigits(rounds[i].b)} = ؟`,
+    (i: number) => {
+      const { a, b, op } = rounds[i];
+      return {
+        shown: `${toArabicDigits(a)} ${op} ${toArabicDigits(b)} = ؟`,
+        spoken: `${numberToArabicWord(a)} ${op === "+" ? "زَائِد" : "نَاقِص"} ${numberToArabicWord(b)} يُسَاوِي كَمْ؟`,
+      };
+    },
     [rounds],
   );
   const renderVisual = useCallback(

@@ -12,7 +12,12 @@ const lesson: Extract<Lesson, { type: "arithmetic" }> = {
   ],
 };
 
-beforeEach(() => jest.useFakeTimers());
+const speech = jest.requireMock("expo-speech") as { speak: jest.Mock };
+
+beforeEach(() => {
+  jest.useFakeTimers();
+  jest.clearAllMocks();
+});
 afterEach(() => jest.useRealTimers());
 
 test("renders the equation with Arabic digits and scores the rounds", () => {
@@ -22,10 +27,15 @@ test("renders the equation with Arabic digits and scores the rounds", () => {
     <ArithmeticActivity lesson={lesson} color="#7C3AED" attemptKey="x:1" onComplete={onComplete} onRoundResult={onRoundResult} />,
   );
   expect(screen.getByText("٢ + ٣ = ؟")).toBeTruthy();
+  act(() => jest.advanceTimersByTime(400));
+  expect(speech.speak).toHaveBeenLastCalledWith("اثْنَان زَائِد ثَلاثَة يُسَاوِي كَمْ؟", expect.anything());
   fireEvent.press(screen.getByRole("button", { name: "٦" }));
+  expect(speech.speak).toHaveBeenLastCalledWith("خَمْسَة", expect.anything());
   expect(screen.getByRole("button", { name: "٥" })).toBeDisabled();
   act(() => jest.advanceTimersByTime(900));
   expect(screen.getByText("٧ - ٤ = ؟")).toBeTruthy();
+  act(() => jest.advanceTimersByTime(400));
+  expect(speech.speak).toHaveBeenLastCalledWith("سَبْعَة نَاقِص أَرْبَعَة يُسَاوِي كَمْ؟", expect.anything());
   fireEvent.press(screen.getByRole("button", { name: "٣" }));
   act(() => jest.advanceTimersByTime(900));
   expect(onComplete).toHaveBeenCalledWith({ correct: 1, total: 2 });

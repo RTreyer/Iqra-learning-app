@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, type ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import type { Lesson } from "@/content/types";
-import { toArabicDigits } from "@/lib/arabicNumbers";
+import { numberToArabicWord, toArabicDigits } from "@/lib/arabicNumbers";
 import { speak } from "@/lib/speech";
 import { colors, touchTarget } from "@/theme/tokens";
 import { ChoiceCard } from "../shared/ChoiceCard";
@@ -17,8 +17,8 @@ type Props = Omit<ActivityProps<MathLesson["type"]>, "lesson"> & {
   lesson: MathLesson;
   /** Options and answer of each round. */
   roundOf: (index: number) => { options: number[]; answer: number };
-  /** Spoken and shown question for a round. */
-  promptOf: (index: number) => string;
+  /** Question for a round: `shown` uses digits and symbols, `spoken` reads numbers as words. */
+  promptOf: (index: number) => { shown: string; spoken: string };
   renderVisual: (index: number) => ReactNode;
 };
 
@@ -33,22 +33,22 @@ export function NumberQuiz({ lesson, color, attemptKey, onComplete, onRoundResul
   const labels = useMemo(() => shuffled.items.map(toArabicDigits), [shuffled.items]);
   const maxOptions = useMemo(() => Math.max(...lesson.rounds.map((r) => r.options.length)), [lesson.rounds]);
   const { values, bounce } = useBounce(maxOptions);
-  const prompt = promptOf(quiz.roundIndex);
+  const { shown, spoken } = promptOf(quiz.roundIndex);
 
   useEffect(() => {
-    const t = setTimeout(() => speak(prompt), PROMPT_DELAY_MS);
+    const t = setTimeout(() => speak(spoken), PROMPT_DELAY_MS);
     return () => clearTimeout(t);
-  }, [prompt, quiz.roundIndex]);
+  }, [spoken, quiz.roundIndex]);
 
   const handlePick = useCallback(
     (idx: number) => {
       const correct = idx === shuffled.correctIndex;
       if (!pick(idx, correct)) return;
       if (correct) {
-        speak("أحسنت!");
+        speak("أَحْسَنْت");
         bounce(idx, 1.2);
       } else {
-        speak(toArabicDigits(answer));
+        speak(numberToArabicWord(answer));
       }
     },
     [shuffled.correctIndex, pick, bounce, answer],
@@ -58,9 +58,9 @@ export function NumberQuiz({ lesson, color, attemptKey, onComplete, onRoundResul
     <View style={act.container}>
       <ProgressDots count={total} current={quiz.roundIndex} color={color} />
       <View style={styles.visual}>{renderVisual(quiz.roundIndex)}</View>
-      <Pressable accessibilityRole="button" style={styles.question} onPress={() => speak(prompt)}>
+      <Pressable accessibilityRole="button" style={styles.question} onPress={() => speak(spoken)}>
         <Text style={styles.speaker}>🔊</Text>
-        <Text style={styles.questionText}>{prompt}</Text>
+        <Text style={styles.questionText}>{shown}</Text>
       </Pressable>
       <View style={styles.options}>
         {labels.map((label, idx) => (

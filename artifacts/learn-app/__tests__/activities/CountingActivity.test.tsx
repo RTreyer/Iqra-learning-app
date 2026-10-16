@@ -28,14 +28,17 @@ test("shows Eastern Arabic digits, scores first taps and completes", () => {
     <CountingActivity lesson={lesson} color="#7C3AED" attemptKey="c:1" onComplete={onComplete} onRoundResult={onRoundResult} />,
   );
   expect(screen.getAllByText("🍎")).toHaveLength(3);
+  act(() => jest.advanceTimersByTime(400));
+  expect(speech.speak).toHaveBeenLastCalledWith("كَمْ عَدَدُهَا؟", expect.anything());
   expect(screen.getByRole("button", { name: "٣" })).toBeTruthy();
   expect(screen.queryByText("3")).toBeNull();
 
   fireEvent.press(screen.getByRole("button", { name: "٣" }));
+  expect(speech.speak).toHaveBeenLastCalledWith("أَحْسَنْت", expect.anything());
   expect(screen.getByText("✓")).toBeTruthy(); // glyph next to the colour feedback
   act(() => jest.advanceTimersByTime(900));
   fireEvent.press(screen.getByRole("button", { name: "٦" }));
-  expect(speech.speak).toHaveBeenLastCalledWith("٥", expect.anything());
+  expect(speech.speak).toHaveBeenLastCalledWith("خَمْسَة", expect.anything());
   fireEvent.press(screen.getByRole("button", { name: "٥" })); // locked
   act(() => jest.advanceTimersByTime(900));
   fireEvent.press(screen.getByRole("button", { name: "٢" }));
