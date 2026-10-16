@@ -33,9 +33,11 @@ export function UnitCard({ unit, progress, onPress }: Props) {
           <View style={styles.label}>
             <Text style={styles.labelText}>{unit.theme}</Text>
           </View>
-          <View style={styles.label}>
-            <Text style={styles.labelText}>{unit.badgeLabel}</Text>
-          </View>
+          {unit.badgeLabel !== unit.theme ? (
+            <View style={styles.label}>
+              <Text style={styles.labelText}>{unit.badgeLabel}</Text>
+            </View>
+          ) : null}
           <ProgressPill {...progress} />
         </View>
       </View>
