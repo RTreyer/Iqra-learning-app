@@ -219,8 +219,8 @@ module.exports = {
 
 **Files:** create `lib/speech.ts`, `lib/haptics.ts`, `__tests__/speech.test.ts`
 
-- [ ] Test first: `speak("ب")` calls `Speech.stop` then `Speech.speak("ب", { language: "ar", rate: 0.8 })`; when `Speech.speak` throws, `speak` does not.
-- [ ] `lib/speech.ts`:
+- [x] Test first: `speak("ب")` calls `Speech.stop` then `Speech.speak("ب", { language: "ar", rate: 0.8 })`; when `Speech.speak` throws, `speak` does not.
+- [x] `lib/speech.ts`:
 ```ts
 import * as Speech from "expo-speech";
 export const ARABIC_RATE = 0.8;
@@ -229,7 +229,7 @@ export function speak(text: string, rate: number = ARABIC_RATE): void {
 }
 export function stopSpeaking(): void { try { Speech.stop(); } catch {} }
 ```
-- [ ] `lib/haptics.ts`:
+- [x] `lib/haptics.ts`:
 ```ts
 import * as Haptics from "expo-haptics";
 const safe = (p: Promise<void>) => { p.catch(() => {}); };
@@ -239,17 +239,17 @@ export const error = () => safe(Haptics.notificationAsync(Haptics.NotificationFe
 export const warning = () => safe(Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning));
 ```
 Convention: `tap` on any press, `success` on correct, `error` on wrong, `warning` on invalid trace.
-- [ ] Arabic voice detection (owner decision: TTS now, detect and warn). `lib/speech.ts` adds `export async function hasArabicVoice(): Promise<boolean>` using `Speech.getAvailableVoicesAsync()` and matching `voice.language` against `/^ar/i` (web: `speechSynthesis.getVoices()`, true when unavailable to avoid false warnings). `app/_layout.tsx` calls it once after mount; when false and `@iqra_voice_hint_shown` is not set in AsyncStorage, show a dismissible banner in Arabic and English: "لَا يُوجَدُ صَوْتٌ عَرَبِيٌّ عَلَى هٰذَا الْجِهَاز. اطلُب مِن شَخْصٍ بَالِغٍ تَثْبِيت صَوْت عَرَبِيّ مِن إِعْدَادَات تَحْوِيل النَّصّ إِلَى كَلَام." / "No Arabic voice is installed. Ask an adult to install an Arabic voice in the device's text to speech settings." Dismiss sets the flag. Tests: voices with `ar-SA` → true; only `en-US` → false; banner shown once.
-- [ ] Commit: `feat: shared speech and haptics helpers, Arabic voice detection`
+- [x] Arabic voice detection (owner decision: TTS now, detect and warn). `lib/speech.ts` adds `export async function hasArabicVoice(): Promise<boolean>` using `Speech.getAvailableVoicesAsync()` and matching `voice.language` against `/^ar/i` (web: `speechSynthesis.getVoices()`, true when unavailable to avoid false warnings). `app/_layout.tsx` calls it once after mount; when false and `@iqra_voice_hint_shown` is not set in AsyncStorage, show a dismissible banner in Arabic and English: "لَا يُوجَدُ صَوْتٌ عَرَبِيٌّ عَلَى هٰذَا الْجِهَاز. اطلُب مِن شَخْصٍ بَالِغٍ تَثْبِيت صَوْت عَرَبِيّ مِن إِعْدَادَات تَحْوِيل النَّصّ إِلَى كَلَام." / "No Arabic voice is installed. Ask an adult to install an Arabic voice in the device's text to speech settings." Dismiss sets the flag. Tests: voices with `ar-SA` → true; only `en-US` → false; banner shown once.
+- [x] Commit: `feat: shared speech and haptics helpers, Arabic voice detection`
 
 ### Task 3.2: Theme tokens
 
 **Files:** create `theme/tokens.ts`; delete `constants/colors.ts`, `hooks/useColors.ts`; modify `app/+not-found.tsx`, `components/ErrorFallback.tsx`, `components/ScreenBackground.tsx`
 
-- [ ] `theme/tokens.ts`: `colors` (text `#1E293B`, muted `#64748B`, border `#E2E8F0`, surface `#F8FAFC`, success `#059669`, successSoft `#D1FAE5`, danger `#EF4444`, dangerSoft `#FEE2E2`, star `#F59E0B`, cream `#FFFBF0`), `subjects` (arabic `#2563EB`, math `#7C3AED`, science `#059669`), `radius` (sm 12, md 20, lg 28), `spacing` (xs 4, sm 8, md 16, lg 24, xl 32), `shadow.card = Platform.select({ android: { elevation: 3 }, web: { boxShadow: "0 4px 12px rgba(0,0,0,0.12)" }, default: {} })`, `touchTarget: 48`.
-- [ ] `ScreenBackground.tsx`: gradient variants keyed by `Subject | "home"`, colors from tokens.
-- [ ] Replace `useColors` usages with token imports. No dark mode (listed in UI proposals).
-- [ ] Commit: `refactor: central theme tokens`
+- [x] `theme/tokens.ts`: `colors` (text `#1E293B`, muted `#64748B`, border `#E2E8F0`, surface `#F8FAFC`, success `#059669`, successSoft `#D1FAE5`, danger `#EF4444`, dangerSoft `#FEE2E2`, star `#F59E0B`, cream `#FFFBF0`), `subjects` (arabic `#2563EB`, math `#7C3AED`, science `#059669`), `radius` (sm 12, md 20, lg 28), `spacing` (xs 4, sm 8, md 16, lg 24, xl 32), `shadow.card = Platform.select({ android: { elevation: 3 }, web: { boxShadow: "0 4px 12px rgba(0,0,0,0.12)" }, default: {} })`, `touchTarget: 48`.
+- [x] `ScreenBackground.tsx`: gradient variants keyed by `Subject | "home"`, colors from tokens.
+- [x] Replace `useColors` usages with token imports. No dark mode (listed in UI proposals).
+- [x] Commit: `refactor: central theme tokens`
 
 ### Task 3.3: Scoring and progress helper
 
@@ -285,7 +285,7 @@ type ProgressState = {
 
 **Files:** create `lib/routes.ts`
 
-- [ ] ```ts
+- [x] ```ts
 import type { Href } from "expo-router";
 export const routes = {
   home: (): Href => "/",
@@ -295,7 +295,7 @@ export const routes = {
 };
 ```
 No raw href strings anywhere else (lint rule from Task 2.1 enforces the `(tabs)` ban; review enforces the rest).
-- [ ] Commit: `feat: typed route helpers`
+- [x] Commit: `feat: typed route helpers`
 
 ---
 

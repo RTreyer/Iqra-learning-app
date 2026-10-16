@@ -52,12 +52,12 @@ To make it self-resuming after a usage limit reset, run inside the session (loca
 | 2.2 Jest with jest-expo | done | da82449, 62d2de7 | hoisted node_modules (delete node_modules and reinstall once), `expo-.*` added to transform allow list, 1 jest + 4 data tests |
 | 2.3 Playwright harness | done | 229d8cb | baseline suite converted to @playwright/test, serial shared page, 14 pass + axe skipped until axe-core added |
 | 2.4 CI | done | f5cd869 | verified inline by controller (single yaml) |
-| 3.1 Speech, haptics, voice detection | in progress | | |
-| 3.2 Theme tokens | | | |
-| 3.3 Scoring and progress v2 | | | |
-| 3.4 Typed routes helper | | | |
-| 4.1 Content model | | | |
-| 4.2 Move Arabic content | | | |
+| 3.1 Speech, haptics, voice detection | done | 813b592, c339eb0, 56284e1 | spec + code review passed; banner is an absolute overlay; web waits once for voiceschanged |
+| 3.2 Theme tokens | done | 75dc06e | spec review passed; legacy `variant` prop kept until 4.4 |
+| 3.3 Scoring and progress v2 | fixing | ded07c5 | code review: read error could wipe stars, early reset resurrected; reducer + effect persistence fix in progress |
+| 3.4 Typed routes helper | done | 0896104 | includes `review()` |
+| 4.1 Content model | in progress | | combined with 4.2 in one agent, two commits |
+| 4.2 Move Arabic content | in progress | | legacy constants files kept until 4.4 so typecheck stays green |
 | 4.3 Activity components | | | 3 commits |
 | 4.4 Screens | | | |
 | 5.1 Science content | | | placeholder, flagged |
@@ -91,6 +91,9 @@ To make it self-resuming after a usage limit reset, run inside the session (loca
 - 2026-10-16: Execution paused by owner after Task 1.1 to preserve usage limit. Resume with the prompt above.
 - 2026-10-16 (evening): Owner restarted the run. Session loop active every 10 minutes (cron job e35b9185, session only). Commits stay local, nothing is pushed without explicit owner approval.
 - 2026-10-16: Model policy (owner: "use the appropriate models to stay efficient"). Implementers: sonnet for config, deletion and data tasks (1.2, 1.3, 2.x, 3.2, 3.4, 5.1, 5.2, 5.6, 6.5); opus for multi file code tasks (3.1, 3.3, 4.x, 5.3 to 5.5, 6.1 to 6.4). Spec reviewers: sonnet. Code quality reviewers: opus. Config only tasks get spec review only.
+- 2026-10-16: Implementers no longer run in parallel after a shared git index swept Task 3.2 deletions into a Task 3.1 commit (history rewritten locally before anything was pushed: c339eb0, 75dc06e, 0896104). Rule: all agents commit with `git commit --only <paths>`; at most one implementer writes at a time unless file sets are disjoint and both use `--only`.
+- 2026-10-16: Task 4.2 keeps the six legacy `constants/*` files (with a LEGACY comment) until Task 4.4 deletes `app/(tabs)`, so typecheck stays green between tasks.
+- 2026-10-16: Code quality review skipped for 3.2 (token values verified one by one) and 3.4 (nine lines).
 - 2026-10-16: Code quality review skipped for 2.1 to 2.4 (config, mechanical autofix and harness conversion, each verified line by line by the spec review). Full code quality reviews start with 3.1.
 - 2026-10-16: Task 2.1 lint fix in useLessonAttempt initially dropped `lessonKey` from the focus effect deps (behaviour regression). Fixed in b4b013c with useCallback keyed on lessonKey. Repo-wide Prettier format deferred to avoid a noise diff; run `pnpm --filter @workspace/learn-app run format` once after Phase 4.
 - 2026-10-16: Task 1.2 kept `expo-font` as a dependency because `@expo/vector-icons` (used by BackButton, ErrorFallback, UiChevron and screens) requires it as a peer; the `expo-font` plugin and custom fonts are gone. Replacing vector icons with inline SVG is noted for the UI proposals (Task 6.5).
