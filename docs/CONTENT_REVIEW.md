@@ -10,3 +10,7 @@ A native Arabic speaker review of all authored content is pending (owner item). 
 | s1 | science | جِسْمِي | placeholder, no source yet | placeholder | | |
 | s2 | science | الْحَيَوَانَات | placeholder, no source yet | placeholder | | |
 | s3 | science | النَّبَاتَات وَالْمَاء | placeholder, no source yet | placeholder | | |
+
+## Rendering notes
+
+▬ (U+25AC) is a text glyph and renders monochrome on Android; replace shape emoji with inline SVG shapes (see docs/UI_PROPOSALS.md).

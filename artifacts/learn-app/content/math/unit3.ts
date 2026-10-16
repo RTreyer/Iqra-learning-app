@@ -31,7 +31,7 @@ export const mathUnit3: Unit = {
         { left: { emoji: "🚪", word: "بَاب" }, right: rectangle },
         { left: { emoji: "⚽", word: "كُرَة" }, right: circle },
         { left: { emoji: "⚠️", word: "إِشَارَة" }, right: triangle },
-        { left: { emoji: "🪟", word: "نَافِذَة" }, right: square },
+        { left: { emoji: "🎁", word: "هَدِيَّة" }, right: square },
       ],
     },
     {
