@@ -7,7 +7,7 @@ export type NamingItem = { emoji: string; word: string };
 
 export type ListenPickQuestion = {
   word: string;
-  choices: Array<{ emoji: string; word: string }>;
+  choices: { emoji: string; word: string }[];
   correctIndex: number;
 };
 

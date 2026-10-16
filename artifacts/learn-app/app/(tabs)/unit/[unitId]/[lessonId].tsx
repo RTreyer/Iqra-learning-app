@@ -37,7 +37,7 @@ function speakArabic(text: string) {
 
 function StoryActivity({ storyTitle, lines, color, onComplete }: {
   storyTitle: string;
-  lines: Array<{ text: string; emoji: string }>;
+  lines: { text: string; emoji: string }[];
   color: string;
   onComplete: () => void;
 }) {
@@ -84,7 +84,7 @@ function StoryActivity({ storyTitle, lines, color, onComplete }: {
 // ── Naming ────────────────────────────────────────────────────────────────────
 
 function NamingActivity({ items, color, onComplete }: {
-  items: Array<{ emoji: string; word: string }>;
+  items: { emoji: string; word: string }[];
   color: string;
   onComplete: () => void;
 }) {
@@ -129,13 +129,12 @@ function NamingActivity({ items, color, onComplete }: {
 // ── Letter Pick ───────────────────────────────────────────────────────────────
 
 function LetterPickActivity({ rounds, color, onComplete }: {
-  rounds: Array<{ targetLetter: string; letters: string[]; correctIndex: number }>;
+  rounds: { targetLetter: string; letters: string[]; correctIndex: number }[];
   color: string;
   onComplete: () => void;
 }) {
   const [roundIndex, setRoundIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
-  const [score, setScore] = useState(0);
   const bounceAnims = useRef(rounds[0].letters.map(() => new Animated.Value(1))).current;
 
   const round = rounds[roundIndex];
@@ -150,7 +149,6 @@ function LetterPickActivity({ rounds, color, onComplete }: {
     setSelected(idx);
     const correct = idx === round.correctIndex;
     if (correct) {
-      setScore((s) => s + 1);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       speakArabic("أحسنت!");
       Animated.sequence([
@@ -209,7 +207,7 @@ function LetterPickActivity({ rounds, color, onComplete }: {
 // ── Word Read ─────────────────────────────────────────────────────────────────
 
 function WordReadActivity({ rounds, color, onComplete }: {
-  rounds: Array<{ word: string; choices: string[]; correctIndex: number }>;
+  rounds: { word: string; choices: string[]; correctIndex: number }[];
   color: string;
   onComplete: () => void;
 }) {
@@ -289,7 +287,7 @@ function WordReadActivity({ rounds, color, onComplete }: {
 // ── Listen & Pick ─────────────────────────────────────────────────────────────
 
 function ListenPickActivity({ questions, color, onComplete }: {
-  questions: Array<{ word: string; choices: Array<{ emoji: string; word: string }>; correctIndex: number }>;
+  questions: { word: string; choices: { emoji: string; word: string }[]; correctIndex: number }[];
   color: string;
   onComplete: () => void;
 }) {

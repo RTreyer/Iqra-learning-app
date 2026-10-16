@@ -12,7 +12,7 @@ export function useLessonAttempt(lessonKey: string) {
 
   useFocusEffect(useCallback(() => {
     restartAttempt();
-  }, [lessonKey, restartAttempt]));
+  }, [restartAttempt]));
 
   const completeAttempt = useCallback(() => setFinishedKey(lessonKey), [lessonKey]);
   return {

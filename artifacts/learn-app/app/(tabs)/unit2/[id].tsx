@@ -44,7 +44,7 @@ function StoryActivity({
   onComplete,
 }: {
   storyTitle: string;
-  lines: Array<{ text: string; emoji: string }>;
+  lines: { text: string; emoji: string }[];
   color: string;
   onComplete: () => void;
 }) {
@@ -107,7 +107,7 @@ function NamingActivity({
   color,
   onComplete,
 }: {
-  items: Array<{ emoji: string; word: string }>;
+  items: { emoji: string; word: string }[];
   color: string;
   onComplete: () => void;
 }) {
@@ -172,13 +172,12 @@ function LetterPickActivity({
 }: {
   targetLetter: string;
   targetWord: string;
-  rounds: Array<{ letters: string[]; correctIndex: number }>;
+  rounds: { letters: string[]; correctIndex: number }[];
   color: string;
   onComplete: () => void;
 }) {
   const [roundIndex, setRoundIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
-  const [score, setScore] = useState(0);
   const bounceAnims = useRef(rounds[0].letters.map(() => new Animated.Value(1))).current;
 
   const round = rounds[roundIndex];
@@ -194,7 +193,6 @@ function LetterPickActivity({
       setSelected(idx);
       const correct = idx === round.correctIndex;
       if (correct) {
-        setScore((s) => s + 1);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         speakArabic("أحسنت!");
         Animated.sequence([
@@ -280,7 +278,7 @@ function WordReadActivity({
   color,
   onComplete,
 }: {
-  rounds: Array<{ word: string; choices: string[]; correctIndex: number }>;
+  rounds: { word: string; choices: string[]; correctIndex: number }[];
   color: string;
   onComplete: () => void;
 }) {
@@ -409,7 +407,7 @@ function ListenPickActivity({
   color,
   onComplete,
 }: {
-  questions: Array<{ word: string; choices: Array<{ emoji: string; word: string }>; correctIndex: number }>;
+  questions: { word: string; choices: { emoji: string; word: string }[]; correctIndex: number }[];
   color: string;
   onComplete: () => void;
 }) {

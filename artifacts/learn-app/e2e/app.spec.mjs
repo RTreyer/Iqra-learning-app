@@ -47,7 +47,6 @@ async function playLetterPick(correct) {
   const idx = [0,1,0,2,0];
   for (let r = 0; r < 5; r++) {
     await page.waitForTimeout(300);
-    const choices = page.locator("text=ابحث عن الحرف").locator("xpath=ancestor::div[1]/following-sibling::div[2]//div[@role='button' or @tabindex='0']");
     // fallback: pick by visible letters under the choices row
     const row = page.locator("div").filter({ hasText: /^سؤال \d من 5$/ }).first().locator("xpath=following-sibling::div[1]");
     const btns = row.locator("[role=button], [tabindex='0']");
@@ -187,7 +186,7 @@ test("T14 accessibility (axe-core) on home, book and lesson", async (t) => {
   const results = {};
   for (const [name, path] of [["home","/"],["book","/book/1/arabic-1-part1"],["lesson","/unit/2/u2-3"]]) {
     await go(path); await page.addScriptTag({ content: axeSrc });
-    const r = await page.evaluate(async () => { const res = await axe.run(document, { runOnly: ["wcag2a","wcag2aa"] }); return res.violations.map(v => ({ id: v.id, impact: v.impact, nodes: v.nodes.length })); });
+    const r = await page.evaluate(async () => { const res = await window.axe.run(document, { runOnly: ["wcag2a","wcag2aa"] }); return res.violations.map(v => ({ id: v.id, impact: v.impact, nodes: v.nodes.length })); });
     results[name] = r;
   }
   console.log("   axe violations:", JSON.stringify(results, null, 1));

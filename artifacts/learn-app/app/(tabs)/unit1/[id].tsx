@@ -42,7 +42,7 @@ function NamingActivity({
   color,
   onComplete,
 }: {
-  items: Array<{ emoji: string; word: string }>;
+  items: { emoji: string; word: string }[];
   color: string;
   onComplete: () => void;
 }) {
@@ -106,7 +106,7 @@ function ListenPickActivity({
   color,
   onComplete,
 }: {
-  questions: Array<{ word: string; choices: Array<{ emoji: string; word: string }>; correctIndex: number }>;
+  questions: { word: string; choices: { emoji: string; word: string }[]; correctIndex: number }[];
   color: string;
   onComplete: () => void;
 }) {
@@ -236,7 +236,7 @@ function BehaviorActivity({
   color,
   onComplete,
 }: {
-  behaviors: Array<{ emoji: string; description: string; isCorrect: boolean }>;
+  behaviors: { emoji: string; description: string; isCorrect: boolean }[];
   color: string;
   onComplete: () => void;
 }) {
@@ -326,7 +326,7 @@ function MatchingActivity({
   color,
   onComplete,
 }: {
-  pairs: Array<{ left: { emoji: string; word: string }; right: { emoji: string; word: string } }>;
+  pairs: { left: { emoji: string; word: string }; right: { emoji: string; word: string } }[];
   color: string;
   onComplete: () => void;
 }) {
@@ -438,7 +438,7 @@ function DrawingActivity({
   color,
   onComplete,
 }: {
-  shapes: Array<{ label: string; emoji: string; instruction: string }>;
+  shapes: { label: string; emoji: string; instruction: string }[];
   color: string;
   onComplete: () => void;
 }) {

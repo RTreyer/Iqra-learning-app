@@ -48,7 +48,6 @@ export default function UnitIndexScreen() {
   }
 
   const doneCount = unit.lessons.filter((l) => getLessonProgress(l.id).completed).length;
-  const lettersDisplay = unit.letters.join("  ");
 
   return (
     <ScreenBackground variant="reading" style={[styles.container, { paddingTop: topPad }]}>

@@ -101,14 +101,14 @@ export default function BookScreen() {
       label: "الوحدة الأولى",
       color: "#059669",
       route: "/(tabs)/unit1",
-      done: (unit1Lessons as Array<{ id: string }>).filter((l) => progress.lessons[l.id]?.completed).length,
-      total: (unit1Lessons as Array<{ id: string }>).length,
+      done: (unit1Lessons as { id: string }[]).filter((l) => progress.lessons[l.id]?.completed).length,
+      total: (unit1Lessons as { id: string }[]).length,
       emoji: "🌱",
     });
   }
   // Units 2–8 — dynamic lookup from allUnitsLessons
   {
-    const { allUnitsLessons } = require("@/constants/allUnitsLessons") as { allUnitsLessons: Array<{ id: string; title: string; emoji: string; color: string; lessons: Array<{ id: string }> }> };
+    const { allUnitsLessons } = require("@/constants/allUnitsLessons") as { allUnitsLessons: { id: string; title: string; emoji: string; color: string; lessons: { id: string }[] }[] };
     for (let n = 2; n <= 8; n++) {
       const key = `unit${n}` as "unit2" | "unit3" | "unit4" | "unit5" | "unit6" | "unit7" | "unit8";
       if (book.modules.includes(key)) {

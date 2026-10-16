@@ -3,7 +3,6 @@
  * Books without content show a "coming soon" badge.
  */
 
-import { Feather } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import React from "react";
 import {

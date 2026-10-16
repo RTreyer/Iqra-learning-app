@@ -20,7 +20,7 @@ export type WordReadRound = {
 };
 export type ComprehensionQuestion = {
   word: string;
-  choices: Array<{ emoji: string; word: string }>;
+  choices: { emoji: string; word: string }[];
   correctIndex: number;
 };
 

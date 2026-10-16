@@ -9,7 +9,9 @@
     "android": "expo start --android",
     "build": "expo export --platform web",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test:language": "node --test scripts/test-ui-translations.mjs"
+    "test:language": "node --test scripts/test-ui-translations.mjs",
+    "lint": "eslint .",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -38,6 +40,8 @@
     "@types/react-dom": "~19.1.7",
     "babel-preset-expo": "~54.0.12",
     "prettier": "^3.0.0",
-    "typescript": "~5.9.2"
+    "typescript": "~5.9.2",
+    "eslint": "^9",
+    "eslint-config-expo": "~10.0.0"
   }
 }
