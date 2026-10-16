@@ -1,27 +1,36 @@
 /**
- * Home screen: one large card per book of the Grade 1 catalog.
+ * Home screen: guidance (continue, today's review, streak) above one large
+ * card per book of the Grade 1 catalog.
  */
 
 import { router } from "expo-router";
-import React from "react";
+import React, { useMemo } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { BookCard } from "@/components/BookCard";
+import { ContinueCard } from "@/components/ContinueCard";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
+import { ReviewCard } from "@/components/ReviewCard";
 import { ScreenBackground } from "@/components/ScreenBackground";
 import { StarBadge } from "@/components/StarBadge";
+import { StreakBadge } from "@/components/StreakBadge";
 import { UiText } from "@/components/UiText";
 import { books } from "@/content";
 import { useLanguage } from "@/context/LanguageContext";
 import { useProgress } from "@/context/ProgressContext";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
+import { nextLesson } from "@/lib/nextLesson";
 import { routes } from "@/lib/routes";
+import { currentStreak } from "@/lib/streak";
 import { colors } from "@/theme/tokens";
 
 export default function HomeScreen() {
   const { t } = useLanguage();
-  const { progress } = useProgress();
+  const { progress, getDueItemIds } = useProgress();
   const pad = useScreenPadding();
+  const next = useMemo(() => nextLesson(progress), [progress]);
+  const streak = useMemo(() => currentStreak(progress.activity.days, new Date()), [progress]);
+  const dueCount = getDueItemIds().length;
 
   return (
     <ScreenBackground style={[styles.container, { paddingTop: pad.top + 8 }]}>
@@ -29,7 +38,7 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <View style={styles.badges}>
           <StarBadge stars={progress.totalStars} />
-          {/* Task 5.5: StreakBadge goes here, beside the star badge. */}
+          {streak >= 2 && <StreakBadge days={streak} />}
         </View>
         <View style={styles.userRow}>
           <Text style={styles.userName} numberOfLines={1}>
@@ -44,7 +53,8 @@ export default function HomeScreen() {
         contentContainerStyle={[styles.list, { paddingBottom: pad.bottom + 16 }]}
         showsVerticalScrollIndicator={false}
       >
-        {/* Task 5.5: ContinueCard and ReviewCard go here, above the book cards. */}
+        {next && <ContinueCard next={next} onPress={() => router.push(routes.lesson(next.lesson.id))} />}
+        {dueCount > 0 && <ReviewCard count={dueCount} onPress={() => router.push(routes.review())} />}
         <UiText style={styles.subtitle}>اختَر الكتاب</UiText>
         {books.map((book) => (
           <BookCard

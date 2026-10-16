@@ -123,6 +123,7 @@ const english: Record<string, string> = {
   "أَحْسَنْت! مُرَاجَعَة الْيَوْم مُكْتَمِلَة": "Well done! Today's review is complete",
   "عناصر": "items",
   "يَوْم مُتَتَالٍ": "day streak",
+  "تَابِعْ:": "Continue:",
 };
 
 export function translateUi(text: string, language: UiLanguage): string {
