@@ -13,6 +13,8 @@ test("English controls, auth errors and book menus", () => {
   assert.equal(translateUi("مسح", "en"), "Clear");
   assert.equal(translateUi("إعادة الدرس", "en"), "Repeat lesson");
   assert.equal(translateUi("إعادة الوحدة", "en"), "Repeat unit");
+  assert.equal(translateUi("3 جملة متبقية", "en"), "3 sentences left");
+  assert.equal(translateUi("2 كلمة متبقية", "en"), "2 words left");
   assert.equal(translateUi("تعذّر تسجيل الدخول. حاول مرة أخرى.", "en"), "Sign-in failed. Please try again.");
   for (const grade of grades) {
     assert.equal(translateUi(grade.label, "en"), `Grade ${grade.id}`);

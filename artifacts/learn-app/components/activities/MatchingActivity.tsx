@@ -1,0 +1,133 @@
+import React, { useCallback, useState } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import * as haptics from "@/lib/haptics";
+import { speak } from "@/lib/speech";
+import { colors, touchTarget } from "@/theme/tokens";
+import { DoneButton } from "./shared/DoneButton";
+import { act } from "./shared/styles";
+import { useShuffled } from "./shared/useShuffled";
+import { withAttemptReset } from "./shared/withAttemptReset";
+import type { ActivityProps } from "./types";
+
+type State = {
+  selectedLeft: number | null;
+  /** Pair indices matched so far. */
+  matched: ReadonlySet<number>;
+  /** Pair indices whose first right tap was wrong. */
+  missed: ReadonlySet<number>;
+};
+
+const INITIAL: State = { selectedLeft: null, matched: new Set(), missed: new Set() };
+
+function Matching({ lesson, color, attemptKey, onComplete }: ActivityProps<"matching">) {
+  const { pairs } = lesson;
+  const [state, setState] = useState<State>(INITIAL);
+  // Shuffle the right column per attempt; only the order array is used.
+  const right = useShuffled(pairs, 0, attemptKey, "match");
+
+  const handleLeft = useCallback((i: number) => {
+    haptics.tap();
+    setState((s) => (s.matched.has(i) ? s : { ...s, selectedLeft: i }));
+  }, []);
+
+  const handleRight = useCallback(
+    (pairIdx: number) => {
+      const left = state.selectedLeft;
+      if (left === null || state.matched.has(pairIdx)) return;
+      if (left === pairIdx) {
+        haptics.success();
+        speak("أحسنت!");
+        setState((s) => ({ ...s, selectedLeft: null, matched: new Set(s.matched).add(pairIdx) }));
+      } else {
+        haptics.error();
+        setState((s) => ({ ...s, selectedLeft: null, missed: new Set(s.missed).add(left) }));
+      }
+    },
+    [state],
+  );
+
+  const allMatched = state.matched.size >= pairs.length;
+  const correct = pairs.length - state.missed.size;
+  const finish = useCallback(
+    () => onComplete({ correct, total: pairs.length }),
+    [onComplete, correct, pairs.length],
+  );
+
+  return (
+    <View style={act.container}>
+      <Text style={act.instruction}>اضغط على شيء في اليمين ثم ما يناسبه في اليسار</Text>
+      <View style={styles.grid}>
+        <View style={styles.column}>
+          {pairs.map((pair, i) => (
+            <Pressable
+              key={i}
+              testID={`match-left-${i}`}
+              accessibilityRole="button"
+              accessibilityLabel={pair.left.word}
+              accessibilityState={{ selected: state.selectedLeft === i }}
+              style={[
+                styles.item,
+                state.selectedLeft === i && { borderColor: color, borderWidth: 3 },
+                state.matched.has(i) && { backgroundColor: color + "22", borderColor: color, borderWidth: 2 },
+              ]}
+              onPress={() => handleLeft(i)}
+            >
+              <Text style={styles.emoji}>{pair.left.emoji}</Text>
+              <Text style={styles.word}>{pair.left.word}</Text>
+            </Pressable>
+          ))}
+        </View>
+        <View style={styles.arrows}>
+          {pairs.map((_, i) => (
+            <Text key={i} style={styles.arrow}>
+              ↔
+            </Text>
+          ))}
+        </View>
+        <View style={styles.column}>
+          {right.order.map((pairIdx) => (
+            <Pressable
+              key={pairIdx}
+              testID={`match-right-${pairIdx}`}
+              accessibilityRole="button"
+              accessibilityLabel={pairs[pairIdx].right.word}
+              style={[styles.item, state.matched.has(pairIdx) && styles.itemMatched]}
+              onPress={() => handleRight(pairIdx)}
+            >
+              <Text style={styles.emoji}>{pairs[pairIdx].right.emoji}</Text>
+              <Text style={styles.word}>{pairs[pairIdx].right.word}</Text>
+            </Pressable>
+          ))}
+        </View>
+      </View>
+      {allMatched ? <DoneButton testID="activity-done" label="أَحْسَنْت! 🌟 تابع" color={color} onPress={finish} /> : null}
+    </View>
+  );
+}
+
+export const MatchingActivity = withAttemptReset(Matching, "MatchingActivity");
+
+const styles = StyleSheet.create({
+  grid: { flexDirection: "row", gap: 8, alignItems: "center", width: "100%", justifyContent: "center" },
+  column: { flex: 1, gap: 10 },
+  item: {
+    backgroundColor: "rgba(255,255,255,0.9)",
+    borderRadius: 16,
+    padding: 12,
+    alignItems: "center",
+    gap: 4,
+    borderWidth: 2,
+    borderColor: colors.border,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.07,
+    shadowRadius: 4,
+    elevation: 2,
+    minHeight: touchTarget,
+  },
+  itemMatched: { backgroundColor: colors.successSoft, borderColor: colors.success, borderWidth: 2 },
+  emoji: { fontSize: 30 },
+  word: { fontSize: 11, fontWeight: "700", color: "#475569", textAlign: "center" },
+  arrows: { gap: 10, alignItems: "center" },
+  arrow: { fontSize: 20, color: "#94A3B8", height: 68, textAlignVertical: "center", lineHeight: 68 },
+});

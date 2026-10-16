@@ -122,6 +122,8 @@ export function translateUi(text: string, language: UiLanguage): string {
   if (value.startsWith("النشاط التالي: ")) return `Next activity: ${value.slice("النشاط التالي: ".length).replace(/\s*←$/, "")} →`;
   const completed = value.match(/^(\d+)\s*\/\s*(\d+)\s+مكتمل$/);
   if (completed) return `${completed[1]} / ${completed[2]} complete`;
+  const remaining = value.match(/^(\d+)\s+(جملة متبقية|كلمة متبقية)$/);
+  if (remaining) return `${remaining[1]} ${english[remaining[2]]}`;
   const scoredContinue = value.match(/^أَحْسَنْت!\s*(\d+\/\d+)\s*🌟 تابع$/);
   if (scoredContinue) return `${scoredContinue[1]} 🌟 Continue`;
   const behaviorContinue = value.match(/^أَحْسَنْت!\s*(\d+\/\d+)\s*صحيح 🌟 تابع$/);
