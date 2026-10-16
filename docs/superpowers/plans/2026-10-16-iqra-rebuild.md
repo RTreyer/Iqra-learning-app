@@ -145,10 +145,10 @@ Remove `build`, `typecheck:libs`, the `prettier` and `typescript` root devDepend
 
 **Files:** `README.md`, `artifacts/learn-app/context/ProgressContext.tsx`
 
-- [ ] README: title "Iqra (أَقْرَأُ وَأَتَعَلَّمُ)", drop KidLearn, drop the API stack line, commands become root scripts, content table replaced in Task 5.3.
-- [ ] `ProgressContext.tsx`: keep `STORAGE_KEY = "@kidlearn_progress_v1"` with a comment (renaming wipes existing progress). Delete `LEGACY_ACCOUNT_KEY_PREFIX`, `LEGACY_PENDING_KEY_PREFIX` and `migrateAccountProgress`; `loadLocalProgress` returns `defaultState` when the key is absent.
-- [ ] `grep -ri "replit\|kidlearn\|REPL_ID" --exclude-dir=node_modules --exclude=pnpm-lock.yaml .` returns only the storage key line and its comment.
-- [ ] Commit: `chore: remove Replit and KidLearn remnants`
+- [x] README: title "Iqra (أَقْرَأُ وَأَتَعَلَّمُ)", drop KidLearn, drop the API stack line, commands become root scripts, content table replaced in Task 5.3.
+- [x] `ProgressContext.tsx`: keep `STORAGE_KEY = "@kidlearn_progress_v1"` with a comment (renaming wipes existing progress). Delete `LEGACY_ACCOUNT_KEY_PREFIX`, `LEGACY_PENDING_KEY_PREFIX` and `migrateAccountProgress`; `loadLocalProgress` returns `defaultState` when the key is absent.
+- [x] `grep -ri "replit\|kidlearn\|REPL_ID" --exclude-dir=node_modules --exclude=pnpm-lock.yaml .` returns only the storage key line and its comment.
+- [x] Commit: `chore: remove Replit and KidLearn remnants`
 
 ---
 
@@ -158,8 +158,8 @@ Remove `build`, `typecheck:libs`, the `prettier` and `typescript` root devDepend
 
 **Files:** create `artifacts/learn-app/eslint.config.js`, `.prettierrc`; modify `package.json`
 
-- [ ] Dev deps: `eslint ^9`, `eslint-config-expo ~10.0.0`.
-- [ ] `eslint.config.js`:
+- [x] Dev deps: `eslint ^9`, `eslint-config-expo ~10.0.0`.
+- [x] `eslint.config.js`:
 ```js
 const expoConfig = require("eslint-config-expo/flat");
 module.exports = [
@@ -168,9 +168,9 @@ module.exports = [
   { rules: { "no-restricted-syntax": ["error", { selector: "Literal[value=/^\\/\\(tabs\\)/]", message: "Use lib/routes.ts helpers" }] } },
 ];
 ```
-- [ ] `.prettierrc`: `{ "printWidth": 100, "trailingComma": "all" }`. Scripts: `"lint": "eslint ."`, `"format": "prettier --write ."`.
-- [ ] `pnpm lint` passes (fix findings, no blanket disables).
-- [ ] Commit: `chore: add eslint and prettier`
+- [x] `.prettierrc`: `{ "printWidth": 100, "trailingComma": "all" }`. Scripts: `"lint": "eslint ."`, `"format": "prettier --write ."`.
+- [x] `pnpm lint` passes (fix findings, no blanket disables).
+- [x] Commit: `chore: add eslint and prettier`
 
 ### Task 2.2: Jest with jest-expo
 
