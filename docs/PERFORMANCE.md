@@ -11,7 +11,7 @@
 | node_modules (workspace root, hoisted) | 477 MB |
 | Jest | 37 suites, 220 tests, about 2.6 s test time (about 3.6 s wall) |
 | E2E | about 82 s wall including web export |
-| APK size | pending EAS build |
+| APK size | 69.8 MB (73,231,240 bytes, EAS preview APK build b28ab03b, 2026-10-17) |
 | `adb shell dumpsys meminfo com.iqra.yemenlearn` | pending device |
 
 ## Verified checklist
