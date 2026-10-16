@@ -26,6 +26,7 @@ type Props = Omit<ActivityProps<MathLesson["type"]>, "lesson"> & {
 export function NumberQuiz({ lesson, color, attemptKey, onComplete, onRoundResult, roundOf, promptOf, renderVisual }: Props) {
   const total = lesson.rounds.length;
   const quiz = useQuiz({ lesson, total, onComplete, onRoundResult, autoAdvanceMs: ADVANCE_MS });
+  const { pick } = quiz;
   const { options, answer } = roundOf(quiz.roundIndex);
   const correctIndex = options.indexOf(answer);
   const shuffled = useShuffled(options, correctIndex, attemptKey, quiz.roundIndex);
@@ -42,7 +43,7 @@ export function NumberQuiz({ lesson, color, attemptKey, onComplete, onRoundResul
   const handlePick = useCallback(
     (idx: number) => {
       const correct = idx === shuffled.correctIndex;
-      if (!quiz.pick(idx, correct)) return;
+      if (!pick(idx, correct)) return;
       if (correct) {
         speak("أحسنت!");
         bounce(idx, 1.2);
@@ -50,7 +51,7 @@ export function NumberQuiz({ lesson, color, attemptKey, onComplete, onRoundResul
         speak(toArabicDigits(answer));
       }
     },
-    [shuffled.correctIndex, quiz, bounce, answer],
+    [shuffled.correctIndex, pick, bounce, answer],
   );
 
   return (
@@ -69,6 +70,7 @@ export function NumberQuiz({ lesson, color, attemptKey, onComplete, onRoundResul
             word={label}
             variant="number"
             state={choiceState(idx, quiz.picked, shuffled.correctIndex)}
+            selected={quiz.picked === idx}
             locked={quiz.locked}
             onPick={handlePick}
             scale={values[idx]}

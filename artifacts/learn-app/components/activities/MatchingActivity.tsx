@@ -5,6 +5,7 @@ import { speak } from "@/lib/speech";
 import { colors, touchTarget } from "@/theme/tokens";
 import { DoneButton } from "./shared/DoneButton";
 import { act } from "./shared/styles";
+import { useOnce } from "./shared/useOnce";
 import { useShuffled } from "./shared/useShuffled";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import type { ActivityProps } from "./types";
@@ -25,10 +26,14 @@ function Matching({ lesson, color, attemptKey, onComplete }: ActivityProps<"matc
   // Shuffle the right column per attempt; only the order array is used.
   const right = useShuffled(pairs, 0, attemptKey, "match");
 
-  const handleLeft = useCallback((i: number) => {
-    haptics.tap();
-    setState((s) => (s.matched.has(i) ? s : { ...s, selectedLeft: i }));
-  }, []);
+  const handleLeft = useCallback(
+    (i: number) => {
+      if (state.matched.has(i)) return;
+      haptics.tap();
+      setState((s) => ({ ...s, selectedLeft: i }));
+    },
+    [state.matched],
+  );
 
   const handleRight = useCallback(
     (pairIdx: number) => {
@@ -48,9 +53,8 @@ function Matching({ lesson, color, attemptKey, onComplete }: ActivityProps<"matc
 
   const allMatched = state.matched.size >= pairs.length;
   const correct = pairs.length - state.missed.size;
-  const finish = useCallback(
-    () => onComplete({ correct, total: pairs.length }),
-    [onComplete, correct, pairs.length],
+  const finish = useOnce(
+    useCallback(() => onComplete({ correct, total: pairs.length }), [onComplete, correct, pairs.length]),
   );
 
   return (
@@ -91,6 +95,7 @@ function Matching({ lesson, color, attemptKey, onComplete }: ActivityProps<"matc
               testID={`match-right-${pairIdx}`}
               accessibilityRole="button"
               accessibilityLabel={pairs[pairIdx].right.word}
+              accessibilityState={{ selected: state.matched.has(pairIdx), disabled: state.matched.has(pairIdx) }}
               style={[styles.item, state.matched.has(pairIdx) && styles.itemMatched]}
               onPress={() => handleRight(pairIdx)}
             >
@@ -100,7 +105,7 @@ function Matching({ lesson, color, attemptKey, onComplete }: ActivityProps<"matc
           ))}
         </View>
       </View>
-      {allMatched ? <DoneButton testID="activity-done" label="أَحْسَنْت! 🌟 تابع" color={color} onPress={finish} /> : null}
+      {allMatched ? <DoneButton testID="activity-done" label="أَحْسَنْت! 🌟 تابع" color={color} onPress={finish.fire} disabled={finish.done} /> : null}
     </View>
   );
 }
@@ -127,7 +132,7 @@ const styles = StyleSheet.create({
   },
   itemMatched: { backgroundColor: colors.successSoft, borderColor: colors.success, borderWidth: 2 },
   emoji: { fontSize: 30 },
-  word: { fontSize: 11, fontWeight: "700", color: "#475569", textAlign: "center" },
+  word: { fontSize: 15, fontWeight: "700", color: "#475569", textAlign: "center" },
   arrows: { gap: 10, alignItems: "center" },
   arrow: { fontSize: 20, color: "#94A3B8", height: 68, textAlignVertical: "center", lineHeight: 68 },
 });

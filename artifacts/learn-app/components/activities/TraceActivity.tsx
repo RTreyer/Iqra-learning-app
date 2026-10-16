@@ -6,10 +6,12 @@ import { UiText } from "@/components/UiText";
 import * as haptics from "@/lib/haptics";
 import { speak } from "@/lib/speech";
 import { ProgressDots } from "./shared/ProgressDots";
+import { useLatest } from "./shared/useLatest";
 import { ADVANCE_MS } from "./shared/useQuiz";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import { PAD_FALLBACK, PAD_MAX, trace, webPad } from "./trace/styles";
-import { strokeToPath, validateTracing, type Stroke } from "./trace/validate";
+import { addPoint, startStroke, type DrawnStroke } from "./trace/path";
+import { validateTracing } from "./trace/validate";
 import type { ActivityProps } from "./types";
 
 const ERROR_VISIBLE_MS = 3000;
@@ -18,7 +20,7 @@ const PLATFORM_PAD = Platform.OS === "web" ? webPad : null;
 function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
   const { targets } = lesson;
   const [targetIndex, setTargetIndex] = useState(0);
-  const [strokes, setStrokes] = useState<Stroke[]>([]);
+  const [strokes, setStrokes] = useState<DrawnStroke[]>([]);
   const [livePath, setLivePath] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [padError, setPadError] = useState(false);
@@ -26,7 +28,10 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
   const [padSize, setPadSize] = useState(PAD_FALLBACK);
   const [shake] = useState(() => new Animated.Value(0));
   /** Stroke being drawn; mutated per pointer move, flushed to `livePath` once per frame. */
-  const current = useRef<Stroke | null>(null);
+  const current = useRef<DrawnStroke | null>(null);
+  /** Strokes are only accepted once the pad has been measured, since validation depends on its size. */
+  const measuredSize = useRef<number | null>(null);
+  const completeRef = useLatest(onComplete);
   const frame = useRef<number | null>(null);
   const locked = useRef(false);
   const errorTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -49,7 +54,7 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
   const gesture = useMemo(() => {
     const flush = () => {
       frame.current = null;
-      setLivePath(current.current ? strokeToPath(current.current) : "");
+      setLivePath(current.current ? current.current.d : "");
     };
     const schedule = () => {
       if (frame.current === null) frame.current = requestAnimationFrame(flush);
@@ -60,15 +65,14 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
       .runOnJS(true)
       .withTestId("trace-pad")
       .onBegin((e) => {
-        if (locked.current) return;
-        current.current = [{ x: e.x, y: e.y }];
+        if (locked.current || measuredSize.current === null) return;
+        if (!Number.isFinite(e.x) || !Number.isFinite(e.y)) return;
+        current.current = startStroke({ x: e.x, y: e.y });
         setPadError(false);
         schedule();
       })
       .onUpdate((e) => {
-        if (!current.current) return;
-        current.current.push({ x: e.x, y: e.y });
-        schedule();
+        if (current.current && addPoint(current.current, { x: e.x, y: e.y })) schedule();
       })
       .onFinalize(() => {
         const stroke = current.current;
@@ -80,11 +84,18 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
       });
   }, []);
 
-  const paths = useMemo(() => strokes.map(strokeToPath), [strokes]);
-
   const handleLayout = useCallback((e: LayoutChangeEvent) => {
     const next = Math.min(PAD_MAX, Math.floor(e.nativeEvent.layout.width));
-    if (next > 0) setPadSize((prev) => (prev === next ? prev : next));
+    if (!(next > 0) || next === measuredSize.current) return;
+    // Strokes drawn at another size would be judged against the wrong pad: start over.
+    const resized = measuredSize.current !== null;
+    measuredSize.current = next;
+    setPadSize(next);
+    if (resized) {
+      current.current = null;
+      setLivePath("");
+      setStrokes([]);
+    }
   }, []);
 
   const handleClear = useCallback(() => {
@@ -97,7 +108,8 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
 
   const handleDone = useCallback(() => {
     if (locked.current) return;
-    const result = validateTracing(strokes, { width: padSize, height: padSize }, target.strokeCount ?? 1);
+    const points = strokes.map((s) => s.points);
+    const result = validateTracing(points, { width: padSize, height: padSize }, target.strokeCount ?? 1);
     if (!result.valid) {
       setError(result.msg);
       setPadError(true);
@@ -122,7 +134,7 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
     speak("أحسنت!");
     advanceTimer.current = setTimeout(() => {
       if (targetIndex + 1 >= targets.length) {
-        onComplete({ correct: 0, total: 0 });
+        completeRef.current({ correct: 0, total: 0 });
         return;
       }
       locked.current = false;
@@ -130,7 +142,7 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
       setPassed(false);
       setTargetIndex(targetIndex + 1);
     }, ADVANCE_MS);
-  }, [strokes, padSize, target.strokeCount, shake, targetIndex, targets.length, onComplete]);
+  }, [strokes, padSize, target.strokeCount, shake, targetIndex, targets.length, completeRef]);
 
   const translateX = shake.interpolate({ inputRange: [0, 1], outputRange: [0, 8] });
   const padDims = { width: padSize, height: padSize };
@@ -150,17 +162,20 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
           </Text>
         </Animated.View>
       ) : null}
-      <View style={trace.measure} onLayout={handleLayout}>
+      <View testID="trace-measure" style={trace.measure} onLayout={handleLayout}>
         <GestureDetector gesture={gesture}>
           <View
             testID="trace-pad"
+            accessible
+            accessibilityLabel={target.label}
+            accessibilityHint="ارسم بإصبعك"
             collapsable={false}
             style={[trace.pad, padDims, padError && trace.padError, passed && trace.padPassed, PLATFORM_PAD]}
           >
             <Text style={[trace.guide, guideFont]}>{target.guide}</Text>
             <Svg style={StyleSheet.absoluteFill} width={padSize} height={padSize}>
-              {paths.map((d, i) => (
-                <Path key={i} d={d} stroke={color} strokeWidth={10} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+              {strokes.map((s, i) => (
+                <Path key={i} d={s.d} stroke={color} strokeWidth={10} fill="none" strokeLinecap="round" strokeLinejoin="round" />
               ))}
               {livePath ? (
                 <Path d={livePath} stroke={color} strokeWidth={10} fill="none" strokeLinecap="round" strokeLinejoin="round" />

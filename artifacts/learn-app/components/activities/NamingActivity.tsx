@@ -6,6 +6,7 @@ import { speak } from "@/lib/speech";
 import { colors } from "@/theme/tokens";
 import { DoneButton } from "./shared/DoneButton";
 import { act } from "./shared/styles";
+import { useOnce } from "./shared/useOnce";
 import { useBounce } from "./shared/useQuiz";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import type { ActivityProps } from "./types";
@@ -26,7 +27,7 @@ function Naming({ lesson, color, onComplete }: ActivityProps<"naming">) {
   );
 
   const remaining = items.length - tapped.size;
-  const finish = useCallback(() => onComplete({ correct: 0, total: 0 }), [onComplete]);
+  const finish = useOnce(useCallback(() => onComplete({ correct: 0, total: 0 }), [onComplete]));
 
   return (
     <View style={act.container}>
@@ -50,7 +51,7 @@ function Naming({ lesson, color, onComplete }: ActivityProps<"naming">) {
         })}
       </View>
       {remaining <= 0 ? (
-        <DoneButton testID="activity-done" label="أَحْسَنْت! 🌟 تابع" color={color} onPress={finish} />
+        <DoneButton testID="activity-done" label="أَحْسَنْت! 🌟 تابع" color={color} onPress={finish.fire} disabled={finish.done} />
       ) : (
         <UiText style={act.hint}>{`${remaining} كلمة متبقية`}</UiText>
       )}
@@ -74,5 +75,5 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   emoji: { fontSize: 34 },
-  word: { fontSize: 13, fontWeight: "700", color: colors.text, textAlign: "center" },
+  word: { fontSize: 15, fontWeight: "700", color: colors.text, textAlign: "center" },
 });

@@ -6,6 +6,7 @@ import { speak } from "@/lib/speech";
 import { colors, touchTarget } from "@/theme/tokens";
 import { DoneButton } from "./shared/DoneButton";
 import { act } from "./shared/styles";
+import { useOnce } from "./shared/useOnce";
 import { useBounce } from "./shared/useQuiz";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import type { ActivityProps } from "./types";
@@ -26,7 +27,7 @@ function Story({ lesson, color, onComplete }: ActivityProps<"story">) {
   );
 
   const remaining = lines.length - heard.size;
-  const finish = useCallback(() => onComplete({ correct: 0, total: 0 }), [onComplete]);
+  const finish = useOnce(useCallback(() => onComplete({ correct: 0, total: 0 }), [onComplete]));
 
   return (
     <View style={act.container}>
@@ -52,7 +53,7 @@ function Story({ lesson, color, onComplete }: ActivityProps<"story">) {
         })}
       </View>
       {remaining <= 0 ? (
-        <DoneButton testID="activity-done" label="أَحْسَنْت! 🌟 تابع" color={color} onPress={finish} />
+        <DoneButton testID="activity-done" label="أَحْسَنْت! 🌟 تابع" color={color} onPress={finish.fire} disabled={finish.done} />
       ) : (
         <UiText style={act.hint}>{`${remaining} جملة متبقية`}</UiText>
       )}

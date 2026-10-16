@@ -34,3 +34,22 @@ test("resets heard lines when attemptKey changes", () => {
   rerenderActivity(<StoryActivity lesson={lesson} color="#2563EB" attemptKey="s:2" onComplete={jest.fn()} />);
   expect(screen.getByText(`${lesson.lines.length} جملة متبقية`)).toBeTruthy();
 });
+
+test("Done fires onComplete once even when tapped twice", () => {
+  const onComplete = jest.fn();
+  renderActivity(<StoryActivity lesson={lesson} color="#2563EB" attemptKey="s:1" onComplete={onComplete} />);
+  for (const line of lesson.lines) fireEvent.press(screen.getByRole("button", { name: line.text }));
+  const done = screen.getByTestId("activity-done");
+  fireEvent.press(done);
+  fireEvent.press(done);
+  expect(onComplete).toHaveBeenCalledTimes(1);
+  expect(screen.getByTestId("activity-done")).toBeDisabled();
+});
+
+test("stops speech when the activity unmounts", () => {
+  const stop = (jest.requireMock("expo-speech") as { stop: jest.Mock }).stop;
+  const view = renderActivity(<StoryActivity lesson={lesson} color="#2563EB" attemptKey="s:1" onComplete={jest.fn()} />);
+  stop.mockClear();
+  view.unmount();
+  expect(stop).toHaveBeenCalled();
+});

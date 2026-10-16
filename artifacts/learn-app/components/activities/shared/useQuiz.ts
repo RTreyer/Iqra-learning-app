@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Animated } from "react-native";
 import type { Lesson } from "@/content/types";
 import * as haptics from "@/lib/haptics";
 import { itemIdFor } from "@/lib/reviewItems";
 import type { Score } from "@/lib/scoring";
 import type { ChoiceState } from "./ChoiceCard";
+import { useLatest } from "./useLatest";
 
 /** Legacy LetterPick delay between the first tap and the next round. */
 export const ADVANCE_MS = 900;
@@ -31,6 +32,8 @@ export function useQuiz({ lesson, total, onComplete, onRoundResult, autoAdvanceM
   const locked = useRef(false);
   const finished = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Timers call the latest callbacks, never a closure from the render that scheduled them.
+  const callbacks = useLatest({ onComplete, onRoundResult });
 
   useEffect(() => () => {
     if (timer.current) clearTimeout(timer.current);
@@ -41,14 +44,14 @@ export function useQuiz({ lesson, total, onComplete, onRoundResult, autoAdvanceM
       if (roundIndex + 1 >= total) {
         if (finished.current) return;
         finished.current = true;
-        onComplete({ correct: count, total });
+        callbacks.current.onComplete({ correct: count, total });
         return;
       }
       locked.current = false;
       setPicked(null);
       setRoundIndex(roundIndex + 1);
     },
-    [roundIndex, total, onComplete],
+    [roundIndex, total, callbacks],
   );
 
   /** Registers the first tap of the round; returns false when the round is already locked. */
@@ -60,20 +63,23 @@ export function useQuiz({ lesson, total, onComplete, onRoundResult, autoAdvanceM
       setPicked(displayIndex);
       setCorrectCount(count);
       const itemId = itemIdFor(lesson, roundIndex);
-      if (itemId !== null) onRoundResult?.(itemId, isCorrect);
+      if (itemId !== null) callbacks.current.onRoundResult?.(itemId, isCorrect);
       if (isCorrect) haptics.success();
       else haptics.error();
       if (autoAdvanceMs !== undefined) timer.current = setTimeout(() => advance(count), autoAdvanceMs);
       return true;
     },
-    [correctCount, lesson, roundIndex, onRoundResult, autoAdvanceMs, advance],
+    [correctCount, lesson, roundIndex, callbacks, autoAdvanceMs, advance],
   );
 
   const next = useCallback(() => {
     if (picked !== null) advance(correctCount);
   }, [picked, correctCount, advance]);
 
-  return { roundIndex, picked, locked: picked !== null, correctCount, isLast: roundIndex + 1 >= total, pick, next };
+  return useMemo(
+    () => ({ roundIndex, picked, locked: picked !== null, correctCount, isLast: roundIndex + 1 >= total, pick, next }),
+    [roundIndex, picked, correctCount, total, pick, next],
+  );
 }
 
 /** Visual state of option `index` given the tapped option and the correct one. */

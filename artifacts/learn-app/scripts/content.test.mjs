@@ -95,3 +95,14 @@ test("lookups resolve books, units, lessons and next lessons", () => {
   assert.equal(getLesson("missing"), null);
   assert.deepEqual(unitLessonIds(getUnit("a1")), ["u1-1", "u1-2", "u1-3", "u1-4", "u1-5"]);
 });
+
+test("quiz options are unique within each round", () => {
+  const unique = (values, id) => assert.equal(new Set(values).size, values.length, `${id}: ${values.join(", ")}`);
+  for (const lesson of byType("counting")) for (const r of lesson.rounds) unique(r.options, lesson.id);
+  for (const lesson of byType("arithmetic")) for (const r of lesson.rounds) unique(r.options, lesson.id);
+  for (const lesson of byType("letter_pick")) for (const r of lesson.rounds) unique(r.letters, lesson.id);
+  for (const lesson of byType("word_read")) for (const r of lesson.rounds) unique(r.choices, lesson.id);
+  for (const lesson of byType("listen_pick")) {
+    for (const q of lesson.questions) unique(q.choices.map((c) => c.word), lesson.id);
+  }
+});

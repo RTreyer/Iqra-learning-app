@@ -13,6 +13,7 @@ import type { ActivityProps } from "./types";
 function LetterPick({ lesson, color, attemptKey, onComplete, onRoundResult }: ActivityProps<"letter_pick">) {
   const { rounds } = lesson;
   const quiz = useQuiz({ lesson, total: rounds.length, onComplete, onRoundResult, autoAdvanceMs: ADVANCE_MS });
+  const { pick } = quiz;
   const round = rounds[quiz.roundIndex];
   const options = useShuffled(round.letters, round.correctIndex, attemptKey, quiz.roundIndex);
   const maxOptions = useMemo(() => Math.max(...rounds.map((r) => r.letters.length)), [rounds]);
@@ -26,7 +27,7 @@ function LetterPick({ lesson, color, attemptKey, onComplete, onRoundResult }: Ac
   const handlePick = useCallback(
     (idx: number) => {
       const correct = idx === options.correctIndex;
-      if (!quiz.pick(idx, correct)) return;
+      if (!pick(idx, correct)) return;
       if (correct) {
         speak("أحسنت!");
         bounce(idx);
@@ -34,7 +35,7 @@ function LetterPick({ lesson, color, attemptKey, onComplete, onRoundResult }: Ac
         speak(round.targetLetter);
       }
     },
-    [options.correctIndex, quiz, bounce, round.targetLetter],
+    [options.correctIndex, pick, bounce, round.targetLetter],
   );
 
   return (
@@ -55,6 +56,7 @@ function LetterPick({ lesson, color, attemptKey, onComplete, onRoundResult }: Ac
             word={letter}
             variant="letter"
             state={choiceState(idx, quiz.picked, options.correctIndex)}
+            selected={quiz.picked === idx}
             locked={quiz.locked}
             onPick={handlePick}
             scale={values[idx]}

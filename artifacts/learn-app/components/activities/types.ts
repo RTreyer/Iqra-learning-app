@@ -1,6 +1,10 @@
 import type { Lesson, LessonType } from "@/content/types";
 import type { Score } from "@/lib/scoring";
 
+/**
+ * Callbacks need not be stable: activities keep the latest `onComplete` / `onRoundResult`
+ * in a ref, so a parent re-render between a tap and a delayed advance is safe.
+ */
 export type ActivityProps<T extends LessonType> = {
   lesson: Extract<Lesson, { type: T }>;
   color: string;

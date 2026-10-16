@@ -11,6 +11,8 @@ type Props = {
   word: string;
   emoji?: string;
   state: ChoiceState;
+  /** True only for the option the child tapped. */
+  selected: boolean;
   locked: boolean;
   variant: ChoiceVariant;
   onPick: (index: number) => void;
@@ -18,23 +20,26 @@ type Props = {
 };
 
 const ICON: Record<ChoiceState, string | null> = { idle: null, correct: "✅", wrong: "❌" };
+/** Number cards are solid coloured, so a plain glyph keeps the feedback visible without colour. */
+const GLYPH: Record<ChoiceState, string | null> = { idle: null, correct: "✓", wrong: "✗" };
+const SPOKEN: Record<ChoiceState, string> = { idle: "", correct: "، صحيح", wrong: "، خطأ" };
 
-export function ChoiceCard({ index, word, emoji, state, locked, variant, onPick, scale }: Props) {
+export function ChoiceCard({ index, word, emoji, state, selected, locked, variant, onPick, scale }: Props) {
   const solid = variant === "number";
-  const icon = variant === "word" || variant === "picture" ? ICON[state] : null;
+  const icon = variant === "letter" ? null : solid ? GLYPH[state] : ICON[state];
   return (
     <Animated.View style={scale ? { transform: [{ scale }] } : undefined}>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={word}
-        accessibilityState={{ disabled: locked, selected: state !== "idle" }}
+        accessibilityLabel={word + SPOKEN[state]}
+        accessibilityState={{ disabled: locked, selected }}
         disabled={locked}
         onPress={() => onPick(index)}
         style={[styles.base, cardStyles[variant], (solid ? solidStates : softStates)[state]]}
       >
         {emoji ? <Text style={styles.emoji}>{emoji}</Text> : null}
         <Text style={[textStyles[variant], (solid ? solidText : softText)[state]]}>{word}</Text>
-        {icon ? <Text style={variant === "picture" ? styles.cornerIcon : styles.icon}>{icon}</Text> : null}
+        {icon ? <Text style={iconStyles[variant]}>{icon}</Text> : null}
       </Pressable>
     </Animated.View>
   );
@@ -43,8 +48,13 @@ export function ChoiceCard({ index, word, emoji, state, locked, variant, onPick,
 const styles = StyleSheet.create({
   base: { minHeight: touchTarget, minWidth: touchTarget, alignItems: "center", justifyContent: "center" },
   emoji: { fontSize: 32 },
-  icon: { fontSize: 18 },
-  cornerIcon: { position: "absolute", top: -8, right: -8, fontSize: 18 },
+});
+
+const iconStyles = StyleSheet.create({
+  letter: {},
+  word: { fontSize: 18 },
+  picture: { position: "absolute", top: -8, right: -8, fontSize: 18 },
+  number: { position: "absolute", top: 4, right: 8, fontSize: 20, fontWeight: "900", color: colors.white },
 });
 
 const cardStyles = StyleSheet.create({
@@ -67,7 +77,7 @@ const cardStyles = StyleSheet.create({
 const textStyles = StyleSheet.create({
   letter: { fontSize: 40, fontWeight: "900", color: colors.text },
   word: { fontSize: 22, fontWeight: "800", color: colors.text, textAlign: "center" },
-  picture: { fontSize: 13, fontWeight: "700", color: colors.text, textAlign: "center" },
+  picture: { fontSize: 15, fontWeight: "700", color: colors.text, textAlign: "center" },
   number: { fontSize: 36, fontWeight: "800", color: colors.success },
 });
 

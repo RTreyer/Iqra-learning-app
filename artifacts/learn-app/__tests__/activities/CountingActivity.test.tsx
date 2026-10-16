@@ -32,6 +32,7 @@ test("shows Eastern Arabic digits, scores first taps and completes", () => {
   expect(screen.queryByText("3")).toBeNull();
 
   fireEvent.press(screen.getByRole("button", { name: "٣" }));
+  expect(screen.getByText("✓")).toBeTruthy(); // glyph next to the colour feedback
   act(() => jest.advanceTimersByTime(900));
   fireEvent.press(screen.getByRole("button", { name: "٦" }));
   expect(speech.speak).toHaveBeenLastCalledWith("٥", expect.anything());

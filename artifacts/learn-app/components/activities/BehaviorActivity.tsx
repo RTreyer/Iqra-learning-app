@@ -5,6 +5,7 @@ import { speak } from "@/lib/speech";
 import { colors, touchTarget } from "@/theme/tokens";
 import { DoneButton } from "./shared/DoneButton";
 import { act } from "./shared/styles";
+import { useOnce } from "./shared/useOnce";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import type { ActivityProps } from "./types";
 
@@ -31,9 +32,8 @@ function Behavior({ lesson, color, onComplete }: ActivityProps<"behavior">) {
 
   const answered = Object.keys(results).length;
   const correct = Object.values(results).filter(Boolean).length;
-  const finish = useCallback(
-    () => onComplete({ correct, total: behaviors.length }),
-    [onComplete, correct, behaviors.length],
+  const finish = useOnce(
+    useCallback(() => onComplete({ correct, total: behaviors.length }), [onComplete, correct, behaviors.length]),
   );
 
   return (
@@ -78,7 +78,8 @@ function Behavior({ lesson, color, onComplete }: ActivityProps<"behavior">) {
           testID="activity-done"
           label={`أَحْسَنْت! ${correct}/${behaviors.length} صحيح 🌟 تابع`}
           color={color}
-          onPress={finish}
+          onPress={finish.fire}
+          disabled={finish.done}
         />
       ) : null}
     </View>

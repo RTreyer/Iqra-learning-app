@@ -15,32 +15,14 @@ export type ValidationResult = { valid: true } | { valid: false; msg: string };
 const TOO_SMALL = "اِرسم الحرف بشكل أكبر 📏";
 const OFF_CENTRE = "اِرسم الحرف في وسط المساحة 🎯";
 
-/** Extracts all M/L coordinate pairs from an SVG path data string. */
-export function parsePoints(d: string): Point[] {
-  const pts: Point[] = [];
-  const tokens = d.split(/\s+/);
-  for (let i = 0; i < tokens.length - 2; i++) {
-    const cmd = tokens[i];
-    if (cmd === "M" || cmd === "L") {
-      const x = parseFloat(tokens[i + 1]);
-      const y = parseFloat(tokens[i + 2]);
-      if (!isNaN(x) && !isNaN(y)) pts.push({ x, y });
-    }
-  }
-  return pts;
-}
-
-/** SVG path data for one stroke ("M x y L x y ..."), the inverse of parsePoints. */
-export function strokeToPath(stroke: Stroke): string {
-  let d = "";
-  for (let i = 0; i < stroke.length; i++) {
-    d += `${i === 0 ? "M" : " L"} ${stroke[i].x.toFixed(1)} ${stroke[i].y.toFixed(1)}`;
-  }
-  return d;
-}
-
 export function validateTracing(strokes: Stroke[], pad: PadSize, strokeCount = 1): ValidationResult {
   const { width: padW, height: padH } = pad;
+  // An unmeasured or collapsed pad cannot be judged; never accept it.
+  if (!(padW > 0 && padH > 0)) return { valid: false, msg: TOO_SMALL };
+  // Drop non finite points (bad events) and strokes left empty by that.
+  strokes = strokes
+    .map((stroke) => stroke.filter((p) => Number.isFinite(p.x) && Number.isFinite(p.y)))
+    .filter((stroke) => stroke.length > 0);
 
   // 1: enough distinct strokes?
   if (strokes.length < strokeCount) {

@@ -53,7 +53,7 @@ test("locks the round, highlights the correct letter and speaks the prompt", () 
   expect(speech.speak).toHaveBeenCalledWith("ب", expect.anything());
   tap("ن");
   expect(screen.getByRole("button", { name: "ب" })).toBeDisabled();
-  expect(screen.getByRole("button", { name: "ب" })).toHaveProp("accessibilityState", { disabled: true, selected: true });
+  expect(screen.getByRole("button", { name: "ب" })).toHaveProp("accessibilityState", { disabled: true, selected: false });
 });
 
 test("resets when attemptKey changes", () => {
@@ -66,4 +66,30 @@ test("resets when attemptKey changes", () => {
   rerenderActivity(<LetterPickActivity lesson={lesson} color="#7C3AED" attemptKey="a:2" onComplete={jest.fn()} />);
   expect(screen.getByText("سؤال 1 من 5")).toBeTruthy();
   expect(screen.getByRole("button", { name: "ب" })).not.toBeDisabled();
+});
+
+test("uses the latest callbacks when the parent re-renders before the advance", () => {
+  const single = { ...lesson, rounds: lesson.rounds.slice(0, 1) };
+  const first = jest.fn();
+  const latest = jest.fn();
+  const { rerenderActivity } = renderActivity(
+    <LetterPickActivity lesson={single} color="#7C3AED" attemptKey="a:1" onComplete={first} />,
+  );
+  tap("ب");
+  rerenderActivity(<LetterPickActivity lesson={single} color="#7C3AED" attemptKey="a:1" onComplete={latest} />);
+  advance();
+  expect(first).not.toHaveBeenCalled();
+  expect(latest).toHaveBeenCalledWith({ correct: 1, total: 1 });
+});
+
+test("only the tapped option is selected and revealed options announce the result", () => {
+  renderActivity(<LetterPickActivity lesson={lesson} color="#7C3AED" attemptKey="a:1" onComplete={jest.fn()} />);
+  tap("ت");
+  const buttons = screen.getAllByRole("button");
+  const byLetter = (l: string) => buttons.find((b) => String(b.props.accessibilityLabel).startsWith(l))!;
+  expect(byLetter("ت").props.accessibilityLabel).toBe("ت، خطأ");
+  expect(byLetter("ت").props.accessibilityState.selected).toBe(true);
+  expect(byLetter("ب").props.accessibilityLabel).toBe("ب، صحيح");
+  expect(byLetter("ب").props.accessibilityState.selected).toBe(false);
+  expect(byLetter("ن").props.accessibilityLabel).toBe("ن");
 });

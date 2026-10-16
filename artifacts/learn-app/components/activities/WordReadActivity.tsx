@@ -14,6 +14,7 @@ import type { ActivityProps } from "./types";
 function WordRead({ lesson, color, attemptKey, onComplete, onRoundResult }: ActivityProps<"word_read">) {
   const { rounds } = lesson;
   const quiz = useQuiz({ lesson, total: rounds.length, onComplete, onRoundResult });
+  const { pick } = quiz;
   const round = rounds[quiz.roundIndex];
   const options = useShuffled(round.choices, round.correctIndex, attemptKey, quiz.roundIndex);
   const maxOptions = useMemo(() => Math.max(...rounds.map((r) => r.choices.length)), [rounds]);
@@ -27,7 +28,7 @@ function WordRead({ lesson, color, attemptKey, onComplete, onRoundResult }: Acti
   const handlePick = useCallback(
     (idx: number) => {
       const correct = idx === options.correctIndex;
-      if (!quiz.pick(idx, correct)) return;
+      if (!pick(idx, correct)) return;
       if (correct) {
         speak("أحسنت!");
         bounce(idx, 1.1);
@@ -35,7 +36,7 @@ function WordRead({ lesson, color, attemptKey, onComplete, onRoundResult }: Acti
         speak(round.choices[round.correctIndex]);
       }
     },
-    [options.correctIndex, quiz, bounce, round],
+    [options.correctIndex, pick, bounce, round],
   );
 
   const nextLabel = quiz.isLast ? `أَحْسَنْت! ${quiz.correctCount}/${rounds.length} 🌟 تابع` : "التالي ←";
@@ -55,6 +56,7 @@ function WordRead({ lesson, color, attemptKey, onComplete, onRoundResult }: Acti
             word={choice}
             variant="word"
             state={choiceState(idx, quiz.picked, options.correctIndex)}
+            selected={quiz.picked === idx}
             locked={quiz.locked}
             onPick={handlePick}
             scale={values[idx]}

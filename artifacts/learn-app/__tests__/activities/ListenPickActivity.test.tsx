@@ -4,9 +4,11 @@ import { ListenPickActivity } from "@/components/activities/ListenPickActivity";
 import { lessonOf, renderActivity } from "@/test-utils/activities";
 
 const lesson = lessonOf("u2-5", "listen_pick");
-/** The choice card labelled `word` (the listen button may show the same word). */
+/** The choice card for `word` (the listen button may show the same word); revealed cards add "، صحيح/خطأ". */
 const choice = (word: string) => {
-  const node = screen.getAllByRole("button", { name: word }).find((n) => n.props.accessibilityLabel === word);
+  const node = screen
+    .getAllByRole("button")
+    .find((n) => n.props.accessibilityLabel === word || String(n.props.accessibilityLabel).startsWith(`${word}، `));
   if (!node) throw new Error(`No choice ${word}`);
   return node;
 };

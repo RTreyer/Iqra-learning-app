@@ -1,4 +1,5 @@
-import { parsePoints, strokeToPath, validateTracing, type Stroke } from "@/components/activities/trace/validate";
+import { MAX_STROKE_POINTS, addPoint, startStroke } from "@/components/activities/trace/path";
+import { validateTracing, type Stroke } from "@/components/activities/trace/validate";
 
 const PAD = { width: 300, height: 300 };
 
@@ -52,14 +53,41 @@ describe("validateTracing", () => {
   });
 });
 
-describe("path helpers", () => {
-  it("round trips a stroke through SVG path data", () => {
-    const stroke = [{ x: 1, y: 2 }, { x: 3.5, y: 4 }, { x: 10, y: 20 }];
-    expect(strokeToPath(stroke)).toBe("M 1.0 2.0 L 3.5 4.0 L 10.0 20.0");
-    expect(parsePoints(strokeToPath(stroke))).toEqual(stroke);
+describe("invalid input", () => {
+  it("rejects an unmeasured or collapsed pad", () => {
+    const diagonal = [line(30, 30, 270, 270)];
+    expect(validateTracing(diagonal, { width: 0, height: 300 }).valid).toBe(false);
+    expect(validateTracing(diagonal, { width: 300, height: NaN }).valid).toBe(false);
+    expect(validateTracing(diagonal, { width: -1, height: -1 }).valid).toBe(false);
   });
 
-  it("parsePoints ignores malformed tokens", () => {
-    expect(parsePoints("M 1 x L 2 3")).toEqual([{ x: 2, y: 3 }]);
+  it("drops non finite points", () => {
+    const poisoned = [...line(30, 30, 270, 270), { x: NaN, y: 10 }, { x: Infinity, y: 0 }];
+    expect(validateTracing([poisoned], PAD)).toEqual({ valid: true });
+    const onlyBad: Stroke = [{ x: NaN, y: NaN }];
+    expect(validateTracing([onlyBad], PAD)).toEqual({ valid: false, msg: "اِرسم خطاً واحداً على الأقل ✏️" });
+  });
+});
+
+describe("stroke path building", () => {
+  it("keeps points and path data in sync", () => {
+    const s = startStroke({ x: 1, y: 2 });
+    expect(addPoint(s, { x: 10, y: 20 })).toBe(true);
+    expect(s.points).toEqual([{ x: 1, y: 2 }, { x: 10, y: 20 }]);
+    expect(s.d).toBe("M 1.0 2.0 L 10.0 20.0");
+  });
+
+  it("skips points closer than 2 px and non finite points", () => {
+    const s = startStroke({ x: 0, y: 0 });
+    expect(addPoint(s, { x: 1, y: 1 })).toBe(false);
+    expect(addPoint(s, { x: NaN, y: 5 })).toBe(false);
+    expect(addPoint(s, { x: 2, y: 0 })).toBe(true);
+    expect(s.points).toHaveLength(2);
+  });
+
+  it("caps a stroke at the maximum point count", () => {
+    const s = startStroke({ x: 0, y: 0 });
+    for (let i = 1; i < MAX_STROKE_POINTS + 50; i++) addPoint(s, { x: i * 3, y: 0 });
+    expect(s.points).toHaveLength(MAX_STROKE_POINTS);
   });
 });

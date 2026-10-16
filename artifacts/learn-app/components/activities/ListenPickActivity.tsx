@@ -14,6 +14,7 @@ import type { ActivityProps } from "./types";
 function ListenPick({ lesson, color, attemptKey, onComplete, onRoundResult }: ActivityProps<"listen_pick">) {
   const { questions } = lesson;
   const quiz = useQuiz({ lesson, total: questions.length, onComplete, onRoundResult });
+  const { pick } = quiz;
   const q = questions[quiz.roundIndex];
   const options = useShuffled(q.choices, q.correctIndex, attemptKey, quiz.roundIndex);
   const maxOptions = useMemo(() => Math.max(...questions.map((x) => x.choices.length)), [questions]);
@@ -27,7 +28,7 @@ function ListenPick({ lesson, color, attemptKey, onComplete, onRoundResult }: Ac
   const handlePick = useCallback(
     (idx: number) => {
       const correct = idx === options.correctIndex;
-      if (!quiz.pick(idx, correct)) return;
+      if (!pick(idx, correct)) return;
       if (correct) {
         speak("أحسنت!");
         bounce(idx, 1.15);
@@ -35,7 +36,7 @@ function ListenPick({ lesson, color, attemptKey, onComplete, onRoundResult }: Ac
         speak(q.choices[q.correctIndex].word);
       }
     },
-    [options.correctIndex, quiz, bounce, q],
+    [options.correctIndex, pick, bounce, q],
   );
 
   const nextLabel = quiz.isLast ? `أَحْسَنْت! ${quiz.correctCount}/${questions.length} 🌟 تابع` : "التالي ←";
@@ -56,6 +57,7 @@ function ListenPick({ lesson, color, attemptKey, onComplete, onRoundResult }: Ac
             emoji={choice.emoji}
             variant="picture"
             state={choiceState(idx, quiz.picked, options.correctIndex)}
+            selected={quiz.picked === idx}
             locked={quiz.locked}
             onPick={handlePick}
             scale={values[idx]}

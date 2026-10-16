@@ -5,7 +5,7 @@ import { colors, touchTarget } from "@/theme/tokens";
 export const act = StyleSheet.create({
   container: { flex: 1, alignItems: "center", paddingHorizontal: 20, paddingTop: 8, gap: 16 },
   instruction: { fontSize: 14, color: "#475569", fontWeight: "600", textAlign: "center" },
-  hint: { fontSize: 13, color: "#94A3B8", textAlign: "center", fontWeight: "500" },
+  hint: { fontSize: 15, color: "#94A3B8", textAlign: "center", fontWeight: "500" },
   fullWidth: { width: "100%", gap: 10 },
 
   listenBtn: { borderRadius: 20, padding: 20, alignItems: "center", gap: 6, minWidth: 200, minHeight: touchTarget },
