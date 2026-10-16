@@ -27,19 +27,15 @@ describe("useVoiceHint", () => {
     await AsyncStorage.setItem(VOICE_HINT_KEY, "1");
     mockSpeech.getAvailableVoicesAsync.mockResolvedValue([{ language: "en-US" }]);
     const { result } = renderHook(() => useVoiceHint());
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 0));
-    });
+    await waitFor(() => expect(AsyncStorage.getItem).toHaveBeenCalledWith(VOICE_HINT_KEY));
     expect(result.current.visible).toBe(false);
+    expect(mockSpeech.getAvailableVoicesAsync).not.toHaveBeenCalled();
   });
 
   it("never shows when an Arabic voice exists", async () => {
     mockSpeech.getAvailableVoicesAsync.mockResolvedValue([{ language: "ar-SA" }]);
     const { result } = renderHook(() => useVoiceHint());
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 0));
-    });
+    await waitFor(() => expect(mockSpeech.getAvailableVoicesAsync).toHaveBeenCalled());
     expect(result.current.visible).toBe(false);
-    expect(mockSpeech.getAvailableVoicesAsync).toHaveBeenCalled();
   });
 });

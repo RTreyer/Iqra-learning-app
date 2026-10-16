@@ -22,6 +22,11 @@ describe("speak", () => {
     );
   });
 
+  it("passes a custom rate through", () => {
+    speak("x", 0.5);
+    expect(Speech.speak).toHaveBeenCalledWith("x", { language: "ar", rate: 0.5 });
+  });
+
   it("does not throw when Speech.speak throws", () => {
     mockSpeech.speak.mockImplementationOnce(() => {
       throw new Error("tts failure");
