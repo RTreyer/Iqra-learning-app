@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import * as haptics from "@/lib/haptics";
 import { speak } from "@/lib/speech";
 import { colors, touchTarget } from "@/theme/tokens";
+import { PRAISE } from "./shared/strings";
 import { DoneButton } from "./shared/DoneButton";
 import { act } from "./shared/styles";
 import { useOnce } from "./shared/useOnce";
@@ -41,7 +42,7 @@ function Matching({ lesson, color, attemptKey, onComplete }: ActivityProps<"matc
       if (left === null || state.matched.has(pairIdx)) return;
       if (left === pairIdx) {
         haptics.success();
-        speak("أحسنت!");
+        speak(PRAISE);
         setState((s) => ({ ...s, selectedLeft: null, matched: new Set(s.matched).add(pairIdx) }));
       } else {
         haptics.error();

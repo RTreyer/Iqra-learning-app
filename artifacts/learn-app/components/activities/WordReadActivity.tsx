@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from "react";
 import { Text, View } from "react-native";
 import { speak } from "@/lib/speech";
+import { PRAISE } from "./shared/strings";
 import { ChoiceCard } from "./shared/ChoiceCard";
 import { DoneButton } from "./shared/DoneButton";
 import { ListenButton } from "./shared/ListenButton";
@@ -30,7 +31,7 @@ function WordRead({ lesson, color, attemptKey, onComplete, onRoundResult }: Acti
       const correct = idx === options.correctIndex;
       if (!pick(idx, correct)) return;
       if (correct) {
-        speak("أحسنت!");
+        speak(PRAISE);
         bounce(idx, 1.1);
       } else {
         speak(round.choices[round.correctIndex]);

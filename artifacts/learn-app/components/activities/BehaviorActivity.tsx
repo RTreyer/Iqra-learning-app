@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import * as haptics from "@/lib/haptics";
 import { speak } from "@/lib/speech";
 import { colors, touchTarget } from "@/theme/tokens";
+import { PRAISE } from "./shared/strings";
 import { DoneButton } from "./shared/DoneButton";
 import { act } from "./shared/styles";
 import { useOnce } from "./shared/useOnce";
@@ -21,7 +22,7 @@ function Behavior({ lesson, color, onComplete }: ActivityProps<"behavior">) {
       setResults((prev) => (prev[index] !== undefined ? prev : { ...prev, [index]: right }));
       if (right) {
         haptics.success();
-        speak("أحسنت!");
+        speak(PRAISE);
       } else {
         haptics.error();
         speak("حاول مرة أخرى");

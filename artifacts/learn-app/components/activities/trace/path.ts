@@ -11,7 +11,10 @@ export type DrawnStroke = { points: Point[]; d: string };
 const fmt = (n: number) => n.toFixed(1);
 
 export function startStroke(p: Point): DrawnStroke {
-  return { points: [p], d: `M ${fmt(p.x)} ${fmt(p.y)}` };
+  // A repeated point gives a zero length segment, so a single tap still draws a round dot.
+  const x = fmt(p.x);
+  const y = fmt(p.y);
+  return { points: [p], d: `M ${x} ${y} L ${x} ${y}` };
 }
 
 /** Appends `p` in place when it is finite, far enough from the last point and under the cap. */

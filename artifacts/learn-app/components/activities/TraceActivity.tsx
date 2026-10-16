@@ -5,6 +5,7 @@ import { Path, Svg } from "react-native-svg";
 import { UiText } from "@/components/UiText";
 import * as haptics from "@/lib/haptics";
 import { speak } from "@/lib/speech";
+import { PRAISE } from "./shared/strings";
 import { ProgressDots } from "./shared/ProgressDots";
 import { useLatest } from "./shared/useLatest";
 import { ADVANCE_MS } from "./shared/useQuiz";
@@ -131,7 +132,7 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
     setError(null);
     setPadError(false);
     haptics.success();
-    speak("أحسنت!");
+    speak(PRAISE);
     advanceTimer.current = setTimeout(() => {
       if (targetIndex + 1 >= targets.length) {
         completeRef.current({ correct: 0, total: 0 });

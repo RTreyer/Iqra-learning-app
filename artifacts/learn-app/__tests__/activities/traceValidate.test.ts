@@ -74,7 +74,13 @@ describe("stroke path building", () => {
     const s = startStroke({ x: 1, y: 2 });
     expect(addPoint(s, { x: 10, y: 20 })).toBe(true);
     expect(s.points).toEqual([{ x: 1, y: 2 }, { x: 10, y: 20 }]);
-    expect(s.d).toBe("M 1.0 2.0 L 10.0 20.0");
+    expect(s.d).toBe("M 1.0 2.0 L 1.0 2.0 L 10.0 20.0");
+  });
+
+  it("draws a single point stroke as a dot", () => {
+    const s = startStroke({ x: 5, y: 6 });
+    expect(s.points).toEqual([{ x: 5, y: 6 }]);
+    expect(s.d).toBe("M 5.0 6.0 L 5.0 6.0");
   });
 
   it("skips points closer than 2 px and non finite points", () => {

@@ -46,10 +46,16 @@ test("Done fires onComplete once even when tapped twice", () => {
   expect(screen.getByTestId("activity-done")).toBeDisabled();
 });
 
-test("stops speech when the activity unmounts", () => {
+test("stops speech on a new attempt but not on unmount", () => {
   const stop = (jest.requireMock("expo-speech") as { stop: jest.Mock }).stop;
   const view = renderActivity(<StoryActivity lesson={lesson} color="#2563EB" attemptKey="s:1" onComplete={jest.fn()} />);
   stop.mockClear();
+  view.rerenderActivity(<StoryActivity lesson={lesson} color="#2563EB" attemptKey="s:1" onComplete={jest.fn()} />);
+  expect(stop).not.toHaveBeenCalled();
+  view.rerenderActivity(<StoryActivity lesson={lesson} color="#2563EB" attemptKey="s:2" onComplete={jest.fn()} />);
+  expect(stop).toHaveBeenCalledTimes(1);
+  stop.mockClear();
+  // The lesson screen speaks its completion message while the activity unmounts.
   view.unmount();
-  expect(stop).toHaveBeenCalled();
+  expect(stop).not.toHaveBeenCalled();
 });

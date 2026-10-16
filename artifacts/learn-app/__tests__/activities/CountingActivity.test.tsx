@@ -1,6 +1,7 @@
 import { act, fireEvent, screen } from "@testing-library/react-native";
 import React from "react";
 import { CountingActivity } from "@/components/activities/CountingActivity";
+import { PRAISE } from "@/components/activities/shared/strings";
 import type { Lesson } from "@/content/types";
 import { renderActivity } from "@/test-utils/activities";
 
@@ -34,7 +35,7 @@ test("shows Eastern Arabic digits, scores first taps and completes", () => {
   expect(screen.queryByText("3")).toBeNull();
 
   fireEvent.press(screen.getByRole("button", { name: "٣" }));
-  expect(speech.speak).toHaveBeenLastCalledWith("أَحْسَنْت", expect.anything());
+  expect(speech.speak).toHaveBeenLastCalledWith(PRAISE, expect.anything());
   expect(screen.getByText("✓")).toBeTruthy(); // glyph next to the colour feedback
   act(() => jest.advanceTimersByTime(900));
   fireEvent.press(screen.getByRole("button", { name: "٦" }));

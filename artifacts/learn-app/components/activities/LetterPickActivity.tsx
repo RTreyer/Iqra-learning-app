@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { speak } from "@/lib/speech";
 import { colors } from "@/theme/tokens";
+import { PRAISE } from "./shared/strings";
 import { ChoiceCard } from "./shared/ChoiceCard";
 import { ProgressDots } from "./shared/ProgressDots";
 import { act } from "./shared/styles";
@@ -29,7 +30,7 @@ function LetterPick({ lesson, color, attemptKey, onComplete, onRoundResult }: Ac
       const correct = idx === options.correctIndex;
       if (!pick(idx, correct)) return;
       if (correct) {
-        speak("أحسنت!");
+        speak(PRAISE);
         bounce(idx);
       } else {
         speak(round.targetLetter);

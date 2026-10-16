@@ -6,6 +6,7 @@ import { speak } from "@/lib/speech";
 import { colors, touchTarget } from "@/theme/tokens";
 import { ChoiceCard } from "../shared/ChoiceCard";
 import { ProgressDots } from "../shared/ProgressDots";
+import { PRAISE } from "../shared/strings";
 import { act } from "../shared/styles";
 import { ADVANCE_MS, PROMPT_DELAY_MS, choiceState, useBounce, useQuiz } from "../shared/useQuiz";
 import { useShuffled } from "../shared/useShuffled";
@@ -45,7 +46,7 @@ export function NumberQuiz({ lesson, color, attemptKey, onComplete, onRoundResul
       const correct = idx === shuffled.correctIndex;
       if (!pick(idx, correct)) return;
       if (correct) {
-        speak("أَحْسَنْت");
+        speak(PRAISE);
         bounce(idx, 1.2);
       } else {
         speak(numberToArabicWord(answer));
