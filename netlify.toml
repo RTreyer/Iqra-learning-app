@@ -6,7 +6,7 @@
 [build.environment]
   NODE_VERSION = "24"
 
-# The app is a single-page app: every path (e.g. /grade/1) is served by
+# The app is a single-page app: every path (e.g. /lesson/u2-3) is served by
 # index.html and resolved by expo-router in the browser.
 [[redirects]]
   from = "/*"

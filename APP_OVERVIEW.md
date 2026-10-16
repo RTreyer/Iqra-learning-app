@@ -63,7 +63,7 @@ artifacts/learn-app/                the Expo app
   theme/tokens.ts       colours, spacing, touch target
   scripts/              content.test.mjs, ui-translations.test.mjs (test:data)
   e2e/                  Playwright specs and static server
-  __tests__/            Jest tests (35 suites, 211 tests)
+  __tests__/            Jest tests (37 suites, 220 tests)
 ```
 
 ## 5. Routes
@@ -98,8 +98,8 @@ artifacts/learn-app/                the Expo app
 pnpm install
 pnpm typecheck        # root scripts delegate to @workspace/learn-app
 pnpm lint
-pnpm test             # Jest: 35 suites, 211 tests
-pnpm test:data        # 20 tests (content integrity, UI translations)
+pnpm test             # Jest: 37 suites, 220 tests
+pnpm test:data        # 21 tests (content integrity, UI translations)
 pnpm test:e2e         # web export, then Playwright
 pnpm build:web        # static export to artifacts/learn-app/dist/ (1.53 MB after Task 4.4)
 pnpm --filter @workspace/learn-app run web    # dev in browser
