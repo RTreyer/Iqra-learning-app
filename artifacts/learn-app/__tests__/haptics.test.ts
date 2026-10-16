@@ -12,10 +12,6 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
-afterEach(() => {
-  jest.restoreAllMocks();
-});
-
 describe("haptics on native", () => {
   it("tap triggers a light impact", () => {
     haptics.tap();
@@ -33,14 +29,20 @@ describe("haptics on native", () => {
 
   it("swallows a rejected promise", async () => {
     mockHaptics.impactAsync.mockRejectedValueOnce(new Error("unsupported"));
-    expect(() => haptics.tap()).not.toThrow();
-    await new Promise((r) => setImmediate(r));
+    await expect(Promise.resolve(haptics.tap())).resolves.toBeUndefined();
+    expect(mockHaptics.impactAsync).toHaveBeenCalledTimes(1);
   });
 });
 
 describe("haptics on web", () => {
+  let platformOS: { restore: () => void } | undefined;
+
+  afterEach(() => {
+    platformOS?.restore();
+  });
+
   it("calls nothing", () => {
-    jest.replaceProperty(Platform, "OS", "web");
+    platformOS = jest.replaceProperty(Platform, "OS", "web");
     haptics.tap();
     haptics.success();
     haptics.error();

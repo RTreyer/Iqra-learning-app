@@ -78,15 +78,17 @@ describe("hasArabicVoice on web", () => {
     },
   };
 
+  let platformOS: { restore: () => void } | undefined;
+
   beforeEach(() => {
     voices = [];
     listeners = [];
-    jest.replaceProperty(Platform, "OS", "web");
+    platformOS = jest.replaceProperty(Platform, "OS", "web");
     Object.defineProperty(window, "speechSynthesis", { value: synth, configurable: true });
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    platformOS?.restore();
     jest.useRealTimers();
     delete (window as { speechSynthesis?: unknown }).speechSynthesis;
   });
@@ -108,5 +110,13 @@ describe("hasArabicVoice on web", () => {
     jest.advanceTimersByTime(1500);
     await expect(result).resolves.toBe(true);
     expect(listeners).toHaveLength(0);
+  });
+
+  it("returns true when speechSynthesis has no addEventListener", async () => {
+    Object.defineProperty(window, "speechSynthesis", {
+      value: { getVoices: () => [] },
+      configurable: true,
+    });
+    await expect(hasArabicVoice()).resolves.toBe(true);
   });
 });

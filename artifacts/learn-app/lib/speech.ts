@@ -45,7 +45,9 @@ export async function hasArabicVoice(): Promise<boolean> {
       if (!synth) return true;
       let voices = synth.getVoices();
       // Chromium loads voices lazily: wait once for voiceschanged, then re-read.
+      // Without event support we cannot wait, so the empty list means "unknown".
       if (voices.length === 0) {
+        if (typeof synth.addEventListener !== "function") return true;
         await waitForVoices(synth, VOICES_TIMEOUT_MS);
         voices = synth.getVoices();
       }
