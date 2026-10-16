@@ -176,9 +176,9 @@ module.exports = [
 
 **Files:** create `jest.config.js`, `jest.setup.ts`, `__tests__/smoke.test.tsx`; modify `package.json`, root `.npmrc`
 
-- [ ] Dev deps with exact SDK 54 versions: `jest ~29.7.0`, `jest-expo ~54.0.18`, `react-test-renderer 19.1.0`, `@testing-library/react-native ^13`, `@types/jest`.
-- [ ] Root `.npmrc`: add `node-linker=hoisted` (jest-expo expects hoisted React Native internals under pnpm). Re-run `pnpm install`, then `pnpm typecheck && pnpm build:web` to confirm Metro is unaffected.
-- [ ] `jest.config.js`:
+- [x] Dev deps with exact SDK 54 versions: `jest ~29.7.0`, `jest-expo ~54.0.18`, `react-test-renderer 19.1.0`, `@testing-library/react-native ^13`, `@types/jest`.
+- [x] Root `.npmrc`: add `node-linker=hoisted` (jest-expo expects hoisted React Native internals under pnpm). Re-run `pnpm install`, then `pnpm typecheck && pnpm build:web` to confirm Metro is unaffected.
+- [x] `jest.config.js`:
 ```js
 module.exports = {
   preset: "jest-expo",
@@ -189,27 +189,27 @@ module.exports = {
   ],
 };
 ```
-- [ ] `jest.setup.ts`: mock `expo-speech` (`speak`, `stop` as `jest.fn`), `expo-haptics` (all functions resolve), `@react-native-async-storage/async-storage` with `@react-native-async-storage/async-storage/jest/async-storage-mock`, `expo-router` (`router: { push, replace, back }` spies, `useLocalSearchParams: () => params`, `useFocusEffect: (cb) => React.useEffect(cb, [])`), and `react-native-gesture-handler/jestSetup`.
-- [ ] `__tests__/smoke.test.tsx`: render `<LanguageProvider><UiText>مرحبا</UiText></LanguageProvider>`, expect text present.
-- [ ] Rename `scripts/test-ui-translations.mjs` → `scripts/ui-translations.test.mjs`. Scripts: `"test": "jest"`, `"test:data": "node --test scripts/*.test.mjs"`. Remove `test:language`.
-- [ ] `pnpm test` → 1 passing. `pnpm test:data` → 4 passing.
-- [ ] Commit: `test: add jest-expo and testing library`
+- [x] `jest.setup.ts`: mock `expo-speech` (`speak`, `stop` as `jest.fn`), `expo-haptics` (all functions resolve), `@react-native-async-storage/async-storage` with `@react-native-async-storage/async-storage/jest/async-storage-mock`, `expo-router` (`router: { push, replace, back }` spies, `useLocalSearchParams: () => params`, `useFocusEffect: (cb) => React.useEffect(cb, [])`), and `react-native-gesture-handler/jestSetup`.
+- [x] `__tests__/smoke.test.tsx`: render `<LanguageProvider><UiText>مرحبا</UiText></LanguageProvider>`, expect text present.
+- [x] Rename `scripts/test-ui-translations.mjs` → `scripts/ui-translations.test.mjs`. Scripts: `"test": "jest"`, `"test:data": "node --test scripts/*.test.mjs"`. Remove `test:language`.
+- [x] `pnpm test` → 1 passing. `pnpm test:data` → 4 passing.
+- [x] Commit: `test: add jest-expo and testing library`
 
 ### Task 2.3: Playwright harness
 
 **Files:** create `playwright.config.ts`; modify `package.json`
 
-- [ ] Dev dep `@playwright/test`. Config: `testDir: "e2e"`, `webServer: { command: "node e2e/serve.mjs dist 8787", port: 8787, reuseExistingServer: true }`, chromium project, viewport 420x860, `use.locale: "ar"`.
-- [ ] In `e2e/app.spec.mjs` add an `addInitScript` that stubs `window.speechSynthesis.speak` to record calls (headless Chromium has no voices).
-- [ ] Script: `"test:e2e": "expo export --platform web && playwright test"`.
-- [ ] Commit: `test: add playwright harness`
+- [x] Dev dep `@playwright/test`. Config: `testDir: "e2e"`, `webServer: { command: "node e2e/serve.mjs dist 8787", port: 8787, reuseExistingServer: true }`, chromium project, viewport 420x860, `use.locale: "ar"`.
+- [x] In `e2e/app.spec.mjs` add an `addInitScript` that stubs `window.speechSynthesis.speak` to record calls (headless Chromium has no voices).
+- [x] Script: `"test:e2e": "expo export --platform web && playwright test"`.
+- [x] Commit: `test: add playwright harness`
 
 ### Task 2.4: CI
 
 **Files:** create `.github/workflows/ci.yml`
 
-- [ ] On push and pull_request: checkout; `pnpm/action-setup@v4` (reads `packageManager`); `actions/setup-node@v4` node 24 with pnpm cache; `pnpm install --frozen-lockfile`; `pnpm typecheck`; `pnpm lint`; `pnpm test`; `pnpm test:data`; `pnpm --filter @workspace/learn-app exec playwright install --with-deps chromium`; `pnpm test:e2e`; upload `artifacts/learn-app/playwright-report` on failure.
-- [ ] Commit: `ci: typecheck, lint, unit, data and e2e`
+- [x] On push and pull_request: checkout; `pnpm/action-setup@v4` (reads `packageManager`); `actions/setup-node@v4` node 24 with pnpm cache; `pnpm install --frozen-lockfile`; `pnpm typecheck`; `pnpm lint`; `pnpm test`; `pnpm test:data`; `pnpm --filter @workspace/learn-app exec playwright install --with-deps chromium`; `pnpm test:e2e`; upload `artifacts/learn-app/playwright-report` on failure.
+- [x] Commit: `ci: typecheck, lint, unit, data and e2e`
 
 ---
 
