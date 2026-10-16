@@ -6,7 +6,7 @@ import React from "react";
 import { Pressable, StyleSheet } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import { useLanguage } from "@/context/LanguageContext";
-import { touchTarget } from "@/theme/tokens";
+import { shadow, touchTarget } from "@/theme/tokens";
 
 /** Goes back when there is history; otherwise (web deep link or refresh) replaces with the fallback. */
 export function goBackOr(fallback: Href) {
@@ -60,11 +60,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.92)",
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.18,
-    shadowRadius: 6,
-    elevation: 5,
+    ...shadow.card,
     borderWidth: 1,
     borderColor: "rgba(0,0,0,0.06)",
   },

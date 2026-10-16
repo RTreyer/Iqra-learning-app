@@ -4,7 +4,7 @@ import { UiText } from "@/components/UiText";
 import { useLanguage } from "@/context/LanguageContext";
 import * as haptics from "@/lib/haptics";
 import { speak } from "@/lib/speech";
-import { colors, touchTarget } from "@/theme/tokens";
+import { colors, shadow, touchTarget } from "@/theme/tokens";
 import { PRAISE } from "./shared/strings";
 import { DoneButton } from "./shared/DoneButton";
 import { act } from "./shared/styles";
@@ -106,11 +106,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 10,
     width: "100%",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
+    ...shadow.card,
     borderWidth: 1,
     borderColor: colors.border,
   },

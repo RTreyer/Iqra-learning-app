@@ -6,7 +6,7 @@ import { UiChevron } from "@/components/UiChevron";
 import type { Lesson } from "@/content/types";
 import type { LessonStatus } from "@/context/ProgressContext";
 import { useLanguage } from "@/context/LanguageContext";
-import { colors, touchTarget, withAlpha } from "@/theme/tokens";
+import { colors, shadow, touchTarget, withAlpha } from "@/theme/tokens";
 
 type Props = { lesson: Lesson; status: LessonStatus; onPress: () => void };
 
@@ -66,11 +66,7 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 10,
     alignItems: "center",
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 3,
+    ...shadow.card,
     marginHorizontal: 2,
   },
   pressed: { opacity: 0.9, transform: [{ scale: 0.98 }] },

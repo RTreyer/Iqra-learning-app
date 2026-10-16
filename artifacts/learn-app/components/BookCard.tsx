@@ -5,7 +5,7 @@ import { UiChevron } from "@/components/UiChevron";
 import { UiText } from "@/components/UiText";
 import type { Book } from "@/content/types";
 import { useLanguage } from "@/context/LanguageContext";
-import { colors, readableFill, touchTarget, withAlpha } from "@/theme/tokens";
+import { colors, readableFill, shadow, touchTarget, withAlpha } from "@/theme/tokens";
 
 type Props = { book: Book; onPress: () => void };
 
@@ -54,11 +54,7 @@ const styles = StyleSheet.create({
     gap: 16,
     paddingHorizontal: 22,
     paddingVertical: 18,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    elevation: 8,
+    ...shadow.card,
   },
   disabled: { opacity: 0.6 },
   pressed: { opacity: 0.88, transform: [{ scale: 0.97 }] },

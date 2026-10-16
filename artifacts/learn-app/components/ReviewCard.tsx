@@ -5,7 +5,7 @@ import { UiChevron } from "@/components/UiChevron";
 import { UiText } from "@/components/UiText";
 import { useLanguage } from "@/context/LanguageContext";
 import { itemsLabel } from "@/lib/labels";
-import { colors, radius, touchTarget } from "@/theme/tokens";
+import { colors, radius, shadow, touchTarget } from "@/theme/tokens";
 
 type Props = { count: number; onPress: () => void };
 
@@ -49,11 +49,7 @@ const styles = StyleSheet.create({
     gap: 14,
     paddingHorizontal: 18,
     paddingVertical: 12,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 8,
-    elevation: 4,
+    ...shadow.card,
   },
   pressed: { opacity: 0.88, transform: [{ scale: 0.97 }] },
   emojiWrap: { width: 52, height: 52, borderRadius: 26, alignItems: "center", justifyContent: "center", backgroundColor: colors.white },

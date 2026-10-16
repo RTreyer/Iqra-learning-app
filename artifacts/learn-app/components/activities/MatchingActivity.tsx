@@ -4,7 +4,7 @@ import { UiText } from "@/components/UiText";
 import { useLanguage } from "@/context/LanguageContext";
 import * as haptics from "@/lib/haptics";
 import { speak } from "@/lib/speech";
-import { colors, touchTarget, withAlpha } from "@/theme/tokens";
+import { colors, shadow, touchTarget, withAlpha } from "@/theme/tokens";
 import { PRAISE } from "./shared/strings";
 import { DoneButton } from "./shared/DoneButton";
 import { act } from "./shared/styles";
@@ -128,11 +128,7 @@ const styles = StyleSheet.create({
     gap: 4,
     borderWidth: 2,
     borderColor: colors.border,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.07,
-    shadowRadius: 4,
-    elevation: 2,
+    ...shadow.card,
     minHeight: touchTarget,
   },
   itemMatched: { backgroundColor: colors.successSoft, borderColor: colors.success, borderWidth: 2 },

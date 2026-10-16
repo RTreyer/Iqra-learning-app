@@ -6,7 +6,7 @@ import { UiText } from "@/components/UiText";
 import type { Unit } from "@/content/types";
 import type { UnitProgress } from "@/context/ProgressContext";
 import { useLanguage } from "@/context/LanguageContext";
-import { colors, readableFill, touchTarget } from "@/theme/tokens";
+import { colors, readableFill, shadow, touchTarget } from "@/theme/tokens";
 
 type Props = { unit: Unit; progress: UnitProgress; onPress: () => void };
 
@@ -48,11 +48,7 @@ const styles = StyleSheet.create({
     gap: 14,
     paddingHorizontal: 20,
     paddingVertical: 16,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.22,
-    shadowRadius: 12,
-    elevation: 8,
+    ...shadow.card,
   },
   pressed: { opacity: 0.88, transform: [{ scale: 0.97 }] },
   emoji: { fontSize: 40 },

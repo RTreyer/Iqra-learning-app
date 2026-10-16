@@ -18,7 +18,7 @@ import { useProgress } from "@/context/ProgressContext";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
 import { firstParam } from "@/lib/params";
 import { routes } from "@/lib/routes";
-import { colors, readableFill } from "@/theme/tokens";
+import { colors, readableFill, shadow } from "@/theme/tokens";
 
 export default function BookScreen() {
   const bookId = firstParam(useLocalSearchParams<{ bookId?: string | string[] }>().bookId);
@@ -95,11 +95,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 16,
     marginBottom: 12,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 10,
-    elevation: 6,
+    ...shadow.card,
   },
   bannerEmoji: { fontSize: 52 },
   bannerText: { flex: 1, gap: 6 },

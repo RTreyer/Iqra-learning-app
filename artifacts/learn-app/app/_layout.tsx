@@ -10,6 +10,7 @@ import { VoiceHintBanner } from "@/components/VoiceHintBanner";
 import { ProgressProvider } from "@/context/ProgressContext";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { useVoiceHint } from "@/hooks/useVoiceHint";
+import { shadow } from "@/theme/tokens";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -73,6 +74,6 @@ const styles = StyleSheet.create({
     width: "100%",
     maxWidth: WEB_MAX_WIDTH,
     overflow: "hidden",
-    boxShadow: "0 0 24px rgba(0,0,0,0.15)",
+    ...shadow.card,
   },
 });

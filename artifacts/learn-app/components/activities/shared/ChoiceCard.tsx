@@ -1,6 +1,6 @@
 import React from "react";
 import { Animated, Pressable, StyleSheet, Text } from "react-native";
-import { colors, touchTarget } from "@/theme/tokens";
+import { colors, shadow, touchTarget } from "@/theme/tokens";
 
 export type ChoiceState = "idle" | "correct" | "wrong";
 export type ChoiceVariant = "letter" | "word" | "picture" | "number";
@@ -66,11 +66,7 @@ const cardStyles = StyleSheet.create({
     height: 88,
     borderRadius: 20,
     borderWidth: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 2,
+    ...shadow.card,
   },
 });
 

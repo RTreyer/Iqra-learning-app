@@ -36,8 +36,6 @@ const HOME: Config = {
   decos: [
     { emoji: "⭐", size: 110, opacity: 0.12, rotate: "20deg", top: "4%", left: "2%" },
     { emoji: "🌟", size: 80,  opacity: 0.09, rotate: "-15deg", top: "16%", right: "3%" },
-    { emoji: "✨", size: 70,  opacity: 0.10, rotate: "30deg",  top: "45%", left: "1%" },
-    { emoji: "⭐", size: 100, opacity: 0.08, rotate: "-10deg", top: "62%", right: "2%" },
     { emoji: "🌟", size: 90,  opacity: 0.09, rotate: "15deg",  bottom: "8%", left: "5%" },
     { emoji: "✨", size: 65,  opacity: 0.10, rotate: "-30deg", bottom: "6%", right: "8%" },
   ],
@@ -51,7 +49,6 @@ const READING: Config = {
     { emoji: "✨", size: 80,  opacity: 0.10, rotate: "-20deg", top: "22%", left: "1%" },
     { emoji: "📚", size: 110, opacity: 0.08, rotate: "10deg",  top: "52%", right: "1%" },
     { emoji: "⭐", size: 85,  opacity: 0.10, rotate: "-25deg", bottom: "18%", left: "2%" },
-    { emoji: "🌟", size: 70,  opacity: 0.09, rotate: "20deg",  bottom: "6%", right: "5%" },
   ],
 };
 
@@ -63,7 +60,6 @@ const NUMBERS: Config = {
     { emoji: "✨", size: 75,  opacity: 0.09, rotate: "-15deg", top: "20%", right: "2%" },
     { emoji: "🔢", size: 105, opacity: 0.07, rotate: "10deg",  top: "52%", left: "1%" },
     { emoji: "🌟", size: 85,  opacity: 0.10, rotate: "-20deg", bottom: "18%", right: "2%" },
-    { emoji: "✨", size: 70,  opacity: 0.10, rotate: "25deg",  bottom: "6%", left: "7%" },
   ],
 };
 

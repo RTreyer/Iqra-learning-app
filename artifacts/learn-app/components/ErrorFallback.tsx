@@ -14,7 +14,7 @@ import Svg, { Circle, Path } from "react-native-svg";
 
 import { UiText } from "@/components/UiText";
 import { useLanguage } from "@/context/LanguageContext";
-import { colors } from "@/theme/tokens";
+import { colors, shadow } from "@/theme/tokens";
 
 export type ErrorFallbackProps = {
   error: Error;
@@ -221,14 +221,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 24,
     minWidth: 200,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    ...shadow.card,
   },
   buttonText: {
     fontWeight: "600",
