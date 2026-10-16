@@ -461,8 +461,8 @@ Tests: introduce sets dueAt to now + 1 day; three correct reviews reach box 4 wi
 
 ### Task 5.6: Docs refresh
 
-- [ ] README content table: Arabic Part 1 (8 units, 52 lessons), Math Part 1 (2 units, 8 lessons), Science Part 1 (3 units, 9 lessons). Add a "Learning design" section listing the principles table from the Context above. `APP_OVERVIEW.md` sections 2, 4, 5, 6, 8 updated.
-- [ ] Commit: `docs: refresh README and overview`
+- [x] README content table: Arabic Part 1 (8 units, 52 lessons), Math Part 1 (2 units, 8 lessons), Science Part 1 (3 units, 9 lessons). Add a "Learning design" section listing the principles table from the Context above. `APP_OVERVIEW.md` sections 2, 4, 5, 6, 8 updated.
+- [x] Commit: `docs: refresh README and overview`
 
 ---
 
@@ -470,8 +470,8 @@ Tests: introduce sets dueAt to now + 1 day; three correct reviews reach box 4 wi
 
 ### Task 6.1: Accessibility
 
-- [ ] Every pressable card: `accessibilityRole="button"`, `accessibilityLabel`, min 48x48. Run the axe step of the e2e suite on home, book, unit, lesson: 0 contrast violations.
-- [ ] Commit: `fix: accessibility roles and contrast`
+- [x] Every pressable card: `accessibilityRole="button"`, `accessibilityLabel`, min 48x48. Run the axe step of the e2e suite on home, book, unit, lesson: 0 contrast violations.
+- [x] Commit: `fix: accessibility roles and contrast`
 
 ### Task 6.2: Performance pass
 
@@ -483,9 +483,9 @@ Tests: introduce sets dueAt to now + 1 day; three correct reviews reach box 4 wi
 
 **Files:** `e2e/app.spec.mjs`
 
-- [ ] Rewrite the baseline tests for `/`, `/book/[bookId]`, `/unit/[unitId]`, `/lesson/[lessonId]`. Add: 0 of 5 first taps correct → 1 star, 5 of 5 → 3 stars, repeat keeps best; shuffled options still complete (select by text, not position); trace lesson: a 5 px mouse drag shows the error banner, a diagonal drag across the pad completes; math counting and science naming lessons complete; unavailable book card does not navigate; English mode shows "Math" and "Science" while lesson text stays Arabic.
-- [ ] Learning loop tests using Playwright's `page.clock`: fresh start shows the Continue card pointing at Unit 1 lesson 1 and no Review card; complete `u2-3` with two wrong first taps → still no Review card today; `clock.setFixedTime` to tomorrow and reload → Review card shows 5 items (3 letters, the 2 missed ones are box 1); open review, answer all correctly, completion card shows 5/5; reload → Review card gone; streak badge shows 🔥 2 after activity on two consecutive days.
-- [ ] `pnpm test:e2e` green. Commit: `test: e2e for new navigation, scoring, tracing, math and science`
+- [x] Rewrite the baseline tests for `/`, `/book/[bookId]`, `/unit/[unitId]`, `/lesson/[lessonId]`. Add: 0 of 5 first taps correct → 1 star, 5 of 5 → 3 stars, repeat keeps best; shuffled options still complete (select by text, not position); trace lesson: a 5 px mouse drag shows the error banner, a diagonal drag across the pad completes; math counting and science naming lessons complete; unavailable book card does not navigate; English mode shows "Math" and "Science" while lesson text stays Arabic.
+- [x] Learning loop tests using Playwright's `page.clock`: fresh start shows the Continue card pointing at Unit 1 lesson 1 and no Review card; complete `u2-3` with two wrong first taps → still no Review card today; `clock.setFixedTime` to tomorrow and reload → Review card shows 5 items (3 letters, the 2 missed ones are box 1); open review, answer all correctly, completion card shows 5/5; reload → Review card gone; streak badge shows 🔥 2 after activity on two consecutive days.
+- [x] `pnpm test:e2e` green. Commit: `test: e2e for new navigation, scoring, tracing, math and science`
 
 ### Task 6.4: Android device check
 
