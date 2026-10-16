@@ -93,10 +93,10 @@ artifacts/learn-app/
 
 ### Task 0.1: Branch and baseline
 
-- [ ] `git status` clean. `git checkout -b rebuild/single-app`.
-- [ ] `pnpm install && pnpm --filter @workspace/learn-app run typecheck && pnpm --filter @workspace/learn-app run test:language`. Both pass.
-- [ ] Create `artifacts/learn-app/e2e/app.spec.mjs` with the 15 baseline tests from the previous session (navigation chain, letter_pick completion, star persistence, repeat without doubling, language switch, 404, desktop frame, axe scan) and `artifacts/learn-app/e2e/serve.mjs` (static server for `dist` with SPA fallback on port 8787). They document current behaviour and are rewritten in Task 6.3.
-- [ ] Commit: `chore: add baseline e2e suite before rebuild`
+- [x] `git status` clean. `git checkout -b rebuild/single-app`.
+- [x] `pnpm install && pnpm --filter @workspace/learn-app run typecheck && pnpm --filter @workspace/learn-app run test:language`. Both pass.
+- [x] Create `artifacts/learn-app/e2e/app.spec.mjs` with the 15 baseline tests from the previous session (navigation chain, letter_pick completion, star persistence, repeat without doubling, language switch, 404, desktop frame, axe scan) and `artifacts/learn-app/e2e/serve.mjs` (static server for `dist` with SPA fallback on port 8787). They document current behaviour and are rewritten in Task 6.3.
+- [x] Commit: `chore: add baseline e2e suite before rebuild`
 
 ---
 
@@ -106,15 +106,15 @@ artifacts/learn-app/
 
 **Files:** delete `artifacts/api-server/`, `artifacts/mockup-sandbox/`, `lib/`, `scripts/`, `.agents/`, root `tsconfig.json`, root `tsconfig.base.json`; modify `pnpm-workspace.yaml`, root `package.json`, `artifacts/learn-app/package.json`, `.gitignore`
 
-- [ ] `git rm -r artifacts/api-server artifacts/mockup-sandbox lib scripts .agents tsconfig.json tsconfig.base.json`
-- [ ] `pnpm-workspace.yaml` becomes exactly:
+- [x] `git rm -r artifacts/api-server artifacts/mockup-sandbox lib scripts .agents tsconfig.json tsconfig.base.json`
+- [x] `pnpm-workspace.yaml` becomes exactly:
 ```yaml
 packages:
   - artifacts/learn-app
 ```
 No catalog, no overrides, no `minimumReleaseAge*`, no `onlyBuiltDependencies`.
-- [ ] `artifacts/learn-app/package.json`: replace `"react": "catalog:"` with `"19.1.0"`, `"react-dom": "catalog:"` with `"19.1.0"`. `zod` is removed in Task 1.2.
-- [ ] Root `package.json` scripts:
+- [x] `artifacts/learn-app/package.json`: replace `"react": "catalog:"` with `"19.1.0"`, `"react-dom": "catalog:"` with `"19.1.0"`. `zod` is removed in Task 1.2.
+- [x] Root `package.json` scripts:
 ```json
 "typecheck": "pnpm --filter @workspace/learn-app run typecheck",
 "lint": "pnpm --filter @workspace/learn-app run lint",
@@ -124,9 +124,9 @@ No catalog, no overrides, no `minimumReleaseAge*`, no `onlyBuiltDependencies`.
 "build:web": "pnpm --filter @workspace/learn-app run build"
 ```
 Remove `build`, `typecheck:libs`, the `prettier` and `typescript` root devDependencies (they move into learn-app). Keep `packageManager` and the pnpm `preinstall` guard. Keep `.npmrc` unchanged.
-- [ ] `.gitignore`: delete the `# Replit` block (`.cache/`, `.local/`), `.config/`, `.upm/`, `.pythonlibs/`, `attached_assets/`, `*.tar.gz`, `.cursor/...`, `.github/instructions/nx...`. Keep everything else.
-- [ ] `pnpm install` then `pnpm typecheck`. Pass.
-- [ ] Commit: `chore: remove unused backend, codegen libs, sandbox, agent files and workspace catalog`
+- [x] `.gitignore`: delete the `# Replit` block (`.cache/`, `.local/`), `.config/`, `.upm/`, `.pythonlibs/`, `attached_assets/`, `*.tar.gz`, `.cursor/...`, `.github/instructions/nx...`. Keep everything else.
+- [x] `pnpm install` then `pnpm typecheck`. Pass.
+- [x] Commit: `chore: remove unused backend, codegen libs, sandbox, agent files and workspace catalog`
 
 ### Task 1.2: Prune dependencies and platform config
 
