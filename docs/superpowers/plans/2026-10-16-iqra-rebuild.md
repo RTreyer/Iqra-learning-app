@@ -454,10 +454,10 @@ Tests: introduce sets dueAt to now + 1 day; three correct reviews reach box 4 wi
 
 **Files:** create `components/ContinueCard.tsx`, `components/ReviewCard.tsx`, `components/StreakBadge.tsx`, `lib/streak.ts`, `lib/nextLesson.ts`, tests; modify `app/index.tsx`
 
-- [ ] `lib/nextLesson.ts`: `nextLesson(progress): { book, unit, lesson } | null` = first lesson in catalog order (Arabic units 1 to 8, then Math, then Science) whose stars < 3, skipping unavailable books. Test: fresh state → `u1-1`; all Arabic at 3 stars → `m1-1`.
-- [ ] `lib/streak.ts`: `currentStreak(days: string[], today: Date): number` counting consecutive ISO dates ending today or yesterday (yesterday keeps the streak alive until the day is over). Tests: `[]` → 0; today only → 1; yesterday and today → 2; gap → resets.
-- [ ] `app/index.tsx` above the book cards, same visual language (rounded card, subject color, emoji): `ContinueCard` ("تَابِعْ: {unit.title} · {lesson.title}", routes to `routes.lesson(id)`); `ReviewCard` only when `pickDue(...).length > 0` ("مُرَاجَعَة الْيَوْم · {n} عناصر", routes to `routes.review()`); `StreakBadge` beside the star badge when streak ≥ 2 ("🔥 {n}"). Hidden on first launch when nothing is started except `ContinueCard` pointing at `u1-1`.
-- [ ] Commit: `feat: continue, review and streak guidance on home`
+- [x] `lib/nextLesson.ts`: `nextLesson(progress): { book, unit, lesson } | null` = first lesson in catalog order (Arabic units 1 to 8, then Math, then Science) whose stars < 3, skipping unavailable books. Test: fresh state → `u1-1`; all Arabic at 3 stars → `m1-1`.
+- [x] `lib/streak.ts`: `currentStreak(days: string[], today: Date): number` counting consecutive ISO dates ending today or yesterday (yesterday keeps the streak alive until the day is over). Tests: `[]` → 0; today only → 1; yesterday and today → 2; gap → resets.
+- [x] `app/index.tsx` above the book cards, same visual language (rounded card, subject color, emoji): `ContinueCard` ("تَابِعْ: {unit.title} · {lesson.title}", routes to `routes.lesson(id)`); `ReviewCard` only when `pickDue(...).length > 0` ("مُرَاجَعَة الْيَوْم · {n} عناصر", routes to `routes.review()`); `StreakBadge` beside the star badge when streak ≥ 2 ("🔥 {n}"). Hidden on first launch when nothing is started except `ContinueCard` pointing at `u1-1`.
+- [x] Commit: `feat: continue, review and streak guidance on home`
 
 ### Task 5.6: Docs refresh
 
