@@ -10,6 +10,9 @@ import { unit8 } from "./arabic/unit8.ts";
 import { mathUnit1 } from "./math/unit1.ts";
 import { mathUnit2 } from "./math/unit2.ts";
 import { mathUnit3 } from "./math/unit3.ts";
+import { scienceUnit1 } from "./science/unit1.ts";
+import { scienceUnit2 } from "./science/unit2.ts";
+import { scienceUnit3 } from "./science/unit3.ts";
 
 export const books: Book[] = [
   {
@@ -39,7 +42,7 @@ export const books: Book[] = [
     subtitle: "الصف الأول",
     emoji: "🔬",
     color: SUBJECT_COLORS.science,
-    available: false,
-    units: [],
+    available: true,
+    units: [scienceUnit1, scienceUnit2, scienceUnit3],
   },
 ];
