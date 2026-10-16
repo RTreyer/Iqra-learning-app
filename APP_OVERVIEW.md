@@ -1,6 +1,6 @@
-# Iqra (أَقْرَأُ وَأَتَعَلَّمُ) – App Overview
+# Iqra (أَقْرَأُ وَأَتَعَلَّمُ) App Overview
 
-Status snapshot as of 2026-10-16. Use this file as context when writing prompts to improve or extend the app.
+Status snapshot as of 2026-10-17 (rebuild). Use this file as context when writing prompts to improve or extend the app.
 
 ## 1. Purpose
 
@@ -12,111 +12,116 @@ Offline-first learning app for children in Yemen, primary school grades 1 to 6. 
 
 ## 2. What exists today
 
-| Area | State |
-|---|---|
-| Grade 1 Arabic Part 1 | 8 units, 45 lessons (Unit 1: 5 pre-reading lessons, Units 2 to 8: 5 lessons each on letter phonics) |
-| Grade 1 Arabic Part 2 | Marked available, but 0 lessons (empty screen) |
-| Grade 1 Math Part 1 | Marked available, but 0 lessons (empty screen) |
-| All other Grade 1 books | Marked "coming soon" |
-| Grades 2 to 6 | Placeholder "coming soon" screens |
+The rebuild left one package with one content model (Book, Unit, Lesson) and one lesson screen.
 
-Unit structure for Units 2 to 8 (one unit = 3 letters + a theme story):
-1. `story` – tap each sentence to hear it
-2. `naming` – tap each vocabulary word to hear it
-3. `letter_pick` – 5 rounds, find the target letter among 3
-4. `word_read` – 5 rounds, hear a word and pick it among 3
-5. `listen_pick` – 3 comprehension questions about the story
+| Book | Units | Lessons | State |
+|---|---|---|---|
+| Arabic Part 1 (`arabic-1`) | 8 | 47 | Complete. Unit 1: 5 pre reading lessons. Units 2 to 8: 6 lessons each |
+| Math Part 1 (`math-1`) | 3 | 11 | Exemplary, from textbook Part 1 units 2 to 5 (numbers 0 to 10, add and subtract within 10, plane shapes). Not the full year |
+| Science Part 1 (`science-1`) | 3 | 9 | Placeholder, no textbook source yet |
+| Grades 2 to 6, other subjects | none | none | Not started |
 
-Unit 1 (pre-reading) has its own activity types: `naming`, `listen_pick`, `behavior`, `matching`, `drawing`.
+Review status per unit: `docs/CONTENT_REVIEW.md`.
+
+Lesson structure for Arabic units 2 to 8 (3 letters and a theme story per unit):
+1. `story`: tap each sentence to hear it
+2. `naming`: tap each vocabulary word to hear it
+3. `letter_pick`: find the target letter among 3
+4. `word_read`: hear a word and pick it among 3
+5. `listen_pick`: comprehension questions about the story
+6. `trace`: draw the letters on screen
+
+Unit 1 uses `naming`, `listen_pick`, `behavior`, `matching` and `trace`. Math uses `counting`, `arithmetic`, `naming`, `matching` and `listen_pick`. Science placeholder uses `story`, `naming` and `listen_pick`.
 
 ## 3. Tech stack
 
-- Monorepo: pnpm workspaces, Node 24 (works on 26), TypeScript 5.9.
-- App: Expo SDK 54, expo-router 6, React Native 0.81, React 19, React Compiler and New Architecture enabled.
-- Storage: AsyncStorage only. Key `@kidlearn_progress_v1` for progress, `iqra_ui_language` for language.
+- Monorepo: pnpm workspaces with one package, Node 24, TypeScript 5.9.
+- App: Expo SDK 54, expo-router 6, React Native 0.81, React 19, New Architecture. Typed routes are off, a `lib/routes.ts` helper builds paths.
+- Storage: AsyncStorage only. Key `@kidlearn_progress_v1` (schema v2) for progress, `iqra_ui_language` for language.
 - Audio: expo-speech with Arabic locale. Haptics: expo-haptics.
+- Graphics and input: react-native-svg and react-native-gesture-handler (Pan) for letter tracing. No icon fonts, no `expo-font`, no custom fonts. Icons are inline SVG or emoji.
+- Tests: jest-expo with Testing Library for unit and component tests, Node test runner for content and translation data, Playwright for web end to end.
+- CI: GitHub Actions (`.github/workflows/ci.yml`) runs typecheck, lint, test, test:data and test:e2e.
 - Targets: Android (Expo Go for dev, EAS APK for release), static web (Netlify, SPA redirect).
-- Fonts: Inter via expo-google-fonts. Icons: inline SVG via react-native-svg (icon fonts avoided for web reliability).
 
 ## 4. Repository layout
 
 ```
-artifacts/learn-app/              the Expo app (the only package that matters)
-  app/_layout.tsx                 providers, splash, 480px web frame
-  app/(tabs)/index.tsx            home: grade grid, star badge, language switch
-  app/(tabs)/grade/[grade].tsx    book list per grade
-  app/(tabs)/book/[grade]/[bookId].tsx   module list per book (units, reading, math...)
-  app/(tabs)/unit1/               Unit 1 index + lesson screen (own implementation, 941 lines)
-  app/(tabs)/unit/[unitId]/       generic index + lesson screen for Units 2 to 8
-  app/(tabs)/unit2/               LEGACY duplicate of Unit 2, not linked from UI, dead code
-  app/(tabs)/reading|writing|math/  screens for the empty Part 2 / Math modules
-  constants/grades.ts             grade and book catalog (availability, modules)
-  constants/unit1Lessons.ts       Unit 1 data
-  constants/allUnitsLessons.ts    Units 2 to 8 data (single source of truth for them)
-  constants/unit2Lessons.ts       LEGACY Unit 2 data, same IDs as allUnitsLessons, dead code
-  constants/lessons.ts            reading/writing/math types, arrays are EMPTY
-  constants/lessons-part2.ts      Part 2 reading, array is EMPTY
-  constants/ui-translations.ts    Arabic to English table for UI strings
-  context/ProgressContext.tsx     stars and completion, AsyncStorage, legacy migration
-  context/LanguageContext.tsx     ar/en switch with persistence
-  hooks/useLessonAttempt.ts       fresh attempt on every lesson open (repeat practice)
-  components/                     BackButton, UiText (auto-translating Text), ScreenBackground, ErrorBoundary...
-  scripts/test-ui-translations.mjs   the only automated test
-artifacts/api-server/             Express 5 + Drizzle + Postgres + Replit OIDC. NOT USED by the app.
-artifacts/mockup-sandbox/         Vite playground. NOT USED. Fails typecheck.
-lib/db, lib/api-spec, lib/api-zod, lib/api-client-react   backend schema and generated clients. NOT USED.
-netlify.toml                      web deploy config
-Start-Browser.cmd / Start-Handy.cmd   Windows double-click launchers (German)
-.agents/memory/                   notes from the AI agent that originally built the app
+package.json, pnpm-workspace.yaml   root scripts delegate to the app
+netlify.toml                        web deploy, publishes artifacts/learn-app/dist
+.github/workflows/ci.yml            CI
+Start-Browser.cmd / Start-Handy.cmd Windows double click launchers
+docs/                               UI_PROPOSALS.md, CONTENT_REVIEW.md, content/, superpowers/plans/
+artifacts/learn-app/                the Expo app
+  app/                  routes: _layout, index, book/[bookId], unit/[unitId], lesson/[lessonId], review, +not-found
+  components/           shared UI: cards, badges, BackButton, UiText (auto translating Text), ErrorBoundary, ActivityHost
+  components/activities/  one component per activity type, ReviewRound, shared/ (useQuiz, shuffle, ChoiceCard...), math/, trace/ (validate.ts, path.ts)
+  content/              types.ts, catalog.ts, index.ts, ui-translations.ts, arabic/ (8 units), math/ (3), science/ (3)
+  context/              ProgressContext (progress, hydration, persistence), LanguageContext
+  hooks/                useLessonAttempt, useVoiceHint, useScreenPadding
+  lib/                  scoring, srs, progressState, reviewItems, nextLesson, streak, dates, routes, params, labels, arabicNumbers, speech, haptics
+  theme/tokens.ts       colours, spacing, touch target
+  scripts/              content.test.mjs, ui-translations.test.mjs (test:data)
+  e2e/                  Playwright specs and static server
+  __tests__/            Jest tests (35 suites, 211 tests)
 ```
 
 ## 5. Routes
 
 ```
-/                              home
-/grade/[grade]                 books of a grade
-/book/[grade]/[bookId]         modules of a book
-/unit1                         Unit 1 lesson list
-/unit1/[id]                    Unit 1 lesson (ids u1-1 .. u1-5)
-/unit/[unitId]                 Units 2 to 8 lesson list
-/unit/[unitId]/[lessonId]      lesson (ids u2-1 .. u8-5)
-/reading, /writing, /math      empty module screens
-/unit2, /unit2/[id]            legacy, unreachable from UI
+/                       home: continue card, review card, streak, star badge, books, language switch
+/book/[bookId]          units of a book
+/unit/[unitId]          lessons of a unit
+/lesson/[lessonId]      lesson (ids u1-1 .. u8-6, m1-1 .. m3-3, s1-1 .. s3-3), globally unique
+/review                 today's review session
++not-found              fallback screen
 ```
 
-## 6. Key behaviours (verified by end-to-end tests)
+## 6. Key behaviours
 
-- Completing any lesson awards 3 stars via `completeLesson(lesson.id, 3)`.
-- Stars are max-kept per lesson. Repeating never adds stars. Total is the sum.
-- Opening a completed lesson always starts a fresh attempt. Completion screen offers "Repeat lesson", "Next activity" and "Back to list".
-- Language switch persists and affects only strings wrapped in `UiText` or passed through `translateUi`. Plain `Text` stays Arabic.
-- No network requests at runtime on web. Zero console errors across all flows.
-- Desktop browser shows a centered 480 px phone frame.
+- Stars come from the score: 3 at 100 percent, 2 at 60 percent or more, otherwise 1 (`starsForScore`).
+- Only the first tap of a round counts. The round locks after it.
+- Answer positions are shuffled with a seeded shuffle at render time. Content data is not edited.
+- Replaying a lesson starts a fresh attempt. Best stars are kept, stars are never added twice. Total is the sum of best results.
+- Review session: items due today (Leitner boxes 1 to 5, intervals 1, 2, 4, 7, 14 days, local day). Up to 10 items, interleaved by kind, wrong items repeat once at the end, only the first answer is recorded. Correct promotes only when due, wrong resets to box 1. Review awards no stars.
+- Home guidance: a continue card for the next lesson below 3 stars, a review card with the due count, a streak badge from 2 days.
+- Voice hint banner appears when the device has no Arabic TTS voice.
+- Tracing: gesture handler Pan draws strokes on an SVG pad. A heuristic checks stroke count, path length (50 percent of the shorter pad side), bounding box (20 percent of width or 15 percent of height) and centroid (within 35 percent of centre). It is an effort check, not shape matching.
+- Opening a lesson speaks the title first, then the activity mounts.
+- Language switch persists and affects only strings wrapped in `UiText` or passed through `translateUi`.
+- Progress is stored with a corrupt blob backup. Storage read errors never overwrite saved stars.
+- No network requests at runtime. Desktop browser shows a centered 480 px phone frame.
 
 ## 7. Commands
 
 ```bash
 pnpm install
-pnpm --filter @workspace/learn-app run typecheck      # passes
-pnpm --filter @workspace/learn-app run test:language  # 4 tests, pass
-pnpm --filter @workspace/learn-app run web            # dev in browser
-pnpm --filter @workspace/learn-app run dev            # Expo Go QR
-pnpm --filter @workspace/learn-app run build          # static web export to dist/
-pnpm build / pnpm typecheck (root)                    # FAILS because of mockup-sandbox
+pnpm typecheck        # root scripts delegate to @workspace/learn-app
+pnpm lint
+pnpm test             # Jest: 35 suites, 211 tests
+pnpm test:data        # 20 tests (content integrity, UI translations)
+pnpm test:e2e         # web export, then Playwright
+pnpm build:web        # static export to artifacts/learn-app/dist/ (1.53 MB after Task 4.4)
+pnpm --filter @workspace/learn-app run web    # dev in browser
+pnpm --filter @workspace/learn-app run dev    # Expo Go QR
+eas build -p android --profile preview        # APK, run in artifacts/learn-app
 ```
 
-## 8. Known defects, ranked
+If pnpm is not installed globally, prefix with `npx pnpm@10.34.6`.
 
-1. **Stars ignore performance.** 0 of 5 correct answers gives the same 3 stars as 5 of 5. Score is tracked in each activity but never passed to `completeLesson`.
-2. **Comprehension answers are always option 0.** In every unit's lesson 5, `correctIndex` is 0 for all questions. Guessable.
-3. **Empty modules marked available.** `arabic-1-part2` and `math-1-part1` are `available: true` with 0 lessons and open blank screens with no message.
-4. **Lesson ID collision.** Legacy `unit2Lessons.ts` and `allUnitsLessons.ts` both use u2-1 to u2-5 with different content. Progress bleeds between them.
-5. **Root build broken.** `mockup-sandbox` has 2 React type errors and is included in the root typecheck.
-6. **Partial translation.** "N remaining", "complete", and the completion message stay Arabic in English mode.
-7. **Color contrast.** Progress badges on home and book screens measure 2.35:1 to 3.6:1, below WCAG AA 4.5:1.
-8. **Code duplication.** Unit 1 and legacy Unit 2 screens are near copies (900+ lines each) while Units 2 to 8 use a shared engine.
-9. **README overstates content.** Claims 28 + 20 reading, 28 writing, 3 math lessons. Those arrays are empty.
-10. **Dead backend.** Express server, Postgres schema, OIDC auth, OpenAPI codegen ship in the repo but are disconnected. Roughly 40 percent of the codebase.
+## 8. Known gaps
+
+The ten defects of the earlier prototype are fixed or removed (stars ignored score, fixed correct answer position, empty available books, lesson ID collision, broken root build, dead backend, code duplication, README overstating content, partial translation of lesson chrome, README drift). Current gaps:
+
+1. Device verification pending: TTS, haptics, tracing and persistence are not yet checked on a real Android phone (Task 6.4).
+2. Science content is a placeholder until the owner provides the textbook.
+3. Native Arabic speaker review of all authored content is pending.
+4. The Playwright suite still targets the old routes and is rewritten in Task 6.3.
+5. Accessibility pass pending (Task 6.1): back link colour on gradients, header rows mirrored in Arabic, activity instruction strings in `UiText`.
+6. Backlog from `docs/superpowers/plans/PROGRESS.md`: speech `onDone` guard, title fallback by text length, stop speech before `router.replace`, `withAlpha` dev assertion, a shared `useChoiceRound`, retry hydration when both storage reads fail, one rewrite of a v2 blob per launch.
+7. Arabic dual and plural wording for review and streak counts was fixed in the last commits. Keep using the shared label helper (`lib/labels.ts`).
+8. Shape emoji for square and rectangle render poorly on some Android fonts. Replace with inline SVG (UI proposal 3).
+9. Math covers part of Part 1 only. Part 2 (units 6 to 10) is not started.
 
 ## 9. Constraints and conventions to respect
 
@@ -124,41 +129,33 @@ pnpm build / pnpm typecheck (root)                    # FAILS because of mockup-
 - English applies to menus and buttons only. Never translate learning content or Arabic speech.
 - Completed content must stay replayable without limit. Keep best stars, never multiply rewards.
 - 100 percent offline. No login, no accounts, no cloud. Avoid adding network dependencies.
-- Run `pnpm --filter @workspace/learn-app run typecheck` after every change.
+- Run `pnpm typecheck` and `pnpm test` after every change.
 - Keep the Metro `blockList` entries in `metro.config.js`.
 - Use inline SVG rather than icon fonts for anything that must render on web.
 
 ## 10. Improvement areas (candidate roadmap)
 
-Pedagogy and content
-- Tie stars to quiz score (for example 3 stars at 100 percent, 2 at 60 percent, 1 for completion).
-- Randomise answer positions or fix `correctIndex` distribution in comprehension lessons.
-- Fill Grade 1 Arabic Part 2, Math Part 1, and Islamic Education, or mark them unavailable until filled.
-- Add a "lesson coming soon" empty state to module screens.
-- Expand to Grades 2 to 6 using the existing `UnitData` schema.
+Near term (from the rebuild plan)
+- Task 6.1 accessibility, 6.2 performance pass, 6.3 end to end suite on the new routes, 6.4 Android device check.
+- Backlog items listed in section 8.
 
-Code quality
-- Delete legacy `unit2/` screens and `unit2Lessons.ts`, or migrate Unit 1 onto the generic engine.
-- Remove or isolate `api-server`, `lib/*` and `mockup-sandbox` so the root build passes.
-- Move activity components out of screen files into `components/activities/`.
-- Add `type: "module"` to learn-app package.json to silence the test loader warning.
+Product (13 proposals in `docs/UI_PROPOSALS.md`)
+- High value: icon set and SVG shapes instead of emoji, sound on/off toggle, parent area with reset (the `resetProgress` function exists without UI), bundled mp3 fallback for devices without Arabic TTS.
+- Medium: dark mode via tokens, adaptive Android icon (needs owner asset), big text toggle, progress ring, RTL audit in English mode, first launch onboarding, Arabic Part 2 return, mastery badges per letter.
+- Low: daily review reminder.
+- A shared small `settings` store serves proposals 1, 4, 6, 10 and 12.
+- Tracing: heuristic now, graded shape matching against guide paths later.
 
-Quality assurance
-- Add the Playwright end-to-end suite and the content integrity script to the repo and CI.
-- Add unit tests for `ProgressContext` and `useLessonAttempt`.
-- Fix contrast on progress badges. Add `accessibilityLabel` to emoji only buttons.
-
-Product
-- Parent or teacher view: per unit progress, reset progress button (the function exists in `ProgressContext` but has no UI).
-- Audio fallback when the device has no Arabic TTS voice.
-- Native APK verification: TTS, haptics, and the expo-updates startup check against the offline promise.
+Content
+- Fill Arabic Part 2, the rest of Math (Part 1 and Part 2), Science from the real textbook, then Islamic Education and Social Studies.
+- Expand to Grades 2 to 6 using the existing `Book` and `Unit` model in `content/types.ts`.
 
 ## 11. How to use this file for prompting
 
 A good improvement prompt should name:
-1. The target (section 10 item or a defect from section 8).
+1. The target (a section 10 item or a gap from section 8).
 2. The files involved (section 4).
 3. The constraints that must hold (section 9).
-4. The verification to run (section 7, plus the end-to-end flows in section 6).
+4. The verification to run (section 7, plus the behaviours in section 6).
 
-Example: "Tie stars to quiz performance in `app/(tabs)/unit/[unitId]/[lessonId].tsx` and `app/(tabs)/unit1/[id].tsx` without altering any lesson data. Pass the activity score into `completeLesson`. Keep best stars on repeat. Run the learn-app typecheck and the language tests. Confirm 0 of 5 correct no longer yields 3 stars."
+Example: "Add a sound on/off toggle (UI proposal 6). Touch `lib/speech.ts`, `lib/haptics.ts` and the lesson header, plus a new settings context. Do not alter any lesson data. Keep the 48 px touch target. Run typecheck, lint, test and test:data. Confirm `speak()` is silent when muted."

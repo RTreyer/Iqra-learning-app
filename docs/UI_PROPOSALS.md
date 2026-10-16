@@ -58,7 +58,7 @@ A small `settings` store (AsyncStorage, one JSON key, a context like `ProgressCo
 
 The look stays playful and colourful, so the current style is kept.
 
-**Files touched.** New `artifacts/learn-app/components/icons/ShapeIcon.tsx` and `Icon.tsx`; new `artifacts/learn-app/assets/icons/`; `artifacts/learn-app/content/types.ts` (optional `icon` key); content files under `artifacts/learn-app/content/`; `components/activities/*` where emoji are drawn; `package.json` (remove `@expo/vector-icons` and `expo-font`, see risks); tab bar icons in `app/(tabs)/_layout.tsx`.
+**Files touched.** New `artifacts/learn-app/components/icons/ShapeIcon.tsx` and `Icon.tsx`; new `artifacts/learn-app/assets/icons/`; `artifacts/learn-app/content/types.ts` (optional `icon` key); content files under `artifacts/learn-app/content/`; `components/activities/*` where emoji are drawn; `package.json` (remove `@expo/vector-icons` and `expo-font`, see risks); header and card icons in `components/` (`BackButton.tsx`, `UnitCard.tsx`, `BookCard.tsx`).
 
 **Effort.** L.
 
@@ -70,7 +70,7 @@ The look stays playful and colourful, so the current style is kept.
 
 **Design.** Parent area switch: Normal, Large, Extra large. A token `fontScale` of 1, 1.25, 1.5 multiplies letter and word sizes in lessons, not menus. Cards grow in height and wrap to one column if needed. Persisted in settings.
 
-**Files touched.** `theme/tokens.ts` (`typeScale`); new `artifacts/learn-app/theme/useTypeScale.ts`; new settings context; lesson and activity components under `components/activities/`; `app/(tabs)/index.tsx`; `app/(tabs)/book/[grade]/[bookId].tsx`.
+**Files touched.** `theme/tokens.ts` (`typeScale`); new `artifacts/learn-app/theme/useTypeScale.ts`; new settings context; lesson and activity components under `components/activities/`; `app/index.tsx`; `app/book/[bookId].tsx`.
 
 **Effort.** M.
 
@@ -82,7 +82,7 @@ The look stays playful and colourful, so the current style is kept.
 
 **Design.** A circular arc in the subject colour, with the star count or a check in the middle. Full ring turns gold. Used on unit cards and the book screen. The text stays as small secondary label for parents.
 
-**Files touched.** New `artifacts/learn-app/components/ProgressRing.tsx` (`react-native-svg`, `Circle` with `strokeDasharray`); `app/(tabs)/book/[grade]/[bookId].tsx`; unit screen under `app/`.
+**Files touched.** New `artifacts/learn-app/components/ProgressRing.tsx` (`react-native-svg`, `Circle` with `strokeDasharray`); `app/book/[bookId].tsx`; unit screen under `app/`.
 
 **Effort.** S.
 
@@ -106,7 +106,7 @@ The look stays playful and colourful, so the current style is kept.
 
 **Design.** A small gear icon on the home screen opens a gate. The gate is a hold-to-confirm button (hold 3 seconds) or one arithmetic question such as 7 + 6 (answer by number pad, Arabic-Indic digits accepted). Inside: per unit progress (ring plus stars), streak from `activity.days`, items due today (from `items[].dueAt`), switches for sound, big text, dark mode, reminder, and a Reset progress button with a second confirmation. Menu labels may be English, content stays Arabic.
 
-**Files touched.** New `artifacts/learn-app/app/parent.tsx` (or `app/(tabs)/parent.tsx`); new `components/ParentGate.tsx`; `app/(tabs)/index.tsx` (gear entry); `context/ProgressContext.tsx` (read only, plus maybe a `getStreak` helper in `lib/progressState.ts`); `content/ui-translations.ts`.
+**Files touched.** New `artifacts/learn-app/app/parent.tsx` ; new `components/ParentGate.tsx`; `app/index.tsx` (gear entry); `context/ProgressContext.tsx` (read only, plus maybe a `getStreak` helper in `lib/progressState.ts`); `content/ui-translations.ts`.
 
 **Effort.** M.
 
@@ -143,7 +143,7 @@ Size budget: mono, 22 kHz, 32 kbps mp3, about 4 KB per second. Letters: 28 x 2 c
 
 Use explicit `writingDirection: "rtl"` and `direction` on content containers instead of relying on global `I18nManager`, which needs an app restart.
 
-**Files touched.** `context/LanguageContext.tsx` (read only first); `app/(tabs)/index.tsx`; `app/(tabs)/book/[grade]/[bookId].tsx`; `components/activities/*`; a checklist added to `docs/` after the audit.
+**Files touched.** `context/LanguageContext.tsx` (read only first); `app/index.tsx`; `app/book/[bookId].tsx`; `components/activities/*`; a checklist added to `docs/` after the audit.
 
 **Effort.** S for the audit, M if many fixes.
 
@@ -167,7 +167,7 @@ Use explicit `writingDirection: "rtl"` and `direction` on content containers ins
 
 **Design.** Show the Part 2 card dimmed with a "قريباً" badge and no tap action, or a gentle toast. When content ships, set `available: true`, add the unit files, and the card becomes normal with no code change. The progress ring (proposal 5) starts at zero.
 
-**Files touched.** `artifacts/learn-app/content/catalog.ts`; `app/(tabs)/book/[grade]/[bookId].tsx` (badge rendering, already planned); new content files under `content/`; catalog test.
+**Files touched.** `artifacts/learn-app/content/catalog.ts`; `app/book/[bookId].tsx` (badge rendering, already planned); new content files under `content/`; catalog test.
 
 **Effort.** S.
 
@@ -203,7 +203,7 @@ Owner decision: heuristic validation now, graded matching later.
 
 ### Current heuristic
 
-The tracing activity validates a drawing with simple checks (`components/activities/trace/validate.ts`; the directory exists but this file was not present when this document was written, so the numbers below come from the task brief):
+The tracing activity validates a drawing with simple checks (`components/activities/trace/validate.ts`, called from `components/activities/TraceActivity.tsx`; the numbers below match the code):
 - stroke count is at least one,
 - total path length is at least 50 percent of the shorter pad side,
 - bounding box covers at least 20 percent of pad width or 15 percent of pad height,
