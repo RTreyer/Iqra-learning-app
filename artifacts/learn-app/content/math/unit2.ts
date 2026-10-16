@@ -14,7 +14,7 @@ export const mathUnit2: Unit = {
   lessons: [
     {
       id: "m2-1", number: 1, type: "arithmetic",
-      title: "أَجْمَعُ ضِمْنَ ٥", subtitle: "٣ زَائِد ٢ يُسَاوِي ٥",
+      title: "أَجْمَعُ ضِمْنَ ٥", subtitle: "٣ زَائِد ١ يُسَاوِي ٤",
       emoji: "➕", color,
       rounds: [
         { a: 1, b: 2, op: "+", options: [2, 3, 4] },
@@ -38,7 +38,7 @@ export const mathUnit2: Unit = {
     },
     {
       id: "m2-3", number: 3, type: "arithmetic",
-      title: "أَطْرَحُ ضِمْنَ ٥", subtitle: "٥ نَاقِص ٢ يُسَاوِي ٣",
+      title: "أَطْرَحُ ضِمْنَ ٥", subtitle: "٤ نَاقِص ٢ يُسَاوِي ٢",
       emoji: "➖", color,
       rounds: [
         { a: 3, b: 1, op: "-", options: [1, 2, 3] },
@@ -50,7 +50,7 @@ export const mathUnit2: Unit = {
     },
     {
       id: "m2-4", number: 4, type: "arithmetic",
-      title: "أَطْرَحُ ضِمْنَ ١٠", subtitle: "٨ نَاقِص ٣ يُسَاوِي ٥",
+      title: "أَطْرَحُ ضِمْنَ ١٠", subtitle: "٩ نَاقِص ٣ يُسَاوِي ٦",
       emoji: "➖", color,
       rounds: [
         { a: 8, b: 3, op: "-", options: [4, 5, 6] },

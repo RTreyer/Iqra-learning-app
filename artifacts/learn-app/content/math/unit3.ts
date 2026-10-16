@@ -4,7 +4,7 @@ import { SUBJECT_COLORS, type Unit } from "../types.ts";
 const color = SUBJECT_COLORS.math;
 
 const circle = { emoji: "⚪", word: "دَائِرَة" };
-const square = { emoji: "🟥", word: "مُرَبَّع" };
+const square = { emoji: "🔲", word: "مُرَبَّع" };
 const triangle = { emoji: "🔺", word: "مُثَلَّث" };
 const rectangle = { emoji: "▬", word: "مُسْتَطِيل" };
 
@@ -36,12 +36,12 @@ export const mathUnit3: Unit = {
     },
     {
       id: "m3-3", number: 3, type: "listen_pick",
-      title: "أَيُّ شَكْلٍ هَٰذَا؟", subtitle: "أَسْمَعُ الاسْمَ وَأَخْتَارُ الشَّكْل",
+      title: "أَيُّ شَكْلٍ هَٰذَا؟", subtitle: "أَسْمَعُ الاِسْمَ وَأَخْتَارُ الشَّكْل",
       emoji: "👂", color,
       questions: [
         { word: "مُثَلَّث", choices: [circle, triangle, square], correctIndex: 1 },
-        { word: "مُثَلَّث", choices: [triangle, rectangle, circle], correctIndex: 0 },
-        { word: "مُثَلَّث", choices: [square, circle, triangle], correctIndex: 2 },
+        { word: "دَائِرَة", choices: [triangle, rectangle, circle], correctIndex: 2 },
+        { word: "مُسْتَطِيل", choices: [square, rectangle, circle], correctIndex: 1 },
       ],
     },
   ],

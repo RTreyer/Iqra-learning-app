@@ -31,7 +31,7 @@ export const scienceUnit2: Unit = {
       items: [
         { emoji: "🐱", word: "قِطَّة" }, { emoji: "🐦", word: "عُصْفُور" },
         { emoji: "🐟", word: "سَمَكَة" }, { emoji: "🐄", word: "بَقَرَة" },
-        { emoji: "🐑", word: "خَرُوف" }, { emoji: "🐓", word: "دَجَاجَة" },
+        { emoji: "🐑", word: "خَرُوف" }, { emoji: "🐔", word: "دَجَاجَة" },
       ],
     },
     {
@@ -40,7 +40,7 @@ export const scienceUnit2: Unit = {
       emoji: "👂", color,
       questions: [
         { word: "عُصْفُور", choices: [{ emoji: "🐟", word: "سَمَكَة" }, { emoji: "🐦", word: "عُصْفُور" }, { emoji: "🐄", word: "بَقَرَة" }], correctIndex: 1 },
-        { word: "سَمَكَة", choices: [{ emoji: "🐱", word: "قِطَّة" }, { emoji: "🐓", word: "دَجَاجَة" }, { emoji: "🐟", word: "سَمَكَة" }], correctIndex: 2 },
+        { word: "سَمَكَة", choices: [{ emoji: "🐱", word: "قِطَّة" }, { emoji: "🐔", word: "دَجَاجَة" }, { emoji: "🐟", word: "سَمَكَة" }], correctIndex: 2 },
         { word: "بَقَرَة", choices: [{ emoji: "🐄", word: "بَقَرَة" }, { emoji: "🐑", word: "خَرُوف" }, { emoji: "🐦", word: "عُصْفُور" }], correctIndex: 0 },
       ],
     },
