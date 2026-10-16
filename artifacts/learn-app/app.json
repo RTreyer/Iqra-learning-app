@@ -13,30 +13,17 @@
       "resizeMode": "contain",
       "backgroundColor": "#FFFBF0"
     },
-    "ios": {
-      "supportsTablet": false
-    },
     "android": {
-      "package": "com.iqra.yemenlearn"
-    },
-    "runtimeVersion": {
-      "policy": "sdkVersion"
-    },
-    "updates": {
-      "enabled": true,
-      "checkAutomatically": "ON_LOAD",
-      "fallbackToCacheTimeout": 3000
+      "package": "com.iqra.yemenlearn",
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/images/icon.png"
     },
     "plugins": [
-      "expo-updates",
-      "expo-router",
-      "expo-font"
+      "expo-router"
     ],
     "experiments": {
-      "typedRoutes": true,
       "reactCompiler": true
     }
   }

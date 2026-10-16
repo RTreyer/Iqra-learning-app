@@ -1,13 +1,8 @@
 const { getDefaultConfig } = require("expo/metro-config");
-const path = require("path");
 
 const projectRoot = __dirname;
-const workspaceRoot = path.resolve(projectRoot, "../..");
 
 const config = getDefaultConfig(projectRoot);
-
-// Keep Expo's default watch folders and add the monorepo for workspace libs.
-config.watchFolders = [...new Set([...(config.watchFolders || []), workspaceRoot])];
 
 // Block native-only / build-tool packages that Metro cannot bundle
 // and that cause ENOENT errors when their temp files disappear after install.
@@ -25,10 +20,6 @@ const BLOCK_LIST_PATTERNS = [
 config.resolver = {
   ...config.resolver,
   blockList: BLOCK_LIST_PATTERNS,
-  nodeModulesPaths: [
-    path.resolve(projectRoot, "node_modules"),
-    path.resolve(workspaceRoot, "node_modules"),
-  ],
 };
 
 module.exports = config;
