@@ -1,5 +1,5 @@
 import { Platform } from "react-native";
-import type { Subject } from "@/content/types";
+import { SUBJECT_COLORS, type Subject } from "@/content/types";
 
 export type { Subject };
 
@@ -18,11 +18,7 @@ export const colors = {
   white: "#FFFFFF",
 } as const;
 
-export const subjects: Record<Subject, string> = {
-  arabic: "#2563EB",
-  math: "#7C3AED",
-  science: "#059669",
-};
+export const subjects = SUBJECT_COLORS;
 
 type Gradient = readonly [string, string, ...string[]];
 

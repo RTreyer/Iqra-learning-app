@@ -2,6 +2,9 @@
 
 export type Subject = "arabic" | "math" | "science";
 
+/** Single source of subject colors; theme/tokens.ts re-exports them as `subjects`. */
+export const SUBJECT_COLORS: Record<Subject, string> = { arabic: "#2563EB", math: "#7C3AED", science: "#059669" };
+
 export type Choice = { emoji: string; word: string };
 
 export type LessonBase = {

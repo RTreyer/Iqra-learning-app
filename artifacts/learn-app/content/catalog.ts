@@ -1,4 +1,4 @@
-import type { Book } from "./types";
+import { SUBJECT_COLORS, type Book } from "./types.ts";
 import { unit1 } from "./arabic/unit1.ts";
 import { unit2 } from "./arabic/unit2.ts";
 import { unit3 } from "./arabic/unit3.ts";
@@ -8,9 +8,6 @@ import { unit6 } from "./arabic/unit6.ts";
 import { unit7 } from "./arabic/unit7.ts";
 import { unit8 } from "./arabic/unit8.ts";
 
-// Book colors equal `subjects` in theme/tokens.ts. They are literals here because
-// tokens imports react-native and this module must load in plain Node (test:data);
-// __tests__/content.test.ts guards that they stay in sync.
 export const books: Book[] = [
   {
     id: "arabic-1",
@@ -28,7 +25,7 @@ export const books: Book[] = [
     title: "الرياضيات",
     subtitle: "الصف الأول",
     emoji: "🔢",
-    color: "#7C3AED",
+    color: SUBJECT_COLORS.math,
     available: false,
     units: [],
   },
@@ -38,7 +35,7 @@ export const books: Book[] = [
     title: "العلوم",
     subtitle: "الصف الأول",
     emoji: "🔬",
-    color: "#059669",
+    color: SUBJECT_COLORS.science,
     available: false,
     units: [],
   },
