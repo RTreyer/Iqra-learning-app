@@ -25,6 +25,13 @@
     ],
     "experiments": {
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "d7c231c8-0185-4618-ac32-75b0a79261dc"
+      }
+    },
+    "owner": "cj8181"
   }
 }
