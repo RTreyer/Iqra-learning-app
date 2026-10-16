@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { UiChevron } from "@/components/UiChevron";
 import { UiText } from "@/components/UiText";
 import { useLanguage } from "@/context/LanguageContext";
+import { itemsLabel } from "@/lib/labels";
 import { colors, radius, touchTarget } from "@/theme/tokens";
 
 type Props = { count: number; onPress: () => void };
@@ -11,12 +12,12 @@ type Props = { count: number; onPress: () => void };
 /** Home guidance: today's due review items. Shown only when something is due. */
 export function ReviewCard({ count, onPress }: Props) {
   const { t, language } = useLanguage();
-  const items = `${count} عناصر`;
+  const items = itemsLabel(count, language);
   return (
     <Pressable
       testID="review-card"
       accessibilityRole="button"
-      accessibilityLabel={`${t("مُرَاجَعَة الْيَوْم")} · ${t(items)}`}
+      accessibilityLabel={`${t("مُرَاجَعَة الْيَوْم")} · ${items}`}
       onPress={onPress}
       style={({ pressed }) => [
         styles.card,

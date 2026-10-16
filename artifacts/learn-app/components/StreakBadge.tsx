@@ -2,13 +2,14 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { useLanguage } from "@/context/LanguageContext";
+import { streakLabel } from "@/lib/labels";
 import { colors, withAlpha } from "@/theme/tokens";
 
 /** Consecutive active days, shown beside the star badge. */
 export function StreakBadge({ days }: { days: number }) {
-  const { t } = useLanguage();
+  const { language } = useLanguage();
   return (
-    <View style={styles.row} testID="streak-badge" accessible accessibilityLabel={t(`${days} يَوْم مُتَتَالٍ`)}>
+    <View style={styles.row} testID="streak-badge" accessible accessibilityLabel={streakLabel(days, language)}>
       <Text style={styles.count}>{`🔥 ${days}`}</Text>
     </View>
   );

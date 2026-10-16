@@ -14,6 +14,13 @@ const NOW = new Date(2026, 9, 16, 10, 0, 0);
 const DUE = new Date(2026, 9, 15).toISOString();
 const { router } = jest.requireMock("expo-router") as { router: { push: jest.Mock } };
 
+async function seed(dueCount: number, days: string[]) {
+  const item = { box: 2, dueAt: DUE, lastSeenAt: DUE, lapses: 0 };
+  const ids = Array.from(allItems().keys()).slice(0, dueCount);
+  const items = Object.fromEntries(ids.map((id) => [id, item]));
+  await AsyncStorage.setItem(KEY, JSON.stringify({ version: 2, lessons: {}, items, activity: { days }, totalStars: 0 }));
+}
+
 function renderHome() {
   return renderScreen(
     <ProgressProvider>
@@ -41,19 +48,29 @@ test("first launch shows only the continue card, pointing at u1-1", async () => 
   expect(router.push).toHaveBeenCalledWith(routes.lesson("u1-1"));
 });
 
-test("due items and a two day streak show the review card and streak badge", async () => {
-  const ids = Array.from(allItems().keys()).slice(0, 2);
-  const item = { box: 2, dueAt: DUE, lastSeenAt: DUE, lapses: 0 };
-  const items = Object.fromEntries(ids.map((id) => [id, item]));
-  await AsyncStorage.setItem(
-    KEY,
-    JSON.stringify({ version: 2, lessons: {}, items, activity: { days: ["2026-10-15", "2026-10-16"] }, totalStars: 0 }),
-  );
+test("two due items and a two day streak show the review card and streak badge", async () => {
+  await seed(2, ["2026-10-15", "2026-10-16"]);
   renderHome();
   const review = await screen.findByTestId("review-card");
-  expect(screen.getByText("2 عناصر")).toBeTruthy();
+  expect(screen.getByText("عنصران")).toBeTruthy();
   expect(screen.getByTestId("streak-badge")).toHaveTextContent("🔥 2");
-  expect(screen.getByLabelText("2 يَوْم مُتَتَالٍ")).toBeTruthy();
+  expect(screen.getByLabelText("يَوْمَانِ مُتَتَالِيَانِ")).toBeTruthy();
   fireEvent.press(review);
   expect(router.push).toHaveBeenCalledWith(routes.review());
+});
+
+test("one due item uses the singular and a one day streak hides the badge", async () => {
+  await seed(1, ["2026-10-16"]);
+  renderHome();
+  await screen.findByTestId("review-card");
+  expect(screen.getByText("عنصر واحد")).toBeTruthy();
+  expect(screen.queryByTestId("streak-badge")).toBeNull();
+});
+
+test("three due items and a three day streak use the plural", async () => {
+  await seed(3, ["2026-10-14", "2026-10-15", "2026-10-16"]);
+  renderHome();
+  await screen.findByTestId("review-card");
+  expect(screen.getByText("3 عناصر")).toBeTruthy();
+  expect(screen.getByLabelText("3 أَيَّام مُتَتَالِيَة")).toBeTruthy();
 });

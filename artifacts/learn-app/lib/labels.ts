@@ -8,3 +8,11 @@ export function itemsLabel(n: number, language: UiLanguage): string {
   if (n >= 3 && n <= 10) return `${n} عناصر`;
   return `${n} عنصرًا`;
 }
+
+/** Spoken streak for the badge (n >= 2; the badge hides below 2), with Arabic dual and plural forms. */
+export function streakLabel(n: number, language: UiLanguage): string {
+  if (language === "en") return `${n} day streak`;
+  if (n === 2) return "يَوْمَانِ مُتَتَالِيَانِ";
+  if (n >= 3 && n <= 10) return `${n} أَيَّام مُتَتَالِيَة`;
+  return `${n} يَوْمًا مُتَتَالِيًا`;
+}

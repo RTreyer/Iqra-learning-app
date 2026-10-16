@@ -29,6 +29,7 @@ export default function HomeScreen() {
   const { progress, getDueItemIds } = useProgress();
   const pad = useScreenPadding();
   const next = useMemo(() => nextLesson(progress), [progress]);
+  // Recomputed only on progress changes or remount, so a day rollover while open waits for the next change.
   const streak = useMemo(() => currentStreak(progress.activity.days, new Date()), [progress]);
   const dueCount = getDueItemIds().length;
 
