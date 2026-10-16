@@ -12,9 +12,9 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { useColors } from "@/hooks/useColors";
 import { UiText } from "@/components/UiText";
 import { useLanguage } from "@/context/LanguageContext";
+import { colors } from "@/theme/tokens";
 
 export type ErrorFallbackProps = {
   error: Error;
@@ -23,7 +23,6 @@ export type ErrorFallbackProps = {
 
 export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
   const { t } = useLanguage();
-  const colors = useColors();
   const insets = useSafeAreaInsets();
 
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -52,7 +51,7 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
   });
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={[styles.container, { backgroundColor: colors.cream }]}>
       {__DEV__ ? (
         <Pressable
           onPress={() => setIsModalVisible(true)}
@@ -62,21 +61,21 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
             styles.topButton,
             {
               top: insets.top + 16,
-              backgroundColor: colors.card,
+              backgroundColor: colors.white,
               opacity: pressed ? 0.8 : 1,
             },
           ]}
         >
-          <Feather name="alert-circle" size={20} color={colors.foreground} />
+          <Feather name="alert-circle" size={20} color={colors.text} />
         </Pressable>
       ) : null}
 
       <View style={styles.content}>
-        <UiText style={[styles.title, { color: colors.foreground }]}>
+        <UiText style={[styles.title, { color: colors.text }]}>
           حدث خطأ
         </UiText>
 
-        <UiText style={[styles.message, { color: colors.mutedForeground }]}>
+        <UiText style={[styles.message, { color: colors.muted }]}>
           أعد تحميل التطبيق للمتابعة.
         </UiText>
 
@@ -85,7 +84,7 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
           style={({ pressed }) => [
             styles.button,
             {
-              backgroundColor: colors.primary,
+              backgroundColor: colors.star,
               opacity: pressed ? 0.9 : 1,
               transform: [{ scale: pressed ? 0.98 : 1 }],
             },
@@ -94,7 +93,7 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
           <UiText
             style={[
               styles.buttonText,
-              { color: colors.primaryForeground },
+              { color: colors.white },
             ]}
           >
             حاول مرة أخرى
@@ -113,7 +112,7 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
             <View
               style={[
                 styles.modalContainer,
-                { backgroundColor: colors.background },
+                { backgroundColor: colors.cream },
               ]}
             >
               <View
@@ -122,7 +121,7 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
                   { borderBottomColor: colors.border },
                 ]}
               >
-                <UiText style={[styles.modalTitle, { color: colors.foreground }]}>
+                <UiText style={[styles.modalTitle, { color: colors.text }]}>
                   تفاصيل الخطأ
                 </UiText>
                 <Pressable
@@ -134,7 +133,7 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
                     { opacity: pressed ? 0.6 : 1 },
                   ]}
                 >
-                  <Feather name="x" size={24} color={colors.foreground} />
+                  <Feather name="x" size={24} color={colors.text} />
                 </Pressable>
               </View>
 
@@ -149,14 +148,14 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
                 <View
                   style={[
                     styles.errorContainer,
-                    { backgroundColor: colors.card },
+                    { backgroundColor: colors.white },
                   ]}
                 >
                   <Text
                     style={[
                       styles.errorText,
                       {
-                        color: colors.foreground,
+                        color: colors.text,
                         fontFamily: monoFont,
                       },
                     ]}

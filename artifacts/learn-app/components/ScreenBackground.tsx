@@ -9,7 +9,10 @@ import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { StyleProp, StyleSheet, Text, ViewStyle } from "react-native";
 
+import { gradients, legacyGradients, type Subject } from "@/theme/tokens";
+
 export type BgVariant = "home" | "reading" | "math" | "writing";
+export type BgSubject = Subject | "home";
 
 type DecoItem = {
   emoji: string;
@@ -23,7 +26,7 @@ type DecoItem = {
 };
 
 type Config = {
-  colors: readonly [string, string, string];
+  colors: readonly [string, string, ...string[]];
   start: { x: number; y: number };
   end: { x: number; y: number };
   decos: DecoItem[];
@@ -31,7 +34,7 @@ type Config = {
 
 const CONFIGS: Record<BgVariant, Config> = {
   home: {
-    colors: ["#FFFDE7", "#FFF0A0", "#FFDC70"] as const,
+    colors: gradients.home,
     start: { x: 0.1, y: 0 },
     end: { x: 0.9, y: 1 },
     decos: [
@@ -44,7 +47,7 @@ const CONFIGS: Record<BgVariant, Config> = {
     ],
   },
   reading: {
-    colors: ["#E3F4FF", "#B8DFFF", "#8EC9FF"] as const,
+    colors: legacyGradients.reading,
     start: { x: 0, y: 0 },
     end: { x: 1, y: 1 },
     decos: [
@@ -56,7 +59,7 @@ const CONFIGS: Record<BgVariant, Config> = {
     ],
   },
   math: {
-    colors: ["#E3FFF2", "#B0F5D8", "#7FECC0"] as const,
+    colors: legacyGradients.math,
     start: { x: 0.1, y: 0 },
     end: { x: 0.9, y: 1 },
     decos: [
@@ -68,7 +71,7 @@ const CONFIGS: Record<BgVariant, Config> = {
     ],
   },
   writing: {
-    colors: ["#EEE9FF", "#D8CFFF", "#C0B0FF"] as const,
+    colors: legacyGradients.writing,
     start: { x: 0, y: 0 },
     end: { x: 1, y: 1 },
     decos: [
@@ -81,14 +84,26 @@ const CONFIGS: Record<BgVariant, Config> = {
   },
 };
 
+const SUBJECT_STYLE: Record<BgSubject, Pick<Config, "start" | "end" | "decos">> = {
+  home: CONFIGS.home,
+  arabic: CONFIGS.reading,
+  math: CONFIGS.math,
+  science: CONFIGS.math,
+};
+
 type Props = {
-  variant: BgVariant;
+  /** Legacy per screen look. Defaults to "home". Ignored when `subject` is set. */
+  variant?: BgVariant;
+  /** Token based gradient keyed by subject. */
+  subject?: BgSubject;
   children: React.ReactNode;
   style?: StyleProp<ViewStyle>;
 };
 
-export function ScreenBackground({ variant, children, style }: Props) {
-  const cfg = CONFIGS[variant];
+export function ScreenBackground({ variant = "home", subject, children, style }: Props) {
+  const cfg: Config = subject
+    ? { ...SUBJECT_STYLE[subject], colors: gradients[subject] }
+    : CONFIGS[variant];
 
   return (
     <LinearGradient
