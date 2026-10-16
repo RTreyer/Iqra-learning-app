@@ -63,12 +63,12 @@ To make it self-resuming after a usage limit reset, run inside the session (loca
 | 5.1 Science content | done | 6890685, 830a447 | 3 units, 9 lessons, placeholder; spec + Arabic review passed |
 | 5.2 Math content | done | c9cb8e0, 80dce34, 830a447 | 3 units, 11 lessons from textbook Part 1 (numbers 0 to 10, add/sub within 10, plane shapes); `numberToArabicWord` follows after 4.3 lands `lib/arabicNumbers.ts` |
 | 5.3 Review items and Leitner scheduler | done | a215936, 7accc6c | spec + code review passed; promote only when due, wrong always resets; due by local day; clock skew guard |
-| 5.4 Review session screen | fixing | a0cce03 | spec review passed; code review: record at tap time, gate on hydrated; fix in progress |
-| 5.5 Home guidance | done (grammar follow-up pending) | 05149de | review passed; Arabic dual/plural for "{n} عناصر" and "{n} يَوْم مُتَتَالٍ" to use the shared label helper from the 5.4 fix |
-| 5.6 Docs refresh | | | |
-| 6.1 Accessibility | | | carry over from 4.4 re-review: back link colour on gradients (use colors.text or #475569), mirror header rows in Arabic (row-reverse), UiText for activity instruction strings |
+| 5.4 Review session screen | done | a0cce03, db3a3e4 | spec + code review passed; answers recorded at tap time; session mounts after hydration; `hydrated`/`loadSettled` exposed |
+| 5.5 Home guidance | done | 05149de, 947e0eb | review passed; Arabic dual/plural labels via lib/labels.ts |
+| 5.6 Docs refresh | in progress | | README, APP_OVERVIEW, UI_PROPOSALS paths |
+| 6.1 Accessibility | in progress | | carry over from 4.4 re-review: back link colour on gradients (use colors.text or #475569), mirror header rows in Arabic (row-reverse), UiText for activity instruction strings |
 | 6.2 Performance pass | | | APK/meminfo numbers need a device, record web bundle only |
-| 6.3 E2E suite on new routes | | | |
+| 6.3 E2E suite on new routes | in progress | | rewrite for flat routes + learning loop with page.clock + axe |
 | 6.4 Android device check | ready for build | | EAS login verified 2026-10-16 (primary account `cj8181`; a second account `cj818181` also exists, use `cj8181` for `eas init` unless the owner says otherwise). Device testing still needs the owner's phone |
 | 6.5 UI proposals doc | done (path check in 5.6) | 0fb8b9c | 13 proposals + tracing roadmap; file paths referencing app/(tabs) must be updated in 5.6 after 4.4 |
 | 6.6 Flatten to root | owner | | optional, separate PR, owner decides |

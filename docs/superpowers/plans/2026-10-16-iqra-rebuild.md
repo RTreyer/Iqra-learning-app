@@ -444,11 +444,11 @@ Tests: introduce sets dueAt to now + 1 day; three correct reviews reach box 4 wi
 
 **Files:** create `app/review.tsx`, `components/activities/ReviewRound.tsx`, `__tests__/review.test.tsx`; modify `lib/routes.ts` (`review: (): Href => "/review"`), `content/ui-translations.ts`
 
-- [ ] `ReviewRound.tsx` renders one `ReviewItem` using the shared pieces (`ChoiceCard`, listen button, `useShuffled`) with the same first tap scoring and feedback as the lesson activities. Props: `item`, `attemptKey`, `onAnswer(correct: boolean)`.
-- [ ] `app/review.tsx`: on mount `pickDue(progress.items, new Date())` → queue. Shows `ProgressDots`, current `ReviewRound`, interleaved order from `pickDue`. On answer: `recordReview(itemId, correct)`, `success()`/`error()`, speak; wrong items are appended once to the end of the queue for same session repetition (not re-recorded a second time). When the queue is empty: completion card "أَحْسَنْت! مُرَاجَعَة الْيَوْم مُكْتَمِلَة" with correct/total and a back link. No stars for review (stars belong to lessons; avoids farming). If nothing is due on open, show "لا شَيْءَ لِلْمُرَاجَعَةِ الْيَوْم" with a back link.
-- [ ] Translations: "مُرَاجَعَة" → "Review", "مُرَاجَعَة الْيَوْم" → "Today's review", "تَابِعْ" → "Continue", "لا شَيْءَ لِلْمُرَاجَعَةِ الْيَوْم" → "Nothing to review today", "{n} عناصر" → "{n} items", "يَوْم مُتَتَالٍ" → "day streak".
-- [ ] Test: with 3 due items mocked in context, answering wrong, right, right, then right on the repeated item calls `recordReview` 3 times and shows the completion card with 2/3.
-- [ ] Commit: `feat: spaced repetition review session`
+- [x] `ReviewRound.tsx` renders one `ReviewItem` using the shared pieces (`ChoiceCard`, listen button, `useShuffled`) with the same first tap scoring and feedback as the lesson activities. Props: `item`, `attemptKey`, `onAnswer(correct: boolean)`.
+- [x] `app/review.tsx`: on mount `pickDue(progress.items, new Date())` → queue. Shows `ProgressDots`, current `ReviewRound`, interleaved order from `pickDue`. On answer: `recordReview(itemId, correct)`, `success()`/`error()`, speak; wrong items are appended once to the end of the queue for same session repetition (not re-recorded a second time). When the queue is empty: completion card "أَحْسَنْت! مُرَاجَعَة الْيَوْم مُكْتَمِلَة" with correct/total and a back link. No stars for review (stars belong to lessons; avoids farming). If nothing is due on open, show "لا شَيْءَ لِلْمُرَاجَعَةِ الْيَوْم" with a back link.
+- [x] Translations: "مُرَاجَعَة" → "Review", "مُرَاجَعَة الْيَوْم" → "Today's review", "تَابِعْ" → "Continue", "لا شَيْءَ لِلْمُرَاجَعَةِ الْيَوْم" → "Nothing to review today", "{n} عناصر" → "{n} items", "يَوْم مُتَتَالٍ" → "day streak".
+- [x] Test: with 3 due items mocked in context, answering wrong, right, right, then right on the repeated item calls `recordReview` 3 times and shows the completion card with 2/3.
+- [x] Commit: `feat: spaced repetition review session`
 
 ### Task 5.5: Home guidance: continue, review due, streak
 
