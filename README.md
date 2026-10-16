@@ -1,4 +1,4 @@
-# أَقْرَأُ وَأَتَعَلَّمُ — KidLearn Yemen
+# Iqra (أَقْرَأُ وَأَتَعَلَّمُ)
 
 Offline-first learning app for children grades 1–6 in Yemen.
 Goal: enable children to independently learn all primary-school subjects — without a teacher — in a playful and effective way, based on the official Yemen MoE curriculum.
@@ -21,22 +21,26 @@ Goal: enable children to independently learn all primary-school subjects — wit
 
 ## Run & Operate
 
-Requires Node.js 24 and pnpm (`corepack enable pnpm`).
+Requires Node.js 24 or newer and pnpm 10 (`npx pnpm@10.34.6` or `corepack enable pnpm`).
 
 **Windows quick start:** after `pnpm install`, double-click `Start-Browser.cmd` (opens the app in the browser) or `Start-Handy.cmd` (shows a QR code for Expo Go).
 
 - `pnpm install` — install dependencies
+- `pnpm typecheck` — typecheck the workspace
+- `pnpm build:web` — build the static web export into `artifacts/learn-app/dist/`
 - `pnpm --filter @workspace/learn-app run dev` — start Expo; scan the QR code with Expo Go on an Android phone
 - `pnpm --filter @workspace/learn-app run web` — run the app in the browser
-- `pnpm --filter @workspace/learn-app run typecheck` — typecheck the app
 - `pnpm --filter @workspace/learn-app run test:language` — UI translation tests
-- `eas build -p android --profile preview` (in `artifacts/learn-app`) — build an installable APK via Expo EAS
+
+## Targets
+
+- Android: installable APK via Expo EAS (`eas build -p android --profile preview` in `artifacts/learn-app`)
+- Web: static export in `dist/`
 
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
 - Mobile: Expo SDK (expo-router, expo-speech, expo-haptics, AsyncStorage)
-- API: Express 5 + Postgres in `artifacts/api-server` / `lib/db` — **not used by the app**, kept for a possible future sync feature
 
 ## Where things live
 
@@ -49,7 +53,7 @@ Requires Node.js 24 and pnpm (`corepack enable pnpm`).
 
 ## Architecture decisions
 
-- **No server, no login:** progress is stored on the device only (AsyncStorage key `@kidlearn_progress_v1`). Progress from older per-account builds is migrated automatically on first start.
+- **No server, no login:** progress is stored on the device only (AsyncStorage key `@kidlearn_progress_v1`). The key keeps its legacy name for compatibility, so existing progress is preserved.
 
 - **Route structure:** `/(tabs)/grade/[grade]` → `/(tabs)/book/[grade]/[bookId]` → subject module index → lesson screen
 - **Lesson IDs:** `r1–r28` (Part 1 reading), `p2r1–p2r20` (Part 2 reading), `w1–w28` (writing), `m1–m3` (math)
@@ -65,5 +69,5 @@ Requires Node.js 24 and pnpm (`corepack enable pnpm`).
 
 - `expo-speech` version mismatch warning is non-critical — speech still works
 - `shadow*` and `pointerEvents` deprecation warnings are cosmetic — no functional impact
-- Always run `pnpm --filter @workspace/learn-app run typecheck` after any code change
+- Always run `pnpm typecheck` after any code change
 - BackButton uses inline SVG (react-native-svg), not Feather icons — avoids web icon font failures

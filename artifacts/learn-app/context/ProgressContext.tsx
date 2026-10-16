@@ -3,12 +3,6 @@
  *
  * Fully offline: progress lives in React state and is persisted to
  * AsyncStorage on the device. There is no server, login or sync.
- *
- * Migration:
- *  Earlier versions scoped progress per logged-in account
- *  (`@kidlearn_progress_v1_<userId>`). On first start without a device-wide
- *  entry, the account entry with the most stars is copied over so children
- *  keep their stars after the update.
  */
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -23,9 +17,8 @@ import React, {
 
 // ─── AsyncStorage keys ────────────────────────────────────────────────────────
 
+// Legacy name kept on purpose: renaming the key would wipe existing progress.
 const STORAGE_KEY = "@kidlearn_progress_v1";
-const LEGACY_ACCOUNT_KEY_PREFIX = "@kidlearn_progress_v1_";
-const LEGACY_PENDING_KEY_PREFIX = "@kidlearn_pending_sync_v1_";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -59,37 +52,11 @@ const ProgressContext = createContext<ProgressContextValue>({
 
 // ─── AsyncStorage helpers ─────────────────────────────────────────────────────
 
-/**
- * One-time migration from per-account keys to the device-wide key.
- * Picks the account with the most stars and removes the old account keys.
- */
-async function migrateAccountProgress(): Promise<ProgressState | null> {
-  try {
-    const keys = await AsyncStorage.getAllKeys();
-    const accountKeys = keys.filter((k) => k.startsWith(LEGACY_ACCOUNT_KEY_PREFIX));
-    const pendingKeys = keys.filter((k) => k.startsWith(LEGACY_PENDING_KEY_PREFIX));
-    if (accountKeys.length === 0) return null;
-
-    let best: ProgressState | null = null;
-    for (const [, json] of await AsyncStorage.multiGet(accountKeys)) {
-      if (!json) continue;
-      const state = JSON.parse(json) as ProgressState;
-      if (!best || state.totalStars > best.totalStars) best = state;
-    }
-
-    if (best) await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(best));
-    await AsyncStorage.multiRemove([...accountKeys, ...pendingKeys]);
-    return best;
-  } catch {
-    return null;
-  }
-}
-
 async function loadLocalProgress(): Promise<ProgressState> {
   try {
     const json = await AsyncStorage.getItem(STORAGE_KEY);
     if (json) return JSON.parse(json) as ProgressState;
-    return (await migrateAccountProgress()) ?? defaultState;
+    return defaultState;
   } catch {
     return defaultState;
   }
