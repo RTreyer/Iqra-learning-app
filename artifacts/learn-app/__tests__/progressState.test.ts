@@ -1,5 +1,6 @@
 import {
   applyCompletion,
+  clampStars,
   createEmptyState,
   mergeProgress,
   unitProgress,
@@ -116,6 +117,15 @@ describe("mergeProgress", () => {
   });
 });
 
+describe("mergeProgress ties", () => {
+  it("keeps the stored entry and its completedAt when stars are equal", () => {
+    const stored = applyCompletion(createEmptyState(), "a", 2, NOW);
+    const local = applyCompletion(createEmptyState(), "a", 2, LATER);
+    const merged = mergeProgress(stored, local);
+    expect(merged.lessons.a.completedAt).toBe(NOW.toISOString());
+  });
+});
+
 describe("unitProgress", () => {
   it("counts done lessons and sums stars for the given ids", () => {
     let s = applyCompletion(createEmptyState(), "a", 3, NOW);
@@ -123,5 +133,83 @@ describe("unitProgress", () => {
     s = applyCompletion(s, "other", 3, NOW);
     expect(unitProgress(s, ["a", "b", "c"])).toEqual({ done: 2, total: 3, stars: 5 });
     expect(unitProgress(s, [])).toEqual({ done: 0, total: 0, stars: 0 });
+  });
+});
+
+describe("validation", () => {
+  it.each([
+    [2, 2],
+    [2.6, 3],
+    [7, 3],
+    [-1, 0],
+    [NaN, 0],
+    [Infinity, 0],
+    ["2", 0],
+    [undefined, 0],
+  ])("clampStars(%p) is %p", (input, expected) => {
+    expect(clampStars(input)).toBe(expected);
+  });
+
+  it("clamps stored stars and recomputes totalStars", () => {
+    const state = upgradeState(
+      {
+        lessons: {
+          a: { completed: true, stars: 9 },
+          b: { completed: true, stars: "3" },
+          c: { completed: true, stars: -2 },
+        },
+        totalStars: 12,
+      },
+      NOW,
+    );
+    expect(state.lessons.a.stars).toBe(3);
+    expect(state.lessons.b.stars).toBe(0);
+    expect(state.lessons.c.stars).toBe(0);
+    expect(state.totalStars).toBe(3);
+  });
+
+  it("clamps stars passed to applyCompletion", () => {
+    expect(applyCompletion(createEmptyState(), "a", 10, NOW).lessons.a.stars).toBe(3);
+    expect(applyCompletion(createEmptyState(), "a", NaN, NOW).lessons.a.stars).toBe(0);
+    expect(applyCompletion(createEmptyState(), "a", 1.4, NOW).totalStars).toBe(1);
+  });
+
+  it("drops items with an invalid shape", () => {
+    const good = { box: 3, dueAt: "2026-01-02", lastSeenAt: "2026-01-01", lapses: 1 };
+    const state = upgradeState(
+      {
+        version: 2,
+        lessons: {},
+        items: {
+          good,
+          box0: { ...good, box: 0 },
+          box6: { ...good, box: 6 },
+          boxFloat: { ...good, box: 2.5 },
+          dueNum: { ...good, dueAt: 5 },
+          seenMissing: { ...good, lastSeenAt: undefined },
+          lapsesNeg: { ...good, lapses: -1 },
+          lapsesNaN: { ...good, lapses: NaN },
+          notObject: "x",
+        },
+        activity: { days: [] },
+        totalStars: 0,
+      },
+      NOW,
+    );
+    expect(state.items).toEqual({ good });
+  });
+
+  it("keeps only YYYY-MM-DD activity days", () => {
+    const state = upgradeState(
+      {
+        version: 2,
+        lessons: {},
+        items: {},
+        activity: { days: ["2026-01-01", "2026-1-2", "yesterday", 20260103, "2026-01-04T00:00"] },
+        totalStars: 0,
+      },
+      NOW,
+    );
+    expect(state.activity.days).toEqual(["2026-01-01"]);
   });
 });

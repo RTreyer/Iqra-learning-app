@@ -45,8 +45,33 @@ function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
+const DAY_KEY = /^\d{4}-\d{2}-\d{2}$/;
+
 function normalizeDays(days: string[]): string[] {
-  return Array.from(new Set(days)).sort().slice(-MAX_ACTIVITY_DAYS);
+  return Array.from(new Set(days.filter((d) => DAY_KEY.test(d))))
+    .sort()
+    .slice(-MAX_ACTIVITY_DAYS);
+}
+
+/** Stars are whole numbers 0..3. Anything that is not a finite number (numeric strings too) counts as 0. */
+export function clampStars(stars: unknown): number {
+  if (typeof stars !== "number" || !Number.isFinite(stars)) return 0;
+  return Math.min(3, Math.max(0, Math.round(stars)));
+}
+
+function isProgressItem(value: unknown): value is ProgressItem {
+  return (
+    isObject(value) &&
+    typeof value.box === "number" &&
+    Number.isInteger(value.box) &&
+    value.box >= 1 &&
+    value.box <= 5 &&
+    typeof value.dueAt === "string" &&
+    typeof value.lastSeenAt === "string" &&
+    typeof value.lapses === "number" &&
+    Number.isFinite(value.lapses) &&
+    value.lapses >= 0
+  );
 }
 
 /**
@@ -64,13 +89,18 @@ export function upgradeState(raw: unknown, now: Date = new Date()): ProgressStat
       if (!isObject(entry)) continue;
       lessons[id] = {
         completed: entry.completed === true,
-        stars: typeof entry.stars === "number" ? entry.stars : 0,
+        stars: clampStars(entry.stars),
         completedAt: typeof entry.completedAt === "string" ? entry.completedAt : nowIso,
       };
     }
   }
 
-  const items = isObject(raw.items) ? (raw.items as Record<string, ProgressItem>) : {};
+  const items: Record<string, ProgressItem> = {};
+  if (isObject(raw.items)) {
+    for (const [id, item] of Object.entries(raw.items)) {
+      if (isProgressItem(item)) items[id] = item;
+    }
+  }
   const rawDays = isObject(raw.activity) && Array.isArray(raw.activity.days) ? raw.activity.days : [];
   const days = normalizeDays(rawDays.filter((d): d is string => typeof d === "string"));
 
@@ -94,10 +124,11 @@ export function applyCompletion(
   stars: number,
   now: Date = new Date(),
 ): ProgressState {
+  const earned = clampStars(stars);
   const existing = state.lessons[lessonId];
-  const improved = !existing || stars > existing.stars;
+  const improved = !existing || earned > existing.stars;
   const lesson: LessonProgress = improved
-    ? { completed: true, stars: Math.max(existing?.stars ?? 0, stars), completedAt: now.toISOString() }
+    ? { completed: true, stars: earned, completedAt: now.toISOString() }
     : { ...existing, completed: true };
   const lessons = { ...state.lessons, [lessonId]: lesson };
   return {
