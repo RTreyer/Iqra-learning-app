@@ -82,7 +82,7 @@ The look stays playful and colourful, so the current style is kept.
 
 **Design.** A circular arc in the subject colour, with the star count or a check in the middle. Full ring turns gold. Used on unit cards and the book screen. The text stays as small secondary label for parents.
 
-**Files touched.** New `artifacts/learn-app/components/ProgressRing.tsx` (`react-native-svg`, `Circle` with `strokeDasharray`); `app/book/[bookId].tsx`; unit screen under `app/`.
+**Files touched.** New `artifacts/learn-app/components/ProgressRing.tsx` (`react-native-svg`, `Circle` with `strokeDasharray`); `app/book/[bookId].tsx`; unit screen `app/unit/[unitId].tsx`.
 
 **Effort.** S.
 
@@ -106,7 +106,7 @@ The look stays playful and colourful, so the current style is kept.
 
 **Design.** A small gear icon on the home screen opens a gate. The gate is a hold-to-confirm button (hold 3 seconds) or one arithmetic question such as 7 + 6 (answer by number pad, Arabic-Indic digits accepted). Inside: per unit progress (ring plus stars), streak from `activity.days`, items due today (from `items[].dueAt`), switches for sound, big text, dark mode, reminder, and a Reset progress button with a second confirmation. Menu labels may be English, content stays Arabic.
 
-**Files touched.** New `artifacts/learn-app/app/parent.tsx` ; new `components/ParentGate.tsx`; `app/index.tsx` (gear entry); `context/ProgressContext.tsx` (read only, plus maybe a `getStreak` helper in `lib/progressState.ts`); `content/ui-translations.ts`.
+**Files touched.** New `artifacts/learn-app/app/parent.tsx`; new `components/ParentGate.tsx`; `app/index.tsx` (gear entry); `context/ProgressContext.tsx` (read only, plus maybe a `getStreak` helper in `lib/progressState.ts`); `content/ui-translations.ts`.
 
 **Effort.** M.
 
@@ -189,9 +189,9 @@ Use explicit `writingDirection: "rtl"` and `direction` on content containers ins
 
 **Rationale.** Boxes 1 to 5 in `progress.items` already track memory strength. Showing a badge at box 5 rewards real mastery, not just completion.
 
-**Design.** In the unit screen, a grid of letter tiles. A tile shows a bronze, silver or gold ring by box (1 to 2, 3 to 4, 5) and a small star at box 5. Locked or unseen letters are grey. Tapping a tile plays the letter. Optional parent view lists the same grid with counts.
+**Design.** In the unit screen (`app/unit/[unitId].tsx`), a grid of letter tiles. A tile shows a bronze, silver or gold ring by box (1 to 2, 3 to 4, 5) and a small star at box 5. Locked or unseen letters are grey. Tapping a tile plays the letter. Optional parent view lists the same grid with counts.
 
-**Files touched.** New `artifacts/learn-app/components/MasteryGrid.tsx`; unit screen under `app/`; `lib/reviewItems.ts` (read to map item ids to letters); `context/ProgressContext.tsx` (read only); `content/ui-translations.ts`.
+**Files touched.** New `artifacts/learn-app/components/MasteryGrid.tsx`; unit screen `app/unit/[unitId].tsx`; `lib/reviewItems.ts` (read to map item ids to letters); `context/ProgressContext.tsx` (read only); `content/ui-translations.ts`.
 
 **Effort.** M.
 
@@ -204,7 +204,7 @@ Owner decision: heuristic validation now, graded matching later.
 ### Current heuristic
 
 The tracing activity validates a drawing with simple checks (`components/activities/trace/validate.ts`, called from `components/activities/TraceActivity.tsx`; the numbers below match the code):
-- stroke count is at least one,
+- stroke count is at least the target `strokeCount` (default one),
 - total path length is at least 50 percent of the shorter pad side,
 - bounding box covers at least 20 percent of pad width or 15 percent of pad height,
 - centroid lies within 35 percent of the pad centre.
