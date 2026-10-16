@@ -46,7 +46,7 @@ To make it self-resuming after a usage limit reset, run inside the session (loca
 |---|---|---|---|
 | 0.1 Branch and baseline | done | 13355fb | typecheck + 4 tests pass, baseline e2e copied |
 | 1.1 Delete packages and catalog | done | ce41975 | spec review passed, 359 packages removed |
-| 1.2 Prune dependencies and platform config | next | | |
+| 1.2 Prune dependencies and platform config | in progress | | started 2026-10-16 evening |
 | 1.3 Scrub remnants | | | |
 | 2.1 ESLint and Prettier | | | |
 | 2.2 Jest with jest-expo | | | |
@@ -61,7 +61,7 @@ To make it self-resuming after a usage limit reset, run inside the session (loca
 | 4.3 Activity components | | | 3 commits |
 | 4.4 Screens | | | |
 | 5.1 Science content | | | placeholder, flagged |
-| 5.2 Math content | | | placeholder, flagged |
+| 5.2 Math content | | | exemplary set derived from the Yemen textbooks (owner PDFs), small scope |
 | 5.3 Review items and Leitner scheduler | | | |
 | 5.4 Review session screen | | | |
 | 5.5 Home guidance | | | |
@@ -76,7 +76,11 @@ To make it self-resuming after a usage limit reset, run inside the session (loca
 ## Owner inputs still open (none block Tasks 1.2 to 6.5)
 
 - An Android phone to verify TTS, haptics, tracing, persistence (Task 6.4).
-- Yemen MoE Math and Science textbook material to align placeholder content (after 5.1 and 5.2; tracked in `docs/CONTENT_REVIEW.md`).
+- Science textbook material to align the Science placeholder content (after 5.1; tracked in `docs/CONTENT_REVIEW.md`).
+- Math textbooks received 2026-10-16 (Grade 1, Sanaa, Part 1 ed. 2026 and Part 2 ed. 2022), Arabic PDFs, about 11 MB and 8 MB:
+  - `/Users/start/Downloads/OneDrive_1_10-16-2026/كتاب_الرياضيات_الجزء_الأول_الطبعة_2026_الصف_الأول_صنعاء_اليمن.pdf`
+  - `/Users/start/Downloads/OneDrive_1_10-16-2026/كتاب_الرياضيات_الجزء_الثاني_الطبعة_2022_الصف_الأول_صنعاء_اليمن.pdf`
+  Task 5.2 uses them as the base for a small exemplary math set only.
 - A native Arabic speaker to review all authored content.
 - A 1024 px padded foreground PNG if an adaptive icon is wanted (UI proposals).
 
@@ -85,3 +89,6 @@ To make it self-resuming after a usage limit reset, run inside the session (loca
 - 2026-10-16: Work on main instead of a feature branch (owner).
 - 2026-10-16: Code quality review skipped for Task 1.1 because the diff is deletions and JSON edits already verified line by line by the spec review.
 - 2026-10-16: Execution paused by owner after Task 1.1 to preserve usage limit. Resume with the prompt above.
+- 2026-10-16 (evening): Owner restarted the run. Session loop active every 10 minutes (cron job e35b9185, session only). Commits stay local, nothing is pushed without explicit owner approval.
+- 2026-10-16: Model policy (owner: "use the appropriate models to stay efficient"). Implementers: sonnet for config, deletion and data tasks (1.2, 1.3, 2.x, 3.2, 3.4, 5.1, 5.2, 5.6, 6.5); opus for multi file code tasks (3.1, 3.3, 4.x, 5.3 to 5.5, 6.1 to 6.4). Spec reviewers: sonnet. Code quality reviewers: opus. Config only tasks get spec review only.
+- 2026-10-16: Owner provided the Yemen Grade 1 Math textbooks (see "Owner inputs"). Task 5.2 derives a small exemplary set of lessons from them (two to three units, not a full year). Content stays illustrative; the textbooks are the base.
