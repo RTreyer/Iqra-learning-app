@@ -51,13 +51,12 @@ To make it self-resuming after a usage limit reset, run inside the session (loca
 | 6.1 Accessibility | | | |
 | 6.2 Performance pass | | | APK/meminfo numbers need a device, record web bundle only |
 | 6.3 E2E suite on new routes | | | |
-| 6.4 Android device check | owner | | needs `eas login` with the owner's Expo account and a phone |
+| 6.4 Android device check | ready for build | | EAS login verified 2026-10-16 (primary account `cj8181`; a second account `cj818181` also exists, use `cj8181` for `eas init` unless the owner says otherwise). Device testing still needs the owner's phone |
 | 6.5 UI proposals doc | | | |
 | 6.6 Flatten to root | owner | | optional, separate PR, owner decides |
 
 ## Owner inputs still open (none block Tasks 1.2 to 6.5)
 
-- Expo account login for the EAS APK build (Task 6.4).
 - An Android phone to verify TTS, haptics, tracing, persistence (Task 6.4).
 - Yemen MoE Math and Science textbook material to align placeholder content (after 5.1 and 5.2; tracked in `docs/CONTENT_REVIEW.md`).
 - A native Arabic speaker to review all authored content.
