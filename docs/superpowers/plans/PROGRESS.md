@@ -13,8 +13,26 @@ Resume the Iqra rebuild. Read docs/superpowers/plans/PROGRESS.md, then docs/supe
 Use superpowers:subagent-driven-development. Continue from the first unchecked task. Work on main, one commit per task
 with the Co-Authored-By line, never push. pnpm is not installed globally: use `npx pnpm@10.34.6`. Do not ask me questions;
 decide using the plan's constraints and log every decision in PROGRESS.md under "Decision log". Update the checkboxes in the
-plan and the task table below after each task. Stop after Task 6.5; Task 6.4 (EAS build) and 6.6 (flatten) need me.
+plan and the task table below after each task. Run Task 6.4's EAS build (account cj8181) but leave device testing to me.
+Task 6.6 (flatten) is mine, skip it. Never stop on a blocker: if a task truly needs my input, mark it "waiting for owner"
+in the table with the exact question, then continue with every other task that does not depend on it. Only stop when
+all remaining unchecked tasks are waiting for owner input or done.
 ```
+
+## Blocker policy (owner instruction 2026-10-16)
+
+A blocked task never halts the run. The dependency order between tasks is:
+
+- 1.2 → 1.3 (same files)
+- 2.1, 2.2, 2.3 are independent of each other; 2.4 needs all three
+- 3.1, 3.2, 3.4 are independent; 3.3 needs nothing from 3.x
+- 4.1 → 4.2 → 4.3 → 4.4 (strict chain); 4.x needs 3.1, 3.3, 3.4 done
+- 5.1, 5.2 need 4.1 only and are independent of each other; 5.3 → 5.4 → 5.5 needs 4.4; 5.6 needs 5.1 to 5.5
+- 6.1, 6.2, 6.3 need 4.4 and 5.5; 6.5 needs nothing; 6.4 needs 6.3
+
+When a task is blocked: mark it "waiting for owner: <question>" in the table, log it in the decision log, skip tasks that
+depend on it, and take the next unchecked task whose dependencies are met. Prefer a documented assumption over waiting
+whenever the plan or APP_OVERVIEW.md gives enough to decide.
 
 To make it self-resuming after a usage limit reset, run inside the session (local only, keep the terminal open):
 
