@@ -15,7 +15,7 @@ export const books: Book[] = [
     title: "أقرأ وأتعلم",
     subtitle: "اللغة العربية — الجزء الأول",
     emoji: "📖",
-    color: "#2563EB",
+    color: SUBJECT_COLORS.arabic,
     available: true,
     units: [unit1, unit2, unit3, unit4, unit5, unit6, unit7, unit8],
   },
