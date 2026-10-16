@@ -58,8 +58,8 @@ To make it self-resuming after a usage limit reset, run inside the session (loca
 | 3.4 Typed routes helper | done | 0896104 | includes `review()` |
 | 4.1 Content model | done | a4fc4fd, a80116e, 83e44fc | spec review passed; code quality folded into the 4.3 review |
 | 4.2 Move Arabic content | done | ad71e4a | 40 legacy lessons byte identical, u1-5 → trace, u2-6 … u8-6 added; legacy constants kept until 4.4 |
-| 4.3 Activity components | in progress | | 3 commits |
-| 4.4 Screens | | | |
+| 4.3 Activity components | fixing | e68ffd3, 7dffdcd, ba0e57b | spec review passed; code review: double complete guard, stale timer callbacks, trace path cost; fixes in progress; `numberToArabicWord` (5.2 leftover) folded in |
+| 4.4 Screens | in progress | | deletes app/(tabs) and legacy constants; old e2e suite breaks until 6.3 |
 | 5.1 Science content | done | 6890685, 830a447 | 3 units, 9 lessons, placeholder; spec + Arabic review passed |
 | 5.2 Math content | done (1 item open) | c9cb8e0, 80dce34, 830a447 | 3 units, 11 lessons from textbook Part 1 (numbers 0 to 10, add/sub within 10, plane shapes); `numberToArabicWord` follows after 4.3 lands `lib/arabicNumbers.ts` |
 | 5.3 Review items and Leitner scheduler | | | |
@@ -85,6 +85,9 @@ To make it self-resuming after a usage limit reset, run inside the session (loca
 - A 1024 px padded foreground PNG if an adaptive icon is wanted (UI proposals).
 
 ## Backlog (small, non blocking)
+
+- Activities: wrap instruction strings ("سؤال N من M", "ابحث عن الحرف", matching/story/naming hints) in UiText with a pattern rule, after 4.4 (ui-translations.ts ownership).
+- Activities: shared `useChoiceRound` to dedupe LetterPick/WordRead/ListenPick (optional).
 
 - ProgressContext: if both storage reads fail, the session runs in memory only. Follow up: retry hydration when an unhydrated provider receives a completion, or on AppState `active`.
 - ProgressContext: LOADED marks the state dirty even when the blob was already v2, so every launch rewrites the blob once. Harmless.
