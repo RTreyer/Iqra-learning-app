@@ -60,8 +60,8 @@ To make it self-resuming after a usage limit reset, run inside the session (loca
 | 4.2 Move Arabic content | done | ad71e4a | 40 legacy lessons byte identical, u1-5 → trace, u2-6 … u8-6 added; legacy constants kept until 4.4 |
 | 4.3 Activity components | in progress | | 3 commits |
 | 4.4 Screens | | | |
-| 5.1 Science content | in progress | | placeholder, flagged; same agent as 5.2 |
-| 5.2 Math content | in progress | | 3 units, 11 lessons from Part 1 (numbers 0 to 10, add/sub within 10, plane shapes); `numberToArabicWord` follows after 4.3 lands `lib/arabicNumbers.ts` |
+| 5.1 Science content | done | 6890685, 830a447 | 3 units, 9 lessons, placeholder; spec + Arabic review passed |
+| 5.2 Math content | done (1 item open) | c9cb8e0, 80dce34, 830a447 | 3 units, 11 lessons from textbook Part 1 (numbers 0 to 10, add/sub within 10, plane shapes); `numberToArabicWord` follows after 4.3 lands `lib/arabicNumbers.ts` |
 | 5.3 Review items and Leitner scheduler | | | |
 | 5.4 Review session screen | | | |
 | 5.5 Home guidance | | | |
@@ -99,6 +99,7 @@ To make it self-resuming after a usage limit reset, run inside the session (loca
 - 2026-10-16: Model policy (owner: "use the appropriate models to stay efficient"). Implementers: sonnet for config, deletion and data tasks (1.2, 1.3, 2.x, 3.2, 3.4, 5.1, 5.2, 5.6, 6.5); opus for multi file code tasks (3.1, 3.3, 4.x, 5.3 to 5.5, 6.1 to 6.4). Spec reviewers: sonnet. Code quality reviewers: opus. Config only tasks get spec review only.
 - 2026-10-16: u1-5 trace guides use ـــ | / ◯ 〰 (the existing five shapes: horizontal, vertical, diagonal, circle, zigzag); the plan's "arc" did not exist in the content, so no new shape was invented.
 - 2026-10-16: `allowImportingTsExtensions` enabled so Node type stripping can run data tests directly on the TS content; content modules import each other with `.ts` extensions and must stay free of react-native imports. `SUBJECT_COLORS` lives in `content/types.ts`, `theme/tokens.ts` re-exports it.
+- 2026-10-16: Math content scope (owner: exemplary, not a full year): 3 units / 11 lessons mapped to textbook Part 1 units 2, 3+4 and 5. Science stays placeholder until the owner provides the textbook. Shape emoji: 🔲 for square (Emoji 1), ▬ text glyph for rectangle, to be replaced by inline SVG shapes (UI proposals).
 - 2026-10-16: Math numbers display in Eastern Arabic digits (textbooks use them); `lib/arabicNumbers.ts`.
 - 2026-10-16: Implementers no longer run in parallel after a shared git index swept Task 3.2 deletions into a Task 3.1 commit (history rewritten locally before anything was pushed: c339eb0, 75dc06e, 0896104). Rule: all agents commit with `git commit --only <paths>`; at most one implementer writes at a time unless file sets are disjoint and both use `--only`.
 - 2026-10-16: Task 4.2 keeps the six legacy `constants/*` files (with a LEGACY comment) until Task 4.4 deletes `app/(tabs)`, so typecheck stays green between tasks.

@@ -398,17 +398,17 @@ const onComplete = (score: Score) => { const s = starsForScore(score); completeL
 
 **Files:** create `content/science/unit1.ts`, `unit2.ts`, `unit3.ts`
 
-- [ ] Unit `s1` "جِسْمِي" (my body), `s2` "الْحَيَوَانَات" (animals), `s3` "النَّبَاتَات وَالْمَاء" (plants and water). Each: `story` (4 lines with emoji), `naming` (6 items), `listen_pick` (3 questions). IDs `s1-1 … s3-3`. Fully vowelled Grade 1 Arabic.
-- [ ] Owner decision: this is placeholder content. Every Math and Science content file starts with a header comment `// STATUS: placeholder, align with Yemen MoE textbook before release. See docs/CONTENT_REVIEW.md`. Create `docs/CONTENT_REVIEW.md` listing each placeholder unit, its intended textbook chapter, and an empty "reviewed by / date" column.
-- [ ] `pnpm test:data` passes. Commit: `content: science part 1 starter units`
+- [x] Unit `s1` "جِسْمِي" (my body), `s2` "الْحَيَوَانَات" (animals), `s3` "النَّبَاتَات وَالْمَاء" (plants and water). Each: `story` (4 lines with emoji), `naming` (6 items), `listen_pick` (3 questions). IDs `s1-1 … s3-3`. Fully vowelled Grade 1 Arabic.
+- [x] Owner decision: this is placeholder content. Every Math and Science content file starts with a header comment `// STATUS: placeholder, align with Yemen MoE textbook before release. See docs/CONTENT_REVIEW.md`. Create `docs/CONTENT_REVIEW.md` listing each placeholder unit, its intended textbook chapter, and an empty "reviewed by / date" column.
+- [x] `pnpm test:data` passes. Commit: `content: science part 1 starter units`
 
 ### Task 5.2: Math starter content
 
 **Files:** create `content/math/unit1.ts`, `unit2.ts`, `lib/arabicNumbers.ts`, `__tests__/arabicNumbers.test.ts`
 
-- [ ] `m1` "الأَعْدَاد مِنْ 1 إِلَى 10": 4 `counting` lessons (1 to 3, 4 to 6, 7 to 10, mixed), 5 rounds each, 3 options per round. `m2` "الْجَمْع وَالطَّرْح": 2 `arithmetic` addition lessons (sums ≤ 5, ≤ 10) and 2 subtraction lessons (within 5, within 10), 5 rounds each. IDs `m1-1 … m2-4`.
-- [ ] `lib/arabicNumbers.ts`: `numberToArabicWord(0..20)` for TTS (`صفر، واحد … عشرون`), tested.
-- [ ] Commit: `content: math part 1 starter units`
+- [x] `m1` "الأَعْدَاد مِنْ 1 إِلَى 10": 4 `counting` lessons (1 to 3, 4 to 6, 7 to 10, mixed), 5 rounds each, 3 options per round. `m2` "الْجَمْع وَالطَّرْح": 2 `arithmetic` addition lessons (sums ≤ 5, ≤ 10) and 2 subtraction lessons (within 5, within 10), 5 rounds each. IDs `m1-1 … m2-4`.
+- [ ] `lib/arabicNumbers.ts`: `numberToArabicWord(0..20)` for TTS (`صفر، واحد … عشرون`), tested. (follows after 4.3)
+- [x] Commit: `content: math part 1 starter units`
 
 ### Task 5.3: Review items and Leitner scheduler
 
