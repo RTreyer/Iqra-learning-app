@@ -7,6 +7,9 @@ import { unit5 } from "./arabic/unit5.ts";
 import { unit6 } from "./arabic/unit6.ts";
 import { unit7 } from "./arabic/unit7.ts";
 import { unit8 } from "./arabic/unit8.ts";
+import { mathUnit1 } from "./math/unit1.ts";
+import { mathUnit2 } from "./math/unit2.ts";
+import { mathUnit3 } from "./math/unit3.ts";
 
 export const books: Book[] = [
   {
@@ -26,8 +29,8 @@ export const books: Book[] = [
     subtitle: "الصف الأول",
     emoji: "🔢",
     color: SUBJECT_COLORS.math,
-    available: false,
-    units: [],
+    available: true,
+    units: [mathUnit1, mathUnit2, mathUnit3],
   },
   {
     id: "science-1",
