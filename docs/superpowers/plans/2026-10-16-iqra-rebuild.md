@@ -369,11 +369,11 @@ export type ActivityProps<T extends LessonBody["type"]> = {
 
 **Files:** create `app/index.tsx`, `app/book/[bookId].tsx`, `app/unit/[unitId].tsx`, `app/lesson/[lessonId].tsx`, `components/ProgressPill.tsx`, `components/LessonCompleteCard.tsx`; modify `app/_layout.tsx`, `hooks/useLessonAttempt.ts`; delete `app/(tabs)/**`
 
-- [ ] `app/_layout.tsx`: one `<Stack screenOptions={{ headerShown: false, animation: "slide_from_right" }} />`. Keep `SafeAreaProvider`, `LanguageProvider`, `ErrorBoundary`, `ProgressProvider`, `GestureHandlerRootView`, `WebFrame`.
-- [ ] `app/index.tsx`: same visual language as today (gradient, star badge, language switch, large colored cards). Cards are `books` from the catalog, navigating with `routes.book(id)`. Unavailable books show the "قريباً" badge and do not navigate.
-- [ ] `app/book/[bookId].tsx`: unit cards with `ProgressPill` from `getUnitProgress`. Styles ported from `book/[grade]/[bookId].tsx`, static imports only.
-- [ ] `app/unit/[unitId].tsx`: lesson rows (number, title, subtitle, emoji, chevron, tick + stars when done). Ported from `unit/[unitId]/index.tsx`.
-- [ ] `app/lesson/[lessonId].tsx`:
+- [x] `app/_layout.tsx`: one `<Stack screenOptions={{ headerShown: false, animation: "slide_from_right" }} />`. Keep `SafeAreaProvider`, `LanguageProvider`, `ErrorBoundary`, `ProgressProvider`, `GestureHandlerRootView`, `WebFrame`.
+- [x] `app/index.tsx`: same visual language as today (gradient, star badge, language switch, large colored cards). Cards are `books` from the catalog, navigating with `routes.book(id)`. Unavailable books show the "قريباً" badge and do not navigate.
+- [x] `app/book/[bookId].tsx`: unit cards with `ProgressPill` from `getUnitProgress`. Styles ported from `book/[grade]/[bookId].tsx`, static imports only.
+- [x] `app/unit/[unitId].tsx`: lesson rows (number, title, subtitle, emoji, chevron, tick + stars when done). Ported from `unit/[unitId]/index.tsx`.
+- [x] `app/lesson/[lessonId].tsx`:
 ```tsx
 const found = getLesson(lessonId);               // null → "الدرس غير موجود" card with back link
 const { completed, stars, completeAttempt, restartAttempt, activityKey } = useLessonAttempt(lessonId);
@@ -385,10 +385,10 @@ const onComplete = (score: Score) => { const s = starsForScore(score); completeL
 ```
 `recordRoundResult` comes from `useProgress()` (Task 5.3) and feeds the spaced repetition schedule from normal lessons.
 `useLessonAttempt` gains `stars` for the current attempt. Title spoken on mount.
-- [ ] `LessonCompleteCard.tsx`: earned stars (1 to 3 ⭐), "إعادة الدرس", "النشاط التالي: {title} ←" or "🎉 أتممت الوحدة!" when `next` is null, "العودة إلى القائمة".
-- [ ] `ProgressPill.tsx`: `#1E293B` text on `rgba(255,255,255,0.88)`.
-- [ ] `git rm -r "artifacts/learn-app/app/(tabs)"`. `pnpm typecheck && pnpm lint && pnpm test && pnpm test:data` pass.
-- [ ] Commit: `feat: single lesson engine and flat navigation`
+- [x] `LessonCompleteCard.tsx`: earned stars (1 to 3 ⭐), "إعادة الدرس", "النشاط التالي: {title} ←" or "🎉 أتممت الوحدة!" when `next` is null, "العودة إلى القائمة".
+- [x] `ProgressPill.tsx`: `#1E293B` text on `rgba(255,255,255,0.88)`.
+- [x] `git rm -r "artifacts/learn-app/app/(tabs)"`. `pnpm typecheck && pnpm lint && pnpm test && pnpm test:data` pass.
+- [x] Commit: `feat: single lesson engine and flat navigation`
 
 ---
 

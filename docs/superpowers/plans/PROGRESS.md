@@ -59,14 +59,14 @@ To make it self-resuming after a usage limit reset, run inside the session (loca
 | 4.1 Content model | done | a4fc4fd, a80116e, 83e44fc | spec review passed; code quality folded into the 4.3 review |
 | 4.2 Move Arabic content | done | ad71e4a | 40 legacy lessons byte identical, u1-5 → trace, u2-6 … u8-6 added; legacy constants kept until 4.4 |
 | 4.3 Activity components | done | e68ffd3, 7dffdcd, ba0e57b, cb39f98, af1b371, 019d5a8 | spec + code review passed (two fix rounds); 131+ jest tests |
-| 4.4 Screens | fixing | 1c9b8ca, 96ab340 | spec review passed; code review: title speech cut off activity prompt, double mount on open, back dead end on web, contrast/RTL; fixes in progress |
+| 4.4 Screens | done | 1c9b8ca, 96ab340, f126146, 96b9d43 | spec + code review passed (one fix round); icon fonts dropped, web bundle 1.53 MB; 182 jest tests |
 | 5.1 Science content | done | 6890685, 830a447 | 3 units, 9 lessons, placeholder; spec + Arabic review passed |
 | 5.2 Math content | done | c9cb8e0, 80dce34, 830a447 | 3 units, 11 lessons from textbook Part 1 (numbers 0 to 10, add/sub within 10, plane shapes); `numberToArabicWord` follows after 4.3 lands `lib/arabicNumbers.ts` |
 | 5.3 Review items and Leitner scheduler | done | a215936, 7accc6c | spec + code review passed; promote only when due, wrong always resets; due by local day; clock skew guard |
-| 5.4 Review session screen | | | |
+| 5.4 Review session screen | in progress | | wires onRoundResult in the lesson screen |
 | 5.5 Home guidance | | | |
 | 5.6 Docs refresh | | | |
-| 6.1 Accessibility | | | |
+| 6.1 Accessibility | | | carry over from 4.4 re-review: back link colour on gradients (use colors.text or #475569), mirror header rows in Arabic (row-reverse), UiText for activity instruction strings |
 | 6.2 Performance pass | | | APK/meminfo numbers need a device, record web bundle only |
 | 6.3 E2E suite on new routes | | | |
 | 6.4 Android device check | ready for build | | EAS login verified 2026-10-16 (primary account `cj8181`; a second account `cj818181` also exists, use `cj8181` for `eas init` unless the owner says otherwise). Device testing still needs the owner's phone |
@@ -85,6 +85,8 @@ To make it self-resuming after a usage limit reset, run inside the session (loca
 - A 1024 px padded foreground PNG if an adaptive icon is wanted (UI proposals).
 
 ## Backlog (small, non blocking)
+
+- Polish from the 4.4 re-review: guard `speak` onDone so it fires once; title fallback based on text length instead of fixed 1500 ms; stop speech in the "next lesson" handler before `router.replace` if Android cuts the next title; `withAlpha` dev assertion for non 6 digit hex; stale vector-icons comment in BackButton.tsx.
 
 - Activities: wrap instruction strings ("سؤال N من M", "ابحث عن الحرف", matching/story/naming hints) in UiText with a pattern rule, after 4.4 (ui-translations.ts ownership).
 - Activities: shared `useChoiceRound` to dedupe LetterPick/WordRead/ListenPick (optional).
