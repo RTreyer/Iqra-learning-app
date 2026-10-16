@@ -414,7 +414,7 @@ const onComplete = (score: Score) => { const s = starsForScore(score); completeL
 
 **Files:** create `lib/reviewItems.ts`, `lib/srs.ts`, `__tests__/reviewItems.test.ts`, `__tests__/srs.test.ts`
 
-- [ ] `lib/reviewItems.ts`:
+- [x] `lib/reviewItems.ts`:
 ```ts
 export type ReviewItem =
   | { id: string; kind: "letter"; targetLetter: string; letters: string[]; correctIndex: number }
@@ -427,7 +427,7 @@ export function itemIdFor(lesson: Lesson, roundIndex: number): string;
 export function allItems(): Map<string, ReviewItem>;                // built once from the catalog
 ```
 IDs: `letter:{targetLetter}`, `word:{word}`, `count:{count}`, `calc:{a}{op}{b}`, `q:{lessonId}:{index}`. Letters and words repeat across units and collapse into one item, which is the point. Test: Unit 2 lessons yield 5 letter items (3 distinct letters), 5 word items, 3 questions.
-- [ ] `lib/srs.ts` (pure, injectable clock):
+- [x] `lib/srs.ts` (pure, injectable clock):
 ```ts
 export const BOX_INTERVAL_DAYS = { 1: 1, 2: 2, 3: 4, 4: 7, 5: 14 } as const;
 export type ItemState = { box: 1 | 2 | 3 | 4 | 5; dueAt: string; lastSeenAt: string; lapses: number };
@@ -437,8 +437,8 @@ export function isDue(state: ItemState, now: Date): boolean;
 export function pickDue(items: Record<string, ItemState>, now: Date, limit = 10): string[]; // oldest due first, then lowest box, interleaved by kind prefix so no two consecutive ids share a kind when avoidable
 ```
 Tests: introduce sets dueAt to now + 1 day; three correct reviews reach box 4 with dueAt 7 days out; one wrong resets to box 1 and increments lapses; `pickDue` returns at most 10, due only, interleaved (`letter`, `word`, `letter`, `calc` …) and deterministic for a fixed input.
-- [ ] `ProgressContext.tsx`: `recordRoundResult(itemId, correct)` applies `introduce` for unknown items in a lesson (first time seen, regardless of correctness, so new material enters the schedule) and `review` for known ones; `recordReview(itemId, correct)` applies `review`; both call `markActiveToday()` which adds today's ISO date to `activity.days`. `completeLesson` also calls `markActiveToday()`. Tests cover each.
-- [ ] Commit: `feat: review items and Leitner scheduler`
+- [x] `ProgressContext.tsx`: `recordRoundResult(itemId, correct)` applies `introduce` for unknown items in a lesson (first time seen, regardless of correctness, so new material enters the schedule) and `review` for known ones; `recordReview(itemId, correct)` applies `review`; both call `markActiveToday()` which adds today's ISO date to `activity.days`. `completeLesson` also calls `markActiveToday()`. Tests cover each.
+- [x] Commit: `feat: review items and Leitner scheduler`
 
 ### Task 5.4: Review session screen
 

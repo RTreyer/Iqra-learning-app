@@ -59,10 +59,10 @@ To make it self-resuming after a usage limit reset, run inside the session (loca
 | 4.1 Content model | done | a4fc4fd, a80116e, 83e44fc | spec review passed; code quality folded into the 4.3 review |
 | 4.2 Move Arabic content | done | ad71e4a | 40 legacy lessons byte identical, u1-5 → trace, u2-6 … u8-6 added; legacy constants kept until 4.4 |
 | 4.3 Activity components | done | e68ffd3, 7dffdcd, ba0e57b, cb39f98, af1b371, 019d5a8 | spec + code review passed (two fix rounds); 131+ jest tests |
-| 4.4 Screens | in code review | 1c9b8ca, 96ab340 | spec review passed; lint 0/0; web bundle 2.01 MB; old e2e suite broken until 6.3 |
+| 4.4 Screens | fixing | 1c9b8ca, 96ab340 | spec review passed; code review: title speech cut off activity prompt, double mount on open, back dead end on web, contrast/RTL; fixes in progress |
 | 5.1 Science content | done | 6890685, 830a447 | 3 units, 9 lessons, placeholder; spec + Arabic review passed |
 | 5.2 Math content | done | c9cb8e0, 80dce34, 830a447 | 3 units, 11 lessons from textbook Part 1 (numbers 0 to 10, add/sub within 10, plane shapes); `numberToArabicWord` follows after 4.3 lands `lib/arabicNumbers.ts` |
-| 5.3 Review items and Leitner scheduler | in review | a215936 | recordRoundResult / recordReview / getDueItemIds |
+| 5.3 Review items and Leitner scheduler | done | a215936, 7accc6c | spec + code review passed; promote only when due, wrong always resets; due by local day; clock skew guard |
 | 5.4 Review session screen | | | |
 | 5.5 Home guidance | | | |
 | 5.6 Docs refresh | | | |
@@ -102,6 +102,8 @@ To make it self-resuming after a usage limit reset, run inside the session (loca
 - 2026-10-16: Model policy (owner: "use the appropriate models to stay efficient"). Implementers: sonnet for config, deletion and data tasks (1.2, 1.3, 2.x, 3.2, 3.4, 5.1, 5.2, 5.6, 6.5); opus for multi file code tasks (3.1, 3.3, 4.x, 5.3 to 5.5, 6.1 to 6.4). Spec reviewers: sonnet. Code quality reviewers: opus. Config only tasks get spec review only.
 - 2026-10-16: u1-5 trace guides use ـــ | / ◯ 〰 (the existing five shapes: horizontal, vertical, diagonal, circle, zigzag); the plan's "arc" did not exist in the content, so no new shape was invented.
 - 2026-10-16: `allowImportingTsExtensions` enabled so Node type stripping can run data tests directly on the TS content; content modules import each other with `.ts` extensions and must stay free of react-native imports. `SUBJECT_COLORS` lives in `content/types.ts`, `theme/tokens.ts` re-exports it.
+- 2026-10-16: Leitner rule (code review): a correct answer promotes only when the item is due; a wrong answer always resets to box 1. Due dates are local midnight, compared by day key, so an item seen in the evening is due the next morning. Items with dueAt more than 14 days ahead count as due (clock skew).
+- 2026-10-16: Lesson open sequence: the title is spoken first and the activity mounts after the title finishes (or after 1.5 s), so the activity's own prompt is not cut off.
 - 2026-10-16: Math content scope (owner: exemplary, not a full year): 3 units / 11 lessons mapped to textbook Part 1 units 2, 3+4 and 5. Science stays placeholder until the owner provides the textbook. Shape emoji: 🔲 for square (Emoji 1), ▬ text glyph for rectangle, to be replaced by inline SVG shapes (UI proposals).
 - 2026-10-16: Math numbers display in Eastern Arabic digits (textbooks use them); `lib/arabicNumbers.ts`.
 - 2026-10-16: Implementers no longer run in parallel after a shared git index swept Task 3.2 deletions into a Task 3.1 commit (history rewritten locally before anything was pushed: c339eb0, 75dc06e, 0896104). Rule: all agents commit with `git commit --only <paths>`; at most one implementer writes at a time unless file sets are disjoint and both use `--only`.
