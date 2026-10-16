@@ -11,6 +11,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "jest",
     "test:data": "node --test scripts/*.test.mjs",
+    "test:e2e": "expo export --platform web && playwright test",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
@@ -37,17 +38,18 @@
     "react-native-web": "^0.21.0"
   },
   "devDependencies": {
-    "@types/react": "~19.1.10",
-    "@types/react-dom": "~19.1.7",
+    "@playwright/test": "^1.64.1",
     "@testing-library/react-native": "^13.0.0",
     "@types/jest": "^29.5.14",
+    "@types/react": "~19.1.10",
+    "@types/react-dom": "~19.1.7",
     "babel-preset-expo": "~54.0.12",
+    "eslint": "^9",
+    "eslint-config-expo": "~10.0.0",
     "jest": "~29.7.0",
     "jest-expo": "~54.0.18",
-    "react-test-renderer": "19.1.0",
     "prettier": "^3.0.0",
-    "typescript": "~5.9.2",
-    "eslint": "^9",
-    "eslint-config-expo": "~10.0.0"
+    "react-test-renderer": "19.1.0",
+    "typescript": "~5.9.2"
   }
 }
