@@ -5,7 +5,7 @@ import { UiChevron } from "@/components/UiChevron";
 import { UiText } from "@/components/UiText";
 import type { Book } from "@/content/types";
 import { useLanguage } from "@/context/LanguageContext";
-import { colors, withAlpha } from "@/theme/tokens";
+import { colors, pillPlate, touchTarget, withAlpha } from "@/theme/tokens";
 
 type Props = { book: Book; onPress: () => void };
 
@@ -16,7 +16,7 @@ export function BookCard({ book, onPress }: Props) {
     <Pressable
       testID={`book-${book.id}`}
       accessibilityRole="button"
-      accessibilityLabel={t(book.title)}
+      accessibilityLabel={book.available ? t(book.title) : `${t(book.title)}، ${t("قريباً")}`}
       accessibilityState={{ disabled: !book.available }}
       disabled={!book.available}
       onPress={onPress}
@@ -29,7 +29,9 @@ export function BookCard({ book, onPress }: Props) {
     >
       <Text style={styles.emoji}>{book.emoji}</Text>
       <View style={[styles.info, { alignItems: language === "en" ? "flex-start" : "flex-end" }]}>
-        <UiText style={styles.title}>{book.title}</UiText>
+        <View style={styles.titlePlate}>
+          <UiText style={styles.title}>{book.title}</UiText>
+        </View>
         <View style={styles.label}>
           <UiText style={styles.labelText}>{book.subtitle}</UiText>
         </View>
@@ -48,7 +50,7 @@ export function BookCard({ book, onPress }: Props) {
 const styles = StyleSheet.create({
   card: {
     width: "100%",
-    minHeight: 120,
+    minHeight: Math.max(120, touchTarget),
     borderRadius: 28,
     alignItems: "center",
     gap: 16,
@@ -64,7 +66,8 @@ const styles = StyleSheet.create({
   pressed: { opacity: 0.88, transform: [{ scale: 0.97 }] },
   emoji: { fontSize: 48 },
   info: { flex: 1, gap: 6 },
-  title: { fontSize: 26, fontWeight: "900", color: colors.white },
+  titlePlate: pillPlate,
+  title: { fontSize: 26, fontWeight: "900", color: colors.text },
   label: { backgroundColor: colors.pill, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 },
   labelText: { fontSize: 13, fontWeight: "800", color: colors.text },
 });

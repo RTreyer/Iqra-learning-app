@@ -52,7 +52,7 @@ test("two due items and a two day streak show the review card and streak badge",
   await seed(2, ["2026-10-15", "2026-10-16"]);
   renderHome();
   const review = await screen.findByTestId("review-card");
-  expect(screen.getByText("عنصران")).toBeTruthy();
+  expect(screen.getByText("عُنْصُرَان")).toBeTruthy();
   expect(screen.getByTestId("streak-badge")).toHaveTextContent("🔥 2");
   expect(screen.getByLabelText("يَوْمَانِ مُتَتَالِيَانِ")).toBeTruthy();
   fireEvent.press(review);
@@ -63,7 +63,7 @@ test("one due item uses the singular and a one day streak hides the badge", asyn
   await seed(1, ["2026-10-16"]);
   renderHome();
   await screen.findByTestId("review-card");
-  expect(screen.getByText("عنصر واحد")).toBeTruthy();
+  expect(screen.getByText("عُنْصُر وَاحِد")).toBeTruthy();
   expect(screen.queryByTestId("streak-badge")).toBeNull();
 });
 
@@ -71,6 +71,6 @@ test("three due items and a three day streak use the plural", async () => {
   await seed(3, ["2026-10-14", "2026-10-15", "2026-10-16"]);
   renderHome();
   await screen.findByTestId("review-card");
-  expect(screen.getByText("3 عناصر")).toBeTruthy();
+  expect(screen.getByText("3 عَنَاصِر")).toBeTruthy();
   expect(screen.getByLabelText("3 أَيَّام مُتَتَالِيَة")).toBeTruthy();
 });

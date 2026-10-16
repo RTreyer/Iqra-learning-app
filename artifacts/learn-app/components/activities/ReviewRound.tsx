@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { UiText } from "@/components/UiText";
 import * as haptics from "@/lib/haptics";
 import { numberToArabicWord, toArabicDigits } from "@/lib/arabicNumbers";
 import type { ReviewItem } from "@/lib/reviewItems";
@@ -88,8 +89,8 @@ function Prompt({ item, color, spoken }: { item: ReviewItem; color: string; spok
     case "letter":
       return (
         <View style={[styles.display, { borderColor: color }]}>
-          <Text style={styles.displayHint}>ابحث عن الحرف</Text>
-          <Text style={[styles.displayBig, { color }]}>{item.targetLetter}</Text>
+          <UiText style={styles.displayHint}>ابحث عن الحرف</UiText>
+          <Text style={styles.displayBig}>{item.targetLetter}</Text>
         </View>
       );
     case "word":
@@ -204,7 +205,7 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   displayHint: { fontSize: 13, color: colors.muted, fontWeight: "600" },
-  displayBig: { fontSize: 72, fontWeight: "900", lineHeight: 88 },
+  displayBig: { fontSize: 72, fontWeight: "900", lineHeight: 88, color: colors.text },
   numberPrompt: { alignItems: "center", gap: 16, maxWidth: 300 },
   question: {
     flexDirection: "row",

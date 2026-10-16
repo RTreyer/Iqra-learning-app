@@ -78,7 +78,7 @@ const textStyles = StyleSheet.create({
   letter: { fontSize: 40, fontWeight: "900", color: colors.text },
   word: { fontSize: 22, fontWeight: "800", color: colors.text, textAlign: "center" },
   picture: { fontSize: 15, fontWeight: "700", color: colors.text, textAlign: "center" },
-  number: { fontSize: 36, fontWeight: "800", color: colors.success },
+  number: { fontSize: 36, fontWeight: "800", color: colors.successText },
 });
 
 const softStates = StyleSheet.create({
@@ -89,14 +89,14 @@ const softStates = StyleSheet.create({
 
 const softText = StyleSheet.create({
   idle: {},
-  correct: { color: colors.success },
+  correct: { color: colors.successText },
   wrong: {},
 });
 
 const solidStates = StyleSheet.create({
   idle: { backgroundColor: "rgba(255,255,255,0.85)", borderColor: "#CBD5E1" },
-  correct: { backgroundColor: "#10B981", borderColor: "#10B981" },
-  wrong: { backgroundColor: "#F87171", borderColor: "#F87171" },
+  correct: { backgroundColor: colors.successText, borderColor: colors.successText },
+  wrong: { backgroundColor: colors.dangerText, borderColor: colors.dangerText },
 });
 
 const solidText = StyleSheet.create({

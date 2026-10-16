@@ -31,7 +31,7 @@ function Naming({ lesson, color, onComplete }: ActivityProps<"naming">) {
 
   return (
     <View style={act.container}>
-      <Text style={act.instruction}>اضغط على كل كلمة لتسمعها 🔊</Text>
+      <UiText style={act.instruction}>اضغط على كل كلمة لتسمعها 🔊</UiText>
       <View style={styles.grid}>
         {items.map((item, i) => {
           const done = tapped.has(i);
@@ -40,11 +40,12 @@ function Naming({ lesson, color, onComplete }: ActivityProps<"naming">) {
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel={item.word}
+                accessibilityState={{ selected: done }}
                 style={[styles.card, done && { borderColor: color, borderWidth: 3, backgroundColor: color + "18" }]}
                 onPress={() => handleTap(i)}
               >
                 <Text style={styles.emoji}>{item.emoji}</Text>
-                <Text style={[styles.word, done && { color }]}>{item.word}</Text>
+                <Text style={styles.word}>{item.word}</Text>
               </Pressable>
             </Animated.View>
           );

@@ -6,7 +6,7 @@ import { UiChevron } from "@/components/UiChevron";
 import type { Lesson } from "@/content/types";
 import type { LessonStatus } from "@/context/ProgressContext";
 import { useLanguage } from "@/context/LanguageContext";
-import { colors, withAlpha } from "@/theme/tokens";
+import { colors, touchTarget, withAlpha } from "@/theme/tokens";
 
 type Props = { lesson: Lesson; status: LessonStatus; onPress: () => void };
 
@@ -45,7 +45,7 @@ export function LessonRow({ lesson, status, onPress }: Props) {
         <Text style={styles.emoji}>{lesson.emoji}</Text>
         {status.completed ? (
           <View style={styles.done} testID={`lesson-done-${lesson.id}`}>
-            <View style={[styles.tick, { backgroundColor: colors.success }]}>
+            <View style={[styles.tick, { backgroundColor: colors.successText }]}>
               <Text style={styles.tickMark}>✓</Text>
             </View>
             <Text style={styles.stars}>{"⭐".repeat(status.stars)}</Text>
@@ -61,6 +61,7 @@ export function LessonRow({ lesson, status, onPress }: Props) {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: withAlpha(colors.white, 0.92),
+    minHeight: touchTarget,
     borderRadius: 20,
     padding: 16,
     gap: 10,

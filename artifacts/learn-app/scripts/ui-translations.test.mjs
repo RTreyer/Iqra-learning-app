@@ -24,9 +24,19 @@ test("Dynamic labels keep scores and Arabic lesson titles", () => {
   assert.equal(translateUi("🎉 أتممت الوحدة الثانية!", "en"), "🎉 Completed Unit 2!");
 });
 test("Arabic lesson content is not translated in English mode", () => {
-  for (const text of ["أَكَلَ أَحْمَدُ تُفَّاحَةً", "اضغط على كل جملة لتسمعها 🔊", "ب", "ابحث عن الحرف"]) {
+  for (const text of ["أَكَلَ أَحْمَدُ تُفَّاحَةً", "ب", "أَلِف"]) {
     assert.equal(translateUi(text, "en"), text);
   }
+});
+test("Activity instructions are chrome and translate", () => {
+  assert.equal(translateUi("سؤال 2 من 5", "en"), "Question 2 of 5");
+  assert.equal(translateUi("سؤال 2 من 5", "ar"), "سؤال 2 من 5");
+  assert.equal(translateUi("سؤال 1 من 4 — اضغط للاستماع ثم اختر", "en"), "Question 1 of 4 — Tap to listen, then choose");
+  assert.equal(translateUi("ابحث عن الحرف", "en"), "Find the letter");
+  assert.equal(translateUi("اضغط على كل جملة لتسمعها 🔊", "en"), "Tap each sentence to hear it 🔊");
+  assert.equal(translateUi("اضغط على كل كلمة لتسمعها 🔊", "en"), "Tap each word to hear it 🔊");
+  assert.equal(translateUi("اضغط ✓ للسلوك الصحيح و ✗ للسلوك الخطأ", "en"), "Tap ✓ for good behavior and ✗ for bad behavior");
+  assert.doesNotMatch(translateUi("اضغط على شيء في اليمين ثم ما يناسبه في اليسار", "en"), /[؀-ۿ]/);
 });
 test("Content model labels translate", () => {
   assert.equal(translateUi("أَكْتُبُ الْحُرُوف", "en"), "I write the letters");

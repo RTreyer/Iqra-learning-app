@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import { UiText } from "@/components/UiText";
 import { speak } from "@/lib/speech";
 import { PRAISE } from "./shared/strings";
 import { ChoiceCard } from "./shared/ChoiceCard";
@@ -45,9 +46,7 @@ function WordRead({ lesson, color, attemptKey, onComplete, onRoundResult }: Acti
   return (
     <View style={act.container}>
       <ProgressDots count={rounds.length} current={quiz.roundIndex} color={color} />
-      <Text style={act.instruction}>
-        سؤال {quiz.roundIndex + 1} من {rounds.length} — اضغط للاستماع ثم اختر
-      </Text>
+      <UiText style={act.instruction}>{`سؤال ${quiz.roundIndex + 1} من ${rounds.length} — اضغط للاستماع ثم اختر`}</UiText>
       <ListenButton text={round.word} color={color} />
       <View style={act.wordChoicesCol}>
         {options.items.map((choice, idx) => (

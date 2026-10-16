@@ -4,17 +4,20 @@ import { Pressable, StyleSheet, View } from "react-native";
 
 import { ScreenBackground } from "@/components/ScreenBackground";
 import { UiText } from "@/components/UiText";
+import { useLanguage } from "@/context/LanguageContext";
 import { routes } from "@/lib/routes";
 import { colors, radius, shadow, spacing, touchTarget } from "@/theme/tokens";
 
 /** Small card for an unknown book, unit or lesson id, with a way back home. */
 export function NotFoundCard({ message }: { message: string }) {
+  const { t } = useLanguage();
   return (
     <ScreenBackground style={styles.centered}>
       <View style={styles.card} testID="not-found">
         <UiText style={styles.message}>{message}</UiText>
         <Pressable
           accessibilityRole="button"
+          accessibilityLabel={t("العودة إلى الرئيسية")}
           style={({ pressed }) => [styles.link, pressed && styles.pressed]}
           onPress={() => router.replace(routes.home())}
         >
@@ -37,6 +40,6 @@ const styles = StyleSheet.create({
   },
   message: { fontSize: 18, fontWeight: "700", color: colors.muted },
   link: { minHeight: touchTarget, justifyContent: "center", paddingHorizontal: spacing.md },
-  linkText: { fontSize: 15, fontWeight: "700", color: colors.star },
+  linkText: { fontSize: 15, fontWeight: "700", color: colors.starText },
   pressed: { opacity: 0.7 },
 });

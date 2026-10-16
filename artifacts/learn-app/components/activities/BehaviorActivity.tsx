@@ -1,5 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { UiText } from "@/components/UiText";
+import { useLanguage } from "@/context/LanguageContext";
 import * as haptics from "@/lib/haptics";
 import { speak } from "@/lib/speech";
 import { colors, touchTarget } from "@/theme/tokens";
@@ -12,6 +14,7 @@ import type { ActivityProps } from "./types";
 
 function Behavior({ lesson, color, onComplete }: ActivityProps<"behavior">) {
   const { behaviors } = lesson;
+  const { t } = useLanguage();
   /** index -> whether the single answer matched `isCorrect`. */
   const [results, setResults] = useState<Readonly<Record<number, boolean>>>({});
 
@@ -39,12 +42,17 @@ function Behavior({ lesson, color, onComplete }: ActivityProps<"behavior">) {
 
   return (
     <View style={act.container}>
-      <Text style={act.instruction}>اضغط ✓ للسلوك الصحيح و ✗ للسلوك الخطأ</Text>
+      <UiText style={act.instruction}>اضغط ✓ للسلوك الصحيح و ✗ للسلوك الخطأ</UiText>
       {behaviors.map((item, i) => {
         const result = results[i];
         return (
           <View
             key={i}
+            accessible={result !== undefined ? true : undefined}
+            accessibilityLabel={
+              result !== undefined ? `${item.description}، ${t(result ? "إجابة صحيحة" : "إجابة خطأ")}` : undefined
+            }
+            accessibilityState={result !== undefined ? { selected: true, disabled: true } : undefined}
             style={[styles.card, result === true && styles.cardRight, result === false && styles.cardWrong]}
           >
             <Text style={styles.emoji}>{item.emoji}</Text>
@@ -55,7 +63,7 @@ function Behavior({ lesson, color, onComplete }: ActivityProps<"behavior">) {
               <View style={styles.buttons}>
                 <Pressable
                   accessibilityRole="button"
-                  accessibilityLabel={`✓ ${item.description}`}
+                  accessibilityLabel={`${t("سلوك صحيح")}: ${item.description}`}
                   style={[styles.round, styles.check]}
                   onPress={() => handleAnswer(i, true)}
                 >
@@ -63,7 +71,7 @@ function Behavior({ lesson, color, onComplete }: ActivityProps<"behavior">) {
                 </Pressable>
                 <Pressable
                   accessibilityRole="button"
-                  accessibilityLabel={`✗ ${item.description}`}
+                  accessibilityLabel={`${t("سلوك خطأ")}: ${item.description}`}
                   style={[styles.round, styles.cross]}
                   onPress={() => handleAnswer(i, false)}
                 >
@@ -115,6 +123,6 @@ const styles = StyleSheet.create({
   round: { width: touchTarget, height: touchTarget, borderRadius: touchTarget / 2, alignItems: "center", justifyContent: "center" },
   check: { backgroundColor: colors.successSoft },
   cross: { backgroundColor: colors.dangerSoft },
-  checkText: { fontSize: 22, color: colors.success, fontWeight: "900" },
-  crossText: { fontSize: 22, color: colors.danger, fontWeight: "900" },
+  checkText: { fontSize: 22, color: colors.successText, fontWeight: "900" },
+  crossText: { fontSize: 22, color: colors.dangerText, fontWeight: "900" },
 });

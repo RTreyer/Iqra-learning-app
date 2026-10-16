@@ -70,5 +70,5 @@ const styles = StyleSheet.create({
     backgroundColor: colors.star,
   },
   pressed: { opacity: 0.8 },
-  buttonText: { fontSize: 18, fontWeight: "700", color: colors.white },
+  buttonText: { fontSize: 18, fontWeight: "700", color: colors.text },
 });

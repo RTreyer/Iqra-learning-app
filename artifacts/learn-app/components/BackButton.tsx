@@ -1,7 +1,4 @@
-/**
- * BackButton — prominent back button using an inline SVG arrow.
- * Avoids @expo/vector-icons font-loading issues on web.
- */
+/** BackButton: prominent back button with an inline SVG chevron. */
 
 import * as Haptics from "expo-haptics";
 import { router, type Href } from "expo-router";
@@ -9,6 +6,7 @@ import React from "react";
 import { Pressable, StyleSheet } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import { useLanguage } from "@/context/LanguageContext";
+import { touchTarget } from "@/theme/tokens";
 
 /** Goes back when there is history; otherwise (web deep link or refresh) replaces with the fallback. */
 export function goBackOr(fallback: Href) {
@@ -41,7 +39,6 @@ export function BackButton({ fallback, onPress }: Props) {
       accessibilityLabel={t("رجوع")}
       accessibilityRole="button"
     >
-      {/* Chevron-left drawn inline — no icon font required */}
       <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
         <Path
           d={language === "ar" ? "M9 18l6-6-6-6" : "M15 18l-6-6 6-6"}
@@ -57,9 +54,9 @@ export function BackButton({ fallback, onPress }: Props) {
 
 const styles = StyleSheet.create({
   btn: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: touchTarget,
+    height: touchTarget,
+    borderRadius: touchTarget / 2,
     backgroundColor: "rgba(255,255,255,0.92)",
     alignItems: "center",
     justifyContent: "center",

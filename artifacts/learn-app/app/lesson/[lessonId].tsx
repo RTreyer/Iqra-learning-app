@@ -12,6 +12,7 @@ import { LessonCompleteCard } from "@/components/LessonCompleteCard";
 import { NotFoundCard } from "@/components/NotFoundCard";
 import { ScreenBackground } from "@/components/ScreenBackground";
 import { getLesson } from "@/content";
+import { useLanguage } from "@/context/LanguageContext";
 import { useProgress } from "@/context/ProgressContext";
 import { useLessonAttempt } from "@/hooks/useLessonAttempt";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
@@ -20,7 +21,7 @@ import { firstParam } from "@/lib/params";
 import { routes } from "@/lib/routes";
 import { starsForScore, type Score } from "@/lib/scoring";
 import { speak, stopSpeaking } from "@/lib/speech";
-import { colors } from "@/theme/tokens";
+import { colors, touchTarget } from "@/theme/tokens";
 
 /** The activity mounts when the title has been spoken, or after this at the latest. */
 const INTRO_FALLBACK_MS = 1500;
@@ -55,6 +56,7 @@ export default function LessonScreen() {
   const lessonId = firstParam(useLocalSearchParams<{ lessonId?: string | string[] }>().lessonId) ?? "";
   const { completeLesson, recordRoundResult } = useProgress();
   const pad = useScreenPadding();
+  const { language } = useLanguage();
 
   const found = getLesson(lessonId);
   const { completed, stars, completeAttempt, restartAttempt, activityKey } = useLessonAttempt(found ? found.lesson.id : "");
@@ -73,7 +75,7 @@ export default function LessonScreen() {
 
   return (
     <ScreenBackground subject={book.subject} style={[styles.screen, { paddingTop: pad.top, paddingBottom: pad.bottom + 16 }]}>
-      <View style={styles.header}>
+      <View style={[styles.header, { flexDirection: language === "en" ? "row" : "row-reverse" }]}>
         <BackButton fallback={routes.unit(unit.id)} />
         <View style={styles.headerCenter}>
           <Text style={styles.lessonEmoji}>{lesson.emoji}</Text>
@@ -116,7 +118,6 @@ export default function LessonScreen() {
 const styles = StyleSheet.create({
   screen: { flex: 1 },
   header: {
-    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
@@ -124,9 +125,9 @@ const styles = StyleSheet.create({
   },
   headerCenter: { flexDirection: "row", alignItems: "center", gap: 8, flex: 1, justifyContent: "center" },
   headerText: { alignItems: "center", flexShrink: 1 },
-  headerSpacer: { width: 44 },
+  headerSpacer: { width: touchTarget },
   lessonEmoji: { fontSize: 22 },
   lessonTitle: { fontSize: 17, fontWeight: "800", color: colors.text, flexShrink: 1 },
-  lessonSubtitle: { fontSize: 12, fontWeight: "500", color: colors.muted, flexShrink: 1 },
+  lessonSubtitle: { fontSize: 12, fontWeight: "500", color: colors.mutedStrong, flexShrink: 1 },
   scrollContent: { flexGrow: 1, paddingBottom: 24 },
 });

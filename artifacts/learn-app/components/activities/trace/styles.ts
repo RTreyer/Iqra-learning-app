@@ -1,5 +1,5 @@
 import { StyleSheet, type ViewStyle } from "react-native";
-import { colors, touchTarget } from "@/theme/tokens";
+import { colors, pillPlate, touchTarget } from "@/theme/tokens";
 
 export const PAD_MAX = 340;
 export const PAD_FALLBACK = 300;
@@ -12,13 +12,13 @@ export const trace = StyleSheet.create({
   container: { flex: 1, alignItems: "center", paddingHorizontal: 20, paddingTop: 8, gap: 12 },
   measure: { width: "100%", alignItems: "center", gap: 12 },
   header: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 12 },
-  label: { fontSize: 30, fontWeight: "800", textAlign: "center" },
+  label: { fontSize: 30, fontWeight: "800", textAlign: "center", color: colors.text },
   emoji: { fontSize: 36 },
   errorBanner: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    backgroundColor: colors.danger,
+    backgroundColor: colors.dangerText,
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 10,
@@ -50,5 +50,6 @@ export const trace = StyleSheet.create({
   },
   clear: { backgroundColor: "rgba(237,233,254,0.9)", borderWidth: 2, borderColor: "#C4B5FD" },
   clearText: { fontSize: 17, fontWeight: "700", color: "#7C3AED" },
-  doneText: { fontSize: 17, fontWeight: "700", color: colors.white },
+  donePlate: pillPlate,
+  doneText: { fontSize: 17, fontWeight: "700", color: colors.text },
 });

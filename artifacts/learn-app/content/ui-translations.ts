@@ -124,6 +124,18 @@ const english: Record<string, string> = {
   "عناصر": "items",
   "يَوْم مُتَتَالٍ": "day streak",
   "تَابِعْ:": "Continue:",
+  "اضغط على كل جملة لتسمعها 🔊": "Tap each sentence to hear it 🔊",
+  "اضغط على كل كلمة لتسمعها 🔊": "Tap each word to hear it 🔊",
+  "اضغط ✓ للسلوك الصحيح و ✗ للسلوك الخطأ": "Tap ✓ for good behavior and ✗ for bad behavior",
+  // The matching columns are mirrored in Arabic, so the sides swap in English.
+  "اضغط على شيء في اليمين ثم ما يناسبه في اليسار": "Tap an item on the left, then its match on the right",
+  "ابحث عن الحرف": "Find the letter",
+  "اضغط للاستماع ثم اختر": "Tap to listen, then choose",
+  "سلوك صحيح": "Good behavior",
+  "سلوك خطأ": "Bad behavior",
+  "إجابة صحيحة": "Correct answer",
+  "إجابة خطأ": "Wrong answer",
+  "ارسم بإصبعك": "Draw with your finger",
 };
 
 export function translateUi(text: string, language: UiLanguage): string {
@@ -136,6 +148,8 @@ export function translateUi(text: string, language: UiLanguage): string {
   if (completed) return `${completed[1]} / ${completed[2]} complete`;
   const remaining = value.match(/^(\d+)\s+(جملة متبقية|كلمة متبقية|عناصر|يَوْم مُتَتَالٍ)$/);
   if (remaining) return `${remaining[1]} ${english[remaining[2]]}`;
+  const question = value.match(/^سؤال (\d+) من (\d+)$/);
+  if (question) return `Question ${question[1]} of ${question[2]}`;
   const scoredContinue = value.match(/^أَحْسَنْت!\s*(\d+\/\d+)\s*🌟 تابع$/);
   if (scoredContinue) return `${scoredContinue[1]} 🌟 Continue`;
   const behaviorContinue = value.match(/^أَحْسَنْت!\s*(\d+\/\d+)\s*صحيح 🌟 تابع$/);

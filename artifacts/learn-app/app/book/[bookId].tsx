@@ -36,7 +36,7 @@ export default function BookScreen() {
 
   return (
     <ScreenBackground subject={book.subject} style={[styles.container, { paddingTop: pad.top + 4 }]}>
-      <View style={styles.header}>
+      <View style={[styles.header, { flexDirection: language === "en" ? "row" : "row-reverse" }]}>
         <BackButton fallback={routes.home()} />
         <View style={styles.headerCenter}>
           <Text style={styles.bookEmoji}>{book.emoji}</Text>
@@ -51,7 +51,9 @@ export default function BookScreen() {
           <View style={styles.bannerLabel}>
             <UiText style={styles.bannerSubject}>{book.subtitle}</UiText>
           </View>
-          <UiText style={styles.bannerTitle}>{book.title}</UiText>
+          <View style={styles.bannerLabel}>
+            <UiText style={styles.bannerTitle}>{book.title}</UiText>
+          </View>
         </View>
       </View>
 
@@ -74,7 +76,6 @@ const styles = StyleSheet.create({
   container: { flex: 1, paddingHorizontal: 20, alignItems: "center" },
   header: {
     width: "100%",
-    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: 14,
@@ -106,7 +107,7 @@ const styles = StyleSheet.create({
   bannerText: { flex: 1, gap: 6 },
   bannerLabel: { backgroundColor: colors.pill, borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3 },
   bannerSubject: { fontSize: 13, color: colors.text, fontWeight: "700" },
-  bannerTitle: { fontSize: 22, fontWeight: "900", color: colors.white, lineHeight: 28 },
+  bannerTitle: { fontSize: 22, fontWeight: "900", color: colors.text, lineHeight: 28 },
   scroll: { width: "100%" },
   list: { gap: 14, paddingTop: 4 },
   subtitle: { fontSize: 15, color: colors.warmText, textAlign: "center", marginBottom: 2, fontWeight: "700" },

@@ -12,6 +12,7 @@ import { NotFoundCard } from "@/components/NotFoundCard";
 import { ScreenBackground } from "@/components/ScreenBackground";
 import { UiText } from "@/components/UiText";
 import { books, getUnit, unitLessonIds } from "@/content";
+import { useLanguage } from "@/context/LanguageContext";
 import { useProgress } from "@/context/ProgressContext";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
 import { firstParam } from "@/lib/params";
@@ -22,6 +23,7 @@ export default function UnitScreen() {
   const unitId = firstParam(useLocalSearchParams<{ unitId?: string | string[] }>().unitId);
   const { getLessonProgress, getUnitProgress } = useProgress();
   const pad = useScreenPadding();
+  const { language } = useLanguage();
 
   const unit = getUnit(unitId ?? "");
   const rows = useMemo(
@@ -36,7 +38,7 @@ export default function UnitScreen() {
 
   return (
     <ScreenBackground subject={book?.subject} style={[styles.container, { paddingTop: pad.top }]}>
-      <View style={styles.header}>
+      <View style={[styles.header, { flexDirection: language === "en" ? "row" : "row-reverse" }]}>
         <BackButton fallback={book ? routes.book(book.id) : routes.home()} />
         <View style={styles.headerCenter}>
           <UiText style={styles.title}>{unit.title}</UiText>
@@ -87,7 +89,6 @@ export default function UnitScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: {
-    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
@@ -104,7 +105,7 @@ const styles = StyleSheet.create({
   letterChip: { borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 },
   letterChipText: { fontSize: 20, fontWeight: "900", color: colors.text },
   progressContainer: { paddingHorizontal: 20, marginBottom: 10, gap: 4 },
-  progressLabel: { fontSize: 12, color: colors.muted, fontWeight: "600", textAlign: "right" },
+  progressLabel: { fontSize: 12, color: colors.mutedStrong, fontWeight: "600", textAlign: "right" },
   progressTrack: { height: 6, backgroundColor: colors.border, borderRadius: 3, overflow: "hidden" },
   progressFill: { height: 6, borderRadius: 3, minWidth: 6 },
   list: { paddingHorizontal: 16, paddingTop: 4, gap: 12 },

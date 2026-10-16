@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { UiText } from "@/components/UiText";
 import { speak } from "@/lib/speech";
 import { colors } from "@/theme/tokens";
 import { PRAISE } from "./shared/strings";
@@ -43,12 +44,10 @@ function LetterPick({ lesson, color, attemptKey, onComplete, onRoundResult }: Ac
     <View style={act.container}>
       <ProgressDots count={rounds.length} current={quiz.roundIndex} color={color} />
       <View style={[styles.display, { borderColor: color }]}>
-        <Text style={styles.displayHint}>ابحث عن الحرف</Text>
-        <Text style={[styles.displayBig, { color }]}>{round.targetLetter}</Text>
+        <UiText style={styles.displayHint}>ابحث عن الحرف</UiText>
+        <Text style={styles.displayBig}>{round.targetLetter}</Text>
       </View>
-      <Text style={act.instruction}>
-        سؤال {quiz.roundIndex + 1} من {rounds.length}
-      </Text>
+      <UiText style={act.instruction}>{`سؤال ${quiz.roundIndex + 1} من ${rounds.length}`}</UiText>
       <View style={act.letterChoicesRow}>
         {options.items.map((letter, idx) => (
           <ChoiceCard
@@ -81,5 +80,5 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   displayHint: { fontSize: 13, color: colors.muted, fontWeight: "600" },
-  displayBig: { fontSize: 72, fontWeight: "900", lineHeight: 88 },
+  displayBig: { fontSize: 72, fontWeight: "900", lineHeight: 88, color: colors.text },
 });

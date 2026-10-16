@@ -29,8 +29,8 @@ export function LanguageSwitch() {
 const styles = StyleSheet.create({
   wrapper: { alignItems: "center", marginBottom: 12, marginTop: 4 },
   switch: { flexDirection: "row", backgroundColor: "rgba(255,255,255,0.8)", borderRadius: 24, padding: 4 },
-  button: { minHeight: 44, minWidth: 90, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 20, alignItems: "center", justifyContent: "center" },
-  active: { backgroundColor: "#D97706" },
+  button: { minHeight: 48, minWidth: 90, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 20, alignItems: "center", justifyContent: "center" },
+  active: { backgroundColor: "#B45309" },
   label: { color: "#78350F", fontSize: 15, fontWeight: "700" },
   activeLabel: { color: "#FFFFFF" },
   error: { color: "#9F1239", fontSize: 13, textAlign: "center", marginTop: 6 },

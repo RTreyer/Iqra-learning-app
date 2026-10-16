@@ -6,11 +6,17 @@ export type { Subject };
 export const colors = {
   text: "#1E293B",
   muted: "#64748B",
+  /** Muted text that must stay readable (4.5:1) on the subject and home gradients. */
+  mutedStrong: "#475569",
   border: "#E2E8F0",
   surface: "#F8FAFC",
   success: "#059669",
+  /** Success as text or as a fill under white text (5.5:1 on white). */
+  successText: "#047857",
   successSoft: "#D1FAE5",
   danger: "#EF4444",
+  /** Danger as text on dangerSoft or as a fill under white text. */
+  dangerText: "#B91C1C",
   dangerSoft: "#FEE2E2",
   star: "#F59E0B",
   starSoft: "#FEF3C7",
@@ -29,6 +35,7 @@ export const colors = {
 
 /** "#RRGGBB" plus an alpha between 0 and 1 as an rgba() string. */
 export function withAlpha(hex: string, alpha: number): string {
+  if (__DEV__ && !/^#[0-9A-Fa-f]{6}$/.test(hex)) throw new Error(`withAlpha expects #RRGGBB, got "${hex}"`);
   const value = hex.replace("#", "");
   const r = parseInt(value.slice(0, 2), 16);
   const g = parseInt(value.slice(2, 4), 16);
@@ -61,3 +68,11 @@ export const shadow = {
 };
 
 export const touchTarget = 48;
+
+/** Label plate for text on a subject, unit or lesson colour: dark text on the translucent pill, never white on the colour. */
+export const pillPlate = {
+  backgroundColor: colors.pill,
+  borderRadius: 12,
+  paddingHorizontal: 12,
+  paddingVertical: 4,
+} as const;

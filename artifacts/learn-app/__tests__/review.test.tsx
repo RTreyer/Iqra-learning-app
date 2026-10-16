@@ -82,7 +82,7 @@ test("plays due items, repeats a wrong one once and records first answers only",
   renderReview();
   await screen.findByTestId("review-round");
   expect(screen.getByText("مُرَاجَعَة الْيَوْم")).toBeTruthy();
-  expect(screen.getByText("3 عناصر")).toBeTruthy();
+  expect(screen.getByText("3 عَنَاصِر")).toBeTruthy();
 
   const [first, second, third] = order;
   answer(first, false);

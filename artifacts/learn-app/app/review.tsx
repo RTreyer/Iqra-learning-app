@@ -18,7 +18,7 @@ import { useScreenPadding } from "@/hooks/useScreenPadding";
 import { itemsLabel } from "@/lib/labels";
 import { routes } from "@/lib/routes";
 import { allItems, type ReviewItem } from "@/lib/reviewItems";
-import { colors } from "@/theme/tokens";
+import { colors, touchTarget } from "@/theme/tokens";
 
 type Session = {
   /** Items to play in order; a wrong first answer appends its item once (due ids are unique). */
@@ -81,10 +81,11 @@ function ReviewSession({ initialIds }: { initialIds: string[] }) {
 export default function ReviewScreen() {
   const { getDueItemIds, hydrated, loadSettled } = useProgress();
   const pad = useScreenPadding();
+  const { language } = useLanguage();
 
   return (
     <ScreenBackground subject="home" style={[styles.screen, { paddingTop: pad.top, paddingBottom: pad.bottom + 16 }]}>
-      <View style={styles.header}>
+      <View style={[styles.header, { flexDirection: language === "en" ? "row" : "row-reverse" }]}>
         <BackButton fallback={routes.home()} />
         <UiText style={styles.title} numberOfLines={1} accessibilityRole="header">
           مُرَاجَعَة الْيَوْم
@@ -106,15 +107,14 @@ export default function ReviewScreen() {
 const styles = StyleSheet.create({
   screen: { flex: 1 },
   header: {
-    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 12,
   },
-  headerSpacer: { width: 44 },
+  headerSpacer: { width: touchTarget },
   title: { flex: 1, fontSize: 17, fontWeight: "800", color: colors.text, textAlign: "center" },
-  count: { fontSize: 13, fontWeight: "600", color: colors.muted, textAlign: "center" },
+  count: { fontSize: 13, fontWeight: "600", color: colors.mutedStrong, textAlign: "center" },
   scrollContent: { flexGrow: 1, justifyContent: "center", paddingBottom: 24, gap: 16 },
   round: { flex: 1, gap: 16, paddingTop: 8 },
 });

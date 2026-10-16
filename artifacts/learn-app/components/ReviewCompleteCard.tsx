@@ -2,6 +2,7 @@ import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { goBackOr } from "@/components/BackButton";
+import { useLanguage } from "@/context/LanguageContext";
 import { UiText } from "@/components/UiText";
 import { routes } from "@/lib/routes";
 import { colors, radius, shadow, spacing, touchTarget } from "@/theme/tokens";
@@ -13,6 +14,8 @@ type Props = {
 
 /** End of a review session, or the card shown when nothing is due. No stars: review is practice. */
 export function ReviewCompleteCard({ score }: Props) {
+  const { t } = useLanguage();
+  const backLabel = score ? "تَابِعْ" : "العودة إلى الرئيسية";
   return (
     <View style={styles.card} testID={score ? "review-complete" : "review-empty"}>
       <Text style={styles.emoji}>{score ? "🎉" : "🌙"}</Text>
@@ -27,10 +30,11 @@ export function ReviewCompleteCard({ score }: Props) {
       <Pressable
         testID="review-back"
         accessibilityRole="button"
+        accessibilityLabel={t(backLabel)}
         style={({ pressed }) => [styles.button, pressed && styles.pressed]}
         onPress={() => goBackOr(routes.home())}
       >
-        <UiText style={styles.buttonText}>{score ? "تَابِعْ" : "العودة إلى الرئيسية"}</UiText>
+        <UiText style={styles.buttonText}>{backLabel}</UiText>
       </Pressable>
     </View>
   );
@@ -49,14 +53,14 @@ const styles = StyleSheet.create({
   },
   emoji: { fontSize: 56 },
   title: { fontSize: 22, fontWeight: "900", color: colors.text, textAlign: "center" },
-  score: { fontSize: 36, fontWeight: "900", color: colors.success },
+  score: { fontSize: 36, fontWeight: "900", color: colors.successText },
   button: {
     marginTop: spacing.md,
     minHeight: touchTarget,
     justifyContent: "center",
     borderRadius: 16,
     paddingHorizontal: 28,
-    backgroundColor: colors.success,
+    backgroundColor: colors.successText,
   },
   buttonText: { fontSize: 16, fontWeight: "800", color: colors.white, textAlign: "center" },
   pressed: { opacity: 0.88, transform: [{ scale: 0.97 }] },

@@ -59,7 +59,7 @@ export function NumberQuiz({ lesson, color, attemptKey, onComplete, onRoundResul
     <View style={act.container}>
       <ProgressDots count={total} current={quiz.roundIndex} color={color} />
       <View style={styles.visual}>{renderVisual(quiz.roundIndex)}</View>
-      <Pressable accessibilityRole="button" style={styles.question} onPress={() => speak(spoken)}>
+      <Pressable accessibilityRole="button" accessibilityLabel={`🔊 ${shown}`} style={styles.question} onPress={() => speak(spoken)}>
         <Text style={styles.speaker}>🔊</Text>
         <Text style={styles.questionText}>{shown}</Text>
       </Pressable>
@@ -87,8 +87,8 @@ export const mathStyles = StyleSheet.create({
   countEmoji: { fontSize: 52 },
   dotGroup: { flexDirection: "row", flexWrap: "wrap", gap: 8, maxWidth: 100, justifyContent: "center" },
   dot: { width: 28, height: 28, borderRadius: 14 },
-  operator: { fontSize: 40, fontWeight: "800", color: "#475569" },
-  questionMark: { fontSize: 52, fontWeight: "800", color: colors.success },
+  operator: { fontSize: 40, fontWeight: "800", color: colors.mutedStrong },
+  questionMark: { fontSize: 52, fontWeight: "800", color: colors.successText },
 });
 
 const styles = StyleSheet.create({

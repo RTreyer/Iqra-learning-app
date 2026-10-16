@@ -3,6 +3,7 @@ import { Animated, Platform, Pressable, StyleSheet, Text, View, type LayoutChang
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { Path, Svg } from "react-native-svg";
 import { UiText } from "@/components/UiText";
+import { useLanguage } from "@/context/LanguageContext";
 import * as haptics from "@/lib/haptics";
 import { speak } from "@/lib/speech";
 import { PRAISE } from "./shared/strings";
@@ -20,6 +21,7 @@ const PLATFORM_PAD = Platform.OS === "web" ? webPad : null;
 
 function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
   const { targets } = lesson;
+  const { t } = useLanguage();
   const [targetIndex, setTargetIndex] = useState(0);
   const [strokes, setStrokes] = useState<DrawnStroke[]>([]);
   const [livePath, setLivePath] = useState("");
@@ -154,7 +156,7 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
       <ProgressDots count={targets.length} current={targetIndex} color={color} />
       <View style={trace.header}>
         {target.emoji ? <Text style={trace.emoji}>{target.emoji}</Text> : null}
-        <Text style={[trace.label, { color }]}>{target.label}</Text>
+        <Text style={trace.label}>{target.label}</Text>
       </View>
       {error ? (
         <Animated.View style={[trace.errorBanner, { transform: [{ translateX }] }]} accessibilityLiveRegion="polite">
@@ -168,8 +170,9 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
           <View
             testID="trace-pad"
             accessible
+            accessibilityRole="image"
             accessibilityLabel={target.label}
-            accessibilityHint="ارسم بإصبعك"
+            accessibilityHint={t("ارسم بإصبعك")}
             collapsable={false}
             style={[trace.pad, padDims, padError && trace.padError, passed && trace.padPassed, PLATFORM_PAD]}
           >
@@ -185,16 +188,25 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
           </View>
         </GestureDetector>
         <View style={trace.controls}>
-          <Pressable testID="trace-clear" accessibilityRole="button" style={[trace.button, trace.clear]} onPress={handleClear}>
+          <Pressable
+            testID="trace-clear"
+            accessibilityRole="button"
+            accessibilityLabel={t("مسح")}
+            style={[trace.button, trace.clear]}
+            onPress={handleClear}
+          >
             <UiText style={trace.clearText}>مسح</UiText>
           </Pressable>
           <Pressable
             testID="trace-done"
             accessibilityRole="button"
+            accessibilityLabel={t("تم")}
             style={[trace.button, { backgroundColor: color }]}
             onPress={handleDone}
           >
-            <UiText style={trace.doneText}>تم</UiText>
+            <View style={trace.donePlate}>
+              <UiText style={trace.doneText}>تم</UiText>
+            </View>
           </Pressable>
         </View>
       </View>

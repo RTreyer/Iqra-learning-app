@@ -10,8 +10,8 @@ test("each behavior is answered once and scored against isCorrect", () => {
   renderActivity(<BehaviorActivity lesson={lesson} color="#D97706" attemptKey="b:1" onComplete={onComplete} />);
   const answers = [true, true, true, false, false]; // right, wrong, right, wrong, right
   lesson.behaviors.forEach((item, i) => {
-    fireEvent.press(screen.getByRole("button", { name: `${answers[i] ? "✓" : "✗"} ${item.description}` }));
-    expect(screen.queryByRole("button", { name: `✓ ${item.description}` })).toBeNull();
+    fireEvent.press(screen.getByRole("button", { name: `${answers[i] ? "سلوك صحيح" : "سلوك خطأ"}: ${item.description}` }));
+    expect(screen.queryByRole("button", { name: `سلوك صحيح: ${item.description}` })).toBeNull();
   });
   expect(screen.getByText("أَحْسَنْت! 3/5 صحيح 🌟 تابع")).toBeTruthy();
   fireEvent.press(screen.getByTestId("activity-done"));
@@ -20,6 +20,6 @@ test("each behavior is answered once and scored against isCorrect", () => {
 
 test("no Done button until every behavior is answered", () => {
   renderActivity(<BehaviorActivity lesson={lesson} color="#D97706" attemptKey="b:1" onComplete={jest.fn()} />);
-  fireEvent.press(screen.getByRole("button", { name: `✓ ${lesson.behaviors[0].description}` }));
+  fireEvent.press(screen.getByRole("button", { name: `سلوك صحيح: ${lesson.behaviors[0].description}` }));
   expect(screen.queryByTestId("activity-done")).toBeNull();
 });

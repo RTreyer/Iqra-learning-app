@@ -4,7 +4,7 @@ import { StyleSheet, View } from "react-native";
 import { UiText } from "@/components/UiText";
 import { useLanguage } from "@/context/LanguageContext";
 import { routes } from "@/lib/routes";
-import { colors } from "@/theme/tokens";
+import { colors, touchTarget } from "@/theme/tokens";
 
 export default function NotFoundScreen() {
   const { t } = useLanguage();
@@ -18,7 +18,7 @@ export default function NotFoundScreen() {
         </UiText>
 
         <Link href={routes.home()} style={styles.link}>
-          <UiText style={[styles.linkText, { color: colors.star }]}>
+          <UiText style={[styles.linkText, { color: colors.starText }]}>
             العودة إلى الرئيسية
           </UiText>
         </Link>
@@ -41,6 +41,7 @@ const styles = StyleSheet.create({
   link: {
     marginTop: 15,
     paddingVertical: 15,
+    minHeight: touchTarget,
   },
   linkText: {
     fontSize: 14,

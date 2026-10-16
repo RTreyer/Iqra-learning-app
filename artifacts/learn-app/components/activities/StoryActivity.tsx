@@ -32,7 +32,7 @@ function Story({ lesson, color, onComplete }: ActivityProps<"story">) {
   return (
     <View style={act.container}>
       <Text style={styles.title}>{lesson.storyTitle}</Text>
-      <Text style={act.instruction}>اضغط على كل جملة لتسمعها 🔊</Text>
+      <UiText style={act.instruction}>اضغط على كل جملة لتسمعها 🔊</UiText>
       <View style={act.fullWidth}>
         {lines.map((line, i) => {
           const done = heard.has(i);
@@ -41,11 +41,12 @@ function Story({ lesson, color, onComplete }: ActivityProps<"story">) {
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel={line.text}
+                accessibilityState={{ selected: done }}
                 style={[styles.line, done && { borderColor: color, borderWidth: 2, backgroundColor: color + "12" }]}
                 onPress={() => handleLine(i)}
               >
                 <Text style={styles.emoji}>{line.emoji}</Text>
-                <Text style={[styles.text, done && { color }]}>{line.text}</Text>
+                <Text style={styles.text}>{line.text}</Text>
                 {done ? <Text style={styles.check}>✓</Text> : null}
               </Pressable>
             </Animated.View>
@@ -78,5 +79,5 @@ const styles = StyleSheet.create({
   },
   emoji: { fontSize: 22, flexShrink: 0 },
   text: { flex: 1, fontSize: 18, fontWeight: "700", color: colors.text, textAlign: "right" },
-  check: { fontSize: 16, color: colors.success },
+  check: { fontSize: 16, color: colors.successText },
 });

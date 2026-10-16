@@ -6,7 +6,7 @@ import { UiText } from "@/components/UiText";
 import type { Unit } from "@/content/types";
 import type { UnitProgress } from "@/context/ProgressContext";
 import { useLanguage } from "@/context/LanguageContext";
-import { colors } from "@/theme/tokens";
+import { colors, pillPlate, touchTarget } from "@/theme/tokens";
 
 type Props = { unit: Unit; progress: UnitProgress; onPress: () => void };
 
@@ -24,7 +24,9 @@ export function UnitCard({ unit, progress, onPress }: Props) {
     >
       <Text style={styles.emoji}>{unit.emoji}</Text>
       <View style={[styles.info, { alignItems: language === "en" ? "flex-start" : "flex-end" }]}>
-        <UiText style={styles.title}>{unit.title}</UiText>
+        <View style={styles.titlePlate}>
+          <UiText style={styles.title}>{unit.title}</UiText>
+        </View>
         <View style={[styles.footer, { flexDirection: row }]}>
           <View style={styles.label}>
             <Text style={styles.labelText}>{unit.theme}</Text>
@@ -42,6 +44,7 @@ export function UnitCard({ unit, progress, onPress }: Props) {
 const styles = StyleSheet.create({
   card: {
     width: "100%",
+    minHeight: touchTarget,
     borderRadius: 24,
     alignItems: "center",
     gap: 14,
@@ -56,7 +59,8 @@ const styles = StyleSheet.create({
   pressed: { opacity: 0.88, transform: [{ scale: 0.97 }] },
   emoji: { fontSize: 40 },
   info: { flex: 1, gap: 6 },
-  title: { fontSize: 22, fontWeight: "800", color: colors.white },
+  titlePlate: pillPlate,
+  title: { fontSize: 22, fontWeight: "800", color: colors.text },
   footer: { alignItems: "center", gap: 8, flexWrap: "wrap" },
   label: { backgroundColor: colors.pill, borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3 },
   labelText: { fontSize: 13, fontWeight: "700", color: colors.text },

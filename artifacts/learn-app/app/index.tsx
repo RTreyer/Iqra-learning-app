@@ -25,7 +25,8 @@ import { currentStreak } from "@/lib/streak";
 import { colors } from "@/theme/tokens";
 
 export default function HomeScreen() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const row = { flexDirection: language === "en" ? "row" : "row-reverse" } as const;
   const { progress, getDueItemIds } = useProgress();
   const pad = useScreenPadding();
   const next = useMemo(() => nextLesson(progress), [progress]);
@@ -36,12 +37,12 @@ export default function HomeScreen() {
   return (
     <ScreenBackground style={[styles.container, { paddingTop: pad.top + 8 }]}>
       <LanguageSwitch />
-      <View style={styles.header}>
-        <View style={styles.badges}>
+      <View style={[styles.header, row]}>
+        <View style={[styles.badges, row]}>
           <StarBadge stars={progress.totalStars} />
           {streak >= 2 && <StreakBadge days={streak} />}
         </View>
-        <View style={styles.userRow}>
+        <View style={[styles.userRow, row]}>
           <Text style={styles.userName} numberOfLines={1}>
             {t("أهلاً")}
           </Text>
@@ -76,13 +77,12 @@ const styles = StyleSheet.create({
   container: { flex: 1, paddingHorizontal: 20, alignItems: "center" },
   header: {
     width: "100%",
-    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: 6,
   },
-  badges: { flexDirection: "row", alignItems: "center", gap: 8 },
-  userRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+  badges: { alignItems: "center", gap: 8 },
+  userRow: { alignItems: "center", gap: 8 },
   userName: { fontSize: 16, fontWeight: "700", color: colors.text, maxWidth: 80 },
   appTitle: { fontSize: 24, fontWeight: "800", color: colors.text, textAlign: "right" },
   scroll: { width: "100%" },
