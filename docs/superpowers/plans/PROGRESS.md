@@ -54,11 +54,11 @@ To make it self-resuming after a usage limit reset, run inside the session (loca
 | 2.4 CI | done | f5cd869 | verified inline by controller (single yaml) |
 | 3.1 Speech, haptics, voice detection | done | 813b592, c339eb0, 56284e1 | spec + code review passed; banner is an absolute overlay; web waits once for voiceschanged |
 | 3.2 Theme tokens | done | 75dc06e | spec review passed; legacy `variant` prop kept until 4.4 |
-| 3.3 Scoring and progress v2 | fixing | ded07c5 | code review: read error could wipe stars, early reset resurrected; reducer + effect persistence fix in progress |
+| 3.3 Scoring and progress v2 | done | ded07c5, 4b5e9e7, 9d0e855 | spec + code review passed; reducer + single persistence effect; read errors never overwrite stored stars; corrupt blobs backed up |
 | 3.4 Typed routes helper | done | 0896104 | includes `review()` |
-| 4.1 Content model | in progress | | combined with 4.2 in one agent, two commits |
-| 4.2 Move Arabic content | in progress | | legacy constants files kept until 4.4 so typecheck stays green |
-| 4.3 Activity components | | | 3 commits |
+| 4.1 Content model | in review | a4fc4fd, a80116e | 47 Arabic lessons, 17 data tests |
+| 4.2 Move Arabic content | in review | ad71e4a | 40 legacy lessons byte identical, u1-5 → trace, u2-6 … u8-6 added; legacy constants kept until 4.4 |
+| 4.3 Activity components | in progress | | 3 commits |
 | 4.4 Screens | | | |
 | 5.1 Science content | | | placeholder, flagged |
 | 5.2 Math content | | | exemplary set derived from the Yemen textbooks (owner PDFs), small scope |
@@ -84,6 +84,12 @@ To make it self-resuming after a usage limit reset, run inside the session (loca
 - A native Arabic speaker to review all authored content.
 - A 1024 px padded foreground PNG if an adaptive icon is wanted (UI proposals).
 
+## Backlog (small, non blocking)
+
+- ProgressContext: if both storage reads fail, the session runs in memory only. Follow up: retry hydration when an unhydrated provider receives a completion, or on AppState `active`.
+- ProgressContext: LOADED marks the state dirty even when the blob was already v2, so every launch rewrites the blob once. Harmless.
+- Replace `@expo/vector-icons` with inline SVG to drop `expo-font` (UI proposals).
+
 ## Decision log
 
 - 2026-10-16: Work on main instead of a feature branch (owner).
@@ -91,6 +97,9 @@ To make it self-resuming after a usage limit reset, run inside the session (loca
 - 2026-10-16: Execution paused by owner after Task 1.1 to preserve usage limit. Resume with the prompt above.
 - 2026-10-16 (evening): Owner restarted the run. Session loop active every 10 minutes (cron job e35b9185, session only). Commits stay local, nothing is pushed without explicit owner approval.
 - 2026-10-16: Model policy (owner: "use the appropriate models to stay efficient"). Implementers: sonnet for config, deletion and data tasks (1.2, 1.3, 2.x, 3.2, 3.4, 5.1, 5.2, 5.6, 6.5); opus for multi file code tasks (3.1, 3.3, 4.x, 5.3 to 5.5, 6.1 to 6.4). Spec reviewers: sonnet. Code quality reviewers: opus. Config only tasks get spec review only.
+- 2026-10-16: u1-5 trace guides use ـــ | / ◯ 〰 (the existing five shapes: horizontal, vertical, diagonal, circle, zigzag); the plan's "arc" did not exist in the content, so no new shape was invented.
+- 2026-10-16: `allowImportingTsExtensions` enabled so Node type stripping can run data tests directly on the TS content; content modules import each other with `.ts` extensions and must stay free of react-native imports. `SUBJECT_COLORS` lives in `content/types.ts`, `theme/tokens.ts` re-exports it.
+- 2026-10-16: Math numbers display in Eastern Arabic digits (textbooks use them); `lib/arabicNumbers.ts`.
 - 2026-10-16: Implementers no longer run in parallel after a shared git index swept Task 3.2 deletions into a Task 3.1 commit (history rewritten locally before anything was pushed: c339eb0, 75dc06e, 0896104). Rule: all agents commit with `git commit --only <paths>`; at most one implementer writes at a time unless file sets are disjoint and both use `--only`.
 - 2026-10-16: Task 4.2 keeps the six legacy `constants/*` files (with a LEGACY comment) until Task 4.4 deletes `app/(tabs)`, so typecheck stays green between tasks.
 - 2026-10-16: Code quality review skipped for 3.2 (token values verified one by one) and 3.4 (nine lines).

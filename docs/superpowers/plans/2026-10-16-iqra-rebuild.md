@@ -255,8 +255,8 @@ Convention: `tap` on any press, `success` on correct, `error` on wrong, `warning
 
 **Files:** create `lib/scoring.ts`, `__tests__/scoring.test.ts`, `__tests__/progress.test.tsx`; modify `context/ProgressContext.tsx`
 
-- [ ] Tests (`starsForScore({ correct, total })`): `{5,5}→3`, `{3,5}→2`, `{2,5}→1`, `{0,5}→1`, `{2,3}→2`, `{1,3}→1`, `{0,0}→3`.
-- [ ] `lib/scoring.ts`:
+- [x] Tests (`starsForScore({ correct, total })`): `{5,5}→3`, `{3,5}→2`, `{2,5}→1`, `{0,5}→1`, `{2,3}→2`, `{1,3}→1`, `{0,0}→3`.
+- [x] `lib/scoring.ts`:
 ```ts
 export type Score = { correct: number; total: number };
 export function starsForScore({ correct, total }: Score): 1 | 2 | 3 {
@@ -267,8 +267,8 @@ export function starsForScore({ correct, total }: Score): 1 | 2 | 3 {
   return 1;
 }
 ```
-- [ ] `ProgressContext.tsx`: keep `completeLesson(lessonId, stars)` with max semantics. Add `getUnitProgress(lessonIds: string[]): { done: number; total: number; stars: number }`. Tests with the AsyncStorage mock: 2 then 3 → 3; 3 then 1 → 3; complete before storage finishes loading is kept after load; reload restores state.
-- [ ] Storage schema v2 (same key `@kidlearn_progress_v1`, add `version: 2`). Shape:
+- [x] `ProgressContext.tsx`: keep `completeLesson(lessonId, stars)` with max semantics. Add `getUnitProgress(lessonIds: string[]): { done: number; total: number; stars: number }`. Tests with the AsyncStorage mock: 2 then 3 → 3; 3 then 1 → 3; complete before storage finishes loading is kept after load; reload restores state.
+- [x] Storage schema v2 (same key `@kidlearn_progress_v1`, add `version: 2`). Shape:
 ```ts
 type ProgressState = {
   version: 2;
@@ -279,7 +279,7 @@ type ProgressState = {
 };
 ```
 `loadLocalProgress` upgrades v1 (`{ lessons, totalStars }`) by adding `version: 2`, `items: {}`, `activity: { days: [] }`, `completedAt = now` for existing lessons. Test: v1 blob loads and is rewritten as v2 with stars intact.
-- [ ] Commit: `feat: score based stars and unit progress helper`
+- [x] Commit: `feat: score based stars and unit progress helper`
 
 ### Task 3.4: Typed routes helper
 
