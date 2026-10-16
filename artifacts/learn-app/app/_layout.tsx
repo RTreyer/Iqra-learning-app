@@ -21,10 +21,10 @@ function RootLayoutNav() {
   const { visible, dismiss } = useVoiceHint();
   return (
     <>
-      {visible && <VoiceHintBanner onDismiss={dismiss} />}
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
       </Stack>
+      {visible && <VoiceHintBanner onDismiss={dismiss} />}
     </>
   );
 }

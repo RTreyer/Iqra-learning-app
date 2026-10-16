@@ -17,6 +17,19 @@ export function stopSpeaking(): void {
 }
 
 const ARABIC = /^ar/i;
+const VOICES_TIMEOUT_MS = 1500;
+
+function waitForVoices(synth: SpeechSynthesis, timeoutMs: number): Promise<void> {
+  return new Promise((resolve) => {
+    const done = () => {
+      clearTimeout(timer);
+      synth.removeEventListener("voiceschanged", done);
+      resolve();
+    };
+    const timer = setTimeout(done, timeoutMs);
+    synth.addEventListener("voiceschanged", done);
+  });
+}
 
 /**
  * True when an Arabic TTS voice is available.
@@ -30,7 +43,13 @@ export async function hasArabicVoice(): Promise<boolean> {
     if (Platform.OS === "web") {
       const synth = typeof window !== "undefined" ? window.speechSynthesis : undefined;
       if (!synth) return true;
-      languages = synth.getVoices().map((v) => v.lang);
+      let voices = synth.getVoices();
+      // Chromium loads voices lazily: wait once for voiceschanged, then re-read.
+      if (voices.length === 0) {
+        await waitForVoices(synth, VOICES_TIMEOUT_MS);
+        voices = synth.getVoices();
+      }
+      languages = voices.map((v) => v.lang);
     } else {
       const voices = await Speech.getAvailableVoicesAsync();
       languages = voices.map((v) => v.language);
