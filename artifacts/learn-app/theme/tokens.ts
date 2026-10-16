@@ -1,6 +1,7 @@
 import { Platform } from "react-native";
+import type { Subject } from "@/content/types";
 
-export type Subject = "arabic" | "math" | "science";
+export type { Subject };
 
 export const colors = {
   text: "#1E293B",
