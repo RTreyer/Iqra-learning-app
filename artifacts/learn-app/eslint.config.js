@@ -21,4 +21,10 @@ module.exports = [
     files: ["e2e/**"],
     rules: { "import/no-unresolved": "off" },
   },
+  {
+    files: ["jest.config.js", "jest.setup.ts", "__tests__/**"],
+    languageOptions: {
+      globals: { jest: "readonly", test: "readonly", expect: "readonly", describe: "readonly", it: "readonly", beforeEach: "readonly", afterEach: "readonly", module: "readonly", require: "readonly" },
+    },
+  },
 ];

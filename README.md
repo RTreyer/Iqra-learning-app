@@ -30,7 +30,7 @@ Requires Node.js 24 or newer and pnpm 10 (`npx pnpm@10.34.6` or `corepack enable
 - `pnpm build:web` — build the static web export into `artifacts/learn-app/dist/`
 - `pnpm --filter @workspace/learn-app run dev` — start Expo; scan the QR code with Expo Go on an Android phone
 - `pnpm --filter @workspace/learn-app run web` — run the app in the browser
-- `pnpm --filter @workspace/learn-app run test:language` — UI translation tests
+- `pnpm test` (Jest) and `pnpm test:data` (UI translation tests)
 
 ## Targets
 
