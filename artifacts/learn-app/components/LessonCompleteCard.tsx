@@ -57,21 +57,16 @@ export function LessonCompleteCard({ stars, onRepeat, next, color = colors.succe
             { backgroundColor: color, flexDirection: language === "en" ? "row" : "row-reverse" },
             pressed && styles.pressed,
           ]}
-          onPress={() => router.push(routes.lesson(next.id))}
+          onPress={() => router.replace(routes.lesson(next.id))}
         >
           <UiText style={styles.buttonText}>النشاط التالي:</UiText>
           <Text style={styles.buttonText}>{next.title}</Text>
           <Text style={styles.buttonText}>{language === "en" ? "→" : "←"}</Text>
         </Pressable>
       ) : (
-        <Pressable
-          testID="unit-finished"
-          accessibilityRole="button"
-          style={({ pressed }) => [styles.button, { backgroundColor: color }, pressed && styles.pressed]}
-          onPress={() => router.back()}
-        >
-          <UiText style={styles.buttonText}>🎉 أتممت الوحدة!</UiText>
-        </Pressable>
+        <UiText testID="unit-finished" style={styles.celebration}>
+          🎉 أتممت الوحدة!
+        </UiText>
       )}
 
       <Pressable testID="back-to-list" accessibilityRole="button" style={styles.backLink} onPress={() => router.back()}>
@@ -91,6 +86,7 @@ const styles = StyleSheet.create({
   button: { borderRadius: 16, paddingVertical: 14, paddingHorizontal: 28, alignItems: "center", marginTop: 16 },
   nextRow: { gap: 6, flexWrap: "wrap", justifyContent: "center" },
   buttonText: { fontSize: 16, fontWeight: "800", color: colors.white, textAlign: "center" },
+  celebration: { fontSize: 22, fontWeight: "900", color: colors.text, textAlign: "center", marginTop: 16 },
   pressed: { opacity: 0.88, transform: [{ scale: 0.97 }] },
   backLink: { marginTop: 8, padding: 8 },
   backLinkText: { fontSize: 14, color: "#94A3B8", fontWeight: "600" },
