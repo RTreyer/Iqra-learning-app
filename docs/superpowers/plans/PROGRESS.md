@@ -70,7 +70,7 @@ To make it self-resuming after a usage limit reset, run inside the session (loca
 | 6.2 Performance pass | | | APK/meminfo numbers need a device, record web bundle only |
 | 6.3 E2E suite on new routes | | | |
 | 6.4 Android device check | ready for build | | EAS login verified 2026-10-16 (primary account `cj8181`; a second account `cj818181` also exists, use `cj8181` for `eas init` unless the owner says otherwise). Device testing still needs the owner's phone |
-| 6.5 UI proposals doc | | | |
+| 6.5 UI proposals doc | done (path check in 5.6) | 0fb8b9c | 13 proposals + tracing roadmap; file paths referencing app/(tabs) must be updated in 5.6 after 4.4 |
 | 6.6 Flatten to root | owner | | optional, separate PR, owner decides |
 
 ## Owner inputs still open (none block Tasks 1.2 to 6.5)
