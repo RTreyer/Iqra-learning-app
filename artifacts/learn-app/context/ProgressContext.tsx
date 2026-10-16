@@ -36,6 +36,7 @@ import {
   type ProgressState,
   type UnitProgress,
 } from "@/lib/progressState";
+import { todayKey } from "@/lib/dates";
 import { pickDue } from "@/lib/srs";
 
 export type { LessonProgress, ProgressItem, ProgressState, UnitProgress } from "@/lib/progressState";
@@ -63,7 +64,12 @@ type ProgressContextValue = {
   recordRoundResult: (itemId: string, correct: boolean) => void;
   /** Records one answer in a review session; synchronous like completeLesson. */
   recordReview: (itemId: string, correct: boolean) => void;
-  /** Ids of items due at `now` (default: the current time), in review order. */
+  /**
+   * Ids of items due at `now` (default: the current time), in review order.
+   * Memoised per items and local day, so the same array comes back until the
+   * items change. The day is read at call time: a render caller sees a new day
+   * on the next state change or re-render (e.g. app foreground).
+   */
   getDueItemIds: (now?: Date) => string[];
   /** Resolves once the stored blob has been removed. */
   resetProgress: () => Promise<void>;
@@ -248,9 +254,20 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: "REVIEW", itemId, correct, now: new Date() });
   }, []);
 
+  // Due state depends only on the local day, so one list per day is exact.
+  const dueCache = useMemo(() => ({ items: progress.items, byDay: new Map<string, string[]>() }), [progress.items]);
+
   const getDueItemIds = useCallback(
-    (now: Date = new Date()): string[] => pickDue(progress.items, now),
-    [progress],
+    (now: Date = new Date()): string[] => {
+      const day = todayKey(now);
+      let ids = dueCache.byDay.get(day);
+      if (!ids) {
+        ids = pickDue(dueCache.items, now);
+        dueCache.byDay.set(day, ids);
+      }
+      return ids;
+    },
+    [dueCache],
   );
 
   const getLessonProgress = useCallback(

@@ -4,7 +4,7 @@
  */
 
 import { todayKey } from "@/lib/dates";
-import { introduce, review } from "@/lib/srs";
+import { introduce, isDue, review } from "@/lib/srs";
 
 export type LessonProgress = {
   completed: boolean;
@@ -142,8 +142,12 @@ function markActiveToday(state: ProgressState, now: Date): ProgressState {
 
 /**
  * Records one answered round inside a lesson. An unknown item is introduced
- * (box 1, due tomorrow) whether the answer was right or wrong, so new
- * material enters the schedule; a known item is reviewed.
+ * (box 1, due tomorrow, no lapse) whether the answer was right or wrong, so
+ * new material enters the schedule without counting a first try as a lapse.
+ * For a known item a wrong answer always resets it to box 1 with a lapse
+ * (error driven repetition), but a correct answer promotes only when the
+ * item is due; otherwise only lastSeenAt moves. Lessons repeat items across
+ * rounds, and one sitting must not climb several boxes.
  */
 export function applyRoundResult(
   state: ProgressState,
@@ -152,11 +156,19 @@ export function applyRoundResult(
   now: Date = new Date(),
 ): ProgressState {
   const existing = state.items[itemId];
-  const item = existing ? review(existing, correct, now) : introduce(now);
+  let item: ProgressItem;
+  if (!existing) item = introduce(now);
+  else if (!correct || isDue(existing, now)) item = review(existing, correct, now);
+  else item = { ...existing, lastSeenAt: now.toISOString() };
   return { ...markActiveToday(state, now), items: { ...state.items, [itemId]: item } };
 }
 
-/** Records an answer in a review session. Always a review; an unknown item is introduced first. */
+/**
+ * Records an answer in a review session, which serves due items only, so it
+ * is always a review. An unknown item is introduced and then reviewed: unlike
+ * applyRoundResult, a wrong answer here counts a lapse, because the child was
+ * explicitly tested on it.
+ */
 export function applyReview(
   state: ProgressState,
   itemId: string,

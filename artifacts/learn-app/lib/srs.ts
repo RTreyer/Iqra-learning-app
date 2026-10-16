@@ -1,8 +1,11 @@
 /**
  * Leitner scheduler. Pure: no React, no storage, the clock is passed in.
- * Dates are stored as ISO strings.
+ * Dates are stored as ISO strings. Scheduling works in local calendar days:
+ * dueAt is local midnight of the due day, so an item seen in the evening is
+ * due the next morning.
  */
 
+import { todayKey } from "@/lib/dates";
 import type { ProgressItem } from "@/lib/progressState";
 
 export const BOX_INTERVAL_DAYS = { 1: 1, 2: 2, 3: 4, 4: 7, 5: 14 } as const;
@@ -10,10 +13,16 @@ export const BOX_INTERVAL_DAYS = { 1: 1, 2: 2, 3: 4, 4: 7, 5: 14 } as const;
 export type ItemState = ProgressItem;
 type Box = ItemState["box"];
 
-const DAY_MS = 24 * 60 * 60 * 1000;
+/** Longest interval; a dueAt further ahead than this means the clock moved backwards. */
+const MAX_INTERVAL_DAYS = BOX_INTERVAL_DAYS[5];
+
+/** Local midnight `days` calendar days after `now`. Built from date parts, so DST safe. */
+function localMidnight(now: Date, days: number): Date {
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate() + days);
+}
 
 function dueAfter(box: Box, now: Date): string {
-  return new Date(now.getTime() + BOX_INTERVAL_DAYS[box] * DAY_MS).toISOString();
+  return localMidnight(now, BOX_INTERVAL_DAYS[box]).toISOString();
 }
 
 /** A newly seen item: box 1, due tomorrow. */
@@ -37,9 +46,16 @@ function dueTime(state: ItemState): number {
   return Number.isNaN(time) ? -Infinity : time;
 }
 
-/** Due at or after dueAt. An unparsable dueAt counts as due so the item is not lost. */
+/**
+ * Due once the local day of `now` reaches the local day of dueAt. An
+ * unparsable dueAt, or one more than MAX_INTERVAL_DAYS days ahead (the clock
+ * was corrected backwards), counts as due so the item is never stuck.
+ */
 export function isDue(state: ItemState, now: Date): boolean {
-  return dueTime(state) <= now.getTime();
+  const time = dueTime(state);
+  if (!Number.isFinite(time)) return true;
+  const dueDay = todayKey(new Date(time));
+  return todayKey(now) >= dueDay || dueDay > todayKey(localMidnight(now, MAX_INTERVAL_DAYS));
 }
 
 function kindOf(id: string): string {
@@ -49,6 +65,8 @@ function kindOf(id: string): string {
 
 /**
  * Due ids, oldest due first, then lowest box, then id (deterministic).
+ * The kind of an id is its prefix before the first ":" (letter, word, count,
+ * calc, q), as produced by lib/reviewItems.ts.
  * Kinds are interleaved: each pick takes the first remaining id whose kind
  * differs from the previous one, falling back to the first remaining id.
  */

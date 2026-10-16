@@ -213,9 +213,11 @@ describe("ProgressContext", () => {
     act(() => result.current.recordRoundResult("letter:ب", false));
     expect(result.current.progress.items["letter:ب"]).toMatchObject({ box: 1, lapses: 0 });
     act(() => result.current.recordRoundResult("letter:ب", true));
-    expect(result.current.progress.items["letter:ب"].box).toBe(2);
+    expect(result.current.progress.items["letter:ب"]).toMatchObject({ box: 1, lapses: 0 });
+    act(() => result.current.recordRoundResult("letter:ب", false));
+    expect(result.current.progress.items["letter:ب"]).toMatchObject({ box: 1, lapses: 1 });
     expect(result.current.progress.activity.days).toHaveLength(1);
-    await waitFor(async () => expect((await stored())?.items["letter:ب"]?.box).toBe(2));
+    await waitFor(async () => expect((await stored())?.items["letter:ب"]?.lapses).toBe(1));
   });
 
   it("recordReview moves the box and resets on a wrong answer", async () => {
@@ -233,6 +235,8 @@ describe("ProgressContext", () => {
     expect(result.current.getDueItemIds()).toEqual([]);
     const later = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
     expect(result.current.getDueItemIds(later)).toEqual(["count:3"]);
+    expect(result.current.getDueItemIds(later)).toBe(result.current.getDueItemIds(later));
+    expect(result.current.getDueItemIds()).toBe(result.current.getDueItemIds());
   });
 
   it("a reset before the load resolves keeps only items recorded since", async () => {

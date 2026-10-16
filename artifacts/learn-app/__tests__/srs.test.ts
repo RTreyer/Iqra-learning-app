@@ -3,6 +3,9 @@ import { BOX_INTERVAL_DAYS, introduce, isDue, pickDue, review, type ItemState } 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = new Date(2026, 9, 16, 18, 0);
 const plus = (date: Date, days: number) => new Date(date.getTime() + days * DAY);
+/** ISO string of local midnight `days` calendar days after `date`. */
+const localDay = (date: Date, days: number) =>
+  new Date(date.getFullYear(), date.getMonth(), date.getDate() + days).toISOString();
 
 function item(box: ItemState["box"], dueAt: Date): ItemState {
   return { box, dueAt: dueAt.toISOString(), lastSeenAt: NOW.toISOString(), lapses: 0 };
@@ -12,7 +15,7 @@ describe("introduce", () => {
   it("puts a new item in box 1, due tomorrow", () => {
     expect(introduce(NOW)).toEqual({
       box: 1,
-      dueAt: plus(NOW, 1).toISOString(),
+      dueAt: localDay(NOW, 1),
       lastSeenAt: NOW.toISOString(),
       lapses: 0,
     });
@@ -28,8 +31,8 @@ describe("review", () => {
       state = review(state, true, at);
     }
     expect(state.box).toBe(4);
-    expect(state.dueAt).toBe(plus(at, BOX_INTERVAL_DAYS[4]).toISOString());
-    expect(state.dueAt).toBe(plus(at, 7).toISOString());
+    expect(state.dueAt).toBe(localDay(at, BOX_INTERVAL_DAYS[4]));
+    expect(state.dueAt).toBe(localDay(at, 7));
     expect(state.lastSeenAt).toBe(at.toISOString());
     expect(state.lapses).toBe(0);
   });
@@ -37,24 +40,39 @@ describe("review", () => {
   it("caps at box 5", () => {
     const state = review(item(5, NOW), true, NOW);
     expect(state.box).toBe(5);
-    expect(state.dueAt).toBe(plus(NOW, 14).toISOString());
+    expect(state.dueAt).toBe(localDay(NOW, 14));
   });
 
   it("a wrong answer resets to box 1 and counts a lapse", () => {
     const state = review({ ...item(4, NOW), lapses: 2 }, false, NOW);
-    expect(state).toMatchObject({ box: 1, lapses: 3, dueAt: plus(NOW, 1).toISOString() });
+    expect(state).toMatchObject({ box: 1, lapses: 3, dueAt: localDay(NOW, 1) });
   });
 });
 
 describe("isDue", () => {
-  it("is due exactly at dueAt, not a millisecond before", () => {
-    expect(isDue(item(1, NOW), NOW)).toBe(true);
-    expect(isDue(item(1, NOW), new Date(NOW.getTime() - 1))).toBe(false);
-    expect(isDue(item(1, NOW), plus(NOW, 3))).toBe(true);
+  it("is due from the start of the due day, by local calendar day", () => {
+    const introducedAt = new Date(2026, 2, 1, 18, 0);
+    const state = introduce(introducedAt);
+    expect(isDue(state, new Date(2026, 2, 1, 23, 59))).toBe(false);
+    expect(isDue(state, new Date(2026, 2, 2, 0, 0))).toBe(true);
+    expect(isDue(state, new Date(2026, 2, 2, 8, 0))).toBe(true);
+    expect(isDue(state, new Date(2026, 2, 5, 8, 0))).toBe(true);
+  });
+
+  it("keeps dueAt on local midnight across a DST change", () => {
+    const state = review({ ...introduce(new Date(2026, 2, 20, 18, 0)), box: 4 }, true, new Date(2026, 2, 20, 18, 0));
+    const due = new Date(state.dueAt);
+    expect([due.getFullYear(), due.getMonth(), due.getDate(), due.getHours()]).toEqual([2026, 3, 3, 0]);
   });
 
   it("treats an unparsable dueAt as due", () => {
     expect(isDue({ ...item(1, NOW), dueAt: "garbage" }, NOW)).toBe(true);
+  });
+
+  it("treats a dueAt more than 14 days ahead as due (clock moved backwards)", () => {
+    expect(isDue(item(5, new Date(localDay(NOW, 14))), NOW)).toBe(false);
+    expect(isDue(item(5, new Date(localDay(NOW, 15))), NOW)).toBe(true);
+    expect(isDue(item(1, new Date(2027, 0, 1)), NOW)).toBe(true);
   });
 });
 

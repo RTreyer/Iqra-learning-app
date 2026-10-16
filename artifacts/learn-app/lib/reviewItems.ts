@@ -13,15 +13,15 @@ export type ReviewItem =
 export function itemsForLesson(lesson: Lesson): ReviewItem[] {
   switch (lesson.type) {
     case "letter_pick":
-      return lesson.rounds.map((r) => ({ id: `letter:${r.targetLetter}`, kind: "letter", ...r }));
+      return lesson.rounds.map((r) => ({ ...r, id: `letter:${r.targetLetter}`, kind: "letter" }));
     case "word_read":
-      return lesson.rounds.map((r) => ({ id: `word:${r.word}`, kind: "word", ...r }));
+      return lesson.rounds.map((r) => ({ ...r, id: `word:${r.word}`, kind: "word" }));
     case "counting":
-      return lesson.rounds.map((r) => ({ id: `count:${r.count}`, kind: "count", ...r }));
+      return lesson.rounds.map((r) => ({ ...r, id: `count:${r.count}`, kind: "count" }));
     case "arithmetic":
-      return lesson.rounds.map((r) => ({ id: `calc:${r.a}${r.op}${r.b}`, kind: "calc", ...r }));
+      return lesson.rounds.map((r) => ({ ...r, id: `calc:${r.a}${r.op}${r.b}`, kind: "calc" }));
     case "listen_pick":
-      return lesson.questions.map((q, index) => ({ id: `q:${lesson.id}:${index}`, kind: "question", ...q }));
+      return lesson.questions.map((q, index) => ({ ...q, id: `q:${lesson.id}:${index}`, kind: "question" }));
     default:
       return [];
   }

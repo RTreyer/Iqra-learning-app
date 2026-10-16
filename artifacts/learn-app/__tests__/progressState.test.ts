@@ -218,8 +218,7 @@ describe("validation", () => {
 });
 
 describe("applyRoundResult", () => {
-  const DAY = 24 * 60 * 60 * 1000;
-  const tomorrow = new Date(NOW.getTime() + DAY).toISOString();
+  const tomorrow = new Date(2026, 9, 17).toISOString();
 
   it.each([true, false])("introduces an unknown item (correct=%s) in box 1, due tomorrow", (correct) => {
     const state = applyRoundResult(createEmptyState(), "letter:ب", correct, NOW);
@@ -236,6 +235,32 @@ describe("applyRoundResult", () => {
     expect(applyRoundResult(once, "word:x", true, LATER).items["word:x"].box).toBe(2);
     const wrong = applyRoundResult(once, "word:x", false, LATER).items["word:x"];
     expect(wrong).toMatchObject({ box: 1, lapses: 1 });
+  });
+
+  it("does not promote repeats of a not yet due item in one session", () => {
+    let state = applyRoundResult(createEmptyState(), "letter:ب", true, NOW);
+    const later = new Date(NOW.getTime() + 60_000);
+    state = applyRoundResult(state, "letter:ب", true, later);
+    state = applyRoundResult(state, "letter:ب", true, later);
+    expect(state.items["letter:ب"]).toEqual({
+      box: 1,
+      dueAt: tomorrow,
+      lastSeenAt: later.toISOString(),
+      lapses: 0,
+    });
+  });
+
+  it("a wrong answer resets a not yet due item to box 1", () => {
+    const base = {
+      ...createEmptyState(),
+      items: { "word:x": { box: 3 as const, dueAt: new Date(2026, 9, 20).toISOString(), lastSeenAt: "", lapses: 0 } },
+    };
+    expect(applyRoundResult(base, "word:x", false, NOW).items["word:x"]).toEqual({
+      box: 1,
+      dueAt: tomorrow,
+      lastSeenAt: NOW.toISOString(),
+      lapses: 1,
+    });
   });
 
   it("marks today active once and leaves other state alone", () => {
