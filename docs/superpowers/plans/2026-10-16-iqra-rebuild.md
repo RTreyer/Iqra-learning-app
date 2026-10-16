@@ -356,14 +356,14 @@ export type ActivityProps<T extends LessonBody["type"]> = {
 ```
 `itemId` comes from `lib/reviewItems.ts` (Task 5.3): `letter:ب`, `word:بَيْت`, `count:7`, `calc:3+2`, `q:u2-5:0`. Quiz activities read it from the round via `itemIdFor(lesson, roundIndex)`.
 
-- [ ] `shared/useShuffled.ts`: seeded Fisher Yates (`mulberry32(hash(attemptKey + roundIndex))`) returning `{ items, correctIndex }` so correct answers move per attempt without touching content. Unit test: deterministic for the same seed, correct item tracked.
-- [ ] `shared/ProgressDots.tsx`, `shared/ChoiceCard.tsx` (`accessibilityRole="button"`, `accessibilityLabel={word}`, `minHeight: touchTarget`, states idle/correct/wrong), `shared/DoneButton.tsx`.
-- [ ] Port from `app/(tabs)/unit/[unitId]/[lessonId].tsx`: `StoryActivity`, `NamingActivity`, `LetterPickActivity`, `WordReadActivity`, `ListenPickActivity`. Port from `app/(tabs)/unit1/[id].tsx`: `BehaviorActivity`, `MatchingActivity`. Port from `app/(tabs)/math/[id].tsx`: `CountingActivity`, `ArithmeticActivity`. Rules for every quiz activity: a round counts as correct only when the first tap is correct; lock the round after the first tap; use `useShuffled` for options; `Animated.Value` arrays sized by the max option count across rounds; `speak`/`haptics` from `lib`.
-- [ ] `trace/validate.ts`: move `parsePoints` and `validateTracing` from `writing/[id].tsx` unchanged (stroke count, path length ≥ 50 percent of shorter pad side, bounding box ≥ 20 percent width or 15 percent height, centroid within 35 percent of centre). Node tests: 5 px stroke fails, off centre stroke fails, diagonal across the pad passes.
-- [ ] `TraceActivity.tsx`: `GestureDetector` with `Gesture.Pan().minDistance(0).shouldCancelWhenOutside(false).runOnJS(true)` using `e.x`/`e.y`; current stroke in a ref, committed to state at most once per `requestAnimationFrame`; strokes rendered with `react-native-svg` `Path` stroke width 10; guide glyph at 0.15 opacity behind; Clear and Done buttons; error banner with shake, `warning()` haptic and spoken retry on invalid trace; web only style `{ touchAction: "none", userSelect: "none" }`; iterates `targets`, completes after the last valid one with `{ correct: 0, total: 0 }`. The lesson screen renders it with `scrollEnabled={false}` on the surrounding ScrollView (Task 4.4).
-- [ ] `index.ts`: `ACTIVITY_COMPONENTS` map typed per activity type with an exhaustive `never` check.
-- [ ] One testing-library test per component: renders, interaction, `onComplete` payload (example: LetterPick with first taps wrong, wrong, right, right, right → `{ correct: 3, total: 5 }`).
-- [ ] Commits: `feat: quiz activity components`, `feat: trace activity on gesture handler`, `feat: math activity components`
+- [x] `shared/useShuffled.ts`: seeded Fisher Yates (`mulberry32(hash(attemptKey + roundIndex))`) returning `{ items, correctIndex }` so correct answers move per attempt without touching content. Unit test: deterministic for the same seed, correct item tracked.
+- [x] `shared/ProgressDots.tsx`, `shared/ChoiceCard.tsx` (`accessibilityRole="button"`, `accessibilityLabel={word}`, `minHeight: touchTarget`, states idle/correct/wrong), `shared/DoneButton.tsx`.
+- [x] Port from `app/(tabs)/unit/[unitId]/[lessonId].tsx`: `StoryActivity`, `NamingActivity`, `LetterPickActivity`, `WordReadActivity`, `ListenPickActivity`. Port from `app/(tabs)/unit1/[id].tsx`: `BehaviorActivity`, `MatchingActivity`. Port from `app/(tabs)/math/[id].tsx`: `CountingActivity`, `ArithmeticActivity`. Rules for every quiz activity: a round counts as correct only when the first tap is correct; lock the round after the first tap; use `useShuffled` for options; `Animated.Value` arrays sized by the max option count across rounds; `speak`/`haptics` from `lib`.
+- [x] `trace/validate.ts`: move `parsePoints` and `validateTracing` from `writing/[id].tsx` unchanged (stroke count, path length ≥ 50 percent of shorter pad side, bounding box ≥ 20 percent width or 15 percent height, centroid within 35 percent of centre). Node tests: 5 px stroke fails, off centre stroke fails, diagonal across the pad passes.
+- [x] `TraceActivity.tsx`: `GestureDetector` with `Gesture.Pan().minDistance(0).shouldCancelWhenOutside(false).runOnJS(true)` using `e.x`/`e.y`; current stroke in a ref, committed to state at most once per `requestAnimationFrame`; strokes rendered with `react-native-svg` `Path` stroke width 10; guide glyph at 0.15 opacity behind; Clear and Done buttons; error banner with shake, `warning()` haptic and spoken retry on invalid trace; web only style `{ touchAction: "none", userSelect: "none" }`; iterates `targets`, completes after the last valid one with `{ correct: 0, total: 0 }`. The lesson screen renders it with `scrollEnabled={false}` on the surrounding ScrollView (Task 4.4).
+- [x] `index.ts`: `ACTIVITY_COMPONENTS` map typed per activity type with an exhaustive `never` check.
+- [x] One testing-library test per component: renders, interaction, `onComplete` payload (example: LetterPick with first taps wrong, wrong, right, right, right → `{ correct: 3, total: 5 }`).
+- [x] Commits: `feat: quiz activity components`, `feat: trace activity on gesture handler`, `feat: math activity components`
 
 ### Task 4.4: Screens
 
@@ -407,7 +407,7 @@ const onComplete = (score: Score) => { const s = starsForScore(score); completeL
 **Files:** create `content/math/unit1.ts`, `unit2.ts`, `lib/arabicNumbers.ts`, `__tests__/arabicNumbers.test.ts`
 
 - [x] `m1` "الأَعْدَاد مِنْ 1 إِلَى 10": 4 `counting` lessons (1 to 3, 4 to 6, 7 to 10, mixed), 5 rounds each, 3 options per round. `m2` "الْجَمْع وَالطَّرْح": 2 `arithmetic` addition lessons (sums ≤ 5, ≤ 10) and 2 subtraction lessons (within 5, within 10), 5 rounds each. IDs `m1-1 … m2-4`.
-- [ ] `lib/arabicNumbers.ts`: `numberToArabicWord(0..20)` for TTS (`صفر، واحد … عشرون`), tested. (follows after 4.3)
+- [x] `lib/arabicNumbers.ts`: `numberToArabicWord(0..20)` for TTS (`صفر، واحد … عشرون`), tested. (done in af1b371)
 - [x] Commit: `content: math part 1 starter units`
 
 ### Task 5.3: Review items and Leitner scheduler

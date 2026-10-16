@@ -58,11 +58,11 @@ To make it self-resuming after a usage limit reset, run inside the session (loca
 | 3.4 Typed routes helper | done | 0896104 | includes `review()` |
 | 4.1 Content model | done | a4fc4fd, a80116e, 83e44fc | spec review passed; code quality folded into the 4.3 review |
 | 4.2 Move Arabic content | done | ad71e4a | 40 legacy lessons byte identical, u1-5 → trace, u2-6 … u8-6 added; legacy constants kept until 4.4 |
-| 4.3 Activity components | fixing | e68ffd3, 7dffdcd, ba0e57b | spec review passed; code review: double complete guard, stale timer callbacks, trace path cost; fixes in progress; `numberToArabicWord` (5.2 leftover) folded in |
-| 4.4 Screens | in progress | | deletes app/(tabs) and legacy constants; old e2e suite breaks until 6.3 |
+| 4.3 Activity components | done | e68ffd3, 7dffdcd, ba0e57b, cb39f98, af1b371, 019d5a8 | spec + code review passed (two fix rounds); 131+ jest tests |
+| 4.4 Screens | in code review | 1c9b8ca, 96ab340 | spec review passed; lint 0/0; web bundle 2.01 MB; old e2e suite broken until 6.3 |
 | 5.1 Science content | done | 6890685, 830a447 | 3 units, 9 lessons, placeholder; spec + Arabic review passed |
-| 5.2 Math content | done (1 item open) | c9cb8e0, 80dce34, 830a447 | 3 units, 11 lessons from textbook Part 1 (numbers 0 to 10, add/sub within 10, plane shapes); `numberToArabicWord` follows after 4.3 lands `lib/arabicNumbers.ts` |
-| 5.3 Review items and Leitner scheduler | | | |
+| 5.2 Math content | done | c9cb8e0, 80dce34, 830a447 | 3 units, 11 lessons from textbook Part 1 (numbers 0 to 10, add/sub within 10, plane shapes); `numberToArabicWord` follows after 4.3 lands `lib/arabicNumbers.ts` |
+| 5.3 Review items and Leitner scheduler | in review | a215936 | recordRoundResult / recordReview / getDueItemIds |
 | 5.4 Review session screen | | | |
 | 5.5 Home guidance | | | |
 | 5.6 Docs refresh | | | |
