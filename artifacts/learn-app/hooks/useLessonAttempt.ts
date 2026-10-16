@@ -10,9 +10,12 @@ export function useLessonAttempt(lessonKey: string) {
     setAttempt((previous) => previous + 1);
   }, []);
 
-  useFocusEffect(useCallback(() => {
-    restartAttempt();
-  }, [restartAttempt]));
+  // Keyed on lessonKey: a new key on the same focused screen must also reset the attempt.
+  const onFocus = useCallback(() => {
+    setFinishedKey((current) => (current === lessonKey ? null : current));
+    setAttempt((previous) => previous + 1);
+  }, [lessonKey]);
+  useFocusEffect(onFocus);
 
   const completeAttempt = useCallback(() => setFinishedKey(lessonKey), [lessonKey]);
   return {

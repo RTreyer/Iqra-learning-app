@@ -17,7 +17,7 @@ module.exports = [
     rules: { "no-restricted-syntax": "off" },
   },
   {
-    // playwright is not installed as a dependency yet; e2e is rewritten in Task 6.3.
+    // playwright is not installed as a dependency yet; temporary until Task 2.3 adds @playwright/test.
     files: ["e2e/**"],
     rules: { "import/no-unresolved": "off" },
   },
