@@ -24,6 +24,7 @@ const english: Record<string, string> = {
   "‹": "›",
   "مسح": "Clear",
   "أنهيتُ": "Done",
+  "تم": "Done",
   "مرة أخرى": "Try again",
   "حاول مرة أخرى": "Try again",
   "هيّا نختبر!": "Start quiz",
