@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { translateUi } from "../content/ui-translations.ts";
-import { grades } from "../constants/grades.ts";
 
 test("Arabic is unchanged, including whitespace and lesson text", () => {
   for (const text of ["اختَر صفّك", "  جاري التحميل...  ", "أَكَلَ أَحْمَدُ تُفَّاحَةً", "التالي ←"]) {
@@ -16,13 +15,6 @@ test("English controls, auth errors and book menus", () => {
   assert.equal(translateUi("3 جملة متبقية", "en"), "3 sentences left");
   assert.equal(translateUi("2 كلمة متبقية", "en"), "2 words left");
   assert.equal(translateUi("تعذّر تسجيل الدخول. حاول مرة أخرى.", "en"), "Sign-in failed. Please try again.");
-  for (const grade of grades) {
-    assert.equal(translateUi(grade.label, "en"), `Grade ${grade.id}`);
-    for (const book of grade.books) {
-      assert.doesNotMatch(translateUi(book.title, "en"), /[\u0600-\u06ff]/);
-      assert.doesNotMatch(translateUi(book.subtitle, "en"), /[\u0600-\u06ff]/);
-    }
-  }
 });
 test("Dynamic labels keep scores and Arabic lesson titles", () => {
   assert.equal(translateUi("2 / 5 مكتمل", "en"), "2 / 5 complete");
@@ -48,4 +40,15 @@ test("Catalog book titles and subtitles translate", async () => {
     assert.doesNotMatch(translateUi(book.title, "en"), /[؀-ۿ]/);
     assert.doesNotMatch(translateUi(book.subtitle, "en"), /[؀-ۿ]/);
   }
+});
+test("Catalog unit titles and lesson screen chrome translate", async () => {
+  const { books } = await import("../content/index.ts");
+  for (const book of books) {
+    for (const unit of book.units) assert.doesNotMatch(translateUi(unit.title, "en"), /[؀-ۿ]/);
+  }
+  assert.equal(translateUi("أَحْسَنْت!", "en"), "Well done!");
+  assert.equal(translateUi("النشاط التالي:", "en"), "Next activity:");
+  assert.equal(translateUi("🎉 أتممت الوحدة!", "en"), "🎉 Unit complete!");
+  assert.equal(translateUi("العودة إلى القائمة", "en"), "Back to the list");
+  assert.equal(translateUi("اختَر الكتاب", "en"), "Choose a book");
 });

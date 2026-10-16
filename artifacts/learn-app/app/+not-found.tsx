@@ -3,6 +3,7 @@ import { StyleSheet, View } from "react-native";
 
 import { UiText } from "@/components/UiText";
 import { useLanguage } from "@/context/LanguageContext";
+import { routes } from "@/lib/routes";
 import { colors } from "@/theme/tokens";
 
 export default function NotFoundScreen() {
@@ -16,7 +17,7 @@ export default function NotFoundScreen() {
           الصفحة غير موجودة
         </UiText>
 
-        <Link href="/" style={styles.link}>
+        <Link href={routes.home()} style={styles.link}>
           <UiText style={[styles.linkText, { color: colors.star }]}>
             العودة إلى الرئيسية
           </UiText>

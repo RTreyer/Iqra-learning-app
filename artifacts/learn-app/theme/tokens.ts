@@ -16,6 +16,8 @@ export const colors = {
   starSoft: "#FEF3C7",
   cream: "#FFFBF0",
   white: "#FFFFFF",
+  /** Translucent white behind small badges such as ProgressPill. */
+  pill: "rgba(255,255,255,0.88)",
 } as const;
 
 export const subjects = SUBJECT_COLORS;
@@ -29,13 +31,6 @@ export const gradients: Record<Subject | "home", Gradient> = {
   math: ["#EFE7FD", "#FFFBF0"],
   science: ["#E1F2ED", "#FFFBF0"],
 };
-
-/** Existing per screen gradients, kept until screens migrate (Task 4.4). */
-export const legacyGradients = {
-  reading: ["#E3F4FF", "#B8DFFF", "#8EC9FF"],
-  math: ["#E3FFF2", "#B0F5D8", "#7FECC0"],
-  writing: ["#EEE9FF", "#D8CFFF", "#C0B0FF"],
-} as const;
 
 export const radius = { sm: 12, md: 20, lg: 28 } as const;
 
