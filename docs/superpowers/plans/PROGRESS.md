@@ -56,12 +56,12 @@ To make it self-resuming after a usage limit reset, run inside the session (loca
 | 3.2 Theme tokens | done | 75dc06e | spec review passed; legacy `variant` prop kept until 4.4 |
 | 3.3 Scoring and progress v2 | done | ded07c5, 4b5e9e7, 9d0e855 | spec + code review passed; reducer + single persistence effect; read errors never overwrite stored stars; corrupt blobs backed up |
 | 3.4 Typed routes helper | done | 0896104 | includes `review()` |
-| 4.1 Content model | in review | a4fc4fd, a80116e | 47 Arabic lessons, 17 data tests |
-| 4.2 Move Arabic content | in review | ad71e4a | 40 legacy lessons byte identical, u1-5 → trace, u2-6 … u8-6 added; legacy constants kept until 4.4 |
+| 4.1 Content model | done | a4fc4fd, a80116e, 83e44fc | spec review passed; code quality folded into the 4.3 review |
+| 4.2 Move Arabic content | done | ad71e4a | 40 legacy lessons byte identical, u1-5 → trace, u2-6 … u8-6 added; legacy constants kept until 4.4 |
 | 4.3 Activity components | in progress | | 3 commits |
 | 4.4 Screens | | | |
-| 5.1 Science content | | | placeholder, flagged |
-| 5.2 Math content | | | exemplary set derived from the Yemen textbooks (owner PDFs), small scope |
+| 5.1 Science content | in progress | | placeholder, flagged; same agent as 5.2 |
+| 5.2 Math content | in progress | | 3 units, 11 lessons from Part 1 (numbers 0 to 10, add/sub within 10, plane shapes); `numberToArabicWord` follows after 4.3 lands `lib/arabicNumbers.ts` |
 | 5.3 Review items and Leitner scheduler | | | |
 | 5.4 Review session screen | | | |
 | 5.5 Home guidance | | | |

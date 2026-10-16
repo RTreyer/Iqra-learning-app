@@ -305,7 +305,7 @@ No raw href strings anywhere else (lint rule from Task 2.1 enforces the `(tabs)`
 
 **Files:** create `content/types.ts`, `content/catalog.ts`, `content/index.ts`, `scripts/content.test.mjs`
 
-- [ ] `content/types.ts`:
+- [x] `content/types.ts`:
 ```ts
 export type Subject = "arabic" | "math" | "science";
 export type Choice = { emoji: string; word: string };
@@ -326,19 +326,19 @@ export type Unit = { id: string; number: number; title: string; theme: string; e
 export type Book = { id: string; subject: Subject; title: string; subtitle: string; emoji: string; color: string; available: boolean; units: Unit[] };
 ```
 Unit IDs are globally unique: Arabic `"a1" … "a8"`, Math `"m1"`, `"m2"`, Science `"s1" … "s3"`. Lesson IDs are globally unique (`u1-1 … u8-6`, `m1-1 …`, `s1-1 …`).
-- [ ] `content/index.ts`: `books`, `getBook(id)`, `getUnit(id)` (searches all books), `getLesson(id)` returning `{ book, unit, lesson, next: Lesson | null }`, `unitLessonIds(unit)`.
-- [ ] `scripts/content.test.mjs` (node --test, imports the TS via Node type stripping like the translation test): unique lesson IDs, unique unit IDs, `correctIndex` in range, `letters[correctIndex] === targetLetter`, `choices[correctIndex] === word`, arithmetic result in `options` and non negative, counting `count` in `options`, every `available` book has lessons, every stored legacy ID `u1-1 … u8-5` still exists.
-- [ ] Commit: `feat: unified content model`
+- [x] `content/index.ts`: `books`, `getBook(id)`, `getUnit(id)` (searches all books), `getLesson(id)` returning `{ book, unit, lesson, next: Lesson | null }`, `unitLessonIds(unit)`.
+- [x] `scripts/content.test.mjs` (node --test, imports the TS via Node type stripping like the translation test): unique lesson IDs, unique unit IDs, `correctIndex` in range, `letters[correctIndex] === targetLetter`, `choices[correctIndex] === word`, arithmetic result in `options` and non negative, counting `count` in `options`, every `available` book has lessons, every stored legacy ID `u1-1 … u8-5` still exists.
+- [x] Commit: `feat: unified content model`
 
 ### Task 4.2: Move Arabic content
 
 **Files:** create `content/arabic/unit1.ts … unit8.ts`; delete `constants/unit1Lessons.ts`, `constants/unit2Lessons.ts`, `constants/allUnitsLessons.ts`, `constants/lessons.ts`, `constants/lessons-part2.ts`, `constants/grades.ts`; move `constants/ui-translations.ts` → `content/ui-translations.ts`
 
-- [ ] Copy each unit object verbatim into its own file typed as `Unit`. Lesson IDs `u1-1 … u8-5`, numbering, all strings and `correctIndex` values unchanged. Unit ids become `a1 … a8`.
-- [ ] Unit 1 lesson `u1-5` changes `type: "drawing"` → `type: "trace"`; `targets` map the existing five shapes: `guide` = `"ـــ"`, `"|"`, `"◯"`, `"◠"`, `"〰"` for line, standing line, circle, arc, wave (match the existing `label`s), `label` and `tts` from the existing `label`/`instruction`. The only Unit 1 content edit, required for real tracing.
-- [ ] Add lesson 6 to units 2 to 8: `{ id: "u{n}-6", number: 6, type: "trace", title: "أَكْتُبُ الْحُرُوف", subtitle: "تتبّع الحرف بأصبعك", emoji: "✍️", color: "#7C3AED", targets: unit.letters.map(l => ({ guide: l, label: l, tts: l })) }`.
-- [ ] `content/ui-translations.ts`: add "أَكْتُبُ الْحُرُوف" → "I write the letters", "تتبّع الحرف بأصبعك" → "Trace the letter with your finger", "جملة متبقية" → "sentences left", "كلمة متبقية" → "words left", "مكتمل" → "complete", "لقد أتممت هذا النشاط بنجاح" → "You finished this activity", "الرياضيات" → "Math", "العلوم" → "Science".
-- [ ] `pnpm test:data` passes (52 Arabic lessons). Commit: `feat: move Arabic content, add tracing lessons`
+- [x] Copy each unit object verbatim into its own file typed as `Unit`. Lesson IDs `u1-1 … u8-5`, numbering, all strings and `correctIndex` values unchanged. Unit ids become `a1 … a8`.
+- [x] Unit 1 lesson `u1-5` changes `type: "drawing"` → `type: "trace"`; `targets` map the existing five shapes: `guide` = `"ـــ"`, `"|"`, `"◯"`, `"◠"`, `"〰"` for line, standing line, circle, arc, wave (match the existing `label`s), `label` and `tts` from the existing `label`/`instruction`. The only Unit 1 content edit, required for real tracing.
+- [x] Add lesson 6 to units 2 to 8: `{ id: "u{n}-6", number: 6, type: "trace", title: "أَكْتُبُ الْحُرُوف", subtitle: "تتبّع الحرف بأصبعك", emoji: "✍️", color: "#7C3AED", targets: unit.letters.map(l => ({ guide: l, label: l, tts: l })) }`.
+- [x] `content/ui-translations.ts`: add "أَكْتُبُ الْحُرُوف" → "I write the letters", "تتبّع الحرف بأصبعك" → "Trace the letter with your finger", "جملة متبقية" → "sentences left", "كلمة متبقية" → "words left", "مكتمل" → "complete", "لقد أتممت هذا النشاط بنجاح" → "You finished this activity", "الرياضيات" → "Math", "العلوم" → "Science".
+- [x] `pnpm test:data` passes (52 Arabic lessons). Commit: `feat: move Arabic content, add tracing lessons`
 
 ### Task 4.3: Activity components
 
