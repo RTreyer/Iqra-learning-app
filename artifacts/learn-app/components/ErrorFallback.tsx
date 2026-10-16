@@ -1,4 +1,3 @@
-import { Feather } from "@expo/vector-icons";
 import { reloadAppAsync } from "expo";
 import React, { useState } from "react";
 import {
@@ -11,6 +10,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Svg, { Circle, Path } from "react-native-svg";
 
 import { UiText } from "@/components/UiText";
 import { useLanguage } from "@/context/LanguageContext";
@@ -66,7 +66,10 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
             },
           ]}
         >
-          <Feather name="alert-circle" size={20} color={colors.text} />
+          <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={colors.text} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+            <Circle cx={12} cy={12} r={10} />
+            <Path d="M12 8v4M12 16h.01" />
+          </Svg>
         </Pressable>
       ) : null}
 
@@ -133,7 +136,9 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
                     { opacity: pressed ? 0.6 : 1 },
                   ]}
                 >
-                  <Feather name="x" size={24} color={colors.text} />
+                  <Svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke={colors.text} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                    <Path d="M18 6L6 18M6 6l12 12" />
+                  </Svg>
                 </Pressable>
               </View>
 

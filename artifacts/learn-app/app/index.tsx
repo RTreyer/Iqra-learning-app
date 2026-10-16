@@ -16,6 +16,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { useProgress } from "@/context/ProgressContext";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
 import { routes } from "@/lib/routes";
+import { colors } from "@/theme/tokens";
 
 export default function HomeScreen() {
   const { t } = useLanguage();
@@ -71,10 +72,10 @@ const styles = StyleSheet.create({
   },
   badges: { flexDirection: "row", alignItems: "center", gap: 8 },
   userRow: { flexDirection: "row", alignItems: "center", gap: 8 },
-  userName: { fontSize: 16, fontWeight: "700", color: "#1E293B", maxWidth: 80 },
-  appTitle: { fontSize: 24, fontWeight: "800", color: "#1E293B", textAlign: "right" },
+  userName: { fontSize: 16, fontWeight: "700", color: colors.text, maxWidth: 80 },
+  appTitle: { fontSize: 24, fontWeight: "800", color: colors.text, textAlign: "right" },
   scroll: { width: "100%" },
   list: { gap: 16, paddingTop: 4 },
-  subtitle: { fontSize: 16, color: "#5C4A00", textAlign: "center", marginTop: 4, fontWeight: "700" },
-  footer: { fontSize: 18, color: "#78350F", marginTop: 4, textAlign: "center", fontWeight: "700" },
+  subtitle: { fontSize: 16, color: colors.warmText, textAlign: "center", marginTop: 4, fontWeight: "700" },
+  footer: { fontSize: 18, color: colors.warmDeep, marginTop: 4, textAlign: "center", fontWeight: "700" },
 });

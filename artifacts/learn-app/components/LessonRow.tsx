@@ -1,40 +1,57 @@
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import { starsLabel } from "@/components/StarBadge";
 import { UiChevron } from "@/components/UiChevron";
 import type { Lesson } from "@/content/types";
 import type { LessonStatus } from "@/context/ProgressContext";
+import { useLanguage } from "@/context/LanguageContext";
+import { colors, withAlpha } from "@/theme/tokens";
 
 type Props = { lesson: Lesson; status: LessonStatus; onPress: () => void };
 
 /** One lesson in the unit list: number, title, subtitle, emoji and a tick plus stars once done. */
 export function LessonRow({ lesson, status, onPress }: Props) {
+  const { language } = useLanguage();
+  const en = language === "en";
+  const label = status.completed
+    ? en
+      ? `${lesson.title}, completed, ${starsLabel(status.stars, language)}`
+      : `${lesson.title}، مكتمل، ${starsLabel(status.stars, language)}`
+    : lesson.title;
   return (
     <Pressable
       testID={`lesson-row-${lesson.id}`}
       accessibilityRole="button"
-      accessibilityLabel={lesson.title}
+      accessibilityLabel={label}
       onPress={onPress}
-      style={({ pressed }) => [styles.card, { borderLeftColor: lesson.color }, pressed && styles.pressed]}
+      style={({ pressed }) => [
+        styles.card,
+        // The accent border sits on the reading start side: left in English, right in Arabic.
+        en
+          ? { flexDirection: "row", borderLeftWidth: 5, borderLeftColor: lesson.color }
+          : { flexDirection: "row-reverse", borderRightWidth: 5, borderRightColor: lesson.color },
+        pressed && styles.pressed,
+      ]}
     >
-      <View style={[styles.numberBadge, { backgroundColor: lesson.color + "22" }]}>
-        <Text style={[styles.numberText, { color: lesson.color }]}>{lesson.number}</Text>
+      <View style={[styles.numberBadge, { backgroundColor: withAlpha(lesson.color, 0.18) }]}>
+        <Text style={styles.numberText}>{lesson.number}</Text>
       </View>
       <View style={styles.center}>
         <Text style={styles.title}>{lesson.title}</Text>
         <Text style={styles.subtitle}>{lesson.subtitle}</Text>
       </View>
-      <View style={styles.right}>
+      <View style={styles.side}>
         <Text style={styles.emoji}>{lesson.emoji}</Text>
         {status.completed ? (
           <View style={styles.done} testID={`lesson-done-${lesson.id}`}>
-            <View style={[styles.tick, { backgroundColor: lesson.color }]}>
+            <View style={[styles.tick, { backgroundColor: colors.success }]}>
               <Text style={styles.tickMark}>✓</Text>
             </View>
             <Text style={styles.stars}>{"⭐".repeat(status.stars)}</Text>
           </View>
         ) : (
-          <UiChevron size={22} color="#CBD5E1" />
+          <UiChevron size={22} color={colors.subtle} />
         )}
       </View>
     </Pressable>
@@ -43,13 +60,12 @@ export function LessonRow({ lesson, status, onPress }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "rgba(255,255,255,0.92)",
+    backgroundColor: withAlpha(colors.white, 0.92),
     borderRadius: 20,
-    borderLeftWidth: 5,
     padding: 16,
-    flexDirection: "row",
+    gap: 10,
     alignItems: "center",
-    shadowColor: "#000",
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.08,
     shadowRadius: 6,
@@ -63,17 +79,16 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
-    marginLeft: 10,
     flexShrink: 0,
   },
-  numberText: { fontSize: 17, fontWeight: "800" },
-  center: { flex: 1, alignItems: "center", gap: 3, paddingHorizontal: 8 },
-  title: { fontSize: 17, fontWeight: "800", color: "#1E293B", textAlign: "center" },
-  subtitle: { fontSize: 11, color: "#64748B", textAlign: "center", fontWeight: "500" },
-  right: { alignItems: "center", gap: 6, marginRight: 4, flexShrink: 0 },
+  numberText: { fontSize: 17, fontWeight: "800", color: colors.text },
+  center: { flex: 1, alignItems: "center", gap: 3 },
+  title: { fontSize: 17, fontWeight: "800", color: colors.text, textAlign: "center" },
+  subtitle: { fontSize: 12, color: colors.muted, textAlign: "center", fontWeight: "500" },
+  side: { alignItems: "center", gap: 6, flexShrink: 0 },
   emoji: { fontSize: 26 },
   done: { alignItems: "center", gap: 2 },
   tick: { width: 26, height: 26, borderRadius: 13, alignItems: "center", justifyContent: "center" },
-  tickMark: { fontSize: 14, color: "#FFFFFF", fontWeight: "800" },
+  tickMark: { fontSize: 14, color: colors.white, fontWeight: "800" },
   stars: { fontSize: 10 },
 });

@@ -18,7 +18,23 @@ export const colors = {
   white: "#FFFFFF",
   /** Translucent white behind small badges such as ProgressPill. */
   pill: "rgba(255,255,255,0.88)",
+  shadow: "#000000",
+  /** Light card outline and dimmed chevrons. */
+  subtle: "#CBD5E1",
+  /** Warm browns used on the yellow home gradient. */
+  warmText: "#5C4A00",
+  warmDeep: "#78350F",
+  starText: "#92400E",
 } as const;
+
+/** "#RRGGBB" plus an alpha between 0 and 1 as an rgba() string. */
+export function withAlpha(hex: string, alpha: number): string {
+  const value = hex.replace("#", "");
+  const r = parseInt(value.slice(0, 2), 16);
+  const g = parseInt(value.slice(2, 4), 16);
+  const b = parseInt(value.slice(4, 6), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
 
 export const subjects = SUBJECT_COLORS;
 

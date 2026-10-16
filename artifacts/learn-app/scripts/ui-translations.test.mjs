@@ -3,7 +3,7 @@ import { test } from "node:test";
 import { translateUi } from "../content/ui-translations.ts";
 
 test("Arabic is unchanged, including whitespace and lesson text", () => {
-  for (const text of ["اختَر صفّك", "  جاري التحميل...  ", "أَكَلَ أَحْمَدُ تُفَّاحَةً", "التالي ←"]) {
+  for (const text of ["اختَر الكتاب", "  جاري التحميل...  ", "أَكَلَ أَحْمَدُ تُفَّاحَةً", "التالي ←"]) {
     assert.equal(translateUi(text, "ar"), text);
   }
 });

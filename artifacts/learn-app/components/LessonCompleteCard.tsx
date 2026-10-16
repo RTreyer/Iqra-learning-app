@@ -7,7 +7,7 @@ import { UiText } from "@/components/UiText";
 import type { Lesson } from "@/content/types";
 import { useLanguage } from "@/context/LanguageContext";
 import { routes } from "@/lib/routes";
-import { colors } from "@/theme/tokens";
+import { colors, touchTarget } from "@/theme/tokens";
 
 const MAX_STARS = 3;
 
@@ -91,6 +91,6 @@ const styles = StyleSheet.create({
   buttonText: { fontSize: 16, fontWeight: "800", color: colors.white, textAlign: "center" },
   celebration: { fontSize: 22, fontWeight: "900", color: colors.text, textAlign: "center", marginTop: 16 },
   pressed: { opacity: 0.88, transform: [{ scale: 0.97 }] },
-  backLink: { marginTop: 8, padding: 8 },
-  backLinkText: { fontSize: 14, color: "#94A3B8", fontWeight: "600" },
+  backLink: { marginTop: 8, paddingHorizontal: 8, minHeight: touchTarget, justifyContent: "center" },
+  backLinkText: { fontSize: 14, color: colors.muted, fontWeight: "600" },
 });

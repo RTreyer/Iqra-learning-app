@@ -13,14 +13,17 @@ import { StarBadge } from "@/components/StarBadge";
 import { UiText } from "@/components/UiText";
 import { UnitCard } from "@/components/UnitCard";
 import { getBook, unitLessonIds } from "@/content";
+import { useLanguage } from "@/context/LanguageContext";
 import { useProgress } from "@/context/ProgressContext";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
 import { firstParam } from "@/lib/params";
 import { routes } from "@/lib/routes";
+import { colors } from "@/theme/tokens";
 
 export default function BookScreen() {
   const bookId = firstParam(useLocalSearchParams<{ bookId?: string | string[] }>().bookId);
   const { progress, getUnitProgress } = useProgress();
+  const { language } = useLanguage();
   const pad = useScreenPadding();
 
   const book = getBook(bookId ?? "");
@@ -42,10 +45,12 @@ export default function BookScreen() {
         <StarBadge stars={progress.totalStars} />
       </View>
 
-      <View style={[styles.banner, { backgroundColor: book.color }]}>
+      <View style={[styles.banner, { backgroundColor: book.color, flexDirection: language === "en" ? "row" : "row-reverse" }]}>
         <Text style={styles.bannerEmoji}>{book.emoji}</Text>
-        <View style={styles.bannerText}>
-          <UiText style={styles.bannerSubject}>{book.subtitle}</UiText>
+        <View style={[styles.bannerText, { alignItems: language === "en" ? "flex-start" : "flex-end" }]}>
+          <View style={styles.bannerLabel}>
+            <UiText style={styles.bannerSubject}>{book.subtitle}</UiText>
+          </View>
           <UiText style={styles.bannerTitle}>{book.title}</UiText>
         </View>
       </View>
@@ -83,27 +88,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   bookEmoji: { fontSize: 22 },
-  bookTitle: { fontSize: 18, fontWeight: "800", color: "#1E293B", flexShrink: 1 },
+  bookTitle: { fontSize: 18, fontWeight: "800", color: colors.text, flexShrink: 1 },
   banner: {
     width: "100%",
     borderRadius: 22,
     padding: 18,
-    flexDirection: "row",
     alignItems: "center",
     gap: 16,
     marginBottom: 12,
-    shadowColor: "#000",
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 10,
     elevation: 6,
   },
   bannerEmoji: { fontSize: 52 },
-  bannerText: { flex: 1, gap: 2 },
-  bannerSubject: { fontSize: 12, color: "rgba(255,255,255,0.8)", fontWeight: "600" },
-  bannerTitle: { fontSize: 22, fontWeight: "900", color: "#FFFFFF", lineHeight: 28 },
+  bannerText: { flex: 1, gap: 6 },
+  bannerLabel: { backgroundColor: colors.pill, borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3 },
+  bannerSubject: { fontSize: 13, color: colors.text, fontWeight: "700" },
+  bannerTitle: { fontSize: 22, fontWeight: "900", color: colors.white, lineHeight: 28 },
   scroll: { width: "100%" },
   list: { gap: 14, paddingTop: 4 },
-  subtitle: { fontSize: 15, color: "#5C4A00", textAlign: "center", marginBottom: 2, fontWeight: "700" },
-  footer: { fontSize: 18, color: "#78350F", marginTop: 4, textAlign: "center", fontWeight: "700" },
+  subtitle: { fontSize: 15, color: colors.warmText, textAlign: "center", marginBottom: 2, fontWeight: "700" },
+  footer: { fontSize: 18, color: colors.warmDeep, marginTop: 4, textAlign: "center", fontWeight: "700" },
 });

@@ -20,6 +20,7 @@ import { firstParam } from "@/lib/params";
 import { routes } from "@/lib/routes";
 import { starsForScore, type Score } from "@/lib/scoring";
 import { speak, stopSpeaking } from "@/lib/speech";
+import { colors } from "@/theme/tokens";
 
 /** The activity mounts when the title has been spoken, or after this at the latest. */
 const INTRO_FALLBACK_MS = 1500;
@@ -125,7 +126,7 @@ const styles = StyleSheet.create({
   headerText: { alignItems: "center", flexShrink: 1 },
   headerSpacer: { width: 44 },
   lessonEmoji: { fontSize: 22 },
-  lessonTitle: { fontSize: 17, fontWeight: "800", color: "#1E293B", flexShrink: 1 },
-  lessonSubtitle: { fontSize: 12, fontWeight: "500", color: "#64748B", flexShrink: 1 },
+  lessonTitle: { fontSize: 17, fontWeight: "800", color: colors.text, flexShrink: 1 },
+  lessonSubtitle: { fontSize: 12, fontWeight: "500", color: colors.muted, flexShrink: 1 },
   scrollContent: { flexGrow: 1, paddingBottom: 24 },
 });

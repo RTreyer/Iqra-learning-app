@@ -16,6 +16,7 @@ import { useProgress } from "@/context/ProgressContext";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
 import { firstParam } from "@/lib/params";
 import { routes } from "@/lib/routes";
+import { colors, withAlpha } from "@/theme/tokens";
 
 export default function UnitScreen() {
   const unitId = firstParam(useLocalSearchParams<{ unitId?: string | string[] }>().unitId);
@@ -39,7 +40,7 @@ export default function UnitScreen() {
         <BackButton fallback={book ? routes.book(book.id) : routes.home()} />
         <View style={styles.headerCenter}>
           <UiText style={styles.title}>{unit.title}</UiText>
-          <View style={[styles.badge, { backgroundColor: unit.color }]}>
+          <View style={[styles.badge, { borderColor: unit.color }]}>
             <Text style={styles.badgeText}>{unit.badgeLabel}</Text>
           </View>
         </View>
@@ -47,12 +48,12 @@ export default function UnitScreen() {
       </View>
 
       <View style={styles.themeRow}>
-        <Text style={[styles.themeText, { color: unit.color }]}>{unit.theme}</Text>
+        <Text style={styles.themeText}>{unit.theme}</Text>
         {unit.letters ? (
           <View style={styles.lettersRow}>
             {unit.letters.map((letter) => (
-              <View key={letter} style={[styles.letterChip, { backgroundColor: unit.color + "18" }]}>
-                <Text style={[styles.letterChipText, { color: unit.color }]}>{letter}</Text>
+              <View key={letter} style={[styles.letterChip, { backgroundColor: withAlpha(unit.color, 0.18) }]}>
+                <Text style={styles.letterChipText}>{letter}</Text>
               </View>
             ))}
           </View>
@@ -93,18 +94,18 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   headerCenter: { flexDirection: "row", alignItems: "center", gap: 8, flex: 1, justifyContent: "center" },
-  title: { fontSize: 19, fontWeight: "800", color: "#1E293B" },
-  badge: { borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3 },
-  badgeText: { fontSize: 11, fontWeight: "700", color: "#FFFFFF" },
+  title: { fontSize: 19, fontWeight: "800", color: colors.text },
+  badge: { backgroundColor: colors.pill, borderWidth: 1, borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3 },
+  badgeText: { fontSize: 12, fontWeight: "700", color: colors.text },
   headerEmoji: { fontSize: 26 },
   themeRow: { alignItems: "center", paddingHorizontal: 20, marginBottom: 8, gap: 6 },
-  themeText: { fontSize: 18, fontWeight: "700" },
+  themeText: { fontSize: 18, fontWeight: "700", color: colors.text },
   lettersRow: { flexDirection: "row", gap: 8 },
   letterChip: { borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 },
-  letterChipText: { fontSize: 20, fontWeight: "900" },
+  letterChipText: { fontSize: 20, fontWeight: "900", color: colors.text },
   progressContainer: { paddingHorizontal: 20, marginBottom: 10, gap: 4 },
-  progressLabel: { fontSize: 12, color: "#64748B", fontWeight: "600", textAlign: "right" },
-  progressTrack: { height: 6, backgroundColor: "#E2E8F0", borderRadius: 3, overflow: "hidden" },
+  progressLabel: { fontSize: 12, color: colors.muted, fontWeight: "600", textAlign: "right" },
+  progressTrack: { height: 6, backgroundColor: colors.border, borderRadius: 3, overflow: "hidden" },
   progressFill: { height: 6, borderRadius: 3, minWidth: 6 },
   list: { paddingHorizontal: 16, paddingTop: 4, gap: 12 },
 });
