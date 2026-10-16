@@ -6,17 +6,26 @@ import { routes } from "@/lib/routes";
 import { mockCanGoBack, renderScreen, setParams } from "@/test-utils/screens";
 
 const mockCompleteLesson = jest.fn();
+const mockRecordRoundResult = jest.fn();
 
 jest.mock("@/context/ProgressContext", () => ({
-  useProgress: () => ({ completeLesson: mockCompleteLesson }),
+  useProgress: () => ({ completeLesson: mockCompleteLesson, recordRoundResult: mockRecordRoundResult }),
 }));
 
 jest.mock("@/components/activities", () => {
   const { Pressable, Text } = jest.requireActual("react-native");
-  const Stub = ({ lesson, onComplete }: { lesson: { type: string }; onComplete: (s: { correct: number; total: number }) => void }) => (
-    <Pressable testID="stub-complete" onPress={() => onComplete({ correct: 5, total: 5 })}>
-      <Text>{`stub:${lesson.type}`}</Text>
-    </Pressable>
+  type MockStubProps = {
+    lesson: { type: string };
+    onComplete: (s: { correct: number; total: number }) => void;
+    onRoundResult?: (itemId: string, correct: boolean) => void;
+  };
+  const Stub = ({ lesson, onComplete, onRoundResult }: MockStubProps) => (
+    <>
+      <Pressable testID="stub-complete" onPress={() => onComplete({ correct: 5, total: 5 })}>
+        <Text>{`stub:${lesson.type}`}</Text>
+      </Pressable>
+      <Pressable testID="stub-round" onPress={() => onRoundResult?.("letter:ب", false)} />
+    </>
   );
   const types = ["story", "naming", "letter_pick", "word_read", "listen_pick", "behavior", "matching", "trace", "counting", "arithmetic"];
   return { ACTIVITY_COMPONENTS: Object.fromEntries(types.map((type) => [type, Stub])) };
@@ -81,6 +90,14 @@ test("completing the activity shows the completion card with 3 stars", () => {
 
   fireEvent.press(screen.getByTestId("repeat-lesson"));
   expect(screen.getByText("stub:letter_pick")).toBeTruthy();
+});
+
+test("round results from the activity are recorded through the progress context", () => {
+  speechFinishes();
+  renderScreen(<LessonScreen />);
+  fireEvent.press(screen.getByTestId("stub-round"));
+  expect(mockRecordRoundResult).toHaveBeenCalledTimes(1);
+  expect(mockRecordRoundResult).toHaveBeenCalledWith("letter:ب", false);
 });
 
 test("back falls back to the unit when there is no history", () => {

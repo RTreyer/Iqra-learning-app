@@ -52,3 +52,14 @@ test("Catalog unit titles and lesson screen chrome translate", async () => {
   assert.equal(translateUi("العودة إلى القائمة", "en"), "Back to the list");
   assert.equal(translateUi("اختَر الكتاب", "en"), "Choose a book");
 });
+test("Review session chrome translates", () => {
+  assert.equal(translateUi("مُرَاجَعَة", "en"), "Review");
+  assert.equal(translateUi("مُرَاجَعَة الْيَوْم", "en"), "Today's review");
+  assert.equal(translateUi("تَابِعْ", "en"), "Continue");
+  assert.equal(translateUi("لا شَيْءَ لِلْمُرَاجَعَةِ الْيَوْم", "en"), "Nothing to review today");
+  assert.equal(translateUi("أَحْسَنْت! مُرَاجَعَة الْيَوْم مُكْتَمِلَة", "en"), "Well done! Today's review is complete");
+  assert.equal(translateUi("عناصر", "en"), "items");
+  assert.equal(translateUi("5 عناصر", "en"), "5 items");
+  assert.equal(translateUi("يَوْم مُتَتَالٍ", "en"), "day streak");
+  assert.equal(translateUi("3 يَوْم مُتَتَالٍ", "en"), "3 day streak");
+});

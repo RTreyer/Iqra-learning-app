@@ -53,7 +53,7 @@ function useLessonIntro(lessonId: string, title: string | undefined): boolean {
 
 export default function LessonScreen() {
   const lessonId = firstParam(useLocalSearchParams<{ lessonId?: string | string[] }>().lessonId) ?? "";
-  const { completeLesson } = useProgress();
+  const { completeLesson, recordRoundResult } = useProgress();
   const pad = useScreenPadding();
 
   const found = getLesson(lessonId);
@@ -105,7 +105,7 @@ export default function LessonScreen() {
             color={unit.color}
             attemptKey={activityKey}
             onComplete={onComplete}
-            // TODO(5.3): onRoundResult={recordRoundResult}
+            onRoundResult={recordRoundResult}
           />
         ) : null}
       </ScrollView>

@@ -116,6 +116,13 @@ const english: Record<string, string> = {
   "الْوَحْدَة الأُولَى": "Unit 1",
   "الْوَحْدَة الثَّانِيَة": "Unit 2",
   "الْوَحْدَة الثَّالِثَة": "Unit 3",
+  "مُرَاجَعَة": "Review",
+  "مُرَاجَعَة الْيَوْم": "Today's review",
+  "تَابِعْ": "Continue",
+  "لا شَيْءَ لِلْمُرَاجَعَةِ الْيَوْم": "Nothing to review today",
+  "أَحْسَنْت! مُرَاجَعَة الْيَوْم مُكْتَمِلَة": "Well done! Today's review is complete",
+  "عناصر": "items",
+  "يَوْم مُتَتَالٍ": "day streak",
 };
 
 export function translateUi(text: string, language: UiLanguage): string {
@@ -126,7 +133,7 @@ export function translateUi(text: string, language: UiLanguage): string {
   if (value.startsWith("النشاط التالي: ")) return `Next activity: ${value.slice("النشاط التالي: ".length).replace(/\s*←$/, "")} →`;
   const completed = value.match(/^(\d+)\s*\/\s*(\d+)\s+مكتمل$/);
   if (completed) return `${completed[1]} / ${completed[2]} complete`;
-  const remaining = value.match(/^(\d+)\s+(جملة متبقية|كلمة متبقية)$/);
+  const remaining = value.match(/^(\d+)\s+(جملة متبقية|كلمة متبقية|عناصر|يَوْم مُتَتَالٍ)$/);
   if (remaining) return `${remaining[1]} ${english[remaining[2]]}`;
   const scoredContinue = value.match(/^أَحْسَنْت!\s*(\d+\/\d+)\s*🌟 تابع$/);
   if (scoredContinue) return `${scoredContinue[1]} 🌟 Continue`;
