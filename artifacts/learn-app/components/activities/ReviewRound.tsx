@@ -6,6 +6,7 @@ import type { ReviewItem } from "@/lib/reviewItems";
 import { speak } from "@/lib/speech";
 import { colors, touchTarget } from "@/theme/tokens";
 import { mathStyles } from "./math/NumberQuiz";
+import { COUNT_PROMPT, answerOf, arithmeticPrompt } from "./math/prompts";
 import { ChoiceCard, type ChoiceVariant } from "./shared/ChoiceCard";
 import { ListenButton } from "./shared/ListenButton";
 import { PRAISE } from "./shared/strings";
@@ -19,8 +20,10 @@ type Props = {
   item: ReviewItem;
   /** Changes for every round; the round remounts and resets on change. */
   attemptKey: string;
-  /** Called once per round with the first tap result, after the advance delay. */
-  onAnswer: (correct: boolean) => void;
+  /** Called once per round, right at the first tap, with its result. */
+  onFirstTap: (correct: boolean) => void;
+  /** Called once per round, the advance delay after the first tap. */
+  onAdvance: () => void;
   color?: string;
 };
 
@@ -35,12 +38,6 @@ type RoundSpec = {
   /** Spoken after a wrong first tap. */
   answer: string;
 };
-
-const COUNT_PROMPT = "كَمْ عَدَدُهَا؟";
-
-function calcAnswer(item: Extract<ReviewItem, { kind: "calc" }>) {
-  return item.op === "+" ? item.a + item.b : item.a - item.b;
-}
 
 function numberRound(options: number[], answer: number, prompt: string): RoundSpec {
   return {
@@ -82,11 +79,7 @@ function roundOf(item: ReviewItem): RoundSpec {
     case "count":
       return numberRound(item.options, item.count, COUNT_PROMPT);
     case "calc":
-      return numberRound(
-        item.options,
-        calcAnswer(item),
-        `${numberToArabicWord(item.a)} ${item.op === "+" ? "زَائِد" : "نَاقِص"} ${numberToArabicWord(item.b)} يُسَاوِي كَمْ؟`,
-      );
+      return numberRound(item.options, answerOf(item), arithmeticPrompt(item.a, item.op, item.b).spoken);
   }
 }
 
@@ -105,8 +98,7 @@ function Prompt({ item, color, spoken }: { item: ReviewItem; color: string; spok
       return <ListenButton text={item.word} color={color} showText />;
     case "count":
     case "calc": {
-      const shown =
-        item.kind === "count" ? COUNT_PROMPT : `${toArabicDigits(item.a)} ${item.op} ${toArabicDigits(item.b)} = ؟`;
+      const shown = item.kind === "count" ? COUNT_PROMPT : arithmeticPrompt(item.a, item.op, item.b).shown;
       return (
         <View style={styles.numberPrompt}>
           {item.kind === "count" ? (
@@ -134,14 +126,14 @@ function Prompt({ item, color, spoken }: { item: ReviewItem; color: string; spok
 }
 
 /** One review item with the lesson quiz rules: the first tap counts and locks the round. */
-function Round({ item, attemptKey, onAnswer, color = colors.success }: Props) {
+function Round({ item, attemptKey, onFirstTap, onAdvance, color = colors.success }: Props) {
   const round = useMemo(() => roundOf(item), [item]);
   const shuffled = useShuffled(round.options, round.correctIndex, attemptKey, item.id);
   const { values, bounce } = useBounce(round.options.length);
   const [picked, setPicked] = useState<number | null>(null);
   const locked = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const latest = useLatest({ onAnswer });
+  const latest = useLatest({ onFirstTap, onAdvance });
 
   useEffect(() => {
     const t = setTimeout(() => speak(round.prompt), PROMPT_DELAY_MS);
@@ -158,6 +150,8 @@ function Round({ item, attemptKey, onAnswer, color = colors.success }: Props) {
       locked.current = true;
       const correct = idx === shuffled.correctIndex;
       setPicked(idx);
+      // Report now: the child may leave before the advance delay ends.
+      latest.current.onFirstTap(correct);
       if (correct) {
         haptics.success();
         speak(PRAISE);
@@ -166,7 +160,7 @@ function Round({ item, attemptKey, onAnswer, color = colors.success }: Props) {
         haptics.error();
         speak(round.answer);
       }
-      timer.current = setTimeout(() => latest.current.onAnswer(correct), ADVANCE_MS);
+      timer.current = setTimeout(() => latest.current.onAdvance(), ADVANCE_MS);
     },
     [shuffled.correctIndex, bounce, round.answer, latest],
   );

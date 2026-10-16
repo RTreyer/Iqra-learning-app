@@ -21,6 +21,7 @@ import React, {
   useEffect,
   useMemo,
   useReducer,
+  useState,
 } from "react";
 
 import {
@@ -56,6 +57,10 @@ export type LessonStatus = Omit<LessonProgress, "completedAt"> & { completedAt?:
 
 type ProgressContextValue = {
   progress: ProgressState;
+  /** True once the stored progress has been read; before that, progress is only what happened this session. */
+  hydrated: boolean;
+  /** True once loading has finished, successfully or not (a failed load leaves `hydrated` false). */
+  loadSettled: boolean;
   /** Updates state synchronously; persistence happens asynchronously afterwards. */
   completeLesson: (lessonId: string, stars: number) => void;
   getLessonProgress: (lessonId: string) => LessonStatus;
@@ -81,6 +86,8 @@ const notCompleted: LessonStatus = { completed: false, stars: 0 };
 
 const ProgressContext = createContext<ProgressContextValue>({
   progress: createEmptyState(),
+  hydrated: false,
+  loadSettled: false,
   completeLesson: () => {},
   getLessonProgress: () => notCompleted,
   getUnitProgress: (lessonIds) => ({ done: 0, total: lessonIds.length, stars: 0 }),
@@ -194,6 +201,7 @@ function reducer(state: State, action: Action): State {
 
 export function ProgressProvider({ children }: { children: React.ReactNode }) {
   const [{ progress, hydrated, dirty }, dispatch] = useReducer(reducer, initialState);
+  const [loadSettled, setLoadSettled] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -205,11 +213,11 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
       switch (result.kind) {
         case "missing":
           dispatch({ type: "LOADED", stored: createEmptyState() });
-          return;
+          break;
         case "ok":
           // The LOADED save below also rewrites an upgraded v1 blob as v2.
           dispatch({ type: "LOADED", stored: result.state });
-          return;
+          break;
         case "corrupt": {
           const backupKey = `${CORRUPT_BACKUP_PREFIX}${Date.now()}`;
           try {
@@ -217,17 +225,23 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
           } catch (err) {
             // Without a backup, stay unhydrated so the corrupt blob is not overwritten.
             warn("corrupt progress backup failed", err);
-            return;
+            break;
           }
-          if (!cancelled) dispatch({ type: "LOADED", stored: createEmptyState() });
-          return;
+          if (cancelled) return;
+          dispatch({ type: "LOADED", stored: createEmptyState() });
+          break;
         }
         case "error":
           // Keep working in memory without persisting; retry once, a later
           // successful read merges the stored progress in.
-          if (attempt === 0) retryTimer = setTimeout(() => void hydrate(1), RETRY_DELAY_MS);
-          return;
+          if (attempt === 0) {
+            retryTimer = setTimeout(() => void hydrate(1), RETRY_DELAY_MS);
+            return;
+          }
+          break;
       }
+      // Loading is over, whether or not it hydrated.
+      if (!cancelled) setLoadSettled(true);
     };
 
     void hydrate(0);
@@ -288,6 +302,8 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo(
     () => ({
       progress,
+      hydrated,
+      loadSettled,
       completeLesson,
       getLessonProgress,
       getUnitProgress,
@@ -298,6 +314,8 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
     }),
     [
       progress,
+      hydrated,
+      loadSettled,
       completeLesson,
       getLessonProgress,
       getUnitProgress,

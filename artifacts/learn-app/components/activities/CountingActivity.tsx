@@ -1,10 +1,11 @@
 import React, { useCallback } from "react";
 import { Text, View } from "react-native";
 import { NumberQuiz, mathStyles } from "./math/NumberQuiz";
+import { COUNT_PROMPT } from "./math/prompts";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import type { ActivityProps } from "./types";
 
-const PROMPT = { shown: "كَمْ عَدَدُهَا؟", spoken: "كَمْ عَدَدُهَا؟" };
+const PROMPT = { shown: COUNT_PROMPT, spoken: COUNT_PROMPT };
 
 function Counting(props: ActivityProps<"counting">) {
   const { rounds } = props.lesson;

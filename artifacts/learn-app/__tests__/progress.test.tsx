@@ -262,4 +262,21 @@ describe("ProgressContext", () => {
     expect((await stored()).items["word:old"]).toBeUndefined();
     expect(result.current.progress.items["word:old"]).toBeUndefined();
   });
+
+  it("reports hydrated and loadSettled once the stored blob is read", async () => {
+    const { result } = renderHook(() => useProgress(), { wrapper });
+    expect(result.current.hydrated).toBe(false);
+    expect(result.current.loadSettled).toBe(false);
+    await waitFor(() => expect(result.current.hydrated).toBe(true));
+    expect(result.current.loadSettled).toBe(true);
+  });
+
+  it("settles without hydrating when both reads fail", async () => {
+    getItem.mockRejectedValueOnce(new Error("locked")).mockRejectedValueOnce(new Error("locked"));
+    const { result } = renderHook(() => useProgress(), { wrapper });
+    await waitFor(() => expect(getItem).toHaveBeenCalledTimes(1));
+    expect(result.current.loadSettled).toBe(false);
+    await waitFor(() => expect(result.current.loadSettled).toBe(true));
+    expect(result.current.hydrated).toBe(false);
+  });
 });

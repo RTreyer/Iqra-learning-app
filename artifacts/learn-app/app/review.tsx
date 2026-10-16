@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { ReviewRound } from "@/components/activities/ReviewRound";
 import { ProgressDots } from "@/components/activities/shared/ProgressDots";
@@ -12,82 +12,83 @@ import { BackButton } from "@/components/BackButton";
 import { ReviewCompleteCard } from "@/components/ReviewCompleteCard";
 import { ScreenBackground } from "@/components/ScreenBackground";
 import { UiText } from "@/components/UiText";
+import { useLanguage } from "@/context/LanguageContext";
 import { useProgress } from "@/context/ProgressContext";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
+import { itemsLabel } from "@/lib/labels";
 import { routes } from "@/lib/routes";
 import { allItems, type ReviewItem } from "@/lib/reviewItems";
 import { colors } from "@/theme/tokens";
 
 type Session = {
-  /** Items to play in order; wrong first answers are appended once. */
+  /** Items to play in order; a wrong first answer appends its item once (due ids are unique). */
   queue: ReviewItem[];
-  /** Number of distinct items in the session (the score denominator). */
+  /** Number of distinct items in the session: the score denominator and the progress goal. */
   total: number;
   index: number;
   /** First answers that were right. */
   correct: number;
-  /** Ids already appended for a repeat. */
-  repeated: ReadonlySet<string>;
 };
 
-function toItems(ids: string[]): ReviewItem[] {
+function startSession(ids: string[]): Session {
   const catalog = allItems();
-  return ids.flatMap((id) => {
+  const queue = ids.flatMap((id) => {
     const item = catalog.get(id);
     return item ? [item] : [];
   });
+  return { queue, total: queue.length, index: 0, correct: 0 };
 }
 
-function startSession(ids: string[]): Session {
-  const queue = toItems(ids);
-  return { queue, total: queue.length, index: 0, correct: 0, repeated: new Set() };
-}
-
-export default function ReviewScreen() {
-  const { getDueItemIds, recordReview } = useProgress();
-  const pad = useScreenPadding();
-  const dueNow = getDueItemIds(new Date());
-  const [session, setSession] = useState(() => startSession(dueNow));
-
-  // The queue is fixed once it has items. Until then, adopt the due list once stored progress has loaded.
-  if (session.total === 0 && dueNow.length > 0) {
-    const loaded = startSession(dueNow);
-    if (loaded.total > 0) setSession(loaded);
-  }
-
+function ReviewSession({ initialIds }: { initialIds: string[] }) {
+  const { recordReview } = useProgress();
+  const { language } = useLanguage();
+  // Built once: later changes to the due list (answers recorded here) do not reshuffle the session.
+  const [session, setSession] = useState(() => startSession(initialIds));
   const { queue, total, index } = session;
   const current = queue[index];
 
-  const onAnswer = (correct: boolean) => {
-    if (!current) return;
-    const firstAnswer = index < total;
-    if (firstAnswer) recordReview(current.id, correct);
-    setSession((s) => {
-      const repeat = firstAnswer && !correct && !s.repeated.has(current.id);
-      return {
-        ...s,
-        queue: repeat ? [...s.queue, current] : s.queue,
-        repeated: repeat ? new Set([...s.repeated, current.id]) : s.repeated,
-        correct: s.correct + (firstAnswer && correct ? 1 : 0),
-        index: s.index + 1,
-      };
-    });
+  // Recorded at the tap, so leaving during the advance delay keeps the answer.
+  const onFirstTap = (correct: boolean) => {
+    if (!current || index >= total) return;
+    recordReview(current.id, correct);
+    setSession((s) => ({
+      ...s,
+      queue: correct ? s.queue : [...s.queue, current],
+      correct: s.correct + (correct ? 1 : 0),
+    }));
   };
+  const onAdvance = () => setSession((s) => ({ ...s, index: s.index + 1 }));
+
+  return (
+    <>
+      {total > 0 ? (
+        <Text style={styles.count} numberOfLines={1}>
+          {itemsLabel(total, language)}
+        </Text>
+      ) : null}
+      {current ? (
+        <View style={styles.round}>
+          <ProgressDots count={total} current={Math.min(index, total - 1)} color={colors.success} />
+          <ReviewRound item={current} attemptKey={`review:${index}`} onFirstTap={onFirstTap} onAdvance={onAdvance} />
+        </View>
+      ) : (
+        <ReviewCompleteCard score={total > 0 ? { correct: session.correct, total } : undefined} />
+      )}
+    </>
+  );
+}
+
+export default function ReviewScreen() {
+  const { getDueItemIds, hydrated, loadSettled } = useProgress();
+  const pad = useScreenPadding();
 
   return (
     <ScreenBackground subject="home" style={[styles.screen, { paddingTop: pad.top, paddingBottom: pad.bottom + 16 }]}>
       <View style={styles.header}>
         <BackButton fallback={routes.home()} />
-        <View style={styles.headerCenter}>
-          <UiText style={styles.title} numberOfLines={1} accessibilityRole="header">
-            مُرَاجَعَة الْيَوْم
-          </UiText>
-          {total > 0 ? (
-            <UiText style={styles.subtitle} numberOfLines={1}>
-              {total} عناصر
-            </UiText>
-          ) : null}
-        </View>
+        <UiText style={styles.title} numberOfLines={1} accessibilityRole="header">
+          مُرَاجَعَة الْيَوْم
+        </UiText>
         <View style={styles.headerSpacer} />
       </View>
       <ScrollView
@@ -95,14 +96,8 @@ export default function ReviewScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {current ? (
-          <View style={styles.round}>
-            <ProgressDots count={queue.length} current={index} color={colors.success} />
-            <ReviewRound item={current} attemptKey={`review:${index}`} onAnswer={onAnswer} />
-          </View>
-        ) : (
-          <ReviewCompleteCard score={total > 0 ? { correct: session.correct, total } : undefined} />
-        )}
+        {/* Wait for stored progress; a load that failed for good still ends in the session (from memory). */}
+        {hydrated || loadSettled ? <ReviewSession initialIds={getDueItemIds(new Date())} /> : null}
       </ScrollView>
     </ScreenBackground>
   );
@@ -117,10 +112,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
   },
-  headerCenter: { alignItems: "center", flex: 1 },
   headerSpacer: { width: 44 },
-  title: { fontSize: 17, fontWeight: "800", color: colors.text },
-  subtitle: { fontSize: 12, fontWeight: "500", color: colors.muted },
+  title: { flex: 1, fontSize: 17, fontWeight: "800", color: colors.text, textAlign: "center" },
+  count: { fontSize: 13, fontWeight: "600", color: colors.muted, textAlign: "center" },
   scrollContent: { flexGrow: 1, justifyContent: "center", paddingBottom: 24, gap: 16 },
   round: { flex: 1, gap: 16, paddingTop: 8 },
 });

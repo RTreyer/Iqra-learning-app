@@ -82,6 +82,7 @@ test("plays due items, repeats a wrong one once and records first answers only",
   renderReview();
   await screen.findByTestId("review-round");
   expect(screen.getByText("مُرَاجَعَة الْيَوْم")).toBeTruthy();
+  expect(screen.getByText("3 عناصر")).toBeTruthy();
 
   const [first, second, third] = order;
   answer(first, false);
@@ -103,6 +104,27 @@ test("plays due items, repeats a wrong one once and records first answers only",
   expect(router.replace).toHaveBeenCalledWith(routes.home());
 });
 
+test("renders no card before stored progress has loaded, then the session", async () => {
+  await seed(seededIds);
+  renderReview();
+  expect(screen.queryByTestId("review-empty")).toBeNull();
+  expect(screen.queryByTestId("review-round")).toBeNull();
+  expect(await screen.findByTestId("review-round")).toBeTruthy();
+  expect(screen.queryByTestId("review-empty")).toBeNull();
+});
+
+test("an answer is recorded at the tap, even when the child leaves before the advance", async () => {
+  const items = await seed(seededIds);
+  const [first] = pickDue(items, NOW);
+  const { unmount } = renderReview();
+  await screen.findByTestId("review-round");
+  const { wrong } = labels(allItems().get(first)!);
+  fireEvent.press(screen.getByRole("button", { name: wrong }));
+  act(() => jest.advanceTimersByTime(100));
+  unmount();
+  await waitFor(async () => expect((await stored()).items[first]).toMatchObject({ box: 1, lapses: 1 }));
+});
+
 test("shows the empty state when nothing is due", async () => {
   renderReview();
   await waitFor(() => expect(screen.getByTestId("review-empty")).toBeTruthy());
@@ -117,26 +139,27 @@ describe("ReviewRound", () => {
   const calc: ReviewItem = { id: "calc:3+2", kind: "calc", a: 3, b: 2, op: "+", options: [4, 5, 6] };
   const count: ReviewItem = { id: "count:3", kind: "count", emoji: "🍎", count: 3, options: [2, 3, 4] };
 
-  test("calc: Eastern digits, first tap only, speaks the answer and reports after 900 ms", () => {
-    const onAnswer = jest.fn();
-    renderScreen(<ReviewRound item={calc} attemptKey="t:0" onAnswer={onAnswer} />);
+  test("calc: Eastern digits, first tap only, reports at the tap and advances after 900 ms", () => {
+    const onFirstTap = jest.fn();
+    const onAdvance = jest.fn();
+    renderScreen(<ReviewRound item={calc} attemptKey="t:0" onFirstTap={onFirstTap} onAdvance={onAdvance} />);
     expect(screen.getByText("٣ + ٢ = ؟")).toBeTruthy();
     fireEvent.press(screen.getByRole("button", { name: "٤" }));
+    expect(onFirstTap).toHaveBeenCalledWith(false);
     fireEvent.press(screen.getByRole("button", { name: "٥، صحيح" }));
+    expect(onFirstTap).toHaveBeenCalledTimes(1);
     expect(speech.speak).toHaveBeenLastCalledWith(numberToArabicWord(5), expect.anything());
     act(() => jest.advanceTimersByTime(899));
-    expect(onAnswer).not.toHaveBeenCalled();
+    expect(onAdvance).not.toHaveBeenCalled();
     act(() => jest.advanceTimersByTime(1));
-    expect(onAnswer).toHaveBeenCalledTimes(1);
-    expect(onAnswer).toHaveBeenCalledWith(false);
+    expect(onAdvance).toHaveBeenCalledTimes(1);
   });
 
   test("count: shows the objects and a right first tap reports true", () => {
-    const onAnswer = jest.fn();
-    renderScreen(<ReviewRound item={count} attemptKey="t:1" onAnswer={onAnswer} />);
+    const onFirstTap = jest.fn();
+    renderScreen(<ReviewRound item={count} attemptKey="t:1" onFirstTap={onFirstTap} onAdvance={jest.fn()} />);
     expect(screen.getAllByText("🍎")).toHaveLength(3);
     fireEvent.press(screen.getByRole("button", { name: "٣" }));
-    act(() => jest.advanceTimersByTime(900));
-    expect(onAnswer).toHaveBeenCalledWith(true);
+    expect(onFirstTap).toHaveBeenCalledWith(true);
   });
 });
