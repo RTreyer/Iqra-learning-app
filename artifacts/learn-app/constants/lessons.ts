@@ -1,3 +1,4 @@
+// LEGACY: superseded by content/*, deleted in Task 4.4
 /**
  * Lesson content data — Yemen MoE Grade 1.
  * Arrays are intentionally empty — content will be added subject by subject.

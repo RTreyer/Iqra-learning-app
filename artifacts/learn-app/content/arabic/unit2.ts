@@ -1,12 +1,14 @@
 import type { Unit } from "../types";
 
+const unit2Letters = ["ب", "ت", "ث"];
+
 // ── Unit 2: ب، ت، ث ── بَيْتُنَا ──────────────────────────────────────────────
 
 export const unit2: Unit = {
   id: "a2",
   number: 2,
   title: "الوحدة الثانية",
-  letters: ["ب", "ت", "ث"],
+  letters: unit2Letters,
   theme: "بَيْتُنَا",
   emoji: "🏠",
   color: "#2563EB",
@@ -67,6 +69,12 @@ export const unit2: Unit = {
         { word: "مَا لَوْنُ الْبَاب؟", choices: [{ emoji: "🤍", word: "أَبْيَض" }, { emoji: "❤️", word: "أَحْمَر" }, { emoji: "💛", word: "أَصْفَر" }], correctIndex: 0 },
         { word: "مَاذَا عِنْدَنَا فِي الْبَيْت؟", choices: [{ emoji: "🍎", word: "تُفَّاح وَتِين" }, { emoji: "🥦", word: "خُضَار" }, { emoji: "🥩", word: "لَحْم" }], correctIndex: 0 },
       ],
+    },
+    {
+      id: "u2-6", number: 6, type: "trace",
+      title: "أَكْتُبُ الْحُرُوف", subtitle: "تتبّع الحرف بأصبعك",
+      emoji: "✍️", color: "#7C3AED",
+      targets: unit2Letters.map((l) => ({ guide: l, label: l, tts: l })),
     },
   ],
 };

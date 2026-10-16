@@ -1,3 +1,4 @@
+// LEGACY: superseded by content/*, deleted in Task 4.4
 /**
  * Grade and book catalog for أَقْرَأُ وَأَتَعَلَّمُ.
  *

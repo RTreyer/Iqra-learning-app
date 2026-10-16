@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import { translateUi, type UiLanguage } from "@/constants/ui-translations";
+import { translateUi, type UiLanguage } from "@/content/ui-translations";
 
 const LANGUAGE_KEY = "iqra_ui_language";
 type LanguageContextValue = {

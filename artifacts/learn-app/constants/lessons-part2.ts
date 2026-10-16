@@ -1,3 +1,4 @@
+// LEGACY: superseded by content/*, deleted in Task 4.4
 /**
  * Reading lessons — "أَقْرَأُ وَأَتَعَلَّمُ الجُزْء الثَّانِي"
  * Yemen MoE Grade 1 Arabic — Part 2.

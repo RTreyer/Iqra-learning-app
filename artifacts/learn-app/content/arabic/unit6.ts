@@ -1,12 +1,14 @@
 import type { Unit } from "../types";
 
+const unit6Letters = ["ص", "ض"];
+
 // ── Unit 6: ص، ض ── أَنَا وَصِحَّتِي ──────────────────────────────────────────
 
 export const unit6: Unit = {
   id: "a6",
   number: 6,
   title: "الوحدة السادسة",
-  letters: ["ص", "ض"],
+  letters: unit6Letters,
   theme: "أَنَا وَصِحَّتِي",
   emoji: "💪",
   color: "#DC2626",
@@ -67,6 +69,12 @@ export const unit6: Unit = {
         { word: "بِمَ يَغْسِلُ يَدَيْه؟", choices: [{ emoji: "🧼", word: "الصَّابُون" }, { emoji: "🏜️", word: "الرَّمْل" }, { emoji: "📄", word: "الْوَرَق" }], correctIndex: 0 },
         { word: "مَا الَّذِي يَقْفِز؟", choices: [{ emoji: "🐸", word: "الضِّفْدَع" }, { emoji: "🦅", word: "الصَّقْر" }, { emoji: "👤", word: "الضَّيْف" }], correctIndex: 0 },
       ],
+    },
+    {
+      id: "u6-6", number: 6, type: "trace",
+      title: "أَكْتُبُ الْحُرُوف", subtitle: "تتبّع الحرف بأصبعك",
+      emoji: "✍️", color: "#7C3AED",
+      targets: unit6Letters.map((l) => ({ guide: l, label: l, tts: l })),
     },
   ],
 };

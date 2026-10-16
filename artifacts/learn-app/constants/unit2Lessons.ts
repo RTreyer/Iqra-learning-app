@@ -1,3 +1,4 @@
+// LEGACY: superseded by content/*, deleted in Task 4.4
 /**
  * الوحدة الثانية — Letter ب unit (6 lessons).
  * Theme: بَيْتُنَا (Our House)

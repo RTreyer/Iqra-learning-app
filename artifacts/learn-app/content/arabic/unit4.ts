@@ -1,12 +1,14 @@
 import type { Unit } from "../types";
 
+const unit4Letters = ["د", "ذ", "ر", "ز"];
+
 // ── Unit 4: د، ذ، ر، ز ── فِي الْمَزْرَعَة ────────────────────────────────────
 
 export const unit4: Unit = {
   id: "a4",
   number: 4,
   title: "الوحدة الرابعة",
-  letters: ["د", "ذ", "ر", "ز"],
+  letters: unit4Letters,
   theme: "فِي الْمَزْرَعَة",
   emoji: "🌾",
   color: "#7C3AED",
@@ -67,6 +69,12 @@ export const unit4: Unit = {
         { word: "أَيْنَ ذَهَبْنَا؟", choices: [{ emoji: "🏞️", word: "النَّهْر" }, { emoji: "🏠", word: "الْبَيْت" }, { emoji: "🏪", word: "السُّوق" }], correctIndex: 0 },
         { word: "مَاذَا رَأَيْنَا عَلَى الأَشْجَار؟", choices: [{ emoji: "🍎", word: "رُمَّان وَزَيْتُون" }, { emoji: "🍌", word: "مَوْز وَبُرْتُقَال" }, { emoji: "🥦", word: "خُضَار فَقَط" }], correctIndex: 0 },
       ],
+    },
+    {
+      id: "u4-6", number: 6, type: "trace",
+      title: "أَكْتُبُ الْحُرُوف", subtitle: "تتبّع الحرف بأصبعك",
+      emoji: "✍️", color: "#7C3AED",
+      targets: unit4Letters.map((l) => ({ guide: l, label: l, tts: l })),
     },
   ],
 };

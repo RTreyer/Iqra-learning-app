@@ -1,12 +1,14 @@
 import type { Unit } from "../types";
 
+const unit7Letters = ["ط", "ظ"];
+
 // ── Unit 7: ط، ظ ── الطَّعَام اللَّذِيذ ────────────────────────────────────────
 
 export const unit7: Unit = {
   id: "a7",
   number: 7,
   title: "الوحدة السابعة",
-  letters: ["ط", "ظ"],
+  letters: unit7Letters,
   theme: "الطَّعَام اللَّذِيذ",
   emoji: "🍽️",
   color: "#0891B2",
@@ -67,6 +69,12 @@ export const unit7: Unit = {
         { word: "مَاذَا يُوجَدُ فِي الطَّبَق؟", choices: [{ emoji: "🍅", word: "طَمَاطِم" }, { emoji: "🐟", word: "سَمَك" }, { emoji: "🍎", word: "فَاكِهَة" }], correctIndex: 0 },
         { word: "أَيْنَ يَأْكُلُون؟", choices: [{ emoji: "🌿", word: "تَحْتَ الظِّلَال" }, { emoji: "🏠", word: "فِي الْبَيْت" }, { emoji: "🏪", word: "فِي السُّوق" }], correctIndex: 0 },
       ],
+    },
+    {
+      id: "u7-6", number: 6, type: "trace",
+      title: "أَكْتُبُ الْحُرُوف", subtitle: "تتبّع الحرف بأصبعك",
+      emoji: "✍️", color: "#7C3AED",
+      targets: unit7Letters.map((l) => ({ guide: l, label: l, tts: l })),
     },
   ],
 };

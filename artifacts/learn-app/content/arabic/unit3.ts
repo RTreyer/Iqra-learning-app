@@ -1,12 +1,14 @@
 import type { Unit } from "../types";
 
+const unit3Letters = ["ج", "ح", "خ"];
+
 // ── Unit 3: ج، ح، خ ── فِي الْحَدِيقَة ────────────────────────────────────────
 
 export const unit3: Unit = {
   id: "a3",
   number: 3,
   title: "الوحدة الثالثة",
-  letters: ["ج", "ح", "خ"],
+  letters: unit3Letters,
   theme: "فِي الْحَدِيقَة",
   emoji: "🌳",
   color: "#059669",
@@ -67,6 +69,12 @@ export const unit3: Unit = {
         { word: "مَا الَّذِي يَأْكُلُ الْخُضَار؟", choices: [{ emoji: "🐑", word: "الْخَرُوف" }, { emoji: "🐴", word: "الْحِصَان" }, { emoji: "🐪", word: "الْجَمَل" }], correctIndex: 0 },
         { word: "كَيْفَ الْجَوّ؟", choices: [{ emoji: "☀️", word: "جَمِيل وَمُشْمِس" }, { emoji: "🌧️", word: "مُمْطِر" }, { emoji: "❄️", word: "بَارِد" }], correctIndex: 0 },
       ],
+    },
+    {
+      id: "u3-6", number: 6, type: "trace",
+      title: "أَكْتُبُ الْحُرُوف", subtitle: "تتبّع الحرف بأصبعك",
+      emoji: "✍️", color: "#7C3AED",
+      targets: unit3Letters.map((l) => ({ guide: l, label: l, tts: l })),
     },
   ],
 };

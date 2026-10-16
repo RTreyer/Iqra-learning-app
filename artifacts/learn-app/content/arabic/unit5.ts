@@ -1,12 +1,14 @@
 import type { Unit } from "../types";
 
+const unit5Letters = ["س", "ش"];
+
 // ── Unit 5: س، ش ── فِي السُّوق ───────────────────────────────────────────────
 
 export const unit5: Unit = {
   id: "a5",
   number: 5,
   title: "الوحدة الخامسة",
-  letters: ["س", "ش"],
+  letters: unit5Letters,
   theme: "فِي السُّوق",
   emoji: "🏪",
   color: "#D97706",
@@ -67,6 +69,12 @@ export const unit5: Unit = {
         { word: "مَاذَا نَشْتَرِي؟", choices: [{ emoji: "🐟", word: "السَّمَك وَالْخُضَار" }, { emoji: "📚", word: "الْكُتُب" }, { emoji: "👕", word: "الْمَلَابِس" }], correctIndex: 0 },
         { word: "كَيْفَ الشَّمْس؟", choices: [{ emoji: "☀️", word: "مُشْرِقَة" }, { emoji: "🌧️", word: "غَائِبَة" }, { emoji: "🌑", word: "مُظْلِمَة" }], correctIndex: 0 },
       ],
+    },
+    {
+      id: "u5-6", number: 6, type: "trace",
+      title: "أَكْتُبُ الْحُرُوف", subtitle: "تتبّع الحرف بأصبعك",
+      emoji: "✍️", color: "#7C3AED",
+      targets: unit5Letters.map((l) => ({ guide: l, label: l, tts: l })),
     },
   ],
 };

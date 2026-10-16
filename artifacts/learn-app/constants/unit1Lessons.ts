@@ -1,3 +1,4 @@
+// LEGACY: superseded by content/*, deleted in Task 4.4
 /**
  * الوحدة الأولى — pre-reading preparatory unit (5 lessons).
  * Each lesson maps to one activity type, mirroring the textbook pages 9–35.

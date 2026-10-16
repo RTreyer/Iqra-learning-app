@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { translateUi } from "../constants/ui-translations.ts";
+import { translateUi } from "../content/ui-translations.ts";
 import { grades } from "../constants/grades.ts";
 
 test("Arabic is unchanged, including whitespace and lesson text", () => {
@@ -32,5 +32,18 @@ test("Dynamic labels keep scores and Arabic lesson titles", () => {
 test("Arabic lesson content is not translated in English mode", () => {
   for (const text of ["أَكَلَ أَحْمَدُ تُفَّاحَةً", "اضغط على كل جملة لتسمعها 🔊", "ب", "ابحث عن الحرف"]) {
     assert.equal(translateUi(text, "en"), text);
+  }
+});
+test("Content model labels translate", () => {
+  assert.equal(translateUi("أَكْتُبُ الْحُرُوف", "en"), "I write the letters");
+  assert.equal(translateUi("تتبّع الحرف بأصبعك", "en"), "Trace the letter with your finger");
+  assert.equal(translateUi("مكتمل", "en"), "complete");
+  assert.equal(translateUi("قريباً", "en"), "Coming soon");
+});
+test("Catalog book titles and subtitles translate", async () => {
+  const { books } = await import("../content/index.ts");
+  for (const book of books) {
+    assert.doesNotMatch(translateUi(book.title, "en"), /[؀-ۿ]/);
+    assert.doesNotMatch(translateUi(book.subtitle, "en"), /[؀-ۿ]/);
   }
 });

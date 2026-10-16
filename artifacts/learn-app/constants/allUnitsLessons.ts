@@ -1,3 +1,4 @@
+// LEGACY: superseded by content/*, deleted in Task 4.4
 /**
  * الوحدات 2–8 — Letter-phonics units for Grade 1 Arabic Part 1.
  * Each unit: story → vocabulary → letter recognition → word reading → comprehension.

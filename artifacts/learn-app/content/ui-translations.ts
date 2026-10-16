@@ -106,6 +106,12 @@ const english: Record<string, string> = {
   "عدّ": "Counting",
   "جمع": "Addition",
   "طرح": "Subtraction",
+  "أَكْتُبُ الْحُرُوف": "I write the letters",
+  "تتبّع الحرف بأصبعك": "Trace the letter with your finger",
+  "جملة متبقية": "sentences left",
+  "كلمة متبقية": "words left",
+  "مكتمل": "complete",
+  "لقد أتممت هذا النشاط بنجاح": "You finished this activity",
 };
 
 export function translateUi(text: string, language: UiLanguage): string {

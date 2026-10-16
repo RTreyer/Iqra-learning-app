@@ -1,12 +1,14 @@
 import type { Unit } from "../types";
 
+const unit8Letters = ["ع", "غ", "ف", "ق"];
+
 // ── Unit 8: ع، غ، ف، ق ── فِي الْقَرْيَة ─────────────────────────────────────
 
 export const unit8: Unit = {
   id: "a8",
   number: 8,
   title: "الوحدة الثامنة",
-  letters: ["ع", "غ", "ف", "ق"],
+  letters: unit8Letters,
   theme: "فِي الْقَرْيَة",
   emoji: "🏡",
   color: "#9333EA",
@@ -67,6 +69,12 @@ export const unit8: Unit = {
         { word: "مَا لَوْنُ الْغُرَاب؟", choices: [{ emoji: "🖤", word: "أَسْوَد" }, { emoji: "🤍", word: "أَبْيَض" }, { emoji: "❤️", word: "أَحْمَر" }], correctIndex: 0 },
         { word: "أَيْنَ الْفَرَاشَة؟", choices: [{ emoji: "🦋", word: "قَرِيبَة مِنَ الزُّهُور" }, { emoji: "🏠", word: "فِي الْبَيْت" }, { emoji: "🌊", word: "فِي الْبَحْر" }], correctIndex: 0 },
       ],
+    },
+    {
+      id: "u8-6", number: 6, type: "trace",
+      title: "أَكْتُبُ الْحُرُوف", subtitle: "تتبّع الحرف بأصبعك",
+      emoji: "✍️", color: "#7C3AED",
+      targets: unit8Letters.map((l) => ({ guide: l, label: l, tts: l })),
     },
   ],
 };
