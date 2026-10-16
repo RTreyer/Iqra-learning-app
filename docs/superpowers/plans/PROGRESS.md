@@ -46,8 +46,8 @@ To make it self-resuming after a usage limit reset, run inside the session (loca
 |---|---|---|---|
 | 0.1 Branch and baseline | done | 13355fb | typecheck + 4 tests pass, baseline e2e copied |
 | 1.1 Delete packages and catalog | done | ce41975 | spec review passed, 359 packages removed |
-| 1.2 Prune dependencies and platform config | in progress | | started 2026-10-16 evening |
-| 1.3 Scrub remnants | | | |
+| 1.2 Prune dependencies and platform config | done | 32b42d4 | spec review passed, 64 packages removed, web bundle 2.82 MB → 2.06 MB, expo-doctor 18/18 |
+| 1.3 Scrub remnants | in progress | | |
 | 2.1 ESLint and Prettier | | | |
 | 2.2 Jest with jest-expo | | | |
 | 2.3 Playwright harness | | | |
@@ -80,7 +80,7 @@ To make it self-resuming after a usage limit reset, run inside the session (loca
 - Math textbooks received 2026-10-16 (Grade 1, Sanaa, Part 1 ed. 2026 and Part 2 ed. 2022), Arabic PDFs, about 11 MB and 8 MB:
   - `/Users/start/Downloads/OneDrive_1_10-16-2026/كتاب_الرياضيات_الجزء_الأول_الطبعة_2026_الصف_الأول_صنعاء_اليمن.pdf`
   - `/Users/start/Downloads/OneDrive_1_10-16-2026/كتاب_الرياضيات_الجزء_الثاني_الطبعة_2022_الصف_الأول_صنعاء_اليمن.pdf`
-  Task 5.2 uses them as the base for a small exemplary math set only.
+  Task 5.2 uses them as the base for a small exemplary math set only. Outline extracted 2026-10-16 (scanned PDFs, read visually): scratchpad `math-books/outline.md`, to be copied into `docs/content/MATH_TEXTBOOK_OUTLINE.md` in Task 5.2. Part 1 has 5 units (sorting/patterns, numbers 0 to 10, addition within 10, subtraction within 10, shapes/fractions); Part 2 has units 6 to 10 (to 20, add/sub within 20, to 100, add/sub within 100, measurement). Books use Eastern Arabic digits, زائد / ناقص / يساوي.
 - A native Arabic speaker to review all authored content.
 - A 1024 px padded foreground PNG if an adaptive icon is wanted (UI proposals).
 
@@ -91,4 +91,6 @@ To make it self-resuming after a usage limit reset, run inside the session (loca
 - 2026-10-16: Execution paused by owner after Task 1.1 to preserve usage limit. Resume with the prompt above.
 - 2026-10-16 (evening): Owner restarted the run. Session loop active every 10 minutes (cron job e35b9185, session only). Commits stay local, nothing is pushed without explicit owner approval.
 - 2026-10-16: Model policy (owner: "use the appropriate models to stay efficient"). Implementers: sonnet for config, deletion and data tasks (1.2, 1.3, 2.x, 3.2, 3.4, 5.1, 5.2, 5.6, 6.5); opus for multi file code tasks (3.1, 3.3, 4.x, 5.3 to 5.5, 6.1 to 6.4). Spec reviewers: sonnet. Code quality reviewers: opus. Config only tasks get spec review only.
+- 2026-10-16: Task 1.2 kept `expo-font` as a dependency because `@expo/vector-icons` (used by BackButton, ErrorFallback, UiChevron and screens) requires it as a peer; the `expo-font` plugin and custom fonts are gone. Replacing vector icons with inline SVG is noted for the UI proposals (Task 6.5).
+- 2026-10-16: Task 5.2 scope fixed to Part 1 Units 2, 3 and 5 (numbers 0 to 10, addition within 10, plane shapes), optionally one Part 2 unit. Exemplary only.
 - 2026-10-16: Owner provided the Yemen Grade 1 Math textbooks (see "Owner inputs"). Task 5.2 derives a small exemplary set of lessons from them (two to three units, not a full year). Content stays illustrative; the textbooks are the base.
