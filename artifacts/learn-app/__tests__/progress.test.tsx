@@ -207,4 +207,55 @@ describe("ProgressContext", () => {
     expect(result.current.progress.totalStars).toBe(0);
     expect(await AsyncStorage.getItem(KEY)).toBeNull();
   });
+
+  it("recordRoundResult introduces, then reviews, and persists items", async () => {
+    const { result } = await renderLoaded();
+    act(() => result.current.recordRoundResult("letter:ب", false));
+    expect(result.current.progress.items["letter:ب"]).toMatchObject({ box: 1, lapses: 0 });
+    act(() => result.current.recordRoundResult("letter:ب", true));
+    expect(result.current.progress.items["letter:ب"].box).toBe(2);
+    expect(result.current.progress.activity.days).toHaveLength(1);
+    await waitFor(async () => expect((await stored())?.items["letter:ب"]?.box).toBe(2));
+  });
+
+  it("recordReview moves the box and resets on a wrong answer", async () => {
+    const { result } = await renderLoaded();
+    act(() => result.current.recordReview("word:x", true));
+    expect(result.current.progress.items["word:x"].box).toBe(2);
+    act(() => result.current.recordReview("word:x", false));
+    expect(result.current.progress.items["word:x"]).toMatchObject({ box: 1, lapses: 1 });
+    await waitFor(async () => expect((await stored())?.items["word:x"]?.lapses).toBe(1));
+  });
+
+  it("getDueItemIds lists items due at the given time", async () => {
+    const { result } = await renderLoaded();
+    act(() => result.current.recordRoundResult("count:3", true));
+    expect(result.current.getDueItemIds()).toEqual([]);
+    const later = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
+    expect(result.current.getDueItemIds(later)).toEqual(["count:3"]);
+  });
+
+  it("a reset before the load resolves keeps only items recorded since", async () => {
+    await AsyncStorage.setItem(
+      KEY,
+      JSON.stringify({
+        version: 2,
+        lessons: {},
+        items: { "word:old": { box: 3, dueAt: "2026-01-01T00:00:00.000Z", lastSeenAt: "2026-01-01T00:00:00.000Z", lapses: 0 } },
+        activity: { days: [] },
+        totalStars: 0,
+      }),
+    );
+    const release = gateNextRead();
+    const { result } = renderHook(() => useProgress(), { wrapper });
+    await act(async () => {
+      await result.current.resetProgress();
+    });
+    act(() => result.current.recordRoundResult("word:new", true));
+    await act(async () => release());
+
+    await waitFor(async () => expect((await stored())?.items["word:new"]).toBeDefined());
+    expect((await stored()).items["word:old"]).toBeUndefined();
+    expect(result.current.progress.items["word:old"]).toBeUndefined();
+  });
 });

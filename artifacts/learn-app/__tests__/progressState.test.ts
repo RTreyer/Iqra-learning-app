@@ -1,5 +1,8 @@
 import {
+  MAX_ACTIVITY_DAYS,
   applyCompletion,
+  applyReview,
+  applyRoundResult,
   clampStars,
   createEmptyState,
   mergeProgress,
@@ -211,5 +214,77 @@ describe("validation", () => {
       NOW,
     );
     expect(state.activity.days).toEqual(["2026-01-01"]);
+  });
+});
+
+describe("applyRoundResult", () => {
+  const DAY = 24 * 60 * 60 * 1000;
+  const tomorrow = new Date(NOW.getTime() + DAY).toISOString();
+
+  it.each([true, false])("introduces an unknown item (correct=%s) in box 1, due tomorrow", (correct) => {
+    const state = applyRoundResult(createEmptyState(), "letter:ب", correct, NOW);
+    expect(state.items["letter:ب"]).toEqual({
+      box: 1,
+      dueAt: tomorrow,
+      lastSeenAt: NOW.toISOString(),
+      lapses: 0,
+    });
+  });
+
+  it("reviews a known item on the second round result", () => {
+    const once = applyRoundResult(createEmptyState(), "word:x", true, NOW);
+    expect(applyRoundResult(once, "word:x", true, LATER).items["word:x"].box).toBe(2);
+    const wrong = applyRoundResult(once, "word:x", false, LATER).items["word:x"];
+    expect(wrong).toMatchObject({ box: 1, lapses: 1 });
+  });
+
+  it("marks today active once and leaves other state alone", () => {
+    const base = applyCompletion(createEmptyState(), "a", 2, NOW);
+    let state = applyRoundResult(base, "q:a:0", true, NOW);
+    state = applyRoundResult(state, "q:a:1", false, NOW);
+    expect(state.activity.days).toEqual(["2026-10-16"]);
+    expect(state.lessons).toBe(base.lessons);
+    expect(state.totalStars).toBe(2);
+  });
+
+  it("keeps activity days trimmed", () => {
+    const days = Array.from({ length: MAX_ACTIVITY_DAYS }, (_, i) => {
+      const d = new Date(2026, 0, 1 + i);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    });
+    const base = { ...createEmptyState(), activity: { days } };
+    const state = applyRoundResult(base, "count:3", true, NOW);
+    expect(state.activity.days).toHaveLength(MAX_ACTIVITY_DAYS);
+    expect(state.activity.days.at(-1)).toBe("2026-10-16");
+  });
+});
+
+describe("applyReview", () => {
+  it("a correct review moves the box up", () => {
+    const base = applyRoundResult(createEmptyState(), "letter:ت", true, NOW);
+    const state = applyReview(base, "letter:ت", true, LATER);
+    expect(state.items["letter:ت"]).toMatchObject({ box: 2, lastSeenAt: LATER.toISOString() });
+  });
+
+  it("a wrong review resets to box 1 and counts a lapse", () => {
+    let state = applyRoundResult(createEmptyState(), "letter:ت", true, NOW);
+    state = applyReview(state, "letter:ت", true, LATER);
+    state = applyReview(state, "letter:ت", false, LATER);
+    expect(state.items["letter:ت"]).toMatchObject({ box: 1, lapses: 1 });
+  });
+
+  it("introduces then reviews an unknown item", () => {
+    expect(applyReview(createEmptyState(), "calc:1+2", true, NOW).items["calc:1+2"].box).toBe(2);
+    expect(applyReview(createEmptyState(), "calc:1+2", false, NOW).items["calc:1+2"]).toMatchObject({
+      box: 1,
+      lapses: 1,
+    });
+  });
+
+  it("appends today to activity days once", () => {
+    let state = applyReview(createEmptyState(), "a", true, NOW);
+    state = applyReview(state, "b", true, NOW);
+    expect(state.activity.days).toEqual(["2026-10-16"]);
+    expect(applyReview(state, "a", true, LATER).activity.days).toEqual(["2026-10-16", "2026-10-17"]);
   });
 });

@@ -4,6 +4,7 @@
  */
 
 import { todayKey } from "@/lib/dates";
+import { introduce, review } from "@/lib/srs";
 
 export type LessonProgress = {
   completed: boolean;
@@ -12,7 +13,7 @@ export type LessonProgress = {
   completedAt: string;
 };
 
-/** Per item review record. Filled by the Leitner scheduler (Task 5.3), empty until then. */
+/** Per item review record, maintained by the Leitner scheduler in lib/srs.ts. */
 export type ProgressItem = {
   box: 1 | 2 | 3 | 4 | 5;
   dueAt: string;
@@ -131,12 +132,39 @@ export function applyCompletion(
     ? { completed: true, stars: earned, completedAt: now.toISOString() }
     : { ...existing, completed: true };
   const lessons = { ...state.lessons, [lessonId]: lesson };
-  return {
-    ...state,
-    lessons,
-    activity: { days: normalizeDays([...state.activity.days, todayKey(now)]) },
-    totalStars: sumStars(lessons),
-  };
+  return { ...markActiveToday(state, now), lessons, totalStars: sumStars(lessons) };
+}
+
+/** Adds today's local date to activity.days once, keeping the list trimmed. */
+function markActiveToday(state: ProgressState, now: Date): ProgressState {
+  return { ...state, activity: { days: normalizeDays([...state.activity.days, todayKey(now)]) } };
+}
+
+/**
+ * Records one answered round inside a lesson. An unknown item is introduced
+ * (box 1, due tomorrow) whether the answer was right or wrong, so new
+ * material enters the schedule; a known item is reviewed.
+ */
+export function applyRoundResult(
+  state: ProgressState,
+  itemId: string,
+  correct: boolean,
+  now: Date = new Date(),
+): ProgressState {
+  const existing = state.items[itemId];
+  const item = existing ? review(existing, correct, now) : introduce(now);
+  return { ...markActiveToday(state, now), items: { ...state.items, [itemId]: item } };
+}
+
+/** Records an answer in a review session. Always a review; an unknown item is introduced first. */
+export function applyReview(
+  state: ProgressState,
+  itemId: string,
+  correct: boolean,
+  now: Date = new Date(),
+): ProgressState {
+  const item = review(state.items[itemId] ?? introduce(now), correct, now);
+  return { ...markActiveToday(state, now), items: { ...state.items, [itemId]: item } };
 }
 
 /**

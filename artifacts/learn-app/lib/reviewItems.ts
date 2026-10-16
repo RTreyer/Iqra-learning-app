@@ -1,4 +1,31 @@
-import type { Lesson } from "@/content/types";
+import { books } from "@/content";
+import type { Choice, Lesson } from "@/content/types";
+
+/** One reviewable piece of content, identified across the whole catalog. */
+export type ReviewItem =
+  | { id: string; kind: "letter"; targetLetter: string; letters: string[]; correctIndex: number }
+  | { id: string; kind: "word"; word: string; choices: string[]; correctIndex: number }
+  | { id: string; kind: "count"; emoji: string; count: number; options: number[] }
+  | { id: string; kind: "calc"; a: number; b: number; op: "+" | "-"; options: number[] }
+  | { id: string; kind: "question"; word: string; choices: Choice[]; correctIndex: number };
+
+/** One item per round of a quiz lesson (repeats kept); [] for every other lesson type. */
+export function itemsForLesson(lesson: Lesson): ReviewItem[] {
+  switch (lesson.type) {
+    case "letter_pick":
+      return lesson.rounds.map((r) => ({ id: `letter:${r.targetLetter}`, kind: "letter", ...r }));
+    case "word_read":
+      return lesson.rounds.map((r) => ({ id: `word:${r.word}`, kind: "word", ...r }));
+    case "counting":
+      return lesson.rounds.map((r) => ({ id: `count:${r.count}`, kind: "count", ...r }));
+    case "arithmetic":
+      return lesson.rounds.map((r) => ({ id: `calc:${r.a}${r.op}${r.b}`, kind: "calc", ...r }));
+    case "listen_pick":
+      return lesson.questions.map((q, index) => ({ id: `q:${lesson.id}:${index}`, kind: "question", ...q }));
+    default:
+      return [];
+  }
+}
 
 /** Stable id of the item asked in one round of a quiz lesson, or null for non quiz lessons. */
 export function itemIdFor(lesson: Lesson, roundIndex: number): string | null {
@@ -24,4 +51,23 @@ export function itemIdFor(lesson: Lesson, roundIndex: number): string | null {
     default:
       return null;
   }
+}
+
+let catalogItems: Map<string, ReviewItem> | null = null;
+
+/** Every review item in the catalog by id, first occurrence wins. Built once on first use. */
+export function allItems(): Map<string, ReviewItem> {
+  if (catalogItems) return catalogItems;
+  const map = new Map<string, ReviewItem>();
+  for (const book of books) {
+    for (const unit of book.units) {
+      for (const lesson of unit.lessons) {
+        for (const item of itemsForLesson(lesson)) {
+          if (!map.has(item.id)) map.set(item.id, item);
+        }
+      }
+    }
+  }
+  catalogItems = map;
+  return map;
 }

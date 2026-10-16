@@ -1,5 +1,5 @@
 /**
- * ProgressContext — tracks completed lessons and earned stars.
+ * ProgressContext — tracks completed lessons, earned stars and review items.
  *
  * Fully offline: progress lives in React state and is persisted to
  * AsyncStorage on the device. There is no server, login or sync.
@@ -25,6 +25,8 @@ import React, {
 
 import {
   applyCompletion,
+  applyReview,
+  applyRoundResult,
   createEmptyState,
   mergeProgress,
   needsUpgrade,
@@ -34,6 +36,7 @@ import {
   type ProgressState,
   type UnitProgress,
 } from "@/lib/progressState";
+import { pickDue } from "@/lib/srs";
 
 export type { LessonProgress, ProgressItem, ProgressState, UnitProgress } from "@/lib/progressState";
 
@@ -56,6 +59,12 @@ type ProgressContextValue = {
   completeLesson: (lessonId: string, stars: number) => void;
   getLessonProgress: (lessonId: string) => LessonStatus;
   getUnitProgress: (lessonIds: string[]) => UnitProgress;
+  /** Records one answered lesson round for an item; synchronous like completeLesson. */
+  recordRoundResult: (itemId: string, correct: boolean) => void;
+  /** Records one answer in a review session; synchronous like completeLesson. */
+  recordReview: (itemId: string, correct: boolean) => void;
+  /** Ids of items due at `now` (default: the current time), in review order. */
+  getDueItemIds: (now?: Date) => string[];
   /** Resolves once the stored blob has been removed. */
   resetProgress: () => Promise<void>;
 };
@@ -69,6 +78,9 @@ const ProgressContext = createContext<ProgressContextValue>({
   completeLesson: () => {},
   getLessonProgress: () => notCompleted,
   getUnitProgress: (lessonIds) => ({ done: 0, total: lessonIds.length, stars: 0 }),
+  recordRoundResult: () => {},
+  recordReview: () => {},
+  getDueItemIds: () => [],
   resetProgress: async () => {},
 });
 
@@ -123,6 +135,8 @@ type State = {
 type Action =
   | { type: "LOADED"; stored: ProgressState }
   | { type: "COMPLETE"; lessonId: string; stars: number; now: Date }
+  | { type: "ROUND_RESULT"; itemId: string; correct: boolean; now: Date }
+  | { type: "REVIEW"; itemId: string; correct: boolean; now: Date }
   | { type: "RESET" };
 
 const initialState: State = {
@@ -146,6 +160,18 @@ function reducer(state: State, action: Action): State {
       return {
         ...state,
         progress: applyCompletion(state.progress, action.lessonId, action.stars, action.now),
+        dirty: true,
+      };
+    case "ROUND_RESULT":
+      return {
+        ...state,
+        progress: applyRoundResult(state.progress, action.itemId, action.correct, action.now),
+        dirty: true,
+      };
+    case "REVIEW":
+      return {
+        ...state,
+        progress: applyReview(state.progress, action.itemId, action.correct, action.now),
         dirty: true,
       };
     case "RESET":
@@ -214,6 +240,19 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: "COMPLETE", lessonId, stars, now: new Date() });
   }, []);
 
+  const recordRoundResult = useCallback((itemId: string, correct: boolean) => {
+    dispatch({ type: "ROUND_RESULT", itemId, correct, now: new Date() });
+  }, []);
+
+  const recordReview = useCallback((itemId: string, correct: boolean) => {
+    dispatch({ type: "REVIEW", itemId, correct, now: new Date() });
+  }, []);
+
+  const getDueItemIds = useCallback(
+    (now: Date = new Date()): string[] => pickDue(progress.items, now),
+    [progress],
+  );
+
   const getLessonProgress = useCallback(
     (lessonId: string): LessonStatus => progress.lessons[lessonId] ?? notCompleted,
     [progress],
@@ -230,8 +269,26 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ progress, completeLesson, getLessonProgress, getUnitProgress, resetProgress }),
-    [progress, completeLesson, getLessonProgress, getUnitProgress, resetProgress],
+    () => ({
+      progress,
+      completeLesson,
+      getLessonProgress,
+      getUnitProgress,
+      recordRoundResult,
+      recordReview,
+      getDueItemIds,
+      resetProgress,
+    }),
+    [
+      progress,
+      completeLesson,
+      getLessonProgress,
+      getUnitProgress,
+      recordRoundResult,
+      recordReview,
+      getDueItemIds,
+      resetProgress,
+    ],
   );
 
   return <ProgressContext.Provider value={value}>{children}</ProgressContext.Provider>;
