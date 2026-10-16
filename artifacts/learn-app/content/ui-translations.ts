@@ -8,12 +8,12 @@ const english: Record<string, string> = {
   "سجِّل دخولك لتبدأ رحلة التعلّم": "Sign in to start learning",
   "تسجيل الدخول": "Sign in",
   "ابدأِ التَّعَلُّم 🚀": "Start learning 🚀",
-  "خروج": "Sign out",
-  "أهلاً": "Hello",
+  خروج: "Sign out",
+  أهلاً: "Hello",
   "اختَر الكتاب": "Choose a book",
   "أنت رائع! 🌟": "You're doing great! 🌟",
-  "رجوع": "Back",
-  "العودة": "Back",
+  رجوع: "Back",
+  العودة: "Back",
   "العودة إلى القائمة": "Back to the list",
   "الدرس التالي": "Next lesson",
   "إعادة الدرس": "Repeat lesson",
@@ -21,9 +21,9 @@ const english: Record<string, string> = {
   "الحرف التالي": "Next letter",
   "التالي ←": "Next →",
   "‹": "›",
-  "مسح": "Clear",
-  "أنهيتُ": "Done",
-  "تم": "Done",
+  مسح: "Clear",
+  أنهيتُ: "Done",
+  تم: "Done",
   "مرة أخرى": "Try again",
   "حاول مرة أخرى": "Try again",
   "هيّا نختبر!": "Start quiz",
@@ -42,23 +42,23 @@ const english: Record<string, string> = {
   "تفاصيل الخطأ": "Error details",
   "إغلاق تفاصيل الخطأ": "Close error details",
   "عرض تفاصيل الخطأ": "View error details",
-  "قريباً": "Coming soon",
+  قريباً: "Coming soon",
   "قريباً!": "Coming soon!",
   "سيتوفر محتوى هذا الكتاب قريباً، تابع معنا!": "This book's content is coming soon!",
   "اختَر ماذا تريد أن تتعلّم اليوم": "Choose what to learn today",
   "هيّا نتعلّم! 🌟": "Let's learn! 🌟",
   "تعذّر تسجيل الدخول. حاول مرة أخرى.": "Sign-in failed. Please try again.",
   "تعذّر بدء تسجيل الدخول. حاول مرة أخرى.": "Couldn't start sign-in. Please try again.",
-  "قِرَاءَة": "Reading",
-  "قراءة": "Reading",
-  "القراءة": "Reading",
-  "كِتَابَة": "Writing",
-  "كتابة": "Writing",
-  "حِسَاب": "Math",
-  "حساب": "Math",
-  "إسلامية": "Islamic education",
-  "الرياضيات": "Math",
-  "العلوم": "Science",
+  قِرَاءَة: "Reading",
+  قراءة: "Reading",
+  القراءة: "Reading",
+  كِتَابَة: "Writing",
+  كتابة: "Writing",
+  حِسَاب: "Math",
+  حساب: "Math",
+  إسلامية: "Islamic education",
+  الرياضيات: "Math",
+  العلوم: "Science",
   "اللغة العربية": "Arabic",
   "التربية الإسلامية": "Islamic education",
   "القرآن الكريم وعلومه": "Quran and Quranic studies",
@@ -87,28 +87,28 @@ const english: Record<string, string> = {
   "الوحدة الثامنة": "Unit 8",
   "الْوَحْدَةُ الأُولَى": "Unit 1",
   "الْوَحْدَةُ الثَّانِيَة": "Unit 2",
-  "مراجعة": "Review",
-  "تَمْهِيدِيَّة": "Introduction",
+  مراجعة: "Review",
+  تَمْهِيدِيَّة: "Introduction",
   "تَسْمِيَة الصُّوَر": "Picture naming",
   "اسْتِمَاع وَاخْتِيَار": "Listen and choose",
-  "السُّلُوك": "Behavior",
-  "مُطَابَقَة": "Matching",
+  السُّلُوك: "Behavior",
+  مُطَابَقَة: "Matching",
   "رَسْم الْخُطُوط": "Drawing lines",
   "قِرَاءَة الْقِصَّة": "Story reading",
-  "الْمُفْرَدَات": "Vocabulary",
-  "الْحُرُوف": "Letters",
+  الْمُفْرَدَات: "Vocabulary",
+  الْحُرُوف: "Letters",
   "الْحَرْف ب": "Letter ب",
   "حَرْف ب": "Letter ب",
   "قِرَاءَة الْكَلِمَات": "Word reading",
   "الْفَهْم وَالاسْتِيعَاب": "Comprehension",
-  "عدّ": "Counting",
-  "جمع": "Addition",
-  "طرح": "Subtraction",
+  عدّ: "Counting",
+  جمع: "Addition",
+  طرح: "Subtraction",
   "أَكْتُبُ الْحُرُوف": "I write the letters",
   "تتبّع الحرف بأصبعك": "Trace the letter with your finger",
   "جملة متبقية": "sentences left",
   "كلمة متبقية": "words left",
-  "مكتمل": "complete",
+  مكتمل: "complete",
   "لقد أتممت هذا النشاط بنجاح": "You finished this activity",
   "أَحْسَنْت!": "Well done!",
   "النشاط التالي:": "Next activity:",
@@ -116,9 +116,9 @@ const english: Record<string, string> = {
   "الْوَحْدَة الأُولَى": "Unit 1",
   "الْوَحْدَة الثَّانِيَة": "Unit 2",
   "الْوَحْدَة الثَّالِثَة": "Unit 3",
-  "مُرَاجَعَة": "Review",
+  مُرَاجَعَة: "Review",
   "مُرَاجَعَة الْيَوْم": "Today's review",
-  "تَابِعْ": "Continue",
+  تَابِعْ: "Continue",
   "لا شَيْءَ لِلْمُرَاجَعَةِ الْيَوْم": "Nothing to review today",
   "أَحْسَنْت! مُرَاجَعَة الْيَوْم مُكْتَمِلَة": "Well done! Today's review is complete",
   "يَوْم مُتَتَالٍ": "day streak",
@@ -127,7 +127,8 @@ const english: Record<string, string> = {
   "اضغط على كل كلمة لتسمعها 🔊": "Tap each word to hear it 🔊",
   "اضغط ✓ للسلوك الصحيح و ✗ للسلوك الخطأ": "Tap ✓ for good behavior and ✗ for bad behavior",
   // The matching columns are mirrored in Arabic, so the sides swap in English.
-  "اضغط على شيء في اليمين ثم ما يناسبه في اليسار": "Tap an item on the left, then its match on the right",
+  "اضغط على شيء في اليمين ثم ما يناسبه في اليسار":
+    "Tap an item on the left, then its match on the right",
   "ابحث عن الحرف": "Find the letter",
   "اضغط للاستماع ثم اختر": "Tap to listen, then choose",
   "سلوك صحيح": "Good behavior",
@@ -142,7 +143,8 @@ export function translateUi(text: string, language: UiLanguage): string {
   const value = text.trim();
   if (english[value]) return english[value];
   // Dynamic navigation labels preserve the Arabic lesson title.
-  if (value.startsWith("النشاط التالي: ")) return `Next activity: ${value.slice("النشاط التالي: ".length).replace(/\s*←$/, "")} →`;
+  if (value.startsWith("النشاط التالي: "))
+    return `Next activity: ${value.slice("النشاط التالي: ".length).replace(/\s*←$/, "")} →`;
   const completed = value.match(/^(\d+)\s*\/\s*(\d+)\s+مكتمل$/);
   if (completed) return `${completed[1]} / ${completed[2]} complete`;
   const remaining = value.match(/^(\d+)\s+(جملة متبقية|كلمة متبقية|يَوْم مُتَتَالٍ)$/);
@@ -156,6 +158,10 @@ export function translateUi(text: string, language: UiLanguage): string {
   const unitComplete = value.match(/^🎉 أتممت (.+)!$/);
   if (unitComplete) return `🎉 Completed ${translateUi(unitComplete[1], language)}!`;
   // Book metadata is translated for navigation without modifying its source.
-  if (value.includes(" — ")) return value.split(" — ").map((part) => translateUi(part, language)).join(" — ");
+  if (value.includes(" — "))
+    return value
+      .split(" — ")
+      .map((part) => translateUi(part, language))
+      .join(" — ");
   return text;
 }

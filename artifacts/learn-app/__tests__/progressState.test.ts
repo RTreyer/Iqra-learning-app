@@ -100,12 +100,7 @@ describe("applyCompletion", () => {
 
 describe("mergeProgress", () => {
   it("keeps the best lesson from either side and unions activity days", () => {
-    const stored = applyCompletion(
-      applyCompletion(createEmptyState(), "a", 3, NOW),
-      "b",
-      1,
-      NOW,
-    );
+    const stored = applyCompletion(applyCompletion(createEmptyState(), "a", 3, NOW), "b", 1, NOW);
     const local = applyCompletion(
       applyCompletion(createEmptyState(), "a", 1, LATER),
       "b",
@@ -220,15 +215,18 @@ describe("validation", () => {
 describe("applyRoundResult", () => {
   const tomorrow = new Date(2026, 9, 17).toISOString();
 
-  it.each([true, false])("introduces an unknown item (correct=%s) in box 1, due tomorrow", (correct) => {
-    const state = applyRoundResult(createEmptyState(), "letter:ب", correct, NOW);
-    expect(state.items["letter:ب"]).toEqual({
-      box: 1,
-      dueAt: tomorrow,
-      lastSeenAt: NOW.toISOString(),
-      lapses: 0,
-    });
-  });
+  it.each([true, false])(
+    "introduces an unknown item (correct=%s) in box 1, due tomorrow",
+    (correct) => {
+      const state = applyRoundResult(createEmptyState(), "letter:ب", correct, NOW);
+      expect(state.items["letter:ب"]).toEqual({
+        box: 1,
+        dueAt: tomorrow,
+        lastSeenAt: NOW.toISOString(),
+        lapses: 0,
+      });
+    },
+  );
 
   it("reviews a known item on the second round result", () => {
     const once = applyRoundResult(createEmptyState(), "word:x", true, NOW);
@@ -253,7 +251,14 @@ describe("applyRoundResult", () => {
   it("a wrong answer resets a not yet due item to box 1", () => {
     const base = {
       ...createEmptyState(),
-      items: { "word:x": { box: 3 as const, dueAt: new Date(2026, 9, 20).toISOString(), lastSeenAt: "", lapses: 0 } },
+      items: {
+        "word:x": {
+          box: 3 as const,
+          dueAt: new Date(2026, 9, 20).toISOString(),
+          lastSeenAt: "",
+          lapses: 0,
+        },
+      },
     };
     expect(applyRoundResult(base, "word:x", false, NOW).items["word:x"]).toEqual({
       box: 1,
@@ -300,16 +305,21 @@ describe("applyReview", () => {
 
   it("introduces then reviews an unknown item", () => {
     expect(applyReview(createEmptyState(), "calc:1+2", true, NOW).items["calc:1+2"].box).toBe(2);
-    expect(applyReview(createEmptyState(), "calc:1+2", false, NOW).items["calc:1+2"]).toMatchObject({
-      box: 1,
-      lapses: 1,
-    });
+    expect(applyReview(createEmptyState(), "calc:1+2", false, NOW).items["calc:1+2"]).toMatchObject(
+      {
+        box: 1,
+        lapses: 1,
+      },
+    );
   });
 
   it("appends today to activity days once", () => {
     let state = applyReview(createEmptyState(), "a", true, NOW);
     state = applyReview(state, "b", true, NOW);
     expect(state.activity.days).toEqual(["2026-10-16"]);
-    expect(applyReview(state, "a", true, LATER).activity.days).toEqual(["2026-10-16", "2026-10-17"]);
+    expect(applyReview(state, "a", true, LATER).activity.days).toEqual([
+      "2026-10-16",
+      "2026-10-17",
+    ]);
   });
 });

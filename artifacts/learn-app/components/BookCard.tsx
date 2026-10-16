@@ -22,7 +22,10 @@ export function BookCard({ book, onPress }: Props) {
       onPress={onPress}
       style={({ pressed }) => [
         styles.card,
-        { backgroundColor: readableFill(book.color), flexDirection: language === "en" ? "row" : "row-reverse" },
+        {
+          backgroundColor: readableFill(book.color),
+          flexDirection: language === "en" ? "row" : "row-reverse",
+        },
         !book.available && styles.disabled,
         pressed && styles.pressed,
       ]}
@@ -61,6 +64,11 @@ const styles = StyleSheet.create({
   emoji: { fontSize: 48 },
   info: { flex: 1, gap: 6 },
   title: { fontSize: 26, fontWeight: "900", color: colors.white },
-  label: { backgroundColor: colors.pill, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 },
+  label: {
+    backgroundColor: colors.pill,
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
   labelText: { fontSize: 13, fontWeight: "800", color: colors.text },
 });

@@ -29,7 +29,11 @@ export type Shuffled<T> = {
 };
 
 /** Seeded Fisher Yates on a copy; the input array is never mutated. */
-export function shuffleWithSeed<T>(items: readonly T[], correctIndex: number, seed: number): Shuffled<T> {
+export function shuffleWithSeed<T>(
+  items: readonly T[],
+  correctIndex: number,
+  seed: number,
+): Shuffled<T> {
   const random = mulberry32(seed);
   const order = items.map((_, i) => i);
   for (let i = order.length - 1; i > 0; i--) {

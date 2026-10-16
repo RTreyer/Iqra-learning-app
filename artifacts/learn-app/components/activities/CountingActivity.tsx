@@ -9,7 +9,10 @@ const PROMPT = { shown: COUNT_PROMPT, spoken: COUNT_PROMPT };
 
 function Counting(props: ActivityProps<"counting">) {
   const { rounds } = props.lesson;
-  const roundOf = useCallback((i: number) => ({ options: rounds[i].options, answer: rounds[i].count }), [rounds]);
+  const roundOf = useCallback(
+    (i: number) => ({ options: rounds[i].options, answer: rounds[i].count }),
+    [rounds],
+  );
   const promptOf = useCallback(() => PROMPT, []);
   const renderVisual = useCallback(
     (i: number) => (
@@ -23,7 +26,9 @@ function Counting(props: ActivityProps<"counting">) {
     ),
     [rounds],
   );
-  return <NumberQuiz {...props} roundOf={roundOf} promptOf={promptOf} renderVisual={renderVisual} />;
+  return (
+    <NumberQuiz {...props} roundOf={roundOf} promptOf={promptOf} renderVisual={renderVisual} />
+  );
 }
 
 export const CountingActivity = withAttemptReset(Counting, "CountingActivity");

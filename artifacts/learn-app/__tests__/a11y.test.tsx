@@ -22,7 +22,10 @@ async function seed() {
   const items = Object.fromEntries(ids.map((id) => [id, item]));
   const days = ["2026-10-14", "2026-10-15", "2026-10-16"];
   const lessons = { "u1-1": { completed: true, stars: 2 } };
-  await AsyncStorage.setItem(KEY, JSON.stringify({ version: 2, lessons, items, activity: { days }, totalStars: 2 }));
+  await AsyncStorage.setItem(
+    KEY,
+    JSON.stringify({ version: 2, lessons, items, activity: { days }, totalStars: 2 }),
+  );
 }
 
 function withProgress(ui: React.ReactElement) {
@@ -33,21 +36,33 @@ function withProgress(ui: React.ReactElement) {
 function expectAccessiblePressables(exactly: number) {
   // Pressable is a memo wrapper in jest-expo, so match the rendered component by its name.
   const pressables = screen.UNSAFE_root.findAll(
-    (node: ReturnType<typeof screen.UNSAFE_root.findAll>[number]) => typeof node.type !== "string" && (node.type as { name?: string }).name === "Pressable" && typeof node.props.onPress === "function",
+    (node: ReturnType<typeof screen.UNSAFE_root.findAll>[number]) =>
+      typeof node.type !== "string" &&
+      (node.type as { name?: string }).name === "Pressable" &&
+      typeof node.props.onPress === "function",
   );
   expect(pressables.length).toBe(exactly);
   for (const node of pressables) {
     const where = String(node.props.testID ?? node.props.accessibilityLabel ?? "unnamed pressable");
     expect({ where, role: node.props.accessibilityRole }).toEqual({ where, role: "button" });
     const label = node.props.accessibilityLabel;
-    expect({ where, label: typeof label === "string" && label.trim().length > 0 }).toEqual({ where, label: true });
-    const style = node.props.style as StyleProp<ViewStyle> | ((state: { pressed: boolean }) => StyleProp<ViewStyle>);
-    const flat = StyleSheet.flatten(typeof style === "function" ? style({ pressed: false }) : style) ?? {};
+    expect({ where, label: typeof label === "string" && label.trim().length > 0 }).toEqual({
+      where,
+      label: true,
+    });
+    const style = node.props.style as
+      StyleProp<ViewStyle> | ((state: { pressed: boolean }) => StyleProp<ViewStyle>);
+    const flat =
+      StyleSheet.flatten(typeof style === "function" ? style({ pressed: false }) : style) ?? {};
     const sizes = [flat.minHeight, flat.height].filter((v): v is number => typeof v === "number");
-    expect({ where, tall: sizes.length > 0 && Math.max(...sizes) >= touchTarget }).toEqual({ where, tall: true });
+    expect({ where, tall: sizes.length > 0 && Math.max(...sizes) >= touchTarget }).toEqual({
+      where,
+      tall: true,
+    });
     // Rows that stretch (no numeric width, or a percentage) are as wide as their parent.
     const widths = [flat.minWidth, flat.width].filter((v): v is number => typeof v === "number");
-    if (widths.length > 0) expect({ where, wide: Math.max(...widths) >= touchTarget }).toEqual({ where, wide: true });
+    if (widths.length > 0)
+      expect({ where, wide: Math.max(...widths) >= touchTarget }).toEqual({ where, wide: true });
   }
 }
 

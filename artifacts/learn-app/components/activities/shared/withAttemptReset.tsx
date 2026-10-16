@@ -6,7 +6,10 @@ import { stopSpeaking } from "@/lib/speech";
  * and stops speech left over from the previous attempt. Unmount does not stop speech: the
  * lesson screen speaks its completion message while swapping the activity for the result card.
  */
-export function withAttemptReset<P extends { attemptKey: string }>(Inner: ComponentType<P>, name: string): ComponentType<P> {
+export function withAttemptReset<P extends { attemptKey: string }>(
+  Inner: ComponentType<P>,
+  name: string,
+): ComponentType<P> {
   function AttemptReset(props: P) {
     const { attemptKey } = props;
     const previousKey = useRef(attemptKey);

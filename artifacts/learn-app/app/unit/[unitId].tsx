@@ -27,10 +27,14 @@ export default function UnitScreen() {
 
   const unit = getUnit(unitId ?? "");
   const rows = useMemo(
-    () => (unit ? unit.lessons.map((lesson) => ({ lesson, status: getLessonProgress(lesson.id) })) : []),
+    () =>
+      unit ? unit.lessons.map((lesson) => ({ lesson, status: getLessonProgress(lesson.id) })) : [],
     [unit, getLessonProgress],
   );
-  const summary = useMemo(() => (unit ? getUnitProgress(unitLessonIds(unit)) : null), [unit, getUnitProgress]);
+  const summary = useMemo(
+    () => (unit ? getUnitProgress(unitLessonIds(unit)) : null),
+    [unit, getUnitProgress],
+  );
 
   if (!unit || !summary) return <NotFoundCard message="الوحدة غير موجودة" />;
 
@@ -54,7 +58,10 @@ export default function UnitScreen() {
         {unit.letters ? (
           <View style={styles.lettersRow}>
             {unit.letters.map((letter) => (
-              <View key={letter} style={[styles.letterChip, { backgroundColor: withAlpha(unit.color, 0.18) }]}>
+              <View
+                key={letter}
+                style={[styles.letterChip, { backgroundColor: withAlpha(unit.color, 0.18) }]}
+              >
                 <Text style={styles.letterChipText}>{letter}</Text>
               </View>
             ))}
@@ -68,7 +75,10 @@ export default function UnitScreen() {
           <View
             style={[
               styles.progressFill,
-              { width: `${summary.total ? (summary.done / summary.total) * 100 : 0}%`, backgroundColor: unit.color },
+              {
+                width: `${summary.total ? (summary.done / summary.total) * 100 : 0}%`,
+                backgroundColor: unit.color,
+              },
             ]}
           />
         </View>
@@ -79,7 +89,12 @@ export default function UnitScreen() {
         showsVerticalScrollIndicator={false}
       >
         {rows.map(({ lesson, status }) => (
-          <LessonRow key={lesson.id} lesson={lesson} status={status} onPress={() => router.push(routes.lesson(lesson.id))} />
+          <LessonRow
+            key={lesson.id}
+            lesson={lesson}
+            status={status}
+            onPress={() => router.push(routes.lesson(lesson.id))}
+          />
         ))}
       </ScrollView>
     </ScreenBackground>
@@ -94,9 +109,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
   },
-  headerCenter: { flexDirection: "row", alignItems: "center", gap: 8, flex: 1, justifyContent: "center" },
+  headerCenter: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    flex: 1,
+    justifyContent: "center",
+  },
   title: { fontSize: 19, fontWeight: "800", color: colors.text },
-  badge: { backgroundColor: colors.pill, borderWidth: 1, borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3 },
+  badge: {
+    backgroundColor: colors.pill,
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
   badgeText: { fontSize: 12, fontWeight: "700", color: colors.text },
   headerEmoji: { fontSize: 26 },
   themeRow: { alignItems: "center", paddingHorizontal: 20, marginBottom: 8, gap: 6 },

@@ -15,7 +15,11 @@ export type ValidationResult = { valid: true } | { valid: false; msg: string };
 const TOO_SMALL = "اِرسم الحرف بشكل أكبر 📏";
 const OFF_CENTRE = "اِرسم الحرف في وسط المساحة 🎯";
 
-export function validateTracing(strokes: Stroke[], pad: PadSize, strokeCount = 1): ValidationResult {
+export function validateTracing(
+  strokes: Stroke[],
+  pad: PadSize,
+  strokeCount = 1,
+): ValidationResult {
   const { width: padW, height: padH } = pad;
   // An unmeasured or collapsed pad cannot be judged; never accept it.
   if (!(padW > 0 && padH > 0)) return { valid: false, msg: TOO_SMALL };
@@ -28,7 +32,10 @@ export function validateTracing(strokes: Stroke[], pad: PadSize, strokeCount = 1
   if (strokes.length < strokeCount) {
     return {
       valid: false,
-      msg: strokeCount === 1 ? "اِرسم خطاً واحداً على الأقل ✏️" : `اِرسم ${strokeCount} خطوط على الأقل ✏️`,
+      msg:
+        strokeCount === 1
+          ? "اِرسم خطاً واحداً على الأقل ✏️"
+          : `اِرسم ${strokeCount} خطوط على الأقل ✏️`,
     };
   }
 
@@ -59,7 +66,8 @@ export function validateTracing(strokes: Stroke[], pad: PadSize, strokeCount = 1
     sumX += p.x;
     sumY += p.y;
   }
-  if (maxX - minX < padW * 0.2 && maxY - minY < padH * 0.15) return { valid: false, msg: TOO_SMALL };
+  if (maxX - minX < padW * 0.2 && maxY - minY < padH * 0.15)
+    return { valid: false, msg: TOO_SMALL };
 
   // 4: centroid within 35 % of the pad centre on each axis (0 = centre, 0.5 = edge).
   const offX = Math.abs(sumX / all.length - padW / 2) / padW;

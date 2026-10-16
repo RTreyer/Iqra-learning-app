@@ -12,7 +12,11 @@ export function answerOf({ a, b, op }: { a: number; b: number; op: "+" | "-" }):
  * Arithmetic question: `shown` uses Eastern Arabic digits and symbols, `spoken` reads it
  * as the textbook does, e.g. "ثَلاثَة زَائِد اثْنَان يُسَاوِي كَمْ؟".
  */
-export function arithmeticPrompt(a: number, op: "+" | "-", b: number): { shown: string; spoken: string } {
+export function arithmeticPrompt(
+  a: number,
+  op: "+" | "-",
+  b: number,
+): { shown: string; spoken: string } {
   return {
     shown: `${toArabicDigits(a)} ${op} ${toArabicDigits(b)} = ؟`,
     spoken: `${numberToArabicWord(a)} ${op === "+" ? "زَائِد" : "نَاقِص"} ${numberToArabicWord(b)} يُسَاوِي كَمْ؟`,

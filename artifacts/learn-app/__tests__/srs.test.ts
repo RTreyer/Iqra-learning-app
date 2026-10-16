@@ -60,9 +60,15 @@ describe("isDue", () => {
   });
 
   it("keeps dueAt on local midnight across a DST change", () => {
-    const state = review({ ...introduce(new Date(2026, 2, 20, 18, 0)), box: 4 }, true, new Date(2026, 2, 20, 18, 0));
+    const state = review(
+      { ...introduce(new Date(2026, 2, 20, 18, 0)), box: 4 },
+      true,
+      new Date(2026, 2, 20, 18, 0),
+    );
     const due = new Date(state.dueAt);
-    expect([due.getFullYear(), due.getMonth(), due.getDate(), due.getHours()]).toEqual([2026, 3, 3, 0]);
+    expect([due.getFullYear(), due.getMonth(), due.getDate(), due.getHours()]).toEqual([
+      2026, 3, 3, 0,
+    ]);
   });
 
   it("treats an unparsable dueAt as due", () => {
@@ -118,7 +124,11 @@ describe("pickDue", () => {
       "letter:a": item(2, past(1)),
       "word:x": item(2, past(1)),
     };
-    const b: Record<string, ItemState> = { "word:x": a["word:x"], "letter:a": a["letter:a"], "word:y": a["word:y"] };
+    const b: Record<string, ItemState> = {
+      "word:x": a["word:x"],
+      "letter:a": a["letter:a"],
+      "word:y": a["word:y"],
+    };
     expect(pickDue(a, NOW)).toEqual(pickDue(b, NOW));
     expect(pickDue(a, NOW)).toEqual(["letter:a", "word:x", "word:y"]);
   });

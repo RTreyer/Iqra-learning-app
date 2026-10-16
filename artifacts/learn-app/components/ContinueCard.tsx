@@ -23,14 +23,21 @@ export function ContinueCard({ next, onPress }: Props) {
       accessibilityRole="button"
       accessibilityLabel={`${t("تَابِعْ:")} ${detail}`}
       onPress={onPress}
-      style={({ pressed }) => [styles.card, { borderColor: accent, flexDirection: row }, pressed && styles.pressed]}
+      style={({ pressed }) => [
+        styles.card,
+        { borderColor: accent, flexDirection: row },
+        pressed && styles.pressed,
+      ]}
     >
       <View style={[styles.emojiWrap, { backgroundColor: withAlpha(accent, 0.15) }]}>
         <Text style={styles.emoji}>{lesson.emoji}</Text>
       </View>
       <View style={[styles.info, { alignItems: align }]}>
         <UiText style={styles.label}>تَابِعْ:</UiText>
-        <Text style={[styles.detail, { textAlign: language === "en" ? "left" : "right" }]} numberOfLines={2}>
+        <Text
+          style={[styles.detail, { textAlign: language === "en" ? "left" : "right" }]}
+          numberOfLines={2}
+        >
           {detail}
         </Text>
       </View>
@@ -53,7 +60,13 @@ const styles = StyleSheet.create({
     ...shadow.card,
   },
   pressed: { opacity: 0.88, transform: [{ scale: 0.97 }] },
-  emojiWrap: { width: 60, height: 60, borderRadius: 30, alignItems: "center", justifyContent: "center" },
+  emojiWrap: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   emoji: { fontSize: 34 },
   info: { flex: 1, gap: 4 },
   label: { fontSize: 18, fontWeight: "900", color: colors.text },

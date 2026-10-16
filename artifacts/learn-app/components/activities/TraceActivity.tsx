@@ -1,5 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Animated, Platform, Pressable, StyleSheet, Text, View, type LayoutChangeEvent } from "react-native";
+import {
+  Animated,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  type LayoutChangeEvent,
+} from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { Path, Svg } from "react-native-svg";
 import { UiText } from "@/components/UiText";
@@ -113,7 +121,11 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
   const handleDone = useCallback(() => {
     if (locked.current) return;
     const points = strokes.map((s) => s.points);
-    const result = validateTracing(points, { width: padSize, height: padSize }, target.strokeCount ?? 1);
+    const result = validateTracing(
+      points,
+      { width: padSize, height: padSize },
+      target.strokeCount ?? 1,
+    );
     if (!result.valid) {
       setError(result.msg);
       setPadError(true);
@@ -150,7 +162,11 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
 
   const translateX = shake.interpolate({ inputRange: [0, 1], outputRange: [0, 8] });
   const padDims = { width: padSize, height: padSize };
-  const guideFont = { color, fontSize: Math.round(padSize * 0.55), lineHeight: Math.round(padSize * 0.75) };
+  const guideFont = {
+    color,
+    fontSize: Math.round(padSize * 0.55),
+    lineHeight: Math.round(padSize * 0.75),
+  };
 
   return (
     <View style={trace.container}>
@@ -160,7 +176,10 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
         <Text style={[trace.label, { color: readableFill(color) }]}>{target.label}</Text>
       </View>
       {error ? (
-        <Animated.View style={[trace.errorBanner, { transform: [{ translateX }] }]} accessibilityLiveRegion="polite">
+        <Animated.View
+          style={[trace.errorBanner, { transform: [{ translateX }] }]}
+          accessibilityLiveRegion="polite"
+        >
           <Text testID="trace-error" style={trace.errorText}>
             {error}
           </Text>
@@ -175,15 +194,36 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
             accessibilityLabel={target.label}
             accessibilityHint={t("ارسم بإصبعك")}
             collapsable={false}
-            style={[trace.pad, padDims, padError && trace.padError, passed && trace.padPassed, PLATFORM_PAD]}
+            style={[
+              trace.pad,
+              padDims,
+              padError && trace.padError,
+              passed && trace.padPassed,
+              PLATFORM_PAD,
+            ]}
           >
             <Text style={[trace.guide, guideFont]}>{target.guide}</Text>
             <Svg style={StyleSheet.absoluteFill} width={padSize} height={padSize}>
               {strokes.map((s, i) => (
-                <Path key={i} d={s.d} stroke={color} strokeWidth={10} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                <Path
+                  key={i}
+                  d={s.d}
+                  stroke={color}
+                  strokeWidth={10}
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               ))}
               {livePath ? (
-                <Path d={livePath} stroke={color} strokeWidth={10} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                <Path
+                  d={livePath}
+                  stroke={color}
+                  strokeWidth={10}
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               ) : null}
             </Svg>
           </View>

@@ -35,9 +35,9 @@ const HOME: Config = {
   end: { x: 0.9, y: 1 },
   decos: [
     { emoji: "⭐", size: 110, opacity: 0.12, rotate: "20deg", top: "4%", left: "2%" },
-    { emoji: "🌟", size: 80,  opacity: 0.09, rotate: "-15deg", top: "16%", right: "3%" },
-    { emoji: "🌟", size: 90,  opacity: 0.09, rotate: "15deg",  bottom: "8%", left: "5%" },
-    { emoji: "✨", size: 65,  opacity: 0.10, rotate: "-30deg", bottom: "6%", right: "8%" },
+    { emoji: "🌟", size: 80, opacity: 0.09, rotate: "-15deg", top: "16%", right: "3%" },
+    { emoji: "🌟", size: 90, opacity: 0.09, rotate: "15deg", bottom: "8%", left: "5%" },
+    { emoji: "✨", size: 65, opacity: 0.1, rotate: "-30deg", bottom: "6%", right: "8%" },
   ],
 };
 
@@ -45,10 +45,10 @@ const READING: Config = {
   start: { x: 0, y: 0 },
   end: { x: 1, y: 1 },
   decos: [
-    { emoji: "📖", size: 100, opacity: 0.10, rotate: "15deg",  top: "3%",  right: "2%" },
-    { emoji: "✨", size: 80,  opacity: 0.10, rotate: "-20deg", top: "22%", left: "1%" },
-    { emoji: "📚", size: 110, opacity: 0.08, rotate: "10deg",  top: "52%", right: "1%" },
-    { emoji: "⭐", size: 85,  opacity: 0.10, rotate: "-25deg", bottom: "18%", left: "2%" },
+    { emoji: "📖", size: 100, opacity: 0.1, rotate: "15deg", top: "3%", right: "2%" },
+    { emoji: "✨", size: 80, opacity: 0.1, rotate: "-20deg", top: "22%", left: "1%" },
+    { emoji: "📚", size: 110, opacity: 0.08, rotate: "10deg", top: "52%", right: "1%" },
+    { emoji: "⭐", size: 85, opacity: 0.1, rotate: "-25deg", bottom: "18%", left: "2%" },
   ],
 };
 
@@ -56,10 +56,10 @@ const NUMBERS: Config = {
   start: { x: 0.1, y: 0 },
   end: { x: 0.9, y: 1 },
   decos: [
-    { emoji: "⭐", size: 100, opacity: 0.10, rotate: "20deg",  top: "4%",  left: "2%" },
-    { emoji: "✨", size: 75,  opacity: 0.09, rotate: "-15deg", top: "20%", right: "2%" },
-    { emoji: "🔢", size: 105, opacity: 0.07, rotate: "10deg",  top: "52%", left: "1%" },
-    { emoji: "🌟", size: 85,  opacity: 0.10, rotate: "-20deg", bottom: "18%", right: "2%" },
+    { emoji: "⭐", size: 100, opacity: 0.1, rotate: "20deg", top: "4%", left: "2%" },
+    { emoji: "✨", size: 75, opacity: 0.09, rotate: "-15deg", top: "20%", right: "2%" },
+    { emoji: "🔢", size: 105, opacity: 0.07, rotate: "10deg", top: "52%", left: "1%" },
+    { emoji: "🌟", size: 85, opacity: 0.1, rotate: "-20deg", bottom: "18%", right: "2%" },
   ],
 };
 

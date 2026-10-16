@@ -19,7 +19,9 @@ export function renderScreen(ui: React.ReactElement) {
 
 /** The mutable params object behind the mocked useLocalSearchParams. */
 export function setParams(next: Record<string, string>) {
-  const params = (jest.requireMock("expo-router") as { __params: Record<string, string | undefined> }).__params;
+  const params = (
+    jest.requireMock("expo-router") as { __params: Record<string, string | undefined> }
+  ).__params;
   for (const key of Object.keys(params)) delete params[key];
   Object.assign(params, next);
 }

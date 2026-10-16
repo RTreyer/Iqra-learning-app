@@ -20,7 +20,9 @@ export function ReviewCompleteCard({ score }: Props) {
     <View style={styles.card} testID={score ? "review-complete" : "review-empty"}>
       <Text style={styles.emoji}>{score ? "🎉" : "🌙"}</Text>
       <UiText style={styles.title}>
-        {score ? "أَحْسَنْت! مُرَاجَعَة الْيَوْم مُكْتَمِلَة" : "لا شَيْءَ لِلْمُرَاجَعَةِ الْيَوْم"}
+        {score
+          ? "أَحْسَنْت! مُرَاجَعَة الْيَوْم مُكْتَمِلَة"
+          : "لا شَيْءَ لِلْمُرَاجَعَةِ الْيَوْم"}
       </UiText>
       {score ? (
         <Text style={styles.score} accessibilityLabel={`${score.correct} / ${score.total}`}>

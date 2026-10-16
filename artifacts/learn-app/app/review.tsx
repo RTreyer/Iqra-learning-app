@@ -69,7 +69,12 @@ function ReviewSession({ initialIds }: { initialIds: string[] }) {
       {current ? (
         <View style={styles.round}>
           <ProgressDots count={total} current={Math.min(index, total - 1)} color={colors.success} />
-          <ReviewRound item={current} attemptKey={`review:${index}`} onFirstTap={onFirstTap} onAdvance={onAdvance} />
+          <ReviewRound
+            item={current}
+            attemptKey={`review:${index}`}
+            onFirstTap={onFirstTap}
+            onAdvance={onAdvance}
+          />
         </View>
       ) : (
         <ReviewCompleteCard score={total > 0 ? { correct: session.correct, total } : undefined} />
@@ -84,7 +89,10 @@ export default function ReviewScreen() {
   const { language } = useLanguage();
 
   return (
-    <ScreenBackground subject="home" style={[styles.screen, { paddingTop: pad.top, paddingBottom: pad.bottom + 16 }]}>
+    <ScreenBackground
+      subject="home"
+      style={[styles.screen, { paddingTop: pad.top, paddingBottom: pad.bottom + 16 }]}
+    >
       <View style={[styles.header, { flexDirection: language === "en" ? "row" : "row-reverse" }]}>
         <BackButton fallback={routes.home()} />
         <UiText style={styles.title} numberOfLines={1} accessibilityRole="header">

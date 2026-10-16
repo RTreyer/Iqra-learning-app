@@ -25,7 +25,9 @@ test("a gap resets the streak", () => {
 });
 
 test("unsorted days and duplicates are ignored", () => {
-  expect(currentStreak(["2026-10-16", "2026-10-14", "2026-10-16", "2026-10-15", "2026-10-15"], TODAY)).toBe(3);
+  expect(
+    currentStreak(["2026-10-16", "2026-10-14", "2026-10-16", "2026-10-15", "2026-10-15"], TODAY),
+  ).toBe(3);
 });
 
 test("streaks cross month and year boundaries", () => {

@@ -4,7 +4,13 @@ import { UiText } from "@/components/UiText";
 import { useLanguage } from "@/context/LanguageContext";
 import { colors, readableFill, touchTarget } from "@/theme/tokens";
 
-type Props = { label: string; color: string; onPress: () => void; testID?: string; disabled?: boolean };
+type Props = {
+  label: string;
+  color: string;
+  onPress: () => void;
+  testID?: string;
+  disabled?: boolean;
+};
 
 /** Continue button; the label is interface chrome and goes through UiText. */
 export function DoneButton({ label, color, onPress, testID, disabled }: Props) {

@@ -5,7 +5,9 @@ import { getLesson } from "@/content";
 import { routes } from "@/lib/routes";
 import { mockCanGoBack, renderScreen } from "@/test-utils/screens";
 
-const { router } = jest.requireMock("expo-router") as { router: { push: jest.Mock; replace: jest.Mock; back: jest.Mock } };
+const { router } = jest.requireMock("expo-router") as {
+  router: { push: jest.Mock; replace: jest.Mock; back: jest.Mock };
+};
 const next = getLesson("u2-4")!.lesson;
 const backTo = routes.unit("a2");
 

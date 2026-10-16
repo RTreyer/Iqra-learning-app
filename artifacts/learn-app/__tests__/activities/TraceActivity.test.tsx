@@ -17,7 +17,9 @@ afterEach(() => jest.useRealTimers());
 
 /** Simulates the first layout pass; strokes are ignored before it. */
 function layout(width = 300) {
-  fireEvent(screen.getByTestId("trace-measure"), "layout", { nativeEvent: { layout: { x: 0, y: 0, width, height: 500 } } });
+  fireEvent(screen.getByTestId("trace-measure"), "layout", {
+    nativeEvent: { layout: { x: 0, y: 0, width, height: 500 } },
+  });
 }
 
 /** Draws a diagonal across a 300 px pad through the real Pan gesture callbacks. */
@@ -34,7 +36,9 @@ function drawDiagonal() {
 }
 
 test("renders the guide and label and speaks the first target", () => {
-  renderActivity(<TraceActivity lesson={lesson} color="#7C3AED" attemptKey="t:1" onComplete={jest.fn()} />);
+  renderActivity(
+    <TraceActivity lesson={lesson} color="#7C3AED" attemptKey="t:1" onComplete={jest.fn()} />,
+  );
   expect(screen.getAllByText(lesson.targets[0].guide).length).toBeGreaterThanOrEqual(2); // label + guide
   expect(speech.speak).toHaveBeenCalledWith(lesson.targets[0].tts, expect.anything());
   expect(screen.getByText("مسح")).toBeTruthy();
@@ -43,7 +47,9 @@ test("renders the guide and label and speaks the first target", () => {
 
 test("Done with no strokes shows the error banner and does not complete", () => {
   const onComplete = jest.fn();
-  renderActivity(<TraceActivity lesson={lesson} color="#7C3AED" attemptKey="t:1" onComplete={onComplete} />);
+  renderActivity(
+    <TraceActivity lesson={lesson} color="#7C3AED" attemptKey="t:1" onComplete={onComplete} />,
+  );
   fireEvent.press(screen.getByTestId("trace-done"));
   expect(screen.getByTestId("trace-error")).toHaveTextContent("اِرسم خطاً واحداً على الأقل ✏️");
   expect(haptics.notificationAsync).toHaveBeenCalledWith("warning");
@@ -55,7 +61,9 @@ test("Done with no strokes shows the error banner and does not complete", () => 
 
 test("valid strokes advance through every target and complete with an empty score", () => {
   const onComplete = jest.fn();
-  renderActivity(<TraceActivity lesson={lesson} color="#7C3AED" attemptKey="t:1" onComplete={onComplete} />);
+  renderActivity(
+    <TraceActivity lesson={lesson} color="#7C3AED" attemptKey="t:1" onComplete={onComplete} />,
+  );
   layout();
   lesson.targets.forEach((target, i) => {
     expect(speech.speak).toHaveBeenCalledWith(target.tts, expect.anything());
@@ -72,7 +80,9 @@ test("valid strokes advance through every target and complete with an empty scor
 });
 
 test("Clear removes the drawn strokes", () => {
-  renderActivity(<TraceActivity lesson={lesson} color="#7C3AED" attemptKey="t:1" onComplete={jest.fn()} />);
+  renderActivity(
+    <TraceActivity lesson={lesson} color="#7C3AED" attemptKey="t:1" onComplete={jest.fn()} />,
+  );
   layout();
   drawDiagonal();
   fireEvent.press(screen.getByTestId("trace-clear"));
@@ -81,7 +91,9 @@ test("Clear removes the drawn strokes", () => {
 });
 
 test("ignores strokes before the first layout and clears them when the pad is resized", () => {
-  renderActivity(<TraceActivity lesson={lesson} color="#7C3AED" attemptKey="t:1" onComplete={jest.fn()} />);
+  renderActivity(
+    <TraceActivity lesson={lesson} color="#7C3AED" attemptKey="t:1" onComplete={jest.fn()} />,
+  );
   drawDiagonal(); // not measured yet: ignored
   fireEvent.press(screen.getByTestId("trace-done"));
   expect(screen.getByTestId("trace-error")).toHaveTextContent("اِرسم خطاً واحداً على الأقل ✏️");
@@ -94,7 +106,9 @@ test("ignores strokes before the first layout and clears them when the pad is re
 });
 
 test("pad exposes the target label and a drawing hint", () => {
-  renderActivity(<TraceActivity lesson={lesson} color="#7C3AED" attemptKey="t:1" onComplete={jest.fn()} />);
+  renderActivity(
+    <TraceActivity lesson={lesson} color="#7C3AED" attemptKey="t:1" onComplete={jest.fn()} />,
+  );
   const pad = screen.getByTestId("trace-pad");
   expect(pad.props.accessibilityLabel).toBe(lesson.targets[0].label);
   expect(pad.props.accessibilityHint).toBe("ارسم بإصبعك");
@@ -105,11 +119,15 @@ test("completes through the latest onComplete when the parent re-renders during 
   const single = { ...one, targets: one.targets.slice(0, 1) };
   const first = jest.fn();
   const latest = jest.fn();
-  const view = renderActivity(<TraceActivity lesson={single} color="#7C3AED" attemptKey="t:1" onComplete={first} />);
+  const view = renderActivity(
+    <TraceActivity lesson={single} color="#7C3AED" attemptKey="t:1" onComplete={first} />,
+  );
   layout();
   drawDiagonal();
   fireEvent.press(screen.getByTestId("trace-done"));
-  view.rerenderActivity(<TraceActivity lesson={single} color="#7C3AED" attemptKey="t:1" onComplete={latest} />);
+  view.rerenderActivity(
+    <TraceActivity lesson={single} color="#7C3AED" attemptKey="t:1" onComplete={latest} />,
+  );
   act(() => jest.advanceTimersByTime(900));
   expect(first).not.toHaveBeenCalled();
   expect(latest).toHaveBeenCalledWith({ correct: 0, total: 0 });

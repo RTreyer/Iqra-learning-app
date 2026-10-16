@@ -7,7 +7,13 @@ import { renderActivity } from "@/test-utils/activities";
 
 // No math content ships yet (the math book is unavailable), so the lesson is built here.
 const lesson: Extract<Lesson, { type: "counting" }> = {
-  id: "m1-1", number: 1, title: "عدّ", subtitle: "", emoji: "🔢", color: "#7C3AED", type: "counting",
+  id: "m1-1",
+  number: 1,
+  title: "عدّ",
+  subtitle: "",
+  emoji: "🔢",
+  color: "#7C3AED",
+  type: "counting",
   rounds: [
     { emoji: "🍎", count: 3, options: [2, 3, 4] },
     { emoji: "⭐", count: 5, options: [5, 6, 4] },
@@ -26,7 +32,13 @@ test("shows Eastern Arabic digits, scores first taps and completes", () => {
   const onComplete = jest.fn();
   const onRoundResult = jest.fn();
   renderActivity(
-    <CountingActivity lesson={lesson} color="#7C3AED" attemptKey="c:1" onComplete={onComplete} onRoundResult={onRoundResult} />,
+    <CountingActivity
+      lesson={lesson}
+      color="#7C3AED"
+      attemptKey="c:1"
+      onComplete={onComplete}
+      onRoundResult={onRoundResult}
+    />,
   );
   expect(screen.getAllByText("🍎")).toHaveLength(3);
   act(() => jest.advanceTimersByTime(400));

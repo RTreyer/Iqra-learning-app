@@ -13,7 +13,13 @@ import { useShuffled } from "./shared/useShuffled";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import type { ActivityProps } from "./types";
 
-function WordRead({ lesson, color, attemptKey, onComplete, onRoundResult }: ActivityProps<"word_read">) {
+function WordRead({
+  lesson,
+  color,
+  attemptKey,
+  onComplete,
+  onRoundResult,
+}: ActivityProps<"word_read">) {
   const { rounds } = lesson;
   const quiz = useQuiz({ lesson, total: rounds.length, onComplete, onRoundResult });
   const { pick } = quiz;
@@ -41,12 +47,16 @@ function WordRead({ lesson, color, attemptKey, onComplete, onRoundResult }: Acti
     [options.correctIndex, pick, bounce, round],
   );
 
-  const nextLabel = quiz.isLast ? `أَحْسَنْت! ${quiz.correctCount}/${rounds.length} 🌟 تابع` : "التالي ←";
+  const nextLabel = quiz.isLast
+    ? `أَحْسَنْت! ${quiz.correctCount}/${rounds.length} 🌟 تابع`
+    : "التالي ←";
 
   return (
     <View style={act.container}>
       <ProgressDots count={rounds.length} current={quiz.roundIndex} color={color} />
-      <UiText style={act.instruction}>{`سؤال ${quiz.roundIndex + 1} من ${rounds.length} — اضغط للاستماع ثم اختر`}</UiText>
+      <UiText
+        style={act.instruction}
+      >{`سؤال ${quiz.roundIndex + 1} من ${rounds.length} — اضغط للاستماع ثم اختر`}</UiText>
       <ListenButton text={round.word} color={color} />
       <View style={act.wordChoicesCol}>
         {options.items.map((choice, idx) => (
@@ -63,7 +73,9 @@ function WordRead({ lesson, color, attemptKey, onComplete, onRoundResult }: Acti
           />
         ))}
       </View>
-      {quiz.locked ? <DoneButton testID="activity-next" label={nextLabel} color={color} onPress={quiz.next} /> : null}
+      {quiz.locked ? (
+        <DoneButton testID="activity-next" label={nextLabel} color={color} onPress={quiz.next} />
+      ) : null}
     </View>
   );
 }

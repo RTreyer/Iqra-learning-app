@@ -25,7 +25,10 @@ test("lesson numbers match their position in the unit", () => {
 
 test("every available book has lessons", () => {
   for (const book of books.filter((b) => b.available)) {
-    assert.ok(book.units.some((u) => u.lessons.length > 0), book.id);
+    assert.ok(
+      book.units.some((u) => u.lessons.length > 0),
+      book.id,
+    );
   }
 });
 
@@ -97,12 +100,21 @@ test("lookups resolve books, units, lessons and next lessons", () => {
 });
 
 test("quiz options are unique within each round", () => {
-  const unique = (values, id) => assert.equal(new Set(values).size, values.length, `${id}: ${values.join(", ")}`);
-  for (const lesson of byType("counting")) for (const r of lesson.rounds) unique(r.options, lesson.id);
-  for (const lesson of byType("arithmetic")) for (const r of lesson.rounds) unique(r.options, lesson.id);
-  for (const lesson of byType("letter_pick")) for (const r of lesson.rounds) unique(r.letters, lesson.id);
-  for (const lesson of byType("word_read")) for (const r of lesson.rounds) unique(r.choices, lesson.id);
+  const unique = (values, id) =>
+    assert.equal(new Set(values).size, values.length, `${id}: ${values.join(", ")}`);
+  for (const lesson of byType("counting"))
+    for (const r of lesson.rounds) unique(r.options, lesson.id);
+  for (const lesson of byType("arithmetic"))
+    for (const r of lesson.rounds) unique(r.options, lesson.id);
+  for (const lesson of byType("letter_pick"))
+    for (const r of lesson.rounds) unique(r.letters, lesson.id);
+  for (const lesson of byType("word_read"))
+    for (const r of lesson.rounds) unique(r.choices, lesson.id);
   for (const lesson of byType("listen_pick")) {
-    for (const q of lesson.questions) unique(q.choices.map((c) => c.word), lesson.id);
+    for (const q of lesson.questions)
+      unique(
+        q.choices.map((c) => c.word),
+        lesson.id,
+      );
   }
 });

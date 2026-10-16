@@ -58,14 +58,20 @@ function Matching({ lesson, color, attemptKey, onComplete }: ActivityProps<"matc
   const allMatched = state.matched.size >= pairs.length;
   const correct = pairs.length - state.missed.size;
   const finish = useOnce(
-    useCallback(() => onComplete({ correct, total: pairs.length }), [onComplete, correct, pairs.length]),
+    useCallback(
+      () => onComplete({ correct, total: pairs.length }),
+      [onComplete, correct, pairs.length],
+    ),
   );
 
   return (
     <View style={act.container}>
       <UiText style={act.instruction}>اضغط على شيء في اليمين ثم ما يناسبه في اليسار</UiText>
       {/* Mirrored in Arabic so the first column sits on the right, as the hint says. */}
-      <View testID="match-grid" style={[styles.grid, { flexDirection: language === "en" ? "row" : "row-reverse" }]}>
+      <View
+        testID="match-grid"
+        style={[styles.grid, { flexDirection: language === "en" ? "row" : "row-reverse" }]}
+      >
         <View style={styles.column}>
           {pairs.map((pair, i) => (
             <Pressable
@@ -73,11 +79,18 @@ function Matching({ lesson, color, attemptKey, onComplete }: ActivityProps<"matc
               testID={`match-left-${i}`}
               accessibilityRole="button"
               accessibilityLabel={pair.left.word}
-              accessibilityState={{ selected: state.selectedLeft === i || state.matched.has(i), disabled: state.matched.has(i) }}
+              accessibilityState={{
+                selected: state.selectedLeft === i || state.matched.has(i),
+                disabled: state.matched.has(i),
+              }}
               style={[
                 styles.item,
                 state.selectedLeft === i && { borderColor: color, borderWidth: 3 },
-                state.matched.has(i) && { backgroundColor: withAlpha(color, 0.13), borderColor: color, borderWidth: 2 },
+                state.matched.has(i) && {
+                  backgroundColor: withAlpha(color, 0.13),
+                  borderColor: color,
+                  borderWidth: 2,
+                },
               ]}
               onPress={() => handleLeft(i)}
             >
@@ -86,7 +99,11 @@ function Matching({ lesson, color, attemptKey, onComplete }: ActivityProps<"matc
             </Pressable>
           ))}
         </View>
-        <View style={styles.arrows} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+        <View
+          style={styles.arrows}
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        >
           {pairs.map((_, i) => (
             <Text key={i} style={styles.arrow}>
               ↔
@@ -100,7 +117,10 @@ function Matching({ lesson, color, attemptKey, onComplete }: ActivityProps<"matc
               testID={`match-right-${pairIdx}`}
               accessibilityRole="button"
               accessibilityLabel={pairs[pairIdx].right.word}
-              accessibilityState={{ selected: state.matched.has(pairIdx), disabled: state.matched.has(pairIdx) }}
+              accessibilityState={{
+                selected: state.matched.has(pairIdx),
+                disabled: state.matched.has(pairIdx),
+              }}
               style={[styles.item, state.matched.has(pairIdx) && styles.itemMatched]}
               onPress={() => handleRight(pairIdx)}
             >
@@ -110,7 +130,15 @@ function Matching({ lesson, color, attemptKey, onComplete }: ActivityProps<"matc
           ))}
         </View>
       </View>
-      {allMatched ? <DoneButton testID="activity-done" label="أَحْسَنْت! 🌟 تابع" color={color} onPress={finish.fire} disabled={finish.done} /> : null}
+      {allMatched ? (
+        <DoneButton
+          testID="activity-done"
+          label="أَحْسَنْت! 🌟 تابع"
+          color={color}
+          onPress={finish.fire}
+          disabled={finish.done}
+        />
+      ) : null}
     </View>
   );
 }
@@ -118,7 +146,13 @@ function Matching({ lesson, color, attemptKey, onComplete }: ActivityProps<"matc
 export const MatchingActivity = withAttemptReset(Matching, "MatchingActivity");
 
 const styles = StyleSheet.create({
-  grid: { flexDirection: "row", gap: 8, alignItems: "center", width: "100%", justifyContent: "center" },
+  grid: {
+    flexDirection: "row",
+    gap: 8,
+    alignItems: "center",
+    width: "100%",
+    justifyContent: "center",
+  },
   column: { flex: 1, gap: 10 },
   item: {
     backgroundColor: "rgba(255,255,255,0.9)",
@@ -135,5 +169,11 @@ const styles = StyleSheet.create({
   emoji: { fontSize: 30 },
   word: { fontSize: 15, fontWeight: "700", color: colors.mutedStrong, textAlign: "center" },
   arrows: { gap: 10, alignItems: "center" },
-  arrow: { fontSize: 20, color: colors.mutedStrong, height: 68, textAlignVertical: "center", lineHeight: 68 },
+  arrow: {
+    fontSize: 20,
+    color: colors.mutedStrong,
+    height: 68,
+    textAlignVertical: "center",
+    lineHeight: 68,
+  },
 });

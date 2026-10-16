@@ -12,10 +12,15 @@ export function UiText({ children, style, accessibilityLabel, ...props }: TextPr
     <Text
       {...props}
       accessibilityLabel={accessibilityLabel ? t(accessibilityLabel) : undefined}
-      style={[style, {
-        writingDirection: language === "en" ? "ltr" : "rtl",
-        ...(alignment === "left" || alignment === "right" ? { textAlign: language === "en" ? "left" : "right" } : {}),
-      }]}
+      style={[
+        style,
+        {
+          writingDirection: language === "en" ? "ltr" : "rtl",
+          ...(alignment === "left" || alignment === "right"
+            ? { textAlign: language === "en" ? "left" : "right" }
+            : {}),
+        },
+      ]}
     >
       {plain ? t(parts.join("")) : children}
     </Text>

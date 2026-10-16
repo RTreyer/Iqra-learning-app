@@ -34,7 +34,11 @@ export const trace = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  padError: { borderColor: colors.danger, borderWidth: 3, backgroundColor: "rgba(254,242,242,0.90)" },
+  padError: {
+    borderColor: colors.danger,
+    borderWidth: 3,
+    backgroundColor: "rgba(254,242,242,0.90)",
+  },
   padPassed: { borderColor: colors.success, borderWidth: 3 },
   guide: { fontWeight: "800", opacity: 0.15, textAlign: "center" },
   controls: { flexDirection: "row", gap: 12, width: "100%", maxWidth: PAD_MAX },

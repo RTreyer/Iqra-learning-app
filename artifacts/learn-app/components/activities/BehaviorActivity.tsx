@@ -37,7 +37,10 @@ function Behavior({ lesson, color, onComplete }: ActivityProps<"behavior">) {
   const answered = Object.keys(results).length;
   const correct = Object.values(results).filter(Boolean).length;
   const finish = useOnce(
-    useCallback(() => onComplete({ correct, total: behaviors.length }), [onComplete, correct, behaviors.length]),
+    useCallback(
+      () => onComplete({ correct, total: behaviors.length }),
+      [onComplete, correct, behaviors.length],
+    ),
   );
 
   return (
@@ -50,10 +53,18 @@ function Behavior({ lesson, color, onComplete }: ActivityProps<"behavior">) {
             key={i}
             accessible={result !== undefined ? true : undefined}
             accessibilityLabel={
-              result !== undefined ? `${item.description}، ${t(result ? "إجابة صحيحة" : "إجابة خطأ")}` : undefined
+              result !== undefined
+                ? `${item.description}، ${t(result ? "إجابة صحيحة" : "إجابة خطأ")}`
+                : undefined
             }
-            accessibilityState={result !== undefined ? { selected: true, disabled: true } : undefined}
-            style={[styles.card, result === true && styles.cardRight, result === false && styles.cardWrong]}
+            accessibilityState={
+              result !== undefined ? { selected: true, disabled: true } : undefined
+            }
+            style={[
+              styles.card,
+              result === true && styles.cardRight,
+              result === false && styles.cardWrong,
+            ]}
           >
             <Text style={styles.emoji}>{item.emoji}</Text>
             <Text style={styles.text}>{item.description}</Text>
@@ -113,10 +124,23 @@ const styles = StyleSheet.create({
   cardRight: { borderColor: colors.success, borderWidth: 2, backgroundColor: colors.successSoft },
   cardWrong: { borderColor: colors.danger, borderWidth: 2, backgroundColor: colors.dangerSoft },
   emoji: { fontSize: 30, flexShrink: 0 },
-  text: { flex: 1, fontSize: 14, fontWeight: "600", color: colors.text, lineHeight: 20, textAlign: "right" },
+  text: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: "600",
+    color: colors.text,
+    lineHeight: 20,
+    textAlign: "right",
+  },
   resultIcon: { fontSize: 24, flexShrink: 0 },
   buttons: { flexDirection: "row", gap: 8, flexShrink: 0 },
-  round: { width: touchTarget, height: touchTarget, borderRadius: touchTarget / 2, alignItems: "center", justifyContent: "center" },
+  round: {
+    width: touchTarget,
+    height: touchTarget,
+    borderRadius: touchTarget / 2,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   check: { backgroundColor: colors.successSoft },
   cross: { backgroundColor: colors.dangerSoft },
   checkText: { fontSize: 22, color: colors.successText, fontWeight: "900" },

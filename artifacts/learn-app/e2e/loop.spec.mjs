@@ -17,10 +17,14 @@ const LETTERS = ["letter:ب", "letter:ت", "letter:ث"];
 /** Target letter shown in the current review round. */
 async function reviewTarget(page) {
   const round = page.getByTestId("review-round");
-  return (await round.getByText("ابحث عن الحرف").locator("xpath=following-sibling::*[1]").innerText()).trim();
+  return (
+    await round.getByText("ابحث عن الحرف").locator("xpath=following-sibling::*[1]").innerText()
+  ).trim();
 }
 
-test("fresh start: Continue points at Unit 1 lesson 1 and there is no Review card", async ({ page }) => {
+test("fresh start: Continue points at Unit 1 lesson 1 and there is no Review card", async ({
+  page,
+}) => {
   await gotoAndWaitReady(page, "/");
   const card = page.getByTestId("continue-card");
   await expect(card).toContainText("تَابِعْ:");
@@ -30,7 +34,9 @@ test("fresh start: Continue points at Unit 1 lesson 1 and there is no Review car
   await expect(page).toHaveURL(/\/lesson\/u1-1$/);
 });
 
-test("missed letters come back tomorrow in today's review, and leave once answered", async ({ page }) => {
+test("missed letters come back tomorrow in today's review, and leave once answered", async ({
+  page,
+}) => {
   await page.clock.setFixedTime(DAY_1);
   // Rounds 4 and 5 (ب and ت seen a second time) are missed: 3 of 5 gives 2 stars.
   expect(await completeQuizLesson(page, "u2-3", 3)).toBe(2);

@@ -12,9 +12,21 @@ import { useShuffled } from "./shared/useShuffled";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import type { ActivityProps } from "./types";
 
-function LetterPick({ lesson, color, attemptKey, onComplete, onRoundResult }: ActivityProps<"letter_pick">) {
+function LetterPick({
+  lesson,
+  color,
+  attemptKey,
+  onComplete,
+  onRoundResult,
+}: ActivityProps<"letter_pick">) {
   const { rounds } = lesson;
-  const quiz = useQuiz({ lesson, total: rounds.length, onComplete, onRoundResult, autoAdvanceMs: ADVANCE_MS });
+  const quiz = useQuiz({
+    lesson,
+    total: rounds.length,
+    onComplete,
+    onRoundResult,
+    autoAdvanceMs: ADVANCE_MS,
+  });
   const { pick } = quiz;
   const round = rounds[quiz.roundIndex];
   const options = useShuffled(round.letters, round.correctIndex, attemptKey, quiz.roundIndex);
@@ -45,7 +57,9 @@ function LetterPick({ lesson, color, attemptKey, onComplete, onRoundResult }: Ac
       <ProgressDots count={rounds.length} current={quiz.roundIndex} color={color} />
       <View style={[styles.display, { borderColor: color }]}>
         <UiText style={styles.displayHint}>ابحث عن الحرف</UiText>
-        <Text style={[styles.displayBig, { color: readableFill(color) }]}>{round.targetLetter}</Text>
+        <Text style={[styles.displayBig, { color: readableFill(color) }]}>
+          {round.targetLetter}
+        </Text>
       </View>
       <UiText style={act.instruction}>{`سؤال ${quiz.roundIndex + 1} من ${rounds.length}`}</UiText>
       <View style={act.letterChoicesRow}>

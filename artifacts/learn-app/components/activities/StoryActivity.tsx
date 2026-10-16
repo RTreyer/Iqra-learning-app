@@ -42,11 +42,20 @@ function Story({ lesson, color, onComplete }: ActivityProps<"story">) {
                 accessibilityRole="button"
                 accessibilityLabel={line.text}
                 accessibilityState={{ selected: done }}
-                style={[styles.line, done && { borderColor: color, borderWidth: 2, backgroundColor: withAlpha(color, 0.07) }]}
+                style={[
+                  styles.line,
+                  done && {
+                    borderColor: color,
+                    borderWidth: 2,
+                    backgroundColor: withAlpha(color, 0.07),
+                  },
+                ]}
                 onPress={() => handleLine(i)}
               >
                 <Text style={styles.emoji}>{line.emoji}</Text>
-                <Text style={[styles.text, done && { color: readableFill(color) }]}>{line.text}</Text>
+                <Text style={[styles.text, done && { color: readableFill(color) }]}>
+                  {line.text}
+                </Text>
                 {done ? <Text style={styles.check}>✓</Text> : null}
               </Pressable>
             </Animated.View>
@@ -54,7 +63,13 @@ function Story({ lesson, color, onComplete }: ActivityProps<"story">) {
         })}
       </View>
       {remaining <= 0 ? (
-        <DoneButton testID="activity-done" label="أَحْسَنْت! 🌟 تابع" color={color} onPress={finish.fire} disabled={finish.done} />
+        <DoneButton
+          testID="activity-done"
+          label="أَحْسَنْت! 🌟 تابع"
+          color={color}
+          onPress={finish.fire}
+          disabled={finish.done}
+        />
       ) : (
         <UiText style={act.hint}>{`${remaining} جملة متبقية`}</UiText>
       )}
@@ -65,7 +80,13 @@ function Story({ lesson, color, onComplete }: ActivityProps<"story">) {
 export const StoryActivity = withAttemptReset(Story, "StoryActivity");
 
 const styles = StyleSheet.create({
-  title: { fontSize: 26, fontWeight: "900", color: colors.text, textAlign: "center", marginBottom: 4 },
+  title: {
+    fontSize: 26,
+    fontWeight: "900",
+    color: colors.text,
+    textAlign: "center",
+    marginBottom: 4,
+  },
   line: {
     flexDirection: "row",
     alignItems: "center",

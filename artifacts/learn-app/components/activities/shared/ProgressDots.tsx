@@ -9,11 +9,22 @@ export function ProgressDots({ count, current, color }: Props) {
   for (let i = 0; i < count; i++) {
     const done = i <= current;
     dots.push(
-      <View key={i} style={[styles.dot, i === current && styles.active, { backgroundColor: done ? color : colors.border }]} />,
+      <View
+        key={i}
+        style={[
+          styles.dot,
+          i === current && styles.active,
+          { backgroundColor: done ? color : colors.border },
+        ]}
+      />,
     );
   }
   return (
-    <View style={styles.row} accessibilityRole="progressbar" accessibilityValue={{ min: 0, max: count, now: current + 1 }}>
+    <View
+      style={styles.row}
+      accessibilityRole="progressbar"
+      accessibilityValue={{ min: 0, max: count, now: current + 1 }}
+    >
       {dots}
     </View>
   );

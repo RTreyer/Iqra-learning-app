@@ -13,9 +13,13 @@ export const mathUnit1: Unit = {
   badgeLabel: "أَعُدُّ",
   lessons: [
     {
-      id: "m1-1", number: 1, type: "counting",
-      title: "أَعُدُّ مِنْ ١ إِلَى ٣", subtitle: "أَعُدُّ وَأَخْتَارُ الْعَدَد",
-      emoji: "🐟", color,
+      id: "m1-1",
+      number: 1,
+      type: "counting",
+      title: "أَعُدُّ مِنْ ١ إِلَى ٣",
+      subtitle: "أَعُدُّ وَأَخْتَارُ الْعَدَد",
+      emoji: "🐟",
+      color,
       rounds: [
         { emoji: "🐟", count: 2, options: [1, 2, 3] },
         { emoji: "🐥", count: 3, options: [2, 4, 3] },
@@ -25,9 +29,13 @@ export const mathUnit1: Unit = {
       ],
     },
     {
-      id: "m1-2", number: 2, type: "counting",
-      title: "أَعُدُّ مِنْ ٤ إِلَى ٦", subtitle: "أَعُدُّ وَأَخْتَارُ الْعَدَد",
-      emoji: "🐥", color,
+      id: "m1-2",
+      number: 2,
+      type: "counting",
+      title: "أَعُدُّ مِنْ ٤ إِلَى ٦",
+      subtitle: "أَعُدُّ وَأَخْتَارُ الْعَدَد",
+      emoji: "🐥",
+      color,
       rounds: [
         { emoji: "🐥", count: 4, options: [3, 4, 5] },
         { emoji: "🍎", count: 6, options: [6, 5, 7] },
@@ -37,9 +45,13 @@ export const mathUnit1: Unit = {
       ],
     },
     {
-      id: "m1-3", number: 3, type: "counting",
-      title: "أَعُدُّ مِنْ ٧ إِلَى ١٠", subtitle: "أَعُدُّ وَأَخْتَارُ الْعَدَد",
-      emoji: "🌸", color,
+      id: "m1-3",
+      number: 3,
+      type: "counting",
+      title: "أَعُدُّ مِنْ ٧ إِلَى ١٠",
+      subtitle: "أَعُدُّ وَأَخْتَارُ الْعَدَد",
+      emoji: "🌸",
+      color,
       rounds: [
         { emoji: "🌸", count: 7, options: [6, 7, 8] },
         { emoji: "🐟", count: 9, options: [9, 8, 10] },
@@ -49,13 +61,41 @@ export const mathUnit1: Unit = {
       ],
     },
     {
-      id: "m1-4", number: 4, type: "listen_pick",
-      title: "أَيُّ عَدَدٍ هَٰذَا؟", subtitle: "أَسْمَعُ الْعَدَدَ وَأَخْتَارُ الرَّقْم",
-      emoji: "👂", color,
+      id: "m1-4",
+      number: 4,
+      type: "listen_pick",
+      title: "أَيُّ عَدَدٍ هَٰذَا؟",
+      subtitle: "أَسْمَعُ الْعَدَدَ وَأَخْتَارُ الرَّقْم",
+      emoji: "👂",
+      color,
       questions: [
-        { word: "خَمْسَة", choices: [{ emoji: "٣", word: "٣" }, { emoji: "٥", word: "٥" }, { emoji: "٧", word: "٧" }], correctIndex: 1 },
-        { word: "ثَمَانِيَة", choices: [{ emoji: "٨", word: "٨" }, { emoji: "٦", word: "٦" }, { emoji: "٩", word: "٩" }], correctIndex: 0 },
-        { word: "اثْنَان", choices: [{ emoji: "٤", word: "٤" }, { emoji: "٣", word: "٣" }, { emoji: "٢", word: "٢" }], correctIndex: 2 },
+        {
+          word: "خَمْسَة",
+          choices: [
+            { emoji: "٣", word: "٣" },
+            { emoji: "٥", word: "٥" },
+            { emoji: "٧", word: "٧" },
+          ],
+          correctIndex: 1,
+        },
+        {
+          word: "ثَمَانِيَة",
+          choices: [
+            { emoji: "٨", word: "٨" },
+            { emoji: "٦", word: "٦" },
+            { emoji: "٩", word: "٩" },
+          ],
+          correctIndex: 0,
+        },
+        {
+          word: "اثْنَان",
+          choices: [
+            { emoji: "٤", word: "٤" },
+            { emoji: "٣", word: "٣" },
+            { emoji: "٢", word: "٢" },
+          ],
+          correctIndex: 2,
+        },
       ],
     },
   ],

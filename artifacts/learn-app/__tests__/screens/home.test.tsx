@@ -18,7 +18,10 @@ async function seed(dueCount: number, days: string[]) {
   const item = { box: 2, dueAt: DUE, lastSeenAt: DUE, lapses: 0 };
   const ids = Array.from(allItems().keys()).slice(0, dueCount);
   const items = Object.fromEntries(ids.map((id) => [id, item]));
-  await AsyncStorage.setItem(KEY, JSON.stringify({ version: 2, lessons: {}, items, activity: { days }, totalStars: 0 }));
+  await AsyncStorage.setItem(
+    KEY,
+    JSON.stringify({ version: 2, lessons: {}, items, activity: { days }, totalStars: 0 }),
+  );
 }
 
 function renderHome() {

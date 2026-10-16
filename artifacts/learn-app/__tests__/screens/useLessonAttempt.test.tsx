@@ -10,7 +10,9 @@ test("the first focus does not remount the activity", () => {
 });
 
 test("stores stars, restarts, and resets on a new key", () => {
-  const { result, rerender } = renderHook(({ id }: { id: string }) => useLessonAttempt(id), { initialProps: { id: "u2-3" } });
+  const { result, rerender } = renderHook(({ id }: { id: string }) => useLessonAttempt(id), {
+    initialProps: { id: "u2-3" },
+  });
   act(() => result.current.completeAttempt(2));
   expect(result.current.completed).toBe(true);
   expect(result.current.stars).toBe(2);

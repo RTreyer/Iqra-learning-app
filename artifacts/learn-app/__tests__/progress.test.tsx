@@ -245,7 +245,14 @@ describe("ProgressContext", () => {
       JSON.stringify({
         version: 2,
         lessons: {},
-        items: { "word:old": { box: 3, dueAt: "2026-01-01T00:00:00.000Z", lastSeenAt: "2026-01-01T00:00:00.000Z", lapses: 0 } },
+        items: {
+          "word:old": {
+            box: 3,
+            dueAt: "2026-01-01T00:00:00.000Z",
+            lastSeenAt: "2026-01-01T00:00:00.000Z",
+            lapses: 0,
+          },
+        },
         activity: { days: [] },
         totalStars: 0,
       }),

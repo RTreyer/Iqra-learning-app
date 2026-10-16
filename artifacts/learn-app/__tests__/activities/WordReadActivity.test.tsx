@@ -12,7 +12,13 @@ test("scores first taps only and advances with the Next button", () => {
   const onComplete = jest.fn();
   const onRoundResult = jest.fn();
   renderActivity(
-    <WordReadActivity lesson={lesson} color="#D97706" attemptKey="w:1" onComplete={onComplete} onRoundResult={onRoundResult} />,
+    <WordReadActivity
+      lesson={lesson}
+      color="#D97706"
+      attemptKey="w:1"
+      onComplete={onComplete}
+      onRoundResult={onRoundResult}
+    />,
   );
   const picks = ["بَيْت", "بَاب", "ثَعْلَب", "بَاب", "ثَوْر"];
   picks.forEach((word, i) => {
@@ -35,7 +41,9 @@ test("scores first taps only and advances with the Next button", () => {
 });
 
 test("speaks the right answer after a wrong first tap and shows the score on the last round", () => {
-  renderActivity(<WordReadActivity lesson={lesson} color="#D97706" attemptKey="w:1" onComplete={jest.fn()} />);
+  renderActivity(
+    <WordReadActivity lesson={lesson} color="#D97706" attemptKey="w:1" onComplete={jest.fn()} />,
+  );
   fireEvent.press(screen.getByRole("button", { name: "تِين" }));
   expect(speech.speak).toHaveBeenLastCalledWith("بَيْت", expect.anything());
   expect(screen.getByText("التالي ←")).toBeTruthy();

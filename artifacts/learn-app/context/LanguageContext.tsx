@@ -1,5 +1,13 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { translateUi, type UiLanguage } from "@/content/ui-translations";
 
 const LANGUAGE_KEY = "iqra_ui_language";
@@ -18,10 +26,17 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const writes = useRef<Promise<void>>(Promise.resolve());
   useEffect(() => {
     let mounted = true;
-    AsyncStorage.getItem(LANGUAGE_KEY).then((stored) => {
-      if (mounted && !changedByUser.current && (stored === "ar" || stored === "en")) updateLanguage(stored);
-    }).catch(() => { if (mounted) setStorageError(true); });
-    return () => { mounted = false; };
+    AsyncStorage.getItem(LANGUAGE_KEY)
+      .then((stored) => {
+        if (mounted && !changedByUser.current && (stored === "ar" || stored === "en"))
+          updateLanguage(stored);
+      })
+      .catch(() => {
+        if (mounted) setStorageError(true);
+      });
+    return () => {
+      mounted = false;
+    };
   }, []);
   const setLanguage = useCallback((next: UiLanguage) => {
     changedByUser.current = true;
@@ -31,11 +46,17 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       try {
         await AsyncStorage.setItem(LANGUAGE_KEY, next);
         setStorageError(false);
-      } catch { setStorageError(true); }
+      } catch {
+        setStorageError(true);
+      }
     });
   }, []);
   const t = useCallback((text: string) => translateUi(text, language), [language]);
-  return <LanguageContext.Provider value={{ language, setLanguage, t, storageError }}>{children}</LanguageContext.Provider>;
+  return (
+    <LanguageContext.Provider value={{ language, setLanguage, t, storageError }}>
+      {children}
+    </LanguageContext.Provider>
+  );
 }
 
 export function useLanguage() {

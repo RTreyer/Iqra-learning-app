@@ -53,13 +53,16 @@ function useLessonIntro(lessonId: string, title: string | undefined): boolean {
 }
 
 export default function LessonScreen() {
-  const lessonId = firstParam(useLocalSearchParams<{ lessonId?: string | string[] }>().lessonId) ?? "";
+  const lessonId =
+    firstParam(useLocalSearchParams<{ lessonId?: string | string[] }>().lessonId) ?? "";
   const { completeLesson, recordRoundResult } = useProgress();
   const pad = useScreenPadding();
   const { language } = useLanguage();
 
   const found = getLesson(lessonId);
-  const { completed, stars, completeAttempt, restartAttempt, activityKey } = useLessonAttempt(found ? found.lesson.id : "");
+  const { completed, stars, completeAttempt, restartAttempt, activityKey } = useLessonAttempt(
+    found ? found.lesson.id : "",
+  );
   const ready = useLessonIntro(lessonId, found?.lesson.title);
 
   if (!found) return <NotFoundCard message="الدرس غير موجود" />;
@@ -74,14 +77,21 @@ export default function LessonScreen() {
   };
 
   return (
-    <ScreenBackground subject={book.subject} style={[styles.screen, { paddingTop: pad.top, paddingBottom: pad.bottom + 16 }]}>
+    <ScreenBackground
+      subject={book.subject}
+      style={[styles.screen, { paddingTop: pad.top, paddingBottom: pad.bottom + 16 }]}
+    >
       <View style={[styles.header, { flexDirection: language === "en" ? "row" : "row-reverse" }]}>
         <BackButton fallback={routes.unit(unit.id)} />
         <View style={styles.headerCenter}>
           <Text style={styles.lessonEmoji}>{lesson.emoji}</Text>
           <View style={styles.headerText}>
-            <Text style={styles.lessonTitle} numberOfLines={1}>{lesson.title}</Text>
-            <Text style={styles.lessonSubtitle} numberOfLines={1}>{lesson.subtitle}</Text>
+            <Text style={styles.lessonTitle} numberOfLines={1}>
+              {lesson.title}
+            </Text>
+            <Text style={styles.lessonSubtitle} numberOfLines={1}>
+              {lesson.subtitle}
+            </Text>
           </View>
         </View>
         <View style={styles.headerSpacer} />
@@ -123,7 +133,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
   },
-  headerCenter: { flexDirection: "row", alignItems: "center", gap: 8, flex: 1, justifyContent: "center" },
+  headerCenter: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    flex: 1,
+    justifyContent: "center",
+  },
   headerText: { alignItems: "center", flexShrink: 1 },
   headerSpacer: { width: touchTarget },
   lessonEmoji: { fontSize: 22 },

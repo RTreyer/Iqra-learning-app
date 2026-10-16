@@ -5,7 +5,10 @@ const PAD = { width: 300, height: 300 };
 
 /** n + 1 evenly spaced points from (x1, y1) to (x2, y2). */
 function line(x1: number, y1: number, x2: number, y2: number, n = 20): Stroke {
-  return Array.from({ length: n + 1 }, (_, i) => ({ x: x1 + ((x2 - x1) * i) / n, y: y1 + ((y2 - y1) * i) / n }));
+  return Array.from({ length: n + 1 }, (_, i) => ({
+    x: x1 + ((x2 - x1) * i) / n,
+    y: y1 + ((y2 - y1) * i) / n,
+  }));
 }
 
 describe("validateTracing", () => {
@@ -23,8 +26,14 @@ describe("validateTracing", () => {
   });
 
   it("fails a long stroke with a tiny bounding box (scribble in place)", () => {
-    const scribble: Stroke = Array.from({ length: 60 }, (_, i) => ({ x: 150 + (i % 2) * 20, y: 150 + (i % 3) * 5 }));
-    expect(validateTracing([scribble], PAD)).toEqual({ valid: false, msg: "اِرسم الحرف بشكل أكبر 📏" });
+    const scribble: Stroke = Array.from({ length: 60 }, (_, i) => ({
+      x: 150 + (i % 2) * 20,
+      y: 150 + (i % 3) * 5,
+    }));
+    expect(validateTracing([scribble], PAD)).toEqual({
+      valid: false,
+      msg: "اِرسم الحرف بشكل أكبر 📏",
+    });
   });
 
   it("fails an off centre stroke", () => {
@@ -38,12 +47,18 @@ describe("validateTracing", () => {
 
   it("respects strokeCount", () => {
     const one = [line(30, 30, 270, 270)];
-    expect(validateTracing(one, PAD, 2)).toEqual({ valid: false, msg: "اِرسم 2 خطوط على الأقل ✏️" });
+    expect(validateTracing(one, PAD, 2)).toEqual({
+      valid: false,
+      msg: "اِرسم 2 خطوط على الأقل ✏️",
+    });
     expect(validateTracing([...one, line(270, 30, 30, 270)], PAD, 2)).toEqual({ valid: true });
   });
 
   it("asks for one stroke when nothing was drawn", () => {
-    expect(validateTracing([], PAD)).toEqual({ valid: false, msg: "اِرسم خطاً واحداً على الأقل ✏️" });
+    expect(validateTracing([], PAD)).toEqual({
+      valid: false,
+      msg: "اِرسم خطاً واحداً على الأقل ✏️",
+    });
   });
 
   it("uses the shorter pad side for the length rule", () => {
@@ -65,7 +80,10 @@ describe("invalid input", () => {
     const poisoned = [...line(30, 30, 270, 270), { x: NaN, y: 10 }, { x: Infinity, y: 0 }];
     expect(validateTracing([poisoned], PAD)).toEqual({ valid: true });
     const onlyBad: Stroke = [{ x: NaN, y: NaN }];
-    expect(validateTracing([onlyBad], PAD)).toEqual({ valid: false, msg: "اِرسم خطاً واحداً على الأقل ✏️" });
+    expect(validateTracing([onlyBad], PAD)).toEqual({
+      valid: false,
+      msg: "اِرسم خطاً واحداً على الأقل ✏️",
+    });
   });
 });
 
@@ -73,7 +91,10 @@ describe("stroke path building", () => {
   it("keeps points and path data in sync", () => {
     const s = startStroke({ x: 1, y: 2 });
     expect(addPoint(s, { x: 10, y: 20 })).toBe(true);
-    expect(s.points).toEqual([{ x: 1, y: 2 }, { x: 10, y: 20 }]);
+    expect(s.points).toEqual([
+      { x: 1, y: 2 },
+      { x: 10, y: 20 },
+    ]);
     expect(s.d).toBe("M 1.0 2.0 L 1.0 2.0 L 10.0 20.0");
   });
 

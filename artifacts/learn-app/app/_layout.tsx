@@ -49,15 +49,15 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <LanguageProvider>
-      <ErrorBoundary>
-        <ProgressProvider>
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <WebFrame>
-              <RootLayoutNav />
-            </WebFrame>
-          </GestureHandlerRootView>
-        </ProgressProvider>
-      </ErrorBoundary>
+        <ErrorBoundary>
+          <ProgressProvider>
+            <GestureHandlerRootView style={{ flex: 1 }}>
+              <WebFrame>
+                <RootLayoutNav />
+              </WebFrame>
+            </GestureHandlerRootView>
+          </ProgressProvider>
+        </ErrorBoundary>
       </LanguageProvider>
     </SafeAreaProvider>
   );

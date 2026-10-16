@@ -55,8 +55,12 @@ export default function HomeScreen() {
         contentContainerStyle={[styles.list, { paddingBottom: pad.bottom + 16 }]}
         showsVerticalScrollIndicator={false}
       >
-        {next && <ContinueCard next={next} onPress={() => router.push(routes.lesson(next.lesson.id))} />}
-        {dueCount > 0 && <ReviewCard count={dueCount} onPress={() => router.push(routes.review())} />}
+        {next && (
+          <ContinueCard next={next} onPress={() => router.push(routes.lesson(next.lesson.id))} />
+        )}
+        {dueCount > 0 && (
+          <ReviewCard count={dueCount} onPress={() => router.push(routes.review())} />
+        )}
         <UiText style={styles.subtitle}>اختَر الكتاب</UiText>
         {books.map((book) => (
           <BookCard
@@ -88,6 +92,18 @@ const styles = StyleSheet.create({
   appTitle: { fontSize: 24, fontWeight: "800", color: colors.text, textAlign: "right" },
   scroll: { width: "100%" },
   list: { gap: 16, paddingTop: 4 },
-  subtitle: { fontSize: 16, color: colors.warmText, textAlign: "center", marginTop: 4, fontWeight: "700" },
-  footer: { fontSize: 18, color: colors.warmDeep, marginTop: 4, textAlign: "center", fontWeight: "700" },
+  subtitle: {
+    fontSize: 16,
+    color: colors.warmText,
+    textAlign: "center",
+    marginTop: 4,
+    fontWeight: "700",
+  },
+  footer: {
+    fontSize: 18,
+    color: colors.warmDeep,
+    marginTop: 4,
+    textAlign: "center",
+    fontWeight: "700",
+  },
 });

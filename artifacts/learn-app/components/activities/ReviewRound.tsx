@@ -80,7 +80,11 @@ function roundOf(item: ReviewItem): RoundSpec {
     case "count":
       return numberRound(item.options, item.count, COUNT_PROMPT);
     case "calc":
-      return numberRound(item.options, answerOf(item), arithmeticPrompt(item.a, item.op, item.b).spoken);
+      return numberRound(
+        item.options,
+        answerOf(item),
+        arithmeticPrompt(item.a, item.op, item.b).spoken,
+      );
   }
 }
 
@@ -90,7 +94,9 @@ function Prompt({ item, color, spoken }: { item: ReviewItem; color: string; spok
       return (
         <View style={[styles.display, { borderColor: color }]}>
           <UiText style={styles.displayHint}>ابحث عن الحرف</UiText>
-          <Text style={[styles.displayBig, { color: readableFill(color) }]}>{item.targetLetter}</Text>
+          <Text style={[styles.displayBig, { color: readableFill(color) }]}>
+            {item.targetLetter}
+          </Text>
         </View>
       );
     case "word":
@@ -99,7 +105,8 @@ function Prompt({ item, color, spoken }: { item: ReviewItem; color: string; spok
       return <ListenButton text={item.word} color={color} showText />;
     case "count":
     case "calc": {
-      const shown = item.kind === "count" ? COUNT_PROMPT : arithmeticPrompt(item.a, item.op, item.b).shown;
+      const shown =
+        item.kind === "count" ? COUNT_PROMPT : arithmeticPrompt(item.a, item.op, item.b).shown;
       return (
         <View style={styles.numberPrompt}>
           {item.kind === "count" ? (
@@ -141,9 +148,12 @@ function Round({ item, attemptKey, onFirstTap, onAdvance, color = colors.success
     return () => clearTimeout(t);
   }, [round.prompt]);
 
-  useEffect(() => () => {
-    if (timer.current) clearTimeout(timer.current);
-  }, []);
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+    },
+    [],
+  );
 
   const handlePick = useCallback(
     (idx: number) => {
@@ -167,7 +177,11 @@ function Round({ item, attemptKey, onFirstTap, onAdvance, color = colors.success
   );
 
   const rowStyle =
-    round.variant === "word" ? act.wordChoicesCol : round.variant === "letter" ? act.letterChoicesRow : act.choicesRow;
+    round.variant === "word"
+      ? act.wordChoicesCol
+      : round.variant === "letter"
+        ? act.letterChoicesRow
+        : act.choicesRow;
 
   return (
     <View style={act.container} testID="review-round">

@@ -17,8 +17,14 @@ function DotGroup({ count, color }: { count: number; color: string }) {
 
 function Arithmetic(props: ActivityProps<"arithmetic">) {
   const { rounds } = props.lesson;
-  const roundOf = useCallback((i: number) => ({ options: rounds[i].options, answer: answerOf(rounds[i]) }), [rounds]);
-  const promptOf = useCallback((i: number) => arithmeticPrompt(rounds[i].a, rounds[i].op, rounds[i].b), [rounds]);
+  const roundOf = useCallback(
+    (i: number) => ({ options: rounds[i].options, answer: answerOf(rounds[i]) }),
+    [rounds],
+  );
+  const promptOf = useCallback(
+    (i: number) => arithmeticPrompt(rounds[i].a, rounds[i].op, rounds[i].b),
+    [rounds],
+  );
   const renderVisual = useCallback(
     (i: number) => (
       <View style={mathStyles.row} testID="arithmetic-visual">
@@ -31,7 +37,9 @@ function Arithmetic(props: ActivityProps<"arithmetic">) {
     ),
     [rounds],
   );
-  return <NumberQuiz {...props} roundOf={roundOf} promptOf={promptOf} renderVisual={renderVisual} />;
+  return (
+    <NumberQuiz {...props} roundOf={roundOf} promptOf={promptOf} renderVisual={renderVisual} />
+  );
 }
 
 export const ArithmeticActivity = withAttemptReset(Arithmetic, "ArithmeticActivity");

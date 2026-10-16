@@ -16,6 +16,7 @@ export function renderActivity(ui: React.ReactElement) {
   const result = render(<LanguageProvider>{ui}</LanguageProvider>);
   return {
     ...result,
-    rerenderActivity: (next: React.ReactElement) => result.rerender(<LanguageProvider>{next}</LanguageProvider>),
+    rerenderActivity: (next: React.ReactElement) =>
+      result.rerender(<LanguageProvider>{next}</LanguageProvider>),
   };
 }

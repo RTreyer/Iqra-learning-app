@@ -102,7 +102,8 @@ export function upgradeState(raw: unknown, now: Date = new Date()): ProgressStat
       if (isProgressItem(item)) items[id] = item;
     }
   }
-  const rawDays = isObject(raw.activity) && Array.isArray(raw.activity.days) ? raw.activity.days : [];
+  const rawDays =
+    isObject(raw.activity) && Array.isArray(raw.activity.days) ? raw.activity.days : [];
   const days = normalizeDays(rawDays.filter((d): d is string => typeof d === "string"));
 
   return { version: 2, lessons, items, activity: { days }, totalStars: sumStars(lessons) };

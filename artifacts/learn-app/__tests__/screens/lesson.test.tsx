@@ -9,7 +9,10 @@ const mockCompleteLesson = jest.fn();
 const mockRecordRoundResult = jest.fn();
 
 jest.mock("@/context/ProgressContext", () => ({
-  useProgress: () => ({ completeLesson: mockCompleteLesson, recordRoundResult: mockRecordRoundResult }),
+  useProgress: () => ({
+    completeLesson: mockCompleteLesson,
+    recordRoundResult: mockRecordRoundResult,
+  }),
 }));
 
 jest.mock("@/components/activities", () => {
@@ -27,17 +30,31 @@ jest.mock("@/components/activities", () => {
       <Pressable testID="stub-round" onPress={() => onRoundResult?.("letter:ب", false)} />
     </>
   );
-  const types = ["story", "naming", "letter_pick", "word_read", "listen_pick", "behavior", "matching", "trace", "counting", "arithmetic"];
+  const types = [
+    "story",
+    "naming",
+    "letter_pick",
+    "word_read",
+    "listen_pick",
+    "behavior",
+    "matching",
+    "trace",
+    "counting",
+    "arithmetic",
+  ];
   return { ACTIVITY_COMPONENTS: Object.fromEntries(types.map((type) => [type, Stub])) };
 });
 
 type SpeakOptions = { onDone?: () => void };
 const speech = jest.requireMock("expo-speech") as { speak: jest.Mock; stop: jest.Mock };
-const { router } = jest.requireMock("expo-router") as { router: { back: jest.Mock; replace: jest.Mock } };
+const { router } = jest.requireMock("expo-router") as {
+  router: { back: jest.Mock; replace: jest.Mock };
+};
 const lesson = getLesson("u2-3")!.lesson;
 
 /** expo-speech finishes every utterance at once. */
-const speechFinishes = () => speech.speak.mockImplementation((_: string, options?: SpeakOptions) => options?.onDone?.());
+const speechFinishes = () =>
+  speech.speak.mockImplementation((_: string, options?: SpeakOptions) => options?.onDone?.());
 
 beforeEach(() => {
   jest.clearAllMocks();

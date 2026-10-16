@@ -19,7 +19,8 @@ describe("shuffleWithSeed", () => {
 
   it("produces different orders for different seeds over a sample", () => {
     const orders = new Set<string>();
-    for (let seed = 0; seed < 50; seed++) orders.add(shuffleWithSeed(ITEMS, 0, seed).items.join(""));
+    for (let seed = 0; seed < 50; seed++)
+      orders.add(shuffleWithSeed(ITEMS, 0, seed).items.join(""));
     expect(orders.size).toBeGreaterThan(10);
   });
 
@@ -68,9 +69,17 @@ describe("itemIdFor", () => {
     expect(itemIdFor(lessonOf("u2-3", "letter_pick"), 0)).toBe("letter:ب");
     expect(itemIdFor(lessonOf("u2-4", "word_read"), 1)).toBe("word:تِين");
     expect(itemIdFor(lessonOf("u2-5", "listen_pick"), 2)).toBe("q:u2-5:2");
-    const counting: Lesson = { ...base, type: "counting", rounds: [{ emoji: "🍎", count: 4, options: [3, 4, 5] }] };
+    const counting: Lesson = {
+      ...base,
+      type: "counting",
+      rounds: [{ emoji: "🍎", count: 4, options: [3, 4, 5] }],
+    };
     expect(itemIdFor(counting, 0)).toBe("count:4");
-    const arithmetic: Lesson = { ...base, type: "arithmetic", rounds: [{ a: 3, b: 2, op: "-", options: [1, 2] }] };
+    const arithmetic: Lesson = {
+      ...base,
+      type: "arithmetic",
+      rounds: [{ a: 3, b: 2, op: "-", options: [1, 2] }],
+    };
     expect(itemIdFor(arithmetic, 0)).toBe("calc:3-2");
   });
 

@@ -73,13 +73,19 @@ function kindOf(id: string): string {
 export function pickDue(items: Record<string, ItemState>, now: Date, limit = 10): string[] {
   const remaining = Object.entries(items)
     .filter(([, state]) => isDue(state, now))
-    .sort(([idA, a], [idB, b]) => dueTime(a) - dueTime(b) || a.box - b.box || (idA < idB ? -1 : idA > idB ? 1 : 0))
+    .sort(
+      ([idA, a], [idB, b]) =>
+        dueTime(a) - dueTime(b) || a.box - b.box || (idA < idB ? -1 : idA > idB ? 1 : 0),
+    )
     .map(([id]) => id);
 
   const picked: string[] = [];
   let lastKind: string | null = null;
   while (picked.length < limit && remaining.length > 0) {
-    const index = Math.max(0, remaining.findIndex((id) => kindOf(id) !== lastKind));
+    const index = Math.max(
+      0,
+      remaining.findIndex((id) => kindOf(id) !== lastKind),
+    );
     const [id] = remaining.splice(index, 1);
     picked.push(id);
     lastKind = kindOf(id);

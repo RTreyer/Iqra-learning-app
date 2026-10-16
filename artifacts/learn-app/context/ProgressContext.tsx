@@ -40,7 +40,12 @@ import {
 import { todayKey } from "@/lib/dates";
 import { pickDue } from "@/lib/srs";
 
-export type { LessonProgress, ProgressItem, ProgressState, UnitProgress } from "@/lib/progressState";
+export type {
+  LessonProgress,
+  ProgressItem,
+  ProgressState,
+  UnitProgress,
+} from "@/lib/progressState";
 
 // ─── AsyncStorage keys ────────────────────────────────────────────────────────
 
@@ -269,7 +274,10 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // Due state depends only on the local day, so one list per day is exact.
-  const dueCache = useMemo(() => ({ items: progress.items, byDay: new Map<string, string[]>() }), [progress.items]);
+  const dueCache = useMemo(
+    () => ({ items: progress.items, byDay: new Map<string, string[]>() }),
+    [progress.items],
+  );
 
   const getDueItemIds = useCallback(
     (now: Date = new Date()): string[] => {

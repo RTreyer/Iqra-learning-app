@@ -8,7 +8,11 @@ const lesson = lessonOf("u2-5", "listen_pick");
 const choice = (word: string) => {
   const node = screen
     .getAllByRole("button")
-    .find((n) => n.props.accessibilityLabel === word || String(n.props.accessibilityLabel).startsWith(`${word}، `));
+    .find(
+      (n) =>
+        n.props.accessibilityLabel === word ||
+        String(n.props.accessibilityLabel).startsWith(`${word}، `),
+    );
   if (!node) throw new Error(`No choice ${word}`);
   return node;
 };
@@ -17,7 +21,13 @@ test("first tap scoring and itemIds per question", () => {
   const onComplete = jest.fn();
   const onRoundResult = jest.fn();
   renderActivity(
-    <ListenPickActivity lesson={lesson} color="#DB2777" attemptKey="l:1" onComplete={onComplete} onRoundResult={onRoundResult} />,
+    <ListenPickActivity
+      lesson={lesson}
+      color="#DB2777"
+      attemptKey="l:1"
+      onComplete={onComplete}
+      onRoundResult={onRoundResult}
+    />,
   );
   expect(screen.getByText(lesson.questions[0].word)).toBeTruthy();
   for (const word of ["ثَعْلَب", "أَحْمَر", "تُفَّاح وَتِين"]) {
@@ -36,10 +46,15 @@ test("first tap scoring and itemIds per question", () => {
 test("works on a Unit 1 listen_pick lesson", () => {
   const unit1 = lessonOf("u1-2", "listen_pick");
   const onComplete = jest.fn();
-  renderActivity(<ListenPickActivity lesson={unit1} color="#000" attemptKey="l:1" onComplete={onComplete} />);
+  renderActivity(
+    <ListenPickActivity lesson={unit1} color="#000" attemptKey="l:1" onComplete={onComplete} />,
+  );
   for (const q of unit1.questions) {
     fireEvent.press(choice(q.choices[q.correctIndex].word));
     fireEvent.press(screen.getByTestId("activity-next"));
   }
-  expect(onComplete).toHaveBeenCalledWith({ correct: unit1.questions.length, total: unit1.questions.length });
+  expect(onComplete).toHaveBeenCalledWith({
+    correct: unit1.questions.length,
+    total: unit1.questions.length,
+  });
 });

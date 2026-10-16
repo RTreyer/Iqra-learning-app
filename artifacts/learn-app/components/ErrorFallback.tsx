@@ -1,14 +1,6 @@
 import { reloadAppAsync } from "expo";
 import React, { useState } from "react";
-import {
-  Modal,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Circle, Path } from "react-native-svg";
 
@@ -66,7 +58,16 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
             },
           ]}
         >
-          <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={colors.text} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+          <Svg
+            width={20}
+            height={20}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke={colors.text}
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <Circle cx={12} cy={12} r={10} />
             <Path d="M12 8v4M12 16h.01" />
           </Svg>
@@ -74,9 +75,7 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
       ) : null}
 
       <View style={styles.content}>
-        <UiText style={[styles.title, { color: colors.text }]}>
-          حدث خطأ
-        </UiText>
+        <UiText style={[styles.title, { color: colors.text }]}>حدث خطأ</UiText>
 
         <UiText style={[styles.message, { color: colors.muted }]}>
           أعد تحميل التطبيق للمتابعة.
@@ -93,14 +92,7 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
             },
           ]}
         >
-          <UiText
-            style={[
-              styles.buttonText,
-              { color: colors.white },
-            ]}
-          >
-            حاول مرة أخرى
-          </UiText>
+          <UiText style={[styles.buttonText, { color: colors.white }]}>حاول مرة أخرى</UiText>
         </Pressable>
       </View>
 
@@ -112,31 +104,25 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
           onRequestClose={() => setIsModalVisible(false)}
         >
           <View style={styles.modalOverlay}>
-            <View
-              style={[
-                styles.modalContainer,
-                { backgroundColor: colors.cream },
-              ]}
-            >
-              <View
-                style={[
-                  styles.modalHeader,
-                  { borderBottomColor: colors.border },
-                ]}
-              >
-                <UiText style={[styles.modalTitle, { color: colors.text }]}>
-                  تفاصيل الخطأ
-                </UiText>
+            <View style={[styles.modalContainer, { backgroundColor: colors.cream }]}>
+              <View style={[styles.modalHeader, { borderBottomColor: colors.border }]}>
+                <UiText style={[styles.modalTitle, { color: colors.text }]}>تفاصيل الخطأ</UiText>
                 <Pressable
                   onPress={() => setIsModalVisible(false)}
                   accessibilityLabel={t("إغلاق تفاصيل الخطأ")}
                   accessibilityRole="button"
-                  style={({ pressed }) => [
-                    styles.closeButton,
-                    { opacity: pressed ? 0.6 : 1 },
-                  ]}
+                  style={({ pressed }) => [styles.closeButton, { opacity: pressed ? 0.6 : 1 }]}
                 >
-                  <Svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke={colors.text} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                  <Svg
+                    width={24}
+                    height={24}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke={colors.text}
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <Path d="M18 6L6 18M6 6l12 12" />
                   </Svg>
                 </Pressable>
@@ -150,12 +136,7 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
                 ]}
                 showsVerticalScrollIndicator
               >
-                <View
-                  style={[
-                    styles.errorContainer,
-                    { backgroundColor: colors.white },
-                  ]}
-                >
+                <View style={[styles.errorContainer, { backgroundColor: colors.white }]}>
                   <Text
                     style={[
                       styles.errorText,

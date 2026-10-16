@@ -75,7 +75,10 @@ const READY = [
   [/^\/$/, (page) => page.getByTestId("book-arabic-1")],
   [/^\/book\//, (page) => page.locator("[data-testid^='unit-']").first()],
   [/^\/unit\//, (page) => page.locator("[data-testid^='lesson-row-']").first()],
-  [/^\/review$/, (page) => page.locator("[data-testid='review-round'], [data-testid='review-empty']").first()],
+  [
+    /^\/review$/,
+    (page) => page.locator("[data-testid='review-round'], [data-testid='review-empty']").first(),
+  ],
 ];
 
 /** Navigates and waits until the screen has rendered its main content. */

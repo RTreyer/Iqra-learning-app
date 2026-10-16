@@ -9,7 +9,12 @@ import { colors, withAlpha } from "@/theme/tokens";
 export function StreakBadge({ days }: { days: number }) {
   const { language } = useLanguage();
   return (
-    <View style={styles.row} testID="streak-badge" accessible accessibilityLabel={streakLabel(days, language)}>
+    <View
+      style={styles.row}
+      testID="streak-badge"
+      accessible
+      accessibilityLabel={streakLabel(days, language)}
+    >
       <Text style={styles.count}>{`🔥 ${days}`}</Text>
     </View>
   );

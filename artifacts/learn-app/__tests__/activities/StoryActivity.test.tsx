@@ -10,7 +10,9 @@ beforeEach(() => jest.clearAllMocks());
 
 test("completes with an empty score once every line was heard", () => {
   const onComplete = jest.fn();
-  renderActivity(<StoryActivity lesson={lesson} color="#2563EB" attemptKey="s:1" onComplete={onComplete} />);
+  renderActivity(
+    <StoryActivity lesson={lesson} color="#2563EB" attemptKey="s:1" onComplete={onComplete} />,
+  );
   expect(screen.getByText(lesson.storyTitle)).toBeTruthy();
   expect(screen.getByText(`${lesson.lines.length} جملة متبقية`)).toBeTruthy();
 
@@ -21,7 +23,8 @@ test("completes with an empty score once every line was heard", () => {
   expect(screen.getByText(`${lesson.lines.length - 1} جملة متبقية`)).toBeTruthy();
   expect(screen.queryByTestId("activity-done")).toBeNull();
 
-  for (const line of lesson.lines.slice(1)) fireEvent.press(screen.getByRole("button", { name: line.text }));
+  for (const line of lesson.lines.slice(1))
+    fireEvent.press(screen.getByRole("button", { name: line.text }));
   fireEvent.press(screen.getByTestId("activity-done"));
   expect(onComplete).toHaveBeenCalledWith({ correct: 0, total: 0 });
 });
@@ -31,13 +34,17 @@ test("resets heard lines when attemptKey changes", () => {
     <StoryActivity lesson={lesson} color="#2563EB" attemptKey="s:1" onComplete={jest.fn()} />,
   );
   fireEvent.press(screen.getByRole("button", { name: lesson.lines[0].text }));
-  rerenderActivity(<StoryActivity lesson={lesson} color="#2563EB" attemptKey="s:2" onComplete={jest.fn()} />);
+  rerenderActivity(
+    <StoryActivity lesson={lesson} color="#2563EB" attemptKey="s:2" onComplete={jest.fn()} />,
+  );
   expect(screen.getByText(`${lesson.lines.length} جملة متبقية`)).toBeTruthy();
 });
 
 test("Done fires onComplete once even when tapped twice", () => {
   const onComplete = jest.fn();
-  renderActivity(<StoryActivity lesson={lesson} color="#2563EB" attemptKey="s:1" onComplete={onComplete} />);
+  renderActivity(
+    <StoryActivity lesson={lesson} color="#2563EB" attemptKey="s:1" onComplete={onComplete} />,
+  );
   for (const line of lesson.lines) fireEvent.press(screen.getByRole("button", { name: line.text }));
   const done = screen.getByTestId("activity-done");
   fireEvent.press(done);
@@ -48,11 +55,17 @@ test("Done fires onComplete once even when tapped twice", () => {
 
 test("stops speech on a new attempt but not on unmount", () => {
   const stop = (jest.requireMock("expo-speech") as { stop: jest.Mock }).stop;
-  const view = renderActivity(<StoryActivity lesson={lesson} color="#2563EB" attemptKey="s:1" onComplete={jest.fn()} />);
+  const view = renderActivity(
+    <StoryActivity lesson={lesson} color="#2563EB" attemptKey="s:1" onComplete={jest.fn()} />,
+  );
   stop.mockClear();
-  view.rerenderActivity(<StoryActivity lesson={lesson} color="#2563EB" attemptKey="s:1" onComplete={jest.fn()} />);
+  view.rerenderActivity(
+    <StoryActivity lesson={lesson} color="#2563EB" attemptKey="s:1" onComplete={jest.fn()} />,
+  );
   expect(stop).not.toHaveBeenCalled();
-  view.rerenderActivity(<StoryActivity lesson={lesson} color="#2563EB" attemptKey="s:2" onComplete={jest.fn()} />);
+  view.rerenderActivity(
+    <StoryActivity lesson={lesson} color="#2563EB" attemptKey="s:2" onComplete={jest.fn()} />,
+  );
   expect(stop).toHaveBeenCalledTimes(1);
   stop.mockClear();
   // The lesson screen speaks its completion message while the activity unmounts.

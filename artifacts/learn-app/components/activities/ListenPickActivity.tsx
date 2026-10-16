@@ -13,13 +13,22 @@ import { useShuffled } from "./shared/useShuffled";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import type { ActivityProps } from "./types";
 
-function ListenPick({ lesson, color, attemptKey, onComplete, onRoundResult }: ActivityProps<"listen_pick">) {
+function ListenPick({
+  lesson,
+  color,
+  attemptKey,
+  onComplete,
+  onRoundResult,
+}: ActivityProps<"listen_pick">) {
   const { questions } = lesson;
   const quiz = useQuiz({ lesson, total: questions.length, onComplete, onRoundResult });
   const { pick } = quiz;
   const q = questions[quiz.roundIndex];
   const options = useShuffled(q.choices, q.correctIndex, attemptKey, quiz.roundIndex);
-  const maxOptions = useMemo(() => Math.max(...questions.map((x) => x.choices.length)), [questions]);
+  const maxOptions = useMemo(
+    () => Math.max(...questions.map((x) => x.choices.length)),
+    [questions],
+  );
   const { values, bounce } = useBounce(maxOptions);
 
   useEffect(() => {
@@ -41,12 +50,16 @@ function ListenPick({ lesson, color, attemptKey, onComplete, onRoundResult }: Ac
     [options.correctIndex, pick, bounce, q],
   );
 
-  const nextLabel = quiz.isLast ? `أَحْسَنْت! ${quiz.correctCount}/${questions.length} 🌟 تابع` : "التالي ←";
+  const nextLabel = quiz.isLast
+    ? `أَحْسَنْت! ${quiz.correctCount}/${questions.length} 🌟 تابع`
+    : "التالي ←";
 
   return (
     <View style={act.container}>
       <ProgressDots count={questions.length} current={quiz.roundIndex} color={color} />
-      <UiText style={act.instruction}>{`سؤال ${quiz.roundIndex + 1} من ${questions.length}`}</UiText>
+      <UiText
+        style={act.instruction}
+      >{`سؤال ${quiz.roundIndex + 1} من ${questions.length}`}</UiText>
       <ListenButton text={q.word} color={color} showText />
       <View style={act.choicesRow}>
         {options.items.map((choice, idx) => (
@@ -64,7 +77,9 @@ function ListenPick({ lesson, color, attemptKey, onComplete, onRoundResult }: Ac
           />
         ))}
       </View>
-      {quiz.locked ? <DoneButton testID="activity-next" label={nextLabel} color={color} onPress={quiz.next} /> : null}
+      {quiz.locked ? (
+        <DoneButton testID="activity-next" label={nextLabel} color={color} onPress={quiz.next} />
+      ) : null}
     </View>
   );
 }

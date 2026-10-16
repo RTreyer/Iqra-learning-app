@@ -27,11 +27,18 @@ test("StarBadge announces the star count", () => {
 });
 
 test("LessonRow announces completion and stars", () => {
-  renderScreen(<LessonRow lesson={lesson} status={{ completed: true, stars: 2 }} onPress={jest.fn()} />);
+  renderScreen(
+    <LessonRow lesson={lesson} status={{ completed: true, stars: 2 }} onPress={jest.fn()} />,
+  );
   expect(screen.getByLabelText(`${lesson.title}، مكتمل، نجمتان`)).toBeTruthy();
 });
 
 test("LessonRow mirrors for Arabic with the accent border on the right", () => {
-  renderScreen(<LessonRow lesson={lesson} status={{ completed: false, stars: 0 }} onPress={jest.fn()} />);
-  expect(screen.getByTestId(`lesson-row-${lesson.id}`)).toHaveStyle({ flexDirection: "row-reverse", borderRightWidth: 5 });
+  renderScreen(
+    <LessonRow lesson={lesson} status={{ completed: false, stars: 0 }} onPress={jest.fn()} />,
+  );
+  expect(screen.getByTestId(`lesson-row-${lesson.id}`)).toHaveStyle({
+    flexDirection: "row-reverse",
+    borderRightWidth: 5,
+  });
 });

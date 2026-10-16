@@ -41,18 +41,33 @@ function Naming({ lesson, color, onComplete }: ActivityProps<"naming">) {
                 accessibilityRole="button"
                 accessibilityLabel={item.word}
                 accessibilityState={{ selected: done }}
-                style={[styles.card, done && { borderColor: color, borderWidth: 3, backgroundColor: withAlpha(color, 0.09) }]}
+                style={[
+                  styles.card,
+                  done && {
+                    borderColor: color,
+                    borderWidth: 3,
+                    backgroundColor: withAlpha(color, 0.09),
+                  },
+                ]}
                 onPress={() => handleTap(i)}
               >
                 <Text style={styles.emoji}>{item.emoji}</Text>
-                <Text style={[styles.word, done && { color: readableFill(color) }]}>{item.word}</Text>
+                <Text style={[styles.word, done && { color: readableFill(color) }]}>
+                  {item.word}
+                </Text>
               </Pressable>
             </Animated.View>
           );
         })}
       </View>
       {remaining <= 0 ? (
-        <DoneButton testID="activity-done" label="أَحْسَنْت! 🌟 تابع" color={color} onPress={finish.fire} disabled={finish.done} />
+        <DoneButton
+          testID="activity-done"
+          label="أَحْسَنْت! 🌟 تابع"
+          color={color}
+          onPress={finish.fire}
+          disabled={finish.done}
+        />
       ) : (
         <UiText style={act.hint}>{`${remaining} كلمة متبقية`}</UiText>
       )}
@@ -63,7 +78,13 @@ function Naming({ lesson, color, onComplete }: ActivityProps<"naming">) {
 export const NamingActivity = withAttemptReset(Naming, "NamingActivity");
 
 const styles = StyleSheet.create({
-  grid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 12, width: "100%" },
+  grid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: 12,
+    width: "100%",
+  },
   card: {
     width: 100,
     height: 100,

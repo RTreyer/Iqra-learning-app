@@ -21,7 +21,11 @@ export function itemsForLesson(lesson: Lesson): ReviewItem[] {
     case "arithmetic":
       return lesson.rounds.map((r) => ({ ...r, id: `calc:${r.a}${r.op}${r.b}`, kind: "calc" }));
     case "listen_pick":
-      return lesson.questions.map((q, index) => ({ ...q, id: `q:${lesson.id}:${index}`, kind: "question" }));
+      return lesson.questions.map((q, index) => ({
+        ...q,
+        id: `q:${lesson.id}:${index}`,
+        kind: "question",
+      }));
     default:
       return [];
   }

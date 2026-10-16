@@ -11,7 +11,9 @@ const right = (i: number) => fireEvent.press(screen.getByTestId(`match-right-${i
 
 test("a pair counts only when its first right tap is correct", () => {
   const onComplete = jest.fn();
-  renderActivity(<MatchingActivity lesson={lesson} color="#7C3AED" attemptKey="m:1" onComplete={onComplete} />);
+  renderActivity(
+    <MatchingActivity lesson={lesson} color="#7C3AED" attemptKey="m:1" onComplete={onComplete} />,
+  );
   left(0);
   right(1); // wrong first try for pair 0
   left(0);
@@ -30,7 +32,9 @@ test("a pair counts only when its first right tap is correct", () => {
 
 test("right taps without a selected left item do nothing", () => {
   const onComplete = jest.fn();
-  renderActivity(<MatchingActivity lesson={lesson} color="#7C3AED" attemptKey="m:1" onComplete={onComplete} />);
+  renderActivity(
+    <MatchingActivity lesson={lesson} color="#7C3AED" attemptKey="m:1" onComplete={onComplete} />,
+  );
   right(0);
   lesson.pairs.forEach((_, i) => {
     left(i);
@@ -42,7 +46,9 @@ test("right taps without a selected left item do nothing", () => {
 
 test("right column order is seeded by attemptKey", () => {
   const order = (key: string) => {
-    const view = renderActivity(<MatchingActivity lesson={lesson} color="#7C3AED" attemptKey={key} onComplete={jest.fn()} />);
+    const view = renderActivity(
+      <MatchingActivity lesson={lesson} color="#7C3AED" attemptKey={key} onComplete={jest.fn()} />,
+    );
     const ids = screen.getAllByTestId(/^match-right-/).map((n) => n.props.testID as string);
     view.unmount();
     return ids.join(",");
@@ -53,18 +59,33 @@ test("right column order is seeded by attemptKey", () => {
 });
 
 describe("grid direction follows the interface language", () => {
-  const direction = () => StyleSheet.flatten(screen.getByTestId("match-grid").props.style).flexDirection;
+  const direction = () =>
+    StyleSheet.flatten(screen.getByTestId("match-grid").props.style).flexDirection;
   afterEach(() => AsyncStorage.clear());
 
   test("Arabic mirrors the columns so the first one is on the right", async () => {
     await AsyncStorage.setItem("iqra_ui_language", "ar");
-    renderActivity(<MatchingActivity lesson={lesson} color="#7C3AED" attemptKey="m:dir-ar" onComplete={jest.fn()} />);
+    renderActivity(
+      <MatchingActivity
+        lesson={lesson}
+        color="#7C3AED"
+        attemptKey="m:dir-ar"
+        onComplete={jest.fn()}
+      />,
+    );
     expect(direction()).toBe("row-reverse");
   });
 
   test("English keeps the first column on the left", async () => {
     await AsyncStorage.setItem("iqra_ui_language", "en");
-    renderActivity(<MatchingActivity lesson={lesson} color="#7C3AED" attemptKey="m:dir-en" onComplete={jest.fn()} />);
+    renderActivity(
+      <MatchingActivity
+        lesson={lesson}
+        color="#7C3AED"
+        attemptKey="m:dir-en"
+        onComplete={jest.fn()}
+      />,
+    );
     await screen.findByText("Tap an item on the left, then its match on the right");
     expect(direction()).toBe("row");
   });

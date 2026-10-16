@@ -98,7 +98,11 @@ export const unit1: Unit = {
       type: "behavior",
       behaviors: [
         { emoji: "📚", description: "يَقْرَأُ الطَّالِبُ كِتَابَه", isCorrect: true },
-        { emoji: "🗑️", description: "يَرْمِي الطَّالِبُ الْقُمَامَةَ فِي الشَّارِع", isCorrect: false },
+        {
+          emoji: "🗑️",
+          description: "يَرْمِي الطَّالِبُ الْقُمَامَةَ فِي الشَّارِع",
+          isCorrect: false,
+        },
         { emoji: "🤝", description: "تُسَاعِدُ الطَّالِبَةُ أُمَّهَا", isCorrect: true },
         {
           emoji: "🏫",

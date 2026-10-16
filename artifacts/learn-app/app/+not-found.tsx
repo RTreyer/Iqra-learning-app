@@ -13,14 +13,10 @@ export default function NotFoundScreen() {
     <>
       <Stack.Screen options={{ title: t("الصفحة غير موجودة") }} />
       <View style={[styles.container, { backgroundColor: colors.cream }]}>
-        <UiText style={[styles.title, { color: colors.text }]}>
-          الصفحة غير موجودة
-        </UiText>
+        <UiText style={[styles.title, { color: colors.text }]}>الصفحة غير موجودة</UiText>
 
         <Link href={routes.home()} style={styles.link}>
-          <UiText style={[styles.linkText, { color: colors.starText }]}>
-            العودة إلى الرئيسية
-          </UiText>
+          <UiText style={[styles.linkText, { color: colors.starText }]}>العودة إلى الرئيسية</UiText>
         </Link>
       </View>
     </>

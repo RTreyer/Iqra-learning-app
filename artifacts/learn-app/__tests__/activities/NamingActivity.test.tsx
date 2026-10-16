@@ -10,7 +10,9 @@ beforeEach(() => jest.clearAllMocks());
 
 test("speaks each word and completes once every item was tapped", () => {
   const onComplete = jest.fn();
-  renderActivity(<NamingActivity lesson={lesson} color="#1D4ED8" attemptKey="n:1" onComplete={onComplete} />);
+  renderActivity(
+    <NamingActivity lesson={lesson} color="#1D4ED8" attemptKey="n:1" onComplete={onComplete} />,
+  );
   expect(screen.getByText(`${lesson.items.length} كلمة متبقية`)).toBeTruthy();
 
   const [first, ...rest] = lesson.items;

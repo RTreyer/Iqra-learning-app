@@ -15,11 +15,15 @@ import { mockCanGoBack, renderScreen } from "@/test-utils/screens";
 const KEY = "@kidlearn_progress_v1";
 const NOW = new Date(2026, 9, 16, 10, 0, 0);
 const YESTERDAY = new Date(2026, 9, 15).toISOString();
-const { router } = jest.requireMock("expo-router") as { router: { back: jest.Mock; replace: jest.Mock } };
+const { router } = jest.requireMock("expo-router") as {
+  router: { back: jest.Mock; replace: jest.Mock };
+};
 
 const unitA2 = books.flatMap((b) => b.units).find((u) => u.id === "a2")!;
 const a2Items = unitA2.lessons.flatMap(itemsForLesson);
-const letterIds = Array.from(new Set(a2Items.filter((i) => i.kind === "letter").map((i) => i.id))).slice(0, 2);
+const letterIds = Array.from(
+  new Set(a2Items.filter((i) => i.kind === "letter").map((i) => i.id)),
+).slice(0, 2);
 const wordId = a2Items.find((i) => i.kind === "word")!.id;
 const seededIds = [...letterIds, wordId];
 
@@ -27,7 +31,10 @@ const seeded: ProgressItem = { box: 2, dueAt: YESTERDAY, lastSeenAt: YESTERDAY, 
 
 async function seed(ids: string[]) {
   const items = Object.fromEntries(ids.map((id) => [id, seeded]));
-  await AsyncStorage.setItem(KEY, JSON.stringify({ version: 2, lessons: {}, items, activity: { days: [] }, totalStars: 0 }));
+  await AsyncStorage.setItem(
+    KEY,
+    JSON.stringify({ version: 2, lessons: {}, items, activity: { days: [] }, totalStars: 0 }),
+  );
   return items;
 }
 
@@ -39,9 +46,15 @@ async function stored() {
 function labels(item: ReviewItem): { right: string; wrong: string } {
   switch (item.kind) {
     case "letter":
-      return { right: item.letters[item.correctIndex], wrong: item.letters.find((_, i) => i !== item.correctIndex)! };
+      return {
+        right: item.letters[item.correctIndex],
+        wrong: item.letters.find((_, i) => i !== item.correctIndex)!,
+      };
     case "word":
-      return { right: item.choices[item.correctIndex], wrong: item.choices.find((_, i) => i !== item.correctIndex)! };
+      return {
+        right: item.choices[item.correctIndex],
+        wrong: item.choices.find((_, i) => i !== item.correctIndex)!,
+      };
     default:
       throw new Error(`unexpected kind ${item.kind}`);
   }
@@ -95,10 +108,13 @@ test("plays due items, repeats a wrong one once and records first answers only",
   expect(screen.getByText("2/3")).toBeTruthy();
   expect(screen.getByText("أَحْسَنْت! مُرَاجَعَة الْيَوْم مُكْتَمِلَة")).toBeTruthy();
 
-  await waitFor(async () => expect((await stored()).items[first]).toMatchObject({ box: 1, lapses: 1 }));
+  await waitFor(async () =>
+    expect((await stored()).items[first]).toMatchObject({ box: 1, lapses: 1 }),
+  );
   const saved = (await stored()).items;
   for (const id of [second, third]) expect(saved[id]).toMatchObject({ box: 3, lapses: 0 });
-  for (const id of order) expect(Date.parse(saved[id].lastSeenAt)).toBeGreaterThanOrEqual(NOW.getTime());
+  for (const id of order)
+    expect(Date.parse(saved[id].lastSeenAt)).toBeGreaterThanOrEqual(NOW.getTime());
 
   fireEvent.press(screen.getByTestId("review-back"));
   expect(router.replace).toHaveBeenCalledWith(routes.home());
@@ -122,7 +138,9 @@ test("an answer is recorded at the tap, even when the child leaves before the ad
   fireEvent.press(screen.getByRole("button", { name: wrong }));
   act(() => jest.advanceTimersByTime(100));
   unmount();
-  await waitFor(async () => expect((await stored()).items[first]).toMatchObject({ box: 1, lapses: 1 }));
+  await waitFor(async () =>
+    expect((await stored()).items[first]).toMatchObject({ box: 1, lapses: 1 }),
+  );
 });
 
 test("shows the empty state when nothing is due", async () => {
@@ -136,13 +154,28 @@ test("shows the empty state when nothing is due", async () => {
 
 describe("ReviewRound", () => {
   const speech = jest.requireMock("expo-speech") as { speak: jest.Mock };
-  const calc: ReviewItem = { id: "calc:3+2", kind: "calc", a: 3, b: 2, op: "+", options: [4, 5, 6] };
-  const count: ReviewItem = { id: "count:3", kind: "count", emoji: "🍎", count: 3, options: [2, 3, 4] };
+  const calc: ReviewItem = {
+    id: "calc:3+2",
+    kind: "calc",
+    a: 3,
+    b: 2,
+    op: "+",
+    options: [4, 5, 6],
+  };
+  const count: ReviewItem = {
+    id: "count:3",
+    kind: "count",
+    emoji: "🍎",
+    count: 3,
+    options: [2, 3, 4],
+  };
 
   test("calc: Eastern digits, first tap only, reports at the tap and advances after 900 ms", () => {
     const onFirstTap = jest.fn();
     const onAdvance = jest.fn();
-    renderScreen(<ReviewRound item={calc} attemptKey="t:0" onFirstTap={onFirstTap} onAdvance={onAdvance} />);
+    renderScreen(
+      <ReviewRound item={calc} attemptKey="t:0" onFirstTap={onFirstTap} onAdvance={onAdvance} />,
+    );
     expect(screen.getByText("٣ + ٢ = ؟")).toBeTruthy();
     fireEvent.press(screen.getByRole("button", { name: "٤" }));
     expect(onFirstTap).toHaveBeenCalledWith(false);
@@ -157,7 +190,9 @@ describe("ReviewRound", () => {
 
   test("count: shows the objects and a right first tap reports true", () => {
     const onFirstTap = jest.fn();
-    renderScreen(<ReviewRound item={count} attemptKey="t:1" onFirstTap={onFirstTap} onAdvance={jest.fn()} />);
+    renderScreen(
+      <ReviewRound item={count} attemptKey="t:1" onFirstTap={onFirstTap} onAdvance={jest.fn()} />,
+    );
     expect(screen.getAllByText("🍎")).toHaveLength(3);
     fireEvent.press(screen.getByRole("button", { name: "٣" }));
     expect(onFirstTap).toHaveBeenCalledWith(true);

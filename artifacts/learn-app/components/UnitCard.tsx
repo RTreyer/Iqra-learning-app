@@ -20,7 +20,11 @@ export function UnitCard({ unit, progress, onPress }: Props) {
       accessibilityRole="button"
       accessibilityLabel={t(unit.title)}
       onPress={onPress}
-      style={({ pressed }) => [styles.card, { backgroundColor: readableFill(unit.color), flexDirection: row }, pressed && styles.pressed]}
+      style={({ pressed }) => [
+        styles.card,
+        { backgroundColor: readableFill(unit.color), flexDirection: row },
+        pressed && styles.pressed,
+      ]}
     >
       <Text style={styles.emoji}>{unit.emoji}</Text>
       <View style={[styles.info, { alignItems: language === "en" ? "flex-start" : "flex-end" }]}>
@@ -55,6 +59,11 @@ const styles = StyleSheet.create({
   info: { flex: 1, gap: 6 },
   title: { fontSize: 22, fontWeight: "800", color: colors.white },
   footer: { alignItems: "center", gap: 8, flexWrap: "wrap" },
-  label: { backgroundColor: colors.pill, borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3 },
+  label: {
+    backgroundColor: colors.pill,
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
   labelText: { fontSize: 13, fontWeight: "700", color: colors.text },
 });

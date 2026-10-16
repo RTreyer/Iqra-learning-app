@@ -13,9 +13,13 @@ export const mathUnit2: Unit = {
   badgeLabel: "أَجْمَعُ وَأَطْرَحُ",
   lessons: [
     {
-      id: "m2-1", number: 1, type: "arithmetic",
-      title: "أَجْمَعُ ضِمْنَ ٥", subtitle: "٣ زَائِد ١ يُسَاوِي ٤",
-      emoji: "➕", color,
+      id: "m2-1",
+      number: 1,
+      type: "arithmetic",
+      title: "أَجْمَعُ ضِمْنَ ٥",
+      subtitle: "٣ زَائِد ١ يُسَاوِي ٤",
+      emoji: "➕",
+      color,
       rounds: [
         { a: 1, b: 2, op: "+", options: [2, 3, 4] },
         { a: 2, b: 2, op: "+", options: [4, 3, 5] },
@@ -25,9 +29,13 @@ export const mathUnit2: Unit = {
       ],
     },
     {
-      id: "m2-2", number: 2, type: "arithmetic",
-      title: "أَجْمَعُ ضِمْنَ ١٠", subtitle: "٦ زَائِد ٣ يُسَاوِي ٩",
-      emoji: "➕", color,
+      id: "m2-2",
+      number: 2,
+      type: "arithmetic",
+      title: "أَجْمَعُ ضِمْنَ ١٠",
+      subtitle: "٦ زَائِد ٣ يُسَاوِي ٩",
+      emoji: "➕",
+      color,
       rounds: [
         { a: 4, b: 3, op: "+", options: [6, 7, 8] },
         { a: 5, b: 4, op: "+", options: [9, 8, 10] },
@@ -37,9 +45,13 @@ export const mathUnit2: Unit = {
       ],
     },
     {
-      id: "m2-3", number: 3, type: "arithmetic",
-      title: "أَطْرَحُ ضِمْنَ ٥", subtitle: "٤ نَاقِص ٢ يُسَاوِي ٢",
-      emoji: "➖", color,
+      id: "m2-3",
+      number: 3,
+      type: "arithmetic",
+      title: "أَطْرَحُ ضِمْنَ ٥",
+      subtitle: "٤ نَاقِص ٢ يُسَاوِي ٢",
+      emoji: "➖",
+      color,
       rounds: [
         { a: 3, b: 1, op: "-", options: [1, 2, 3] },
         { a: 4, b: 3, op: "-", options: [2, 0, 1] },
@@ -49,9 +61,13 @@ export const mathUnit2: Unit = {
       ],
     },
     {
-      id: "m2-4", number: 4, type: "arithmetic",
-      title: "أَطْرَحُ ضِمْنَ ١٠", subtitle: "٩ نَاقِص ٣ يُسَاوِي ٦",
-      emoji: "➖", color,
+      id: "m2-4",
+      number: 4,
+      type: "arithmetic",
+      title: "أَطْرَحُ ضِمْنَ ١٠",
+      subtitle: "٩ نَاقِص ٣ يُسَاوِي ٦",
+      emoji: "➖",
+      color,
       rounds: [
         { a: 8, b: 3, op: "-", options: [4, 5, 6] },
         { a: 10, b: 4, op: "-", options: [6, 5, 7] },

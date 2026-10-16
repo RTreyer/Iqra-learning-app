@@ -7,7 +7,12 @@ function withStars(predicate: (book: Book) => boolean, stars = 3): ProgressState
   const state = createEmptyState();
   for (const book of books.filter(predicate))
     for (const unit of book.units)
-      for (const lesson of unit.lessons) state.lessons[lesson.id] = { completed: true, stars, completedAt: "2026-10-16T00:00:00.000Z" };
+      for (const lesson of unit.lessons)
+        state.lessons[lesson.id] = {
+          completed: true,
+          stars,
+          completedAt: "2026-10-16T00:00:00.000Z",
+        };
   return state;
 }
 

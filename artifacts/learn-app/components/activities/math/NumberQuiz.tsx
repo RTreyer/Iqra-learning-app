@@ -25,7 +25,16 @@ type Props = Omit<ActivityProps<MathLesson["type"]>, "lesson"> & {
 };
 
 /** Shared round flow for counting and arithmetic: numbers shown with Eastern Arabic digits. */
-export function NumberQuiz({ lesson, color, attemptKey, onComplete, onRoundResult, roundOf, promptOf, renderVisual }: Props) {
+export function NumberQuiz({
+  lesson,
+  color,
+  attemptKey,
+  onComplete,
+  onRoundResult,
+  roundOf,
+  promptOf,
+  renderVisual,
+}: Props) {
   const { t } = useLanguage();
   const total = lesson.rounds.length;
   const quiz = useQuiz({ lesson, total, onComplete, onRoundResult, autoAdvanceMs: ADVANCE_MS });
@@ -34,7 +43,10 @@ export function NumberQuiz({ lesson, color, attemptKey, onComplete, onRoundResul
   const correctIndex = options.indexOf(answer);
   const shuffled = useShuffled(options, correctIndex, attemptKey, quiz.roundIndex);
   const labels = useMemo(() => shuffled.items.map(toArabicDigits), [shuffled.items]);
-  const maxOptions = useMemo(() => Math.max(...lesson.rounds.map((r) => r.options.length)), [lesson.rounds]);
+  const maxOptions = useMemo(
+    () => Math.max(...lesson.rounds.map((r) => r.options.length)),
+    [lesson.rounds],
+  );
   const { values, bounce } = useBounce(maxOptions);
   const { shown, spoken } = promptOf(quiz.roundIndex);
 
@@ -61,7 +73,12 @@ export function NumberQuiz({ lesson, color, attemptKey, onComplete, onRoundResul
     <View style={act.container}>
       <ProgressDots count={total} current={quiz.roundIndex} color={color} />
       <View style={styles.visual}>{renderVisual(quiz.roundIndex)}</View>
-      <Pressable accessibilityRole="button" accessibilityLabel={`${t("اضغط للاستماع")}: ${shown}`} style={styles.question} onPress={() => speak(spoken)}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`${t("اضغط للاستماع")}: ${shown}`}
+        style={styles.question}
+        onPress={() => speak(spoken)}
+      >
         <Text style={styles.speaker}>🔊</Text>
         <Text style={styles.questionText}>{shown}</Text>
       </Pressable>
@@ -85,9 +102,21 @@ export function NumberQuiz({ lesson, color, attemptKey, onComplete, onRoundResul
 }
 
 export const mathStyles = StyleSheet.create({
-  row: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center", alignItems: "center", gap: 12 },
+  row: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 12,
+  },
   countEmoji: { fontSize: 52 },
-  dotGroup: { flexDirection: "row", flexWrap: "wrap", gap: 8, maxWidth: 100, justifyContent: "center" },
+  dotGroup: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    maxWidth: 100,
+    justifyContent: "center",
+  },
   dot: { width: 28, height: 28, borderRadius: 14 },
   operator: { fontSize: 40, fontWeight: "800", color: colors.mutedStrong },
   questionMark: { fontSize: 52, fontWeight: "800", color: colors.successText },

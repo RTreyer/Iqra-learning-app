@@ -24,7 +24,17 @@ const ICON: Record<ChoiceState, string | null> = { idle: null, correct: "✅", w
 const GLYPH: Record<ChoiceState, string | null> = { idle: null, correct: "✓", wrong: "✗" };
 const SPOKEN: Record<ChoiceState, string> = { idle: "", correct: "، صحيح", wrong: "، خطأ" };
 
-export function ChoiceCard({ index, word, emoji, state, selected, locked, variant, onPick, scale }: Props) {
+export function ChoiceCard({
+  index,
+  word,
+  emoji,
+  state,
+  selected,
+  locked,
+  variant,
+  onPick,
+  scale,
+}: Props) {
   const solid = variant === "number";
   const icon = variant === "letter" ? null : solid ? GLYPH[state] : ICON[state];
   return (
@@ -46,7 +56,12 @@ export function ChoiceCard({ index, word, emoji, state, selected, locked, varian
 }
 
 const styles = StyleSheet.create({
-  base: { minHeight: touchTarget, minWidth: touchTarget, alignItems: "center", justifyContent: "center" },
+  base: {
+    minHeight: touchTarget,
+    minWidth: touchTarget,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   emoji: { fontSize: 32 },
 });
 
@@ -54,12 +69,26 @@ const iconStyles = StyleSheet.create({
   letter: {},
   word: { fontSize: 18 },
   picture: { position: "absolute", top: -8, right: -8, fontSize: 18 },
-  number: { position: "absolute", top: 4, right: 8, fontSize: 20, fontWeight: "900", color: colors.white },
+  number: {
+    position: "absolute",
+    top: 4,
+    right: 8,
+    fontSize: 20,
+    fontWeight: "900",
+    color: colors.white,
+  },
 });
 
 const cardStyles = StyleSheet.create({
   letter: { width: 80, height: 80, borderRadius: 16, borderWidth: 3 },
-  word: { flexDirection: "row", borderRadius: 16, padding: 16, gap: 8, borderWidth: 2, width: "100%" },
+  word: {
+    flexDirection: "row",
+    borderRadius: 16,
+    padding: 16,
+    gap: 8,
+    borderWidth: 2,
+    width: "100%",
+  },
   picture: { minWidth: 90, borderRadius: 16, padding: 12, gap: 4, borderWidth: 2 },
   number: {
     width: 88,

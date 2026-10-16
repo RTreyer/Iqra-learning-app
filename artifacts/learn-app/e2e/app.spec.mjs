@@ -57,7 +57,9 @@ test.describe("navigation", () => {
     await expect(page).toHaveURL(/\/unit\/a2$/);
     await page.getByTestId("lesson-row-u2-3").click();
     await expect(page).toHaveURL(/\/lesson\/u2-3$/);
-    await expect(page.getByText("أَعْرِفُ الْحُرُوف").filter({ visible: true }).first()).toBeVisible();
+    await expect(
+      page.getByText("أَعْرِفُ الْحُرُوف").filter({ visible: true }).first(),
+    ).toBeVisible();
     await expect(page.getByText("ابحث عن الحرف")).toBeVisible();
     await page.getByRole("button", { name: "رجوع" }).click();
     await expect(page).toHaveURL(/\/unit\/a2$/);
@@ -84,7 +86,9 @@ test.describe("scoring", () => {
     await expect(page.getByTestId("lesson-done-u2-3")).toBeVisible();
   });
 
-  test("3 of 5 first taps correct gives 2 stars; a later tap does not change the score", async ({ page }) => {
+  test("3 of 5 first taps correct gives 2 stars; a later tap does not change the score", async ({
+    page,
+  }) => {
     await gotoAndWaitReady(page, "/lesson/u2-3");
     const rounds = QUIZ_ROUNDS["u2-3"];
     for (let i = 0; i < rounds.length; i++) {
@@ -127,12 +131,16 @@ test.describe("scoring", () => {
     await completeQuizLesson(page, "u2-3", 5);
     await page.getByTestId("next-lesson").click();
     await expect(page).toHaveURL(/\/lesson\/u2-4$/);
-    await expect(page.getByText("أَقْرَأُ الْكَلِمَات").filter({ visible: true }).first()).toBeVisible();
+    await expect(
+      page.getByText("أَقْرَأُ الْكَلِمَات").filter({ visible: true }).first(),
+    ).toBeVisible();
   });
 });
 
 test.describe("activities", () => {
-  test("trace: a 5 px drag shows the error banner, diagonal drags complete the lesson", async ({ page }) => {
+  test("trace: a 5 px drag shows the error banner, diagonal drags complete the lesson", async ({
+    page,
+  }) => {
     await gotoAndWaitReady(page, "/lesson/u2-6");
     await traceDiagonal(page, { length: 5 });
     await page.getByTestId("trace-done").click();
@@ -156,7 +164,12 @@ test.describe("activities", () => {
 
   test("science story and naming lessons complete", async ({ page }) => {
     await gotoAndWaitReady(page, "/lesson/s1-1");
-    await tapAllAndFinish(page, ["هَٰذَا جِسْمِي", "أَرَى بِعَيْنِي", "أَسْمَعُ بِأُذُنِي", "أَشُمُّ بِأَنْفِي"]);
+    await tapAllAndFinish(page, [
+      "هَٰذَا جِسْمِي",
+      "أَرَى بِعَيْنِي",
+      "أَسْمَعُ بِأُذُنِي",
+      "أَشُمُّ بِأَنْفِي",
+    ]);
     expect(await earnedStars(page)).toBe(3);
 
     await page.getByTestId("next-lesson").click();
@@ -178,8 +191,12 @@ test.describe("language", () => {
     await expect(page.getByTestId("book-math-1")).toContainText("Math");
 
     await gotoAndWaitReady(page, "/lesson/u2-1");
-    await expect(page.getByRole("button", { name: "هَذَا بَيْتُنَا الْجَمِيل", exact: true })).toBeVisible();
-    await expect(page.getByText("أَقْرَأُ الْقِصَّة").filter({ visible: true }).first()).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "هَذَا بَيْتُنَا الْجَمِيل", exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByText("أَقْرَأُ الْقِصَّة").filter({ visible: true }).first(),
+    ).toBeVisible();
 
     await gotoAndWaitReady(page, "/");
     await page.getByTestId("language-ar").click();
@@ -194,7 +211,9 @@ test.describe("accessibility", () => {
     axePath = require.resolve("axe-core/axe.min.js");
   } catch {}
 
-  test("axe: no serious or critical color contrast violations on home, book, unit, lesson", async ({ page }) => {
+  test("axe: no serious or critical color contrast violations on home, book, unit, lesson", async ({
+    page,
+  }) => {
     test.skip(!axePath, "axe-core not installed");
     const axeSource = fs.readFileSync(axePath, "utf8");
     const found = {};
@@ -218,17 +237,33 @@ test.describe("accessibility", () => {
             },
           ],
         });
-        const result = await window.axe.run(document, { runOnly: { type: "rule", values: ["color-contrast"] } });
+        const result = await window.axe.run(document, {
+          runOnly: { type: "rule", values: ["color-contrast"] },
+        });
         return {
-          checked: [...result.passes, ...result.violations, ...result.incomplete].reduce((s, r) => s + r.nodes.length, 0),
-          counts: ["passes", "violations", "incomplete"].map((k) => `${k} ${result[k].reduce((s, r) => s + r.nodes.length, 0)}`),
+          checked: [...result.passes, ...result.violations, ...result.incomplete].reduce(
+            (s, r) => s + r.nodes.length,
+            0,
+          ),
+          counts: ["passes", "violations", "incomplete"].map(
+            (k) => `${k} ${result[k].reduce((s, r) => s + r.nodes.length, 0)}`,
+          ),
           serious: result.violations
             .filter((v) => v.impact === "serious" || v.impact === "critical")
-            .flatMap((v) => v.nodes.map((n) => `${v.id} (${v.impact}): ${n.target.join(" ")} ${n.failureSummary}`)),
+            .flatMap((v) =>
+              v.nodes.map(
+                (n) => `${v.id} (${v.impact}): ${n.target.join(" ")} ${n.failureSummary}`,
+              ),
+            ),
         };
       });
       expect(violations.checked, `axe checked text nodes on ${path}`).toBeGreaterThan(0);
-      test.info().annotations.push({ type: "axe color-contrast", description: `${path}: ${violations.counts.join(", ")}` });
+      test
+        .info()
+        .annotations.push({
+          type: "axe color-contrast",
+          description: `${path}: ${violations.counts.join(", ")}`,
+        });
       if (violations.serious.length) found[path] = violations.serious;
     }
     expect(found).toEqual({});

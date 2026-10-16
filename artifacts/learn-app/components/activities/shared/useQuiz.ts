@@ -35,9 +35,12 @@ export function useQuiz({ lesson, total, onComplete, onRoundResult, autoAdvanceM
   // Timers call the latest callbacks, never a closure from the render that scheduled them.
   const callbacks = useLatest({ onComplete, onRoundResult });
 
-  useEffect(() => () => {
-    if (timer.current) clearTimeout(timer.current);
-  }, []);
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+    },
+    [],
+  );
 
   const advance = useCallback(
     (count: number) => {
@@ -66,7 +69,8 @@ export function useQuiz({ lesson, total, onComplete, onRoundResult, autoAdvanceM
       if (itemId !== null) callbacks.current.onRoundResult?.(itemId, isCorrect);
       if (isCorrect) haptics.success();
       else haptics.error();
-      if (autoAdvanceMs !== undefined) timer.current = setTimeout(() => advance(count), autoAdvanceMs);
+      if (autoAdvanceMs !== undefined)
+        timer.current = setTimeout(() => advance(count), autoAdvanceMs);
       return true;
     },
     [correctCount, lesson, roundIndex, callbacks, autoAdvanceMs, advance],
@@ -77,13 +81,25 @@ export function useQuiz({ lesson, total, onComplete, onRoundResult, autoAdvanceM
   }, [picked, correctCount, advance]);
 
   return useMemo(
-    () => ({ roundIndex, picked, locked: picked !== null, correctCount, isLast: roundIndex + 1 >= total, pick, next }),
+    () => ({
+      roundIndex,
+      picked,
+      locked: picked !== null,
+      correctCount,
+      isLast: roundIndex + 1 >= total,
+      pick,
+      next,
+    }),
     [roundIndex, picked, correctCount, total, pick, next],
   );
 }
 
 /** Visual state of option `index` given the tapped option and the correct one. */
-export function choiceState(index: number, picked: number | null, correctIndex: number): ChoiceState {
+export function choiceState(
+  index: number,
+  picked: number | null,
+  correctIndex: number,
+): ChoiceState {
   if (picked === null) return "idle";
   if (index === correctIndex) return "correct";
   return index === picked ? "wrong" : "idle";

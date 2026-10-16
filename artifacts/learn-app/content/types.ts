@@ -3,7 +3,11 @@
 export type Subject = "arabic" | "math" | "science";
 
 /** Single source of subject colors; theme/tokens.ts re-exports them as `subjects`. */
-export const SUBJECT_COLORS: Record<Subject, string> = { arabic: "#2563EB", math: "#7C3AED", science: "#059669" };
+export const SUBJECT_COLORS: Record<Subject, string> = {
+  arabic: "#2563EB",
+  math: "#7C3AED",
+  science: "#059669",
+};
 
 export type Choice = { emoji: string; word: string };
 
@@ -23,7 +27,13 @@ export type ListenPickQuestion = { word: string; choices: Choice[]; correctIndex
 export type BehaviorItem = { emoji: string; description: string; isCorrect: boolean };
 export type MatchPair = { left: Choice; right: Choice };
 /** `emoji` is optional decoration carried over from the legacy drawing shapes. */
-export type TraceTarget = { guide: string; label: string; tts: string; strokeCount?: number; emoji?: string };
+export type TraceTarget = {
+  guide: string;
+  label: string;
+  tts: string;
+  strokeCount?: number;
+  emoji?: string;
+};
 export type CountingRound = { emoji: string; count: number; options: number[] };
 export type ArithmeticRound = { a: number; b: number; op: "+" | "-"; options: number[] };
 

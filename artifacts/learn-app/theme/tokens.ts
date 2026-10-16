@@ -35,7 +35,8 @@ export const colors = {
 
 /** "#RRGGBB" plus an alpha between 0 and 1 as an rgba() string. */
 export function withAlpha(hex: string, alpha: number): string {
-  if (__DEV__ && !/^#[0-9A-Fa-f]{6}$/.test(hex)) throw new Error(`withAlpha expects #RRGGBB, got "${hex}"`);
+  if (__DEV__ && !/^#[0-9A-Fa-f]{6}$/.test(hex))
+    throw new Error(`withAlpha expects #RRGGBB, got "${hex}"`);
   const value = hex.replace("#", "");
   const r = parseInt(value.slice(0, 2), 16);
   const g = parseInt(value.slice(2, 4), 16);
@@ -94,7 +95,10 @@ export function readableFill(hex: string, min = 4.5): string {
   let out = hex;
   for (let step = 0; whiteContrast(out) < min && step < 100; step++) {
     channels = channels.map((c) => Math.floor(c * 0.97));
-    out = `#${channels.map((c) => c.toString(16).padStart(2, "0")).join("").toUpperCase()}`;
+    out = `#${channels
+      .map((c) => c.toString(16).padStart(2, "0"))
+      .join("")
+      .toUpperCase()}`;
   }
   readableCache.set(key, out);
   return out;

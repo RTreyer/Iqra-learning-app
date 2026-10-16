@@ -7,7 +7,9 @@ import { books, getUnit } from "@/content";
 import { routes } from "@/lib/routes";
 import { mockCanGoBack, renderScreen, setParams } from "@/test-utils/screens";
 
-const { router } = jest.requireMock("expo-router") as { router: { push: jest.Mock; replace: jest.Mock } };
+const { router } = jest.requireMock("expo-router") as {
+  router: { push: jest.Mock; replace: jest.Mock };
+};
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -61,7 +63,8 @@ test("back buttons fall back up the hierarchy without history", () => {
 });
 
 test("array params use the first value", () => {
-  const params = (jest.requireMock("expo-router") as { __params: Record<string, unknown> }).__params;
+  const params = (jest.requireMock("expo-router") as { __params: Record<string, unknown> })
+    .__params;
   setParams({});
   params.unitId = ["a2", "a3"];
   renderScreen(<UnitScreen />);

@@ -3,7 +3,12 @@ import { test } from "node:test";
 import { translateUi } from "../content/ui-translations.ts";
 
 test("Arabic is unchanged, including whitespace and lesson text", () => {
-  for (const text of ["اختَر الكتاب", "  جاري التحميل...  ", "أَكَلَ أَحْمَدُ تُفَّاحَةً", "التالي ←"]) {
+  for (const text of [
+    "اختَر الكتاب",
+    "  جاري التحميل...  ",
+    "أَكَلَ أَحْمَدُ تُفَّاحَةً",
+    "التالي ←",
+  ]) {
     assert.equal(translateUi(text, "ar"), text);
   }
 });
@@ -14,13 +19,19 @@ test("English controls, auth errors and book menus", () => {
   assert.equal(translateUi("إعادة الوحدة", "en"), "Repeat unit");
   assert.equal(translateUi("3 جملة متبقية", "en"), "3 sentences left");
   assert.equal(translateUi("2 كلمة متبقية", "en"), "2 words left");
-  assert.equal(translateUi("تعذّر تسجيل الدخول. حاول مرة أخرى.", "en"), "Sign-in failed. Please try again.");
+  assert.equal(
+    translateUi("تعذّر تسجيل الدخول. حاول مرة أخرى.", "en"),
+    "Sign-in failed. Please try again.",
+  );
 });
 test("Dynamic labels keep scores and Arabic lesson titles", () => {
   assert.equal(translateUi("2 / 5 مكتمل", "en"), "2 / 5 complete");
   assert.equal(translateUi("أَحْسَنْت! 3/4 🌟 تابع", "en"), "3/4 🌟 Continue");
   assert.equal(translateUi("أَحْسَنْت! 2/3 صحيح 🌟 تابع", "en"), "2/3 correct 🌟 Continue");
-  assert.equal(translateUi("النشاط التالي: أَقْرَأُ الْقِصَّة ←", "en"), "Next activity: أَقْرَأُ الْقِصَّة →");
+  assert.equal(
+    translateUi("النشاط التالي: أَقْرَأُ الْقِصَّة ←", "en"),
+    "Next activity: أَقْرَأُ الْقِصَّة →",
+  );
   assert.equal(translateUi("🎉 أتممت الوحدة الثانية!", "en"), "🎉 Completed Unit 2!");
 });
 test("Arabic lesson content is not translated in English mode", () => {
@@ -31,11 +42,17 @@ test("Arabic lesson content is not translated in English mode", () => {
 test("Activity instructions are chrome and translate", () => {
   assert.equal(translateUi("سؤال 2 من 5", "en"), "Question 2 of 5");
   assert.equal(translateUi("سؤال 2 من 5", "ar"), "سؤال 2 من 5");
-  assert.equal(translateUi("سؤال 1 من 4 — اضغط للاستماع ثم اختر", "en"), "Question 1 of 4 — Tap to listen, then choose");
+  assert.equal(
+    translateUi("سؤال 1 من 4 — اضغط للاستماع ثم اختر", "en"),
+    "Question 1 of 4 — Tap to listen, then choose",
+  );
   assert.equal(translateUi("ابحث عن الحرف", "en"), "Find the letter");
   assert.equal(translateUi("اضغط على كل جملة لتسمعها 🔊", "en"), "Tap each sentence to hear it 🔊");
   assert.equal(translateUi("اضغط على كل كلمة لتسمعها 🔊", "en"), "Tap each word to hear it 🔊");
-  assert.equal(translateUi("اضغط ✓ للسلوك الصحيح و ✗ للسلوك الخطأ", "en"), "Tap ✓ for good behavior and ✗ for bad behavior");
+  assert.equal(
+    translateUi("اضغط ✓ للسلوك الصحيح و ✗ للسلوك الخطأ", "en"),
+    "Tap ✓ for good behavior and ✗ for bad behavior",
+  );
   assert.doesNotMatch(translateUi("اضغط على شيء في اليمين ثم ما يناسبه في اليسار", "en"), /[؀-ۿ]/);
 });
 test("Content model labels translate", () => {
@@ -67,7 +84,10 @@ test("Review session chrome translates", () => {
   assert.equal(translateUi("مُرَاجَعَة الْيَوْم", "en"), "Today's review");
   assert.equal(translateUi("تَابِعْ", "en"), "Continue");
   assert.equal(translateUi("لا شَيْءَ لِلْمُرَاجَعَةِ الْيَوْم", "en"), "Nothing to review today");
-  assert.equal(translateUi("أَحْسَنْت! مُرَاجَعَة الْيَوْم مُكْتَمِلَة", "en"), "Well done! Today's review is complete");
+  assert.equal(
+    translateUi("أَحْسَنْت! مُرَاجَعَة الْيَوْم مُكْتَمِلَة", "en"),
+    "Well done! Today's review is complete",
+  );
   assert.equal(translateUi("يَوْم مُتَتَالٍ", "en"), "day streak");
   assert.equal(translateUi("3 يَوْم مُتَتَالٍ", "en"), "3 day streak");
 });

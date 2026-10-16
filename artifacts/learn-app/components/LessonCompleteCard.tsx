@@ -22,7 +22,13 @@ type Props = {
   color?: string;
 };
 
-export function LessonCompleteCard({ stars, onRepeat, next, backTo, color = colors.success }: Props) {
+export function LessonCompleteCard({
+  stars,
+  onRepeat,
+  next,
+  backTo,
+  color = colors.success,
+}: Props) {
   const { language, t } = useLanguage();
   const fill = readableFill(color);
   return (
@@ -45,7 +51,11 @@ export function LessonCompleteCard({ stars, onRepeat, next, backTo, color = colo
         testID="repeat-lesson"
         accessibilityRole="button"
         accessibilityLabel={t("إعادة الدرس")}
-        style={({ pressed }) => [styles.button, { backgroundColor: fill }, pressed && styles.pressed]}
+        style={({ pressed }) => [
+          styles.button,
+          { backgroundColor: fill },
+          pressed && styles.pressed,
+        ]}
         onPress={onRepeat}
       >
         <UiText style={styles.buttonText}>إعادة الدرس</UiText>
@@ -75,7 +85,13 @@ export function LessonCompleteCard({ stars, onRepeat, next, backTo, color = colo
         </UiText>
       )}
 
-      <Pressable testID="back-to-list" accessibilityRole="button" accessibilityLabel={t("العودة إلى القائمة")} style={styles.backLink} onPress={() => goBackOr(backTo)}>
+      <Pressable
+        testID="back-to-list"
+        accessibilityRole="button"
+        accessibilityLabel={t("العودة إلى القائمة")}
+        style={styles.backLink}
+        onPress={() => goBackOr(backTo)}
+      >
         <UiText style={styles.backLinkText}>العودة إلى القائمة</UiText>
       </Pressable>
     </View>
@@ -83,17 +99,42 @@ export function LessonCompleteCard({ stars, onRepeat, next, backTo, color = colo
 }
 
 const styles = StyleSheet.create({
-  content: { flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 32, gap: 12 },
+  content: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 32,
+    gap: 12,
+  },
   starsRow: { flexDirection: "row", gap: 8 },
   star: { fontSize: 56 },
   starDimmed: { opacity: 0.2 },
   title: { fontSize: 36, fontWeight: "900", color: colors.text },
   text: { fontSize: 15, color: colors.mutedStrong, textAlign: "center" },
-  button: { borderRadius: 16, paddingVertical: 10, paddingHorizontal: 20, alignItems: "center", justifyContent: "center", marginTop: 16, minHeight: touchTarget },
+  button: {
+    borderRadius: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 16,
+    minHeight: touchTarget,
+  },
   nextRow: { gap: 6, flexWrap: "wrap", justifyContent: "center" },
   buttonText: { fontSize: 16, fontWeight: "800", color: colors.white, textAlign: "center" },
-  celebration: { fontSize: 22, fontWeight: "900", color: colors.text, textAlign: "center", marginTop: 16 },
+  celebration: {
+    fontSize: 22,
+    fontWeight: "900",
+    color: colors.text,
+    textAlign: "center",
+    marginTop: 16,
+  },
   pressed: { opacity: 0.88, transform: [{ scale: 0.97 }] },
-  backLink: { marginTop: 8, paddingHorizontal: 8, minHeight: touchTarget, justifyContent: "center" },
+  backLink: {
+    marginTop: 8,
+    paddingHorizontal: 8,
+    minHeight: touchTarget,
+    justifyContent: "center",
+  },
   backLinkText: { fontSize: 14, color: colors.text, fontWeight: "600" },
 });
