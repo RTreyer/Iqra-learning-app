@@ -1,3 +1,4 @@
+import mockReact from "react";
 import "react-native-gesture-handler/jestSetup";
 
 jest.mock("expo-speech", () => ({
@@ -15,17 +16,19 @@ jest.mock("expo-haptics", () => ({
 }));
 
 jest.mock("@react-native-async-storage/async-storage", () =>
-  require("@react-native-async-storage/async-storage/jest/async-storage-mock"),
+  jest.requireActual("@react-native-async-storage/async-storage/jest/async-storage-mock"),
 );
 
 jest.mock("expo-router", () => {
-  const React = require("react");
   const params: Record<string, string | string[] | undefined> = {};
   return {
     __params: params,
     router: { push: jest.fn(), replace: jest.fn(), back: jest.fn() },
     useLocalSearchParams: () => params,
-    useFocusEffect: (cb: () => void | (() => void)) => React.useEffect(cb, []),
-    Link: ({ children }: { children?: React.ReactNode }) => children ?? null,
+    useFocusEffect: (cb: () => void | (() => void)) =>
+      mockReact.useEffect(() => {
+        cb();
+      }, [cb]),
+    Link: ({ children }: { children?: mockReact.ReactNode }) => children ?? null,
   };
 });
