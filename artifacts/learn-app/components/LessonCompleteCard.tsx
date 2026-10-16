@@ -7,7 +7,7 @@ import { UiText } from "@/components/UiText";
 import type { Lesson } from "@/content/types";
 import { useLanguage } from "@/context/LanguageContext";
 import { routes } from "@/lib/routes";
-import { colors, pillPlate, touchTarget } from "@/theme/tokens";
+import { colors, readableFill, touchTarget } from "@/theme/tokens";
 
 const MAX_STARS = 3;
 
@@ -24,6 +24,7 @@ type Props = {
 
 export function LessonCompleteCard({ stars, onRepeat, next, backTo, color = colors.success }: Props) {
   const { language, t } = useLanguage();
+  const fill = readableFill(color);
   return (
     <View style={styles.content} testID="lesson-complete">
       <View style={styles.starsRow} accessible accessibilityLabel={`${stars} / ${MAX_STARS} ⭐`}>
@@ -44,12 +45,10 @@ export function LessonCompleteCard({ stars, onRepeat, next, backTo, color = colo
         testID="repeat-lesson"
         accessibilityRole="button"
         accessibilityLabel={t("إعادة الدرس")}
-        style={({ pressed }) => [styles.button, { backgroundColor: color }, pressed && styles.pressed]}
+        style={({ pressed }) => [styles.button, { backgroundColor: fill }, pressed && styles.pressed]}
         onPress={onRepeat}
       >
-        <View style={styles.plate}>
-          <UiText style={styles.buttonText}>إعادة الدرس</UiText>
-        </View>
+        <UiText style={styles.buttonText}>إعادة الدرس</UiText>
       </Pressable>
 
       {next ? (
@@ -59,17 +58,16 @@ export function LessonCompleteCard({ stars, onRepeat, next, backTo, color = colo
           accessibilityLabel={`${t("النشاط التالي:")} ${next.title}`}
           style={({ pressed }) => [
             styles.button,
-            { backgroundColor: color },
+            styles.nextRow,
+            // Arabic reads right to left: label first on the right, arrow last on the left.
+            { backgroundColor: fill, flexDirection: language === "en" ? "row" : "row-reverse" },
             pressed && styles.pressed,
           ]}
           onPress={() => router.replace(routes.lesson(next.id))}
         >
-          {/* Arabic reads right to left: label first on the right, arrow last on the left. */}
-          <View style={[styles.plate, styles.nextRow, { flexDirection: language === "en" ? "row" : "row-reverse" }]}>
-            <UiText style={styles.buttonText}>النشاط التالي:</UiText>
-            <Text style={styles.buttonText}>{next.title}</Text>
-            <Text style={styles.buttonText}>{language === "en" ? "→" : "←"}</Text>
-          </View>
+          <UiText style={styles.buttonText}>النشاط التالي:</UiText>
+          <Text style={styles.buttonText}>{next.title}</Text>
+          <Text style={styles.buttonText}>{language === "en" ? "→" : "←"}</Text>
         </Pressable>
       ) : (
         <UiText testID="unit-finished" style={styles.celebration}>
@@ -92,9 +90,8 @@ const styles = StyleSheet.create({
   title: { fontSize: 36, fontWeight: "900", color: colors.text },
   text: { fontSize: 15, color: colors.mutedStrong, textAlign: "center" },
   button: { borderRadius: 16, paddingVertical: 10, paddingHorizontal: 20, alignItems: "center", justifyContent: "center", marginTop: 16, minHeight: touchTarget },
-  plate: pillPlate,
   nextRow: { gap: 6, flexWrap: "wrap", justifyContent: "center" },
-  buttonText: { fontSize: 16, fontWeight: "800", color: colors.text, textAlign: "center" },
+  buttonText: { fontSize: 16, fontWeight: "800", color: colors.white, textAlign: "center" },
   celebration: { fontSize: 22, fontWeight: "900", color: colors.text, textAlign: "center", marginTop: 16 },
   pressed: { opacity: 0.88, transform: [{ scale: 0.97 }] },
   backLink: { marginTop: 8, paddingHorizontal: 8, minHeight: touchTarget, justifyContent: "center" },

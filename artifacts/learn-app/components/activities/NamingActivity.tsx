@@ -3,7 +3,7 @@ import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
 import { UiText } from "@/components/UiText";
 import * as haptics from "@/lib/haptics";
 import { speak } from "@/lib/speech";
-import { colors } from "@/theme/tokens";
+import { colors, readableFill, withAlpha } from "@/theme/tokens";
 import { DoneButton } from "./shared/DoneButton";
 import { act } from "./shared/styles";
 import { useOnce } from "./shared/useOnce";
@@ -41,11 +41,11 @@ function Naming({ lesson, color, onComplete }: ActivityProps<"naming">) {
                 accessibilityRole="button"
                 accessibilityLabel={item.word}
                 accessibilityState={{ selected: done }}
-                style={[styles.card, done && { borderColor: color, borderWidth: 3, backgroundColor: color + "18" }]}
+                style={[styles.card, done && { borderColor: color, borderWidth: 3, backgroundColor: withAlpha(color, 0.09) }]}
                 onPress={() => handleTap(i)}
               >
                 <Text style={styles.emoji}>{item.emoji}</Text>
-                <Text style={styles.word}>{item.word}</Text>
+                <Text style={[styles.word, done && { color: readableFill(color) }]}>{item.word}</Text>
               </Pressable>
             </Animated.View>
           );

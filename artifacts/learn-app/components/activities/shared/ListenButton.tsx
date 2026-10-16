@@ -1,8 +1,9 @@
 import React, { useCallback, useState } from "react";
-import { Animated, Pressable, Text, View } from "react-native";
+import { Animated, Pressable, Text } from "react-native";
 import { UiText } from "@/components/UiText";
 import { useLanguage } from "@/context/LanguageContext";
 import * as haptics from "@/lib/haptics";
+import { readableFill } from "@/theme/tokens";
 import { speak } from "@/lib/speech";
 import { act } from "./styles";
 
@@ -27,14 +28,12 @@ export function ListenButton({ text, color, showText }: Props) {
         testID="listen-button"
         accessibilityRole="button"
         accessibilityLabel={`${t("اضغط للاستماع")}: ${text}`}
-        style={[act.listenBtn, { backgroundColor: color }]}
+        style={[act.listenBtn, { backgroundColor: readableFill(color) }]}
         onPress={handlePress}
       >
         <Text style={act.listenEmoji}>🔊</Text>
-        <View style={act.listenPlate}>
-          {showText ? <Text style={act.listenBtnText}>{text}</Text> : null}
-          <UiText style={act.listenHint}>اضغط للاستماع</UiText>
-        </View>
+        {showText ? <Text style={act.listenBtnText}>{text}</Text> : null}
+        <UiText style={act.listenHint}>اضغط للاستماع</UiText>
       </Pressable>
     </Animated.View>
   );

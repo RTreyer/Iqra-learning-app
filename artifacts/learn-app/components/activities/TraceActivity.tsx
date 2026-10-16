@@ -5,6 +5,7 @@ import { Path, Svg } from "react-native-svg";
 import { UiText } from "@/components/UiText";
 import { useLanguage } from "@/context/LanguageContext";
 import * as haptics from "@/lib/haptics";
+import { readableFill } from "@/theme/tokens";
 import { speak } from "@/lib/speech";
 import { PRAISE } from "./shared/strings";
 import { ProgressDots } from "./shared/ProgressDots";
@@ -156,7 +157,7 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
       <ProgressDots count={targets.length} current={targetIndex} color={color} />
       <View style={trace.header}>
         {target.emoji ? <Text style={trace.emoji}>{target.emoji}</Text> : null}
-        <Text style={trace.label}>{target.label}</Text>
+        <Text style={[trace.label, { color: readableFill(color) }]}>{target.label}</Text>
       </View>
       {error ? (
         <Animated.View style={[trace.errorBanner, { transform: [{ translateX }] }]} accessibilityLiveRegion="polite">
@@ -201,12 +202,10 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
             testID="trace-done"
             accessibilityRole="button"
             accessibilityLabel={t("تم")}
-            style={[trace.button, { backgroundColor: color }]}
+            style={[trace.button, { backgroundColor: readableFill(color) }]}
             onPress={handleDone}
           >
-            <View style={trace.donePlate}>
-              <UiText style={trace.doneText}>تم</UiText>
-            </View>
+            <UiText style={trace.doneText}>تم</UiText>
           </Pressable>
         </View>
       </View>

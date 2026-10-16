@@ -1,4 +1,6 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fireEvent, screen } from "@testing-library/react-native";
+import { StyleSheet } from "react-native";
 import React from "react";
 import { MatchingActivity } from "@/components/activities/MatchingActivity";
 import { lessonOf, renderActivity } from "@/test-utils/activities";
@@ -48,4 +50,22 @@ test("right column order is seeded by attemptKey", () => {
   expect(order("m:1")).toBe(order("m:1"));
   const keys = Array.from({ length: 8 }, (_, i) => order(`m:${i}`));
   expect(new Set(keys).size).toBeGreaterThan(1);
+});
+
+describe("grid direction follows the interface language", () => {
+  const direction = () => StyleSheet.flatten(screen.getByTestId("match-grid").props.style).flexDirection;
+  afterEach(() => AsyncStorage.clear());
+
+  test("Arabic mirrors the columns so the first one is on the right", async () => {
+    await AsyncStorage.setItem("iqra_ui_language", "ar");
+    renderActivity(<MatchingActivity lesson={lesson} color="#7C3AED" attemptKey="m:dir-ar" onComplete={jest.fn()} />);
+    expect(direction()).toBe("row-reverse");
+  });
+
+  test("English keeps the first column on the left", async () => {
+    await AsyncStorage.setItem("iqra_ui_language", "en");
+    renderActivity(<MatchingActivity lesson={lesson} color="#7C3AED" attemptKey="m:dir-en" onComplete={jest.fn()} />);
+    await screen.findByText("Tap an item on the left, then its match on the right");
+    expect(direction()).toBe("row");
+  });
 });

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, type ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import type { Lesson } from "@/content/types";
 import { numberToArabicWord, toArabicDigits } from "@/lib/arabicNumbers";
+import { useLanguage } from "@/context/LanguageContext";
 import { speak } from "@/lib/speech";
 import { colors, touchTarget } from "@/theme/tokens";
 import { ChoiceCard } from "../shared/ChoiceCard";
@@ -25,6 +26,7 @@ type Props = Omit<ActivityProps<MathLesson["type"]>, "lesson"> & {
 
 /** Shared round flow for counting and arithmetic: numbers shown with Eastern Arabic digits. */
 export function NumberQuiz({ lesson, color, attemptKey, onComplete, onRoundResult, roundOf, promptOf, renderVisual }: Props) {
+  const { t } = useLanguage();
   const total = lesson.rounds.length;
   const quiz = useQuiz({ lesson, total, onComplete, onRoundResult, autoAdvanceMs: ADVANCE_MS });
   const { pick } = quiz;
@@ -59,7 +61,7 @@ export function NumberQuiz({ lesson, color, attemptKey, onComplete, onRoundResul
     <View style={act.container}>
       <ProgressDots count={total} current={quiz.roundIndex} color={color} />
       <View style={styles.visual}>{renderVisual(quiz.roundIndex)}</View>
-      <Pressable accessibilityRole="button" accessibilityLabel={`🔊 ${shown}`} style={styles.question} onPress={() => speak(spoken)}>
+      <Pressable accessibilityRole="button" accessibilityLabel={`${t("اضغط للاستماع")}: ${shown}`} style={styles.question} onPress={() => speak(spoken)}>
         <Text style={styles.speaker}>🔊</Text>
         <Text style={styles.questionText}>{shown}</Text>
       </Pressable>

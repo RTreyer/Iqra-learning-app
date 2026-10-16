@@ -1,5 +1,5 @@
 import { StyleSheet, type ViewStyle } from "react-native";
-import { colors, pillPlate, touchTarget } from "@/theme/tokens";
+import { colors, touchTarget } from "@/theme/tokens";
 
 export const PAD_MAX = 340;
 export const PAD_FALLBACK = 300;
@@ -50,6 +50,5 @@ export const trace = StyleSheet.create({
   },
   clear: { backgroundColor: "rgba(237,233,254,0.9)", borderWidth: 2, borderColor: "#C4B5FD" },
   clearText: { fontSize: 17, fontWeight: "700", color: "#7C3AED" },
-  donePlate: pillPlate,
-  doneText: { fontSize: 17, fontWeight: "700", color: colors.text },
+  doneText: { fontSize: 17, fontWeight: "700", color: colors.white },
 });

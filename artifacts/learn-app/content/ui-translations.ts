@@ -121,7 +121,6 @@ const english: Record<string, string> = {
   "تَابِعْ": "Continue",
   "لا شَيْءَ لِلْمُرَاجَعَةِ الْيَوْم": "Nothing to review today",
   "أَحْسَنْت! مُرَاجَعَة الْيَوْم مُكْتَمِلَة": "Well done! Today's review is complete",
-  "عناصر": "items",
   "يَوْم مُتَتَالٍ": "day streak",
   "تَابِعْ:": "Continue:",
   "اضغط على كل جملة لتسمعها 🔊": "Tap each sentence to hear it 🔊",
@@ -146,7 +145,7 @@ export function translateUi(text: string, language: UiLanguage): string {
   if (value.startsWith("النشاط التالي: ")) return `Next activity: ${value.slice("النشاط التالي: ".length).replace(/\s*←$/, "")} →`;
   const completed = value.match(/^(\d+)\s*\/\s*(\d+)\s+مكتمل$/);
   if (completed) return `${completed[1]} / ${completed[2]} complete`;
-  const remaining = value.match(/^(\d+)\s+(جملة متبقية|كلمة متبقية|عناصر|يَوْم مُتَتَالٍ)$/);
+  const remaining = value.match(/^(\d+)\s+(جملة متبقية|كلمة متبقية|يَوْم مُتَتَالٍ)$/);
   if (remaining) return `${remaining[1]} ${english[remaining[2]]}`;
   const question = value.match(/^سؤال (\d+) من (\d+)$/);
   if (question) return `Question ${question[1]} of ${question[2]}`;

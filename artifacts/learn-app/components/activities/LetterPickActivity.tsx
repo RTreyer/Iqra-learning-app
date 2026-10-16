@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { UiText } from "@/components/UiText";
 import { speak } from "@/lib/speech";
-import { colors } from "@/theme/tokens";
+import { colors, readableFill } from "@/theme/tokens";
 import { PRAISE } from "./shared/strings";
 import { ChoiceCard } from "./shared/ChoiceCard";
 import { ProgressDots } from "./shared/ProgressDots";
@@ -45,7 +45,7 @@ function LetterPick({ lesson, color, attemptKey, onComplete, onRoundResult }: Ac
       <ProgressDots count={rounds.length} current={quiz.roundIndex} color={color} />
       <View style={[styles.display, { borderColor: color }]}>
         <UiText style={styles.displayHint}>ابحث عن الحرف</UiText>
-        <Text style={styles.displayBig}>{round.targetLetter}</Text>
+        <Text style={[styles.displayBig, { color: readableFill(color) }]}>{round.targetLetter}</Text>
       </View>
       <UiText style={act.instruction}>{`سؤال ${quiz.roundIndex + 1} من ${rounds.length}`}</UiText>
       <View style={act.letterChoicesRow}>
@@ -80,5 +80,5 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   displayHint: { fontSize: 13, color: colors.muted, fontWeight: "600" },
-  displayBig: { fontSize: 72, fontWeight: "900", lineHeight: 88, color: colors.text },
+  displayBig: { fontSize: 72, fontWeight: "900", lineHeight: 88 },
 });

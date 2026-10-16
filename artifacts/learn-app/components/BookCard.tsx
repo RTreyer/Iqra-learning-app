@@ -5,7 +5,7 @@ import { UiChevron } from "@/components/UiChevron";
 import { UiText } from "@/components/UiText";
 import type { Book } from "@/content/types";
 import { useLanguage } from "@/context/LanguageContext";
-import { colors, pillPlate, touchTarget, withAlpha } from "@/theme/tokens";
+import { colors, readableFill, touchTarget, withAlpha } from "@/theme/tokens";
 
 type Props = { book: Book; onPress: () => void };
 
@@ -22,16 +22,14 @@ export function BookCard({ book, onPress }: Props) {
       onPress={onPress}
       style={({ pressed }) => [
         styles.card,
-        { backgroundColor: book.color, flexDirection: language === "en" ? "row" : "row-reverse" },
+        { backgroundColor: readableFill(book.color), flexDirection: language === "en" ? "row" : "row-reverse" },
         !book.available && styles.disabled,
         pressed && styles.pressed,
       ]}
     >
       <Text style={styles.emoji}>{book.emoji}</Text>
       <View style={[styles.info, { alignItems: language === "en" ? "flex-start" : "flex-end" }]}>
-        <View style={styles.titlePlate}>
-          <UiText style={styles.title}>{book.title}</UiText>
-        </View>
+        <UiText style={styles.title}>{book.title}</UiText>
         <View style={styles.label}>
           <UiText style={styles.labelText}>{book.subtitle}</UiText>
         </View>
@@ -66,8 +64,7 @@ const styles = StyleSheet.create({
   pressed: { opacity: 0.88, transform: [{ scale: 0.97 }] },
   emoji: { fontSize: 48 },
   info: { flex: 1, gap: 6 },
-  titlePlate: pillPlate,
-  title: { fontSize: 26, fontWeight: "900", color: colors.text },
+  title: { fontSize: 26, fontWeight: "900", color: colors.white },
   label: { backgroundColor: colors.pill, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 },
   labelText: { fontSize: 13, fontWeight: "800", color: colors.text },
 });

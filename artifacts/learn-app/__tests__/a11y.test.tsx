@@ -30,12 +30,12 @@ function withProgress(ui: React.ReactElement) {
 }
 
 /** Every Pressable that can be pressed must be announced and large enough to hit. */
-function expectAccessiblePressables(minimum = 1) {
+function expectAccessiblePressables(exactly: number) {
   // Pressable is a memo wrapper in jest-expo, so match the rendered component by its name.
   const pressables = screen.UNSAFE_root.findAll(
     (node: ReturnType<typeof screen.UNSAFE_root.findAll>[number]) => typeof node.type !== "string" && (node.type as { name?: string }).name === "Pressable" && typeof node.props.onPress === "function",
   );
-  expect(pressables.length).toBeGreaterThanOrEqual(minimum);
+  expect(pressables.length).toBe(exactly);
   for (const node of pressables) {
     const where = String(node.props.testID ?? node.props.accessibilityLabel ?? "unnamed pressable");
     expect({ where, role: node.props.accessibilityRole }).toEqual({ where, role: "button" });
@@ -45,6 +45,9 @@ function expectAccessiblePressables(minimum = 1) {
     const flat = StyleSheet.flatten(typeof style === "function" ? style({ pressed: false }) : style) ?? {};
     const sizes = [flat.minHeight, flat.height].filter((v): v is number => typeof v === "number");
     expect({ where, tall: sizes.length > 0 && Math.max(...sizes) >= touchTarget }).toEqual({ where, tall: true });
+    // Rows that stretch (no numeric width, or a percentage) are as wide as their parent.
+    const widths = [flat.minWidth, flat.width].filter((v): v is number => typeof v === "number");
+    if (widths.length > 0) expect({ where, wide: Math.max(...widths) >= touchTarget }).toEqual({ where, wide: true });
   }
 }
 
@@ -60,14 +63,14 @@ test("home: language switch, continue, review and book cards", async () => {
   await seed();
   withProgress(<HomeScreen />);
   await screen.findByTestId("review-card");
-  expectAccessiblePressables(6);
+  expectAccessiblePressables(7);
 });
 
 test("book: back button and unit cards", async () => {
   setParams({ bookId: "arabic-1" });
   withProgress(<BookScreen />);
   await screen.findAllByTestId(/^unit-/);
-  expectAccessiblePressables(2);
+  expectAccessiblePressables(9);
 });
 
 test("unit: back button and lesson rows, including a completed one", async () => {
@@ -75,7 +78,7 @@ test("unit: back button and lesson rows, including a completed one", async () =>
   setParams({ unitId: "a1" });
   withProgress(<UnitScreen />);
   await screen.findAllByTestId(/^lesson-row-/);
-  expectAccessiblePressables(3);
+  expectAccessiblePressables(6);
 });
 
 test("lesson u2-3: back button and the activity controls", async () => {
@@ -84,5 +87,5 @@ test("lesson u2-3: back button and the activity controls", async () => {
   await act(async () => {
     jest.advanceTimersByTime(2000);
   });
-  expectAccessiblePressables(3);
+  expectAccessiblePressables(4);
 });

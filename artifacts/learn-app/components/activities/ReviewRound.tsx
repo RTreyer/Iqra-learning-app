@@ -5,7 +5,7 @@ import * as haptics from "@/lib/haptics";
 import { numberToArabicWord, toArabicDigits } from "@/lib/arabicNumbers";
 import type { ReviewItem } from "@/lib/reviewItems";
 import { speak } from "@/lib/speech";
-import { colors, touchTarget } from "@/theme/tokens";
+import { colors, readableFill, touchTarget } from "@/theme/tokens";
 import { mathStyles } from "./math/NumberQuiz";
 import { COUNT_PROMPT, answerOf, arithmeticPrompt } from "./math/prompts";
 import { ChoiceCard, type ChoiceVariant } from "./shared/ChoiceCard";
@@ -90,7 +90,7 @@ function Prompt({ item, color, spoken }: { item: ReviewItem; color: string; spok
       return (
         <View style={[styles.display, { borderColor: color }]}>
           <UiText style={styles.displayHint}>ابحث عن الحرف</UiText>
-          <Text style={styles.displayBig}>{item.targetLetter}</Text>
+          <Text style={[styles.displayBig, { color: readableFill(color) }]}>{item.targetLetter}</Text>
         </View>
       );
     case "word":
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   displayHint: { fontSize: 13, color: colors.muted, fontWeight: "600" },
-  displayBig: { fontSize: 72, fontWeight: "900", lineHeight: 88, color: colors.text },
+  displayBig: { fontSize: 72, fontWeight: "900", lineHeight: 88 },
   numberPrompt: { alignItems: "center", gap: 16, maxWidth: 300 },
   question: {
     flexDirection: "row",

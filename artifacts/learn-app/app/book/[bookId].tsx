@@ -18,7 +18,7 @@ import { useProgress } from "@/context/ProgressContext";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
 import { firstParam } from "@/lib/params";
 import { routes } from "@/lib/routes";
-import { colors } from "@/theme/tokens";
+import { colors, readableFill } from "@/theme/tokens";
 
 export default function BookScreen() {
   const bookId = firstParam(useLocalSearchParams<{ bookId?: string | string[] }>().bookId);
@@ -45,15 +45,13 @@ export default function BookScreen() {
         <StarBadge stars={progress.totalStars} />
       </View>
 
-      <View style={[styles.banner, { backgroundColor: book.color, flexDirection: language === "en" ? "row" : "row-reverse" }]}>
+      <View style={[styles.banner, { backgroundColor: readableFill(book.color), flexDirection: language === "en" ? "row" : "row-reverse" }]}>
         <Text style={styles.bannerEmoji}>{book.emoji}</Text>
         <View style={[styles.bannerText, { alignItems: language === "en" ? "flex-start" : "flex-end" }]}>
           <View style={styles.bannerLabel}>
             <UiText style={styles.bannerSubject}>{book.subtitle}</UiText>
           </View>
-          <View style={styles.bannerLabel}>
-            <UiText style={styles.bannerTitle}>{book.title}</UiText>
-          </View>
+          <UiText style={styles.bannerTitle}>{book.title}</UiText>
         </View>
       </View>
 
@@ -107,7 +105,7 @@ const styles = StyleSheet.create({
   bannerText: { flex: 1, gap: 6 },
   bannerLabel: { backgroundColor: colors.pill, borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3 },
   bannerSubject: { fontSize: 13, color: colors.text, fontWeight: "700" },
-  bannerTitle: { fontSize: 22, fontWeight: "900", color: colors.text, lineHeight: 28 },
+  bannerTitle: { fontSize: 22, fontWeight: "900", color: colors.white, lineHeight: 28 },
   scroll: { width: "100%" },
   list: { gap: 14, paddingTop: 4 },
   subtitle: { fontSize: 15, color: colors.warmText, textAlign: "center", marginBottom: 2, fontWeight: "700" },

@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { colors, pillPlate, touchTarget } from "@/theme/tokens";
+import { colors, touchTarget } from "@/theme/tokens";
 
 /** Activity styles ported from the legacy unit lesson screens. */
 export const act = StyleSheet.create({
@@ -10,9 +10,8 @@ export const act = StyleSheet.create({
 
   listenBtn: { borderRadius: 20, padding: 20, alignItems: "center", gap: 6, minWidth: 200, minHeight: touchTarget },
   listenEmoji: { fontSize: 36 },
-  listenPlate: { ...pillPlate, alignItems: "center", gap: 2 },
-  listenBtnText: { fontSize: 24, fontWeight: "900", color: colors.text, textAlign: "center" },
-  listenHint: { fontSize: 13, color: colors.mutedStrong, fontWeight: "600" },
+  listenBtnText: { fontSize: 24, fontWeight: "900", color: colors.white, textAlign: "center" },
+  listenHint: { fontSize: 13, color: colors.white, fontWeight: "600" },
 
   choicesRow: { flexDirection: "row", justifyContent: "center", gap: 10, flexWrap: "wrap", width: "100%" },
   wordChoicesCol: { width: "100%", gap: 12 },

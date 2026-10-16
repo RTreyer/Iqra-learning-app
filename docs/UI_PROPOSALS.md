@@ -4,6 +4,10 @@ Status: proposals only. Nothing here is implemented.
 
 Constraints that apply to every proposal: offline only, no login, Arabic UI (English only for menus and buttons), children in Yemen, low-end Android, keep the current visual style (gradient backgrounds, big rounded cards, emoji, star badge, language switch). Touch targets stay at 48 px or more (`touchTarget` in `theme/tokens.ts`).
 
+## Implemented accessibility baseline (2026-10-17)
+
+Every pressable card, row and button has `accessibilityRole="button"`, a meaningful label (Arabic or English for interface text, Arabic for lesson content) and a hit area of at least 48 px. All text reaches 4.5:1: fills that carry white text are darkened with `readableFill` in `theme/tokens.ts` (hue kept, amber becomes a deeper amber), large coloured content text uses the same helper on near white, and small 13 px badges keep the translucent pill plate. Back button headers mirror in Arabic. The WCAG large text 3:1 allowance was not relied upon anywhere.
+
 ## Summary
 
 | # | Proposal | Effort | Value | Depends on |

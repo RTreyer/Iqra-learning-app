@@ -69,10 +69,33 @@ export const shadow = {
 
 export const touchTarget = 48;
 
-/** Label plate for text on a subject, unit or lesson colour: dark text on the translucent pill, never white on the colour. */
-export const pillPlate = {
-  backgroundColor: colors.pill,
-  borderRadius: 12,
-  paddingHorizontal: 12,
-  paddingVertical: 4,
-} as const;
+function channelLuminance(value: number): number {
+  const v = value / 255;
+  return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+}
+
+/** WCAG contrast ratio of white text on a "#RRGGBB" fill. */
+export function whiteContrast(hex: string): number {
+  const [r, g, b] = [1, 3, 5].map((i) => channelLuminance(parseInt(hex.slice(i, i + 2), 16)));
+  return 1.05 / (0.2126 * r + 0.7152 * g + 0.0722 * b + 0.05);
+}
+
+const readableCache = new Map<string, string>();
+
+/**
+ * Display helper: the fill itself when white text on it reaches `min`, otherwise the colour darkened in
+ * small steps (RGB multiply keeps the hue) until it does. Memoised per input.
+ */
+export function readableFill(hex: string, min = 4.5): string {
+  const key = `${hex}|${min}`;
+  const cached = readableCache.get(key);
+  if (cached) return cached;
+  let channels = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+  let out = hex;
+  for (let step = 0; whiteContrast(out) < min && step < 100; step++) {
+    channels = channels.map((c) => Math.floor(c * 0.97));
+    out = `#${channels.map((c) => c.toString(16).padStart(2, "0")).join("").toUpperCase()}`;
+  }
+  readableCache.set(key, out);
+  return out;
+}

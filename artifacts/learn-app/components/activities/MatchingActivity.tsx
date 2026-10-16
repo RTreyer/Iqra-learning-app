@@ -4,7 +4,7 @@ import { UiText } from "@/components/UiText";
 import { useLanguage } from "@/context/LanguageContext";
 import * as haptics from "@/lib/haptics";
 import { speak } from "@/lib/speech";
-import { colors, touchTarget } from "@/theme/tokens";
+import { colors, touchTarget, withAlpha } from "@/theme/tokens";
 import { PRAISE } from "./shared/strings";
 import { DoneButton } from "./shared/DoneButton";
 import { act } from "./shared/styles";
@@ -65,7 +65,7 @@ function Matching({ lesson, color, attemptKey, onComplete }: ActivityProps<"matc
     <View style={act.container}>
       <UiText style={act.instruction}>اضغط على شيء في اليمين ثم ما يناسبه في اليسار</UiText>
       {/* Mirrored in Arabic so the first column sits on the right, as the hint says. */}
-      <View style={[styles.grid, { flexDirection: language === "en" ? "row" : "row-reverse" }]}>
+      <View testID="match-grid" style={[styles.grid, { flexDirection: language === "en" ? "row" : "row-reverse" }]}>
         <View style={styles.column}>
           {pairs.map((pair, i) => (
             <Pressable
@@ -77,7 +77,7 @@ function Matching({ lesson, color, attemptKey, onComplete }: ActivityProps<"matc
               style={[
                 styles.item,
                 state.selectedLeft === i && { borderColor: color, borderWidth: 3 },
-                state.matched.has(i) && { backgroundColor: color + "22", borderColor: color, borderWidth: 2 },
+                state.matched.has(i) && { backgroundColor: withAlpha(color, 0.13), borderColor: color, borderWidth: 2 },
               ]}
               onPress={() => handleLeft(i)}
             >

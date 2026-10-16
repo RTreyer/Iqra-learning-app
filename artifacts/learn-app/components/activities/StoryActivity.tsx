@@ -3,7 +3,7 @@ import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
 import { UiText } from "@/components/UiText";
 import * as haptics from "@/lib/haptics";
 import { speak } from "@/lib/speech";
-import { colors, touchTarget } from "@/theme/tokens";
+import { colors, readableFill, touchTarget, withAlpha } from "@/theme/tokens";
 import { DoneButton } from "./shared/DoneButton";
 import { act } from "./shared/styles";
 import { useOnce } from "./shared/useOnce";
@@ -42,11 +42,11 @@ function Story({ lesson, color, onComplete }: ActivityProps<"story">) {
                 accessibilityRole="button"
                 accessibilityLabel={line.text}
                 accessibilityState={{ selected: done }}
-                style={[styles.line, done && { borderColor: color, borderWidth: 2, backgroundColor: color + "12" }]}
+                style={[styles.line, done && { borderColor: color, borderWidth: 2, backgroundColor: withAlpha(color, 0.07) }]}
                 onPress={() => handleLine(i)}
               >
                 <Text style={styles.emoji}>{line.emoji}</Text>
-                <Text style={styles.text}>{line.text}</Text>
+                <Text style={[styles.text, done && { color: readableFill(color) }]}>{line.text}</Text>
                 {done ? <Text style={styles.check}>✓</Text> : null}
               </Pressable>
             </Animated.View>

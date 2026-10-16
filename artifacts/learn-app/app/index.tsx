@@ -37,8 +37,8 @@ export default function HomeScreen() {
   return (
     <ScreenBackground style={[styles.container, { paddingTop: pad.top + 8 }]}>
       <LanguageSwitch />
-      <View style={[styles.header, row]}>
-        <View style={[styles.badges, row]}>
+      <View style={styles.header}>
+        <View style={styles.badges}>
           <StarBadge stars={progress.totalStars} />
           {streak >= 2 && <StreakBadge days={streak} />}
         </View>
@@ -77,11 +77,12 @@ const styles = StyleSheet.create({
   container: { flex: 1, paddingHorizontal: 20, alignItems: "center" },
   header: {
     width: "100%",
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: 6,
   },
-  badges: { alignItems: "center", gap: 8 },
+  badges: { flexDirection: "row", alignItems: "center", gap: 8 },
   userRow: { alignItems: "center", gap: 8 },
   userName: { fontSize: 16, fontWeight: "700", color: colors.text, maxWidth: 80 },
   appTitle: { fontSize: 24, fontWeight: "800", color: colors.text, textAlign: "right" },
