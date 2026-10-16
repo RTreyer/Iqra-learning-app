@@ -3,7 +3,7 @@
  */
 
 import { useLocalSearchParams } from "expo-router";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { ActivityHost } from "@/components/ActivityHost";
@@ -16,25 +16,48 @@ import { useProgress } from "@/context/ProgressContext";
 import { useLessonAttempt } from "@/hooks/useLessonAttempt";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
 import * as haptics from "@/lib/haptics";
+import { firstParam } from "@/lib/params";
+import { routes } from "@/lib/routes";
 import { starsForScore, type Score } from "@/lib/scoring";
-import { speak } from "@/lib/speech";
+import { speak, stopSpeaking } from "@/lib/speech";
 
-const TITLE_SPEECH_DELAY_MS = 500;
+/** The activity mounts when the title has been spoken, or after this at the latest. */
+const INTRO_FALLBACK_MS = 1500;
+
+/**
+ * Speaks the title, then reports the lesson as ready. Activities speak their own first prompt,
+ * and speak() stops current speech, so they must not mount before the title has finished.
+ */
+function useLessonIntro(lessonId: string, title: string | undefined): boolean {
+  const [readyFor, setReadyFor] = useState<string | null>(null);
+  useEffect(() => {
+    if (!title) return;
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      setReadyFor(lessonId);
+    };
+    const timer = setTimeout(finish, INTRO_FALLBACK_MS);
+    speak(title, { onDone: finish });
+    return () => {
+      settled = true;
+      clearTimeout(timer);
+      stopSpeaking();
+    };
+  }, [lessonId, title]);
+  return readyFor === lessonId;
+}
 
 export default function LessonScreen() {
-  const { lessonId } = useLocalSearchParams<{ lessonId: string }>();
+  const lessonId = firstParam(useLocalSearchParams<{ lessonId?: string | string[] }>().lessonId) ?? "";
   const { completeLesson } = useProgress();
   const pad = useScreenPadding();
 
-  const found = getLesson(lessonId ?? "");
+  const found = getLesson(lessonId);
   const { completed, stars, completeAttempt, restartAttempt, activityKey } = useLessonAttempt(found ? found.lesson.id : "");
-
-  const title = found?.lesson.title;
-  useEffect(() => {
-    if (!title) return;
-    const timer = setTimeout(() => speak(title), TITLE_SPEECH_DELAY_MS);
-    return () => clearTimeout(timer);
-  }, [title]);
+  const ready = useLessonIntro(lessonId, found?.lesson.title);
 
   if (!found) return <NotFoundCard message="الدرس غير موجود" />;
   const { book, unit, lesson, next } = found;
@@ -50,7 +73,7 @@ export default function LessonScreen() {
   return (
     <ScreenBackground subject={book.subject} style={[styles.screen, { paddingTop: pad.top, paddingBottom: pad.bottom + 16 }]}>
       <View style={styles.header}>
-        <BackButton />
+        <BackButton fallback={routes.unit(unit.id)} />
         <View style={styles.headerCenter}>
           <Text style={styles.lessonEmoji}>{lesson.emoji}</Text>
           <View style={styles.headerText}>
@@ -68,8 +91,14 @@ export default function LessonScreen() {
         keyboardShouldPersistTaps="handled"
       >
         {completed ? (
-          <LessonCompleteCard stars={stars} onRepeat={restartAttempt} next={next} color={unit.color} />
-        ) : (
+          <LessonCompleteCard
+            stars={stars}
+            onRepeat={restartAttempt}
+            next={next}
+            backTo={routes.unit(unit.id)}
+            color={unit.color}
+          />
+        ) : ready ? (
           <ActivityHost
             lesson={lesson}
             color={unit.color}
@@ -77,7 +106,7 @@ export default function LessonScreen() {
             onComplete={onComplete}
             // TODO(5.3): onRoundResult={recordRoundResult}
           />
-        )}
+        ) : null}
       </ScrollView>
     </ScreenBackground>
   );

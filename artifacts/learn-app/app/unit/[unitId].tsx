@@ -14,10 +14,11 @@ import { UiText } from "@/components/UiText";
 import { books, getUnit, unitLessonIds } from "@/content";
 import { useProgress } from "@/context/ProgressContext";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
+import { firstParam } from "@/lib/params";
 import { routes } from "@/lib/routes";
 
 export default function UnitScreen() {
-  const { unitId } = useLocalSearchParams<{ unitId: string }>();
+  const unitId = firstParam(useLocalSearchParams<{ unitId?: string | string[] }>().unitId);
   const { getLessonProgress, getUnitProgress } = useProgress();
   const pad = useScreenPadding();
 
@@ -30,12 +31,12 @@ export default function UnitScreen() {
 
   if (!unit || !summary) return <NotFoundCard message="الوحدة غير موجودة" />;
 
-  const subject = books.find((book) => book.units.includes(unit))?.subject;
+  const book = books.find((candidate) => candidate.units.includes(unit));
 
   return (
-    <ScreenBackground subject={subject} style={[styles.container, { paddingTop: pad.top }]}>
+    <ScreenBackground subject={book?.subject} style={[styles.container, { paddingTop: pad.top }]}>
       <View style={styles.header}>
-        <BackButton />
+        <BackButton fallback={book ? routes.book(book.id) : routes.home()} />
         <View style={styles.headerCenter}>
           <UiText style={styles.title}>{unit.title}</UiText>
           <View style={[styles.badge, { backgroundColor: unit.color }]}>

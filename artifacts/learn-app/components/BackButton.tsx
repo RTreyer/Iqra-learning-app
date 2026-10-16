@@ -4,24 +4,32 @@
  */
 
 import * as Haptics from "expo-haptics";
-import { router } from "expo-router";
+import { router, type Href } from "expo-router";
 import React from "react";
 import { Pressable, StyleSheet } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import { useLanguage } from "@/context/LanguageContext";
 
+/** Goes back when there is history; otherwise (web deep link or refresh) replaces with the fallback. */
+export function goBackOr(fallback: Href) {
+  if (router.canGoBack()) router.back();
+  else router.replace(fallback);
+}
+
 type Props = {
+  /** Where to go when there is no history to go back to. */
+  fallback: Href;
   onPress?: () => void;
 };
 
-export function BackButton({ onPress }: Props) {
+export function BackButton({ fallback, onPress }: Props) {
   const { t, language } = useLanguage();
   const handlePress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (onPress) {
       onPress();
     } else {
-      router.back();
+      goBackOr(fallback);
     }
   };
 

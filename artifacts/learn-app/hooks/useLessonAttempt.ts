@@ -1,5 +1,5 @@
 import { useFocusEffect } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 type Finished = { key: string; stars: number };
 
@@ -7,13 +7,19 @@ type Finished = { key: string; stars: number };
 export function useLessonAttempt(lessonKey: string) {
   const [finished, setFinished] = useState<Finished | null>(null);
   const [attempt, setAttempt] = useState(0);
+  const focusedOnce = useRef(false);
   const restartAttempt = useCallback(() => {
     setFinished(null);
     setAttempt((previous) => previous + 1);
   }, []);
 
   // Keyed on lessonKey: a new key on the same focused screen must also reset the attempt.
+  // The first focus is the initial mount, so it keeps the attempt (no double mount of the activity).
   const onFocus = useCallback(() => {
+    if (!focusedOnce.current) {
+      focusedOnce.current = true;
+      return;
+    }
     setFinished((current) => (current?.key === lessonKey ? null : current));
     setAttempt((previous) => previous + 1);
   }, [lessonKey]);

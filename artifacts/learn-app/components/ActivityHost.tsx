@@ -48,5 +48,11 @@ export function ActivityHost({ lesson, ...props }: Props) {
       const Activity = ACTIVITY_COMPONENTS.arithmetic;
       return <Activity lesson={lesson} {...props} />;
     }
+    default:
+      return assertNever(lesson);
   }
+}
+
+function assertNever(value: never): never {
+  throw new Error(`Unhandled lesson type: ${JSON.stringify(value)}`);
 }

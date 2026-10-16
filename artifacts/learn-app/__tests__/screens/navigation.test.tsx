@@ -5,11 +5,14 @@ import BookScreen from "@/app/book/[bookId]";
 import UnitScreen from "@/app/unit/[unitId]";
 import { books, getUnit } from "@/content";
 import { routes } from "@/lib/routes";
-import { renderScreen, setParams } from "@/test-utils/screens";
+import { mockCanGoBack, renderScreen, setParams } from "@/test-utils/screens";
 
-const { router } = jest.requireMock("expo-router") as { router: { push: jest.Mock } };
+const { router } = jest.requireMock("expo-router") as { router: { push: jest.Mock; replace: jest.Mock } };
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockCanGoBack(false);
+});
 
 test("home renders one card per book and opens a book", () => {
   renderScreen(<HomeScreen />);
@@ -42,4 +45,25 @@ test("unit screen renders one row per lesson and opens a lesson", () => {
   expect(screen.getAllByTestId(/^lesson-row-/)).toHaveLength(6);
   fireEvent.press(screen.getByTestId("lesson-row-u2-3"));
   expect(router.push).toHaveBeenCalledWith(routes.lesson("u2-3"));
+});
+
+test("back buttons fall back up the hierarchy without history", () => {
+  setParams({ unitId: "a2" });
+  const unit = renderScreen(<UnitScreen />);
+  fireEvent.press(screen.getByLabelText("رجوع"));
+  expect(router.replace).toHaveBeenLastCalledWith(routes.book("arabic-1"));
+  unit.unmount();
+
+  setParams({ bookId: "math-1" });
+  renderScreen(<BookScreen />);
+  fireEvent.press(screen.getByLabelText("رجوع"));
+  expect(router.replace).toHaveBeenLastCalledWith(routes.home());
+});
+
+test("array params use the first value", () => {
+  const params = (jest.requireMock("expo-router") as { __params: Record<string, unknown> }).__params;
+  setParams({});
+  params.unitId = ["a2", "a3"];
+  renderScreen(<UnitScreen />);
+  expect(screen.getAllByTestId(/^lesson-row-/)).toHaveLength(6);
 });

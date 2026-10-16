@@ -1,7 +1,8 @@
-import { router } from "expo-router";
+import { router, type Href } from "expo-router";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import { goBackOr } from "@/components/BackButton";
 import { UiText } from "@/components/UiText";
 import type { Lesson } from "@/content/types";
 import { useLanguage } from "@/context/LanguageContext";
@@ -16,10 +17,12 @@ type Props = {
   onRepeat: () => void;
   /** Next lesson in the unit, or null when the unit is finished. */
   next: Lesson | null;
+  /** The unit list, used when "back" has no history (web deep link). */
+  backTo: Href;
   color?: string;
 };
 
-export function LessonCompleteCard({ stars, onRepeat, next, color = colors.success }: Props) {
+export function LessonCompleteCard({ stars, onRepeat, next, backTo, color = colors.success }: Props) {
   const { language } = useLanguage();
   return (
     <View style={styles.content} testID="lesson-complete">
@@ -69,7 +72,7 @@ export function LessonCompleteCard({ stars, onRepeat, next, color = colors.succe
         </UiText>
       )}
 
-      <Pressable testID="back-to-list" accessibilityRole="button" style={styles.backLink} onPress={() => router.back()}>
+      <Pressable testID="back-to-list" accessibilityRole="button" style={styles.backLink} onPress={() => goBackOr(backTo)}>
         <UiText style={styles.backLinkText}>العودة إلى القائمة</UiText>
       </Pressable>
     </View>

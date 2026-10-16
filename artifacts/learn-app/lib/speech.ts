@@ -3,11 +3,26 @@ import { Platform } from "react-native";
 
 export const ARABIC_RATE = 0.8;
 
-export function speak(text: string, rate: number = ARABIC_RATE): void {
+export type SpeakOptions = {
+  rate?: number;
+  /** Called once speech ends, fails or is stopped, so a chain waiting on it never hangs. */
+  onDone?: () => void;
+};
+
+/** Speaks Arabic text, stopping any current speech first. A number is read as the rate. */
+export function speak(text: string, options: number | SpeakOptions = {}): void {
+  const { rate = ARABIC_RATE, onDone } = typeof options === "number" ? { rate: options } : options;
   try {
     Speech.stop();
-    Speech.speak(text, { language: "ar", rate });
-  } catch {}
+    if (onDone) {
+      const done = () => onDone();
+      Speech.speak(text, { language: "ar", rate, onDone: done, onError: done, onStopped: done });
+    } else {
+      Speech.speak(text, { language: "ar", rate });
+    }
+  } catch {
+    onDone?.();
+  }
 }
 
 export function stopSpeaking(): void {

@@ -23,3 +23,9 @@ export function setParams(next: Record<string, string>) {
   for (const key of Object.keys(params)) delete params[key];
   Object.assign(params, next);
 }
+
+/** The jest.setup router mock has no canGoBack; screens call it before going back. */
+export function mockCanGoBack(value: boolean) {
+  const { router } = jest.requireMock("expo-router") as { router: Record<string, unknown> };
+  router.canGoBack = jest.fn(() => value);
+}

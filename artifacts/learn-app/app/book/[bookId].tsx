@@ -15,10 +15,11 @@ import { UnitCard } from "@/components/UnitCard";
 import { getBook, unitLessonIds } from "@/content";
 import { useProgress } from "@/context/ProgressContext";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
+import { firstParam } from "@/lib/params";
 import { routes } from "@/lib/routes";
 
 export default function BookScreen() {
-  const { bookId } = useLocalSearchParams<{ bookId: string }>();
+  const bookId = firstParam(useLocalSearchParams<{ bookId?: string | string[] }>().bookId);
   const { progress, getUnitProgress } = useProgress();
   const pad = useScreenPadding();
 
@@ -33,7 +34,7 @@ export default function BookScreen() {
   return (
     <ScreenBackground subject={book.subject} style={[styles.container, { paddingTop: pad.top + 4 }]}>
       <View style={styles.header}>
-        <BackButton />
+        <BackButton fallback={routes.home()} />
         <View style={styles.headerCenter}>
           <Text style={styles.bookEmoji}>{book.emoji}</Text>
           <UiText style={styles.bookTitle} numberOfLines={1}>{book.title}</UiText>

@@ -29,6 +29,31 @@ describe("speak", () => {
     expect(Speech.speak).toHaveBeenCalledWith("x", { language: "ar", rate: 0.5 });
   });
 
+  it("accepts an options object with a rate", () => {
+    speak("x", { rate: 0.6 });
+    expect(Speech.speak).toHaveBeenCalledWith("x", { language: "ar", rate: 0.6 });
+  });
+
+  it("calls onDone when speech finishes, fails or is stopped", () => {
+    const onDone = jest.fn();
+    speak("ب", { onDone });
+    const options = mockSpeech.speak.mock.calls[0][1];
+    expect(options).toMatchObject({ language: "ar", rate: 0.8 });
+    options.onDone();
+    options.onError(new Error("x"));
+    options.onStopped();
+    expect(onDone).toHaveBeenCalledTimes(3);
+  });
+
+  it("calls onDone when Speech.speak throws", () => {
+    mockSpeech.speak.mockImplementationOnce(() => {
+      throw new Error("tts failure");
+    });
+    const onDone = jest.fn();
+    expect(() => speak("ب", { onDone })).not.toThrow();
+    expect(onDone).toHaveBeenCalledTimes(1);
+  });
+
   it("does not throw when Speech.speak throws", () => {
     mockSpeech.speak.mockImplementationOnce(() => {
       throw new Error("tts failure");
