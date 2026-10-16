@@ -1,4 +1,0 @@
-- [Replit Auth mobile setup](replit-auth-mobile.md) — match popup results with their initiating request and preserve exact web redirect URIs.
-- [Metro blockList](metro-blocklist.md) — Metro crashes if watched dirs vanish; always block `.local/skills/` in metro.config.js blockList
-- [Interface language scope](ui-language-scope.md) — English is for menus and buttons only; Arabic lesson content and speech stay unchanged.
-- [Repeating learning content](learning-repetition.md) — saved completion must never block repeated practice; preserve progress and best stars.

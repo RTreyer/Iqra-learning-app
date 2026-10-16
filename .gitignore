@@ -41,13 +41,6 @@ testem.log
 .DS_Store
 Thumbs.db
 
-.cursor/rules/nx-rules.mdc
-.github/instructions/nx.instructions.md
-
-# Replit
-.cache/
-.local/
-
 # Environment / secrets
 .env
 .env.*
@@ -56,11 +49,6 @@ Thumbs.db
 # Logs
 *.log
 pnpm-debug.log*
-
-# Replit / local tooling
-.config/
-.upm/
-.pythonlibs/
 
 # Expo / React Native build output
 web-build/
@@ -71,7 +59,3 @@ android/
 *.p12
 *.key
 *.mobileprovision
-
-# Large local assets & backups (not used by the code)
-attached_assets/
-*.tar.gz
