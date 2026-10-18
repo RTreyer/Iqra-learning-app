@@ -7,6 +7,11 @@ Structured notes read page by page from the Yemen Ministry of Education Grade 1 
 | `arabic-part1/` | أقرأ وأتعلم, Part 1 (Aden 2017, 192 pp.) | `textbooks/arabic-part1/` | read in full, 8 units saved, app comparison done |
 | `arabic-part2/` | أقرأ وأتعلم, Part 2 (Aden, trial edition 2014-2015, 192 pp.) | `textbooks/arabic-part2/` | read in full: Units 7 to 12 saved (7 and 8 repeat Part 1 in an older version) |
 | `my-arabic-part1/` | لغتي العربية (My Arabic Language), Part 1 (Sana'a 2026, 166 pp.). Own course in the app: subject `lughati`, book `lughati-1` | `textbooks/my-arabic-part1/` | read in full: Units 1 to 4 saved, letters أ to غ |
+| `my-arabic-part2/` | لغتي العربية, Part 2 | `textbooks/my-arabic-part2/` | waiting for the PDF |
+| `math-part1/` | الرياضيات (Mathematics), Part 1 | `textbooks/math-part1/` | waiting for the PDF |
+| `math-part2/` | الرياضيات (Mathematics), Part 2 | `textbooks/math-part2/` | waiting for the PDF |
+| `science-part1/` | العلوم (Science), Part 1 | `textbooks/science-part1/` | waiting for the PDF |
+| `science-part2/` | العلوم (Science), Part 2 | `textbooks/science-part2/` | waiting for the PDF |
 
 ## Layout per book
 
