@@ -18,8 +18,9 @@ The rebuild left one package with one content model (Book, Unit, Lesson) and one
 |---|---|---|---|
 | Arabic Part 1 (`arabic-1`) | 8 | 47 | Complete. Unit 1: 5 pre reading lessons. Units 2 to 8: 6 lessons each |
 | Math Part 1 (`math-1`) | 3 | 11 | Exemplary, from textbook Part 1 units 2 to 5 (numbers 0 to 10, add and subtract within 10, plane shapes). Not the full year |
-| Science Part 1 (`science-1`) | 3 | 9 | Placeholder, no textbook source yet |
-| Grades 2 to 6, other subjects | none | none | Not started |
+| Science Part 1 (`science-1`) | 3 | 9 | Placeholder, no textbook source yet. `available: false`, shown as "قريباً" |
+| Arabic Part 2 (`arabic-2`), Math Part 2 (`math-2`) | none | none | `available: false`, shown as "قريباً". Planned for v1.1 |
+| Grades 2 to 6 | none | none | Listed on home as "قريباً" (`grades` in `content/catalog.ts`) |
 
 Review status per unit: `docs/CONTENT_REVIEW.md`.
 
@@ -69,7 +70,7 @@ artifacts/learn-app/                the Expo app
 ## 5. Routes
 
 ```
-/                       home: continue card, review card, streak, star badge, books, language switch
+/                       home: continue card, review card, streak, star badge, grades 1 to 6 (grade 1 books, others "قريباً"), language switch
 /book/[bookId]          units of a book
 /unit/[unitId]          lessons of a unit
 /lesson/[lessonId]      lesson (ids u1-1 .. u8-6, m1-1 .. m3-3, s1-1 .. s3-3), globally unique

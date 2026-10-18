@@ -39,9 +39,10 @@ Progress stays on the device. No server, no accounts. AsyncStorage key `@kidlear
 |---|---|---|---|
 | Arabic Part 1 | 8 | 47 | Complete. Unit 1 has 5 pre reading lessons, units 2 to 8 have 6 lessons each. Native speaker review pending |
 | Math Part 1 | 3 | 11 | Exemplary, derived from the textbook outline (numbers 0 to 10, add and subtract within 10, plane shapes). Not the full year |
-| Science Part 1 | 3 | 9 | Placeholder, no textbook source yet |
+| Science Part 1 | 3 | 9 | Placeholder, no textbook source yet. Shown as "قريباً" on home, not part of the release |
+| Arabic Part 2, Math Part 2 | 0 | 0 | Shown as "قريباً". Planned for release v1.1 |
 
-Grades 2 to 6 and other subjects are not started. Review status per unit: [docs/CONTENT_REVIEW.md](docs/CONTENT_REVIEW.md).
+Home lists grades 1 to 6 (`grades` in `content/catalog.ts`). Grade 1 shows its books; grades 2 to 6 have no books yet and show as "قريباً". Release v1.0 ships Arabic Part 1 and Math Part 1. Review status per unit: [docs/CONTENT_REVIEW.md](docs/CONTENT_REVIEW.md).
 
 ## Learning design
 

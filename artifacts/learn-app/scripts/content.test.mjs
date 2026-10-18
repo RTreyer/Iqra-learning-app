@@ -23,6 +23,19 @@ test("lesson numbers match their position in the unit", () => {
   }
 });
 
+test("books are the grade 1 to 6 books in order, with unique IDs", async () => {
+  const { grades } = await import("../content/index.ts");
+  assert.deepEqual(
+    books.map((b) => b.id),
+    grades.flatMap((g) => g.books.map((b) => b.id)),
+  );
+  assert.equal(new Set(books.map((b) => b.id)).size, books.length);
+  assert.deepEqual(
+    books.filter((b) => b.available).map((b) => b.id),
+    ["arabic-1", "math-1"],
+  );
+});
+
 test("every available book has lessons", () => {
   for (const book of books.filter((b) => b.available)) {
     assert.ok(

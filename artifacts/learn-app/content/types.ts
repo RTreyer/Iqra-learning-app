@@ -76,3 +76,10 @@ export type Book = {
   available: boolean;
   units: Unit[];
 };
+
+/** A school grade on the home screen. A grade without books shows as "قريباً". */
+export type Grade = {
+  number: number;
+  title: string;
+  books: Book[];
+};

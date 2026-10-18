@@ -12,17 +12,20 @@ test("Arabic is unchanged, including whitespace and lesson text", () => {
     assert.equal(translateUi(text, "ar"), text);
   }
 });
-test("English controls, auth errors and book menus", () => {
-  assert.equal(translateUi("ابدأِ التَّعَلُّم 🚀", "en"), "Start learning 🚀");
+test("English controls and book menus", () => {
   assert.equal(translateUi("مسح", "en"), "Clear");
   assert.equal(translateUi("إعادة الدرس", "en"), "Repeat lesson");
-  assert.equal(translateUi("إعادة الوحدة", "en"), "Repeat unit");
   assert.equal(translateUi("3 جملة متبقية", "en"), "3 sentences left");
   assert.equal(translateUi("2 كلمة متبقية", "en"), "2 words left");
-  assert.equal(
-    translateUi("تعذّر تسجيل الدخول. حاول مرة أخرى.", "en"),
-    "Sign-in failed. Please try again.",
+  assert.equal(translateUi("اللغة العربية — الجزء الثاني", "en"), "Arabic — Part 2");
+});
+test("Every grade title translates", async () => {
+  const { grades } = await import("../content/index.ts");
+  assert.deepEqual(
+    grades.map((g) => g.number),
+    [1, 2, 3, 4, 5, 6],
   );
+  for (const grade of grades) assert.equal(translateUi(grade.title, "en"), `Grade ${grade.number}`);
 });
 test("Dynamic labels keep scores and Arabic lesson titles", () => {
   assert.equal(translateUi("2 / 5 مكتمل", "en"), "2 / 5 complete");

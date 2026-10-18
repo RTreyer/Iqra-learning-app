@@ -17,18 +17,23 @@ import {
   traceDiagonal,
 } from "./helpers.mjs";
 
-const BOOK_IDS = ["arabic-1", "math-1", "science-1"];
+const BOOK_IDS = ["arabic-1", "arabic-2", "math-1", "math-2", "science-1"];
+const AVAILABLE_BOOK_IDS = ["arabic-1", "math-1"];
 
 test.describe("navigation", () => {
-  test("home shows the three books, zero stars and no streak", async ({ page }) => {
+  test("home shows grade 1 books, grades 2 to 6 as soon, zero stars and no streak", async ({
+    page,
+  }) => {
     await gotoAndWaitReady(page, "/");
     for (const id of BOOK_IDS) await expect(page.getByTestId(`book-${id}`)).toBeVisible();
+    for (const n of [2, 3, 4, 5, 6])
+      await expect(page.getByTestId(`grade-${n}`)).toContainText("قريباً");
     await expect(page.getByTestId("star-badge")).toContainText("0");
     await expect(page.getByTestId("streak-badge")).toHaveCount(0);
   });
 
   test("every available book card navigates to its book", async ({ page }) => {
-    for (const id of BOOK_IDS) {
+    for (const id of AVAILABLE_BOOK_IDS) {
       await gotoAndWaitReady(page, "/");
       const card = page.getByTestId(`book-${id}`);
       await expect(card).not.toHaveAttribute("aria-disabled", "true");
@@ -162,6 +167,7 @@ test.describe("activities", () => {
     await expect.poll(async () => (await readProgress(page))?.lessons["m1-1"]?.stars).toBe(3);
   });
 
+  // Science is hidden behind "قريباً" on home, but its lessons still open by URL.
   test("science story and naming lessons complete", async ({ page }) => {
     await gotoAndWaitReady(page, "/lesson/s1-1");
     await tapAllAndFinish(page, [
@@ -258,12 +264,10 @@ test.describe("accessibility", () => {
         };
       });
       expect(violations.checked, `axe checked text nodes on ${path}`).toBeGreaterThan(0);
-      test
-        .info()
-        .annotations.push({
-          type: "axe color-contrast",
-          description: `${path}: ${violations.counts.join(", ")}`,
-        });
+      test.info().annotations.push({
+        type: "axe color-contrast",
+        description: `${path}: ${violations.counts.join(", ")}`,
+      });
       if (violations.serious.length) found[path] = violations.serious;
     }
     expect(found).toEqual({});

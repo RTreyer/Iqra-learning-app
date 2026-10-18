@@ -1,6 +1,6 @@
 /**
- * Home screen: guidance (continue, today's review, streak) above one large
- * card per book of the Grade 1 catalog.
+ * Home screen: guidance (continue, today's review, streak) above grades 1 to 6.
+ * A grade with books lists one large card per book; a grade without books shows "قريباً".
  */
 
 import { router } from "expo-router";
@@ -9,13 +9,14 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { BookCard } from "@/components/BookCard";
 import { ContinueCard } from "@/components/ContinueCard";
+import { GradeSoonCard } from "@/components/GradeSoonCard";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
 import { ReviewCard } from "@/components/ReviewCard";
 import { ScreenBackground } from "@/components/ScreenBackground";
 import { StarBadge } from "@/components/StarBadge";
 import { StreakBadge } from "@/components/StreakBadge";
 import { UiText } from "@/components/UiText";
-import { books } from "@/content";
+import { grades } from "@/content";
 import { useLanguage } from "@/context/LanguageContext";
 import { useProgress } from "@/context/ProgressContext";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
@@ -62,15 +63,26 @@ export default function HomeScreen() {
           <ReviewCard count={dueCount} onPress={() => router.push(routes.review())} />
         )}
         <UiText style={styles.subtitle}>اختَر الكتاب</UiText>
-        {books.map((book) => (
-          <BookCard
-            key={book.id}
-            book={book}
-            onPress={() => {
-              if (book.available) router.push(routes.book(book.id));
-            }}
-          />
-        ))}
+        {grades.map((grade) =>
+          grade.books.length === 0 ? (
+            <GradeSoonCard key={grade.number} grade={grade} />
+          ) : (
+            <View key={grade.number} style={styles.grade}>
+              <UiText testID={`grade-${grade.number}-title`} style={styles.gradeTitle}>
+                {grade.title}
+              </UiText>
+              {grade.books.map((book) => (
+                <BookCard
+                  key={book.id}
+                  book={book}
+                  onPress={() => {
+                    if (book.available) router.push(routes.book(book.id));
+                  }}
+                />
+              ))}
+            </View>
+          ),
+        )}
         <UiText style={styles.footer}>أنت رائع! 🌟</UiText>
       </ScrollView>
     </ScreenBackground>
@@ -92,6 +104,13 @@ const styles = StyleSheet.create({
   appTitle: { fontSize: 24, fontWeight: "800", color: colors.text, textAlign: "right" },
   scroll: { width: "100%" },
   list: { gap: 16, paddingTop: 4 },
+  grade: { gap: 16 },
+  gradeTitle: {
+    fontSize: 20,
+    fontWeight: "900",
+    color: colors.warmDeep,
+    textAlign: "right",
+  },
   subtitle: {
     fontSize: 16,
     color: colors.warmText,

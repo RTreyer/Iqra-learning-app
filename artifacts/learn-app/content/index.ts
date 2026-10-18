@@ -1,8 +1,8 @@
-import { books } from "./catalog.ts";
+import { books, grades } from "./catalog.ts";
 import type { Book, Lesson, Unit } from "./types";
 
 export type * from "./types";
-export { books };
+export { books, grades };
 
 export type LessonLookup = { book: Book; unit: Unit; lesson: Lesson; next: Lesson | null };
 

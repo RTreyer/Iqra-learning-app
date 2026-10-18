@@ -51,6 +51,19 @@ test("first launch shows only the continue card, pointing at u1-1", async () => 
   expect(router.push).toHaveBeenCalledWith(routes.lesson("u1-1"));
 });
 
+test("grade 1 lists its books and grades 2 to 6 show as coming soon", async () => {
+  renderHome();
+  await screen.findByTestId("continue-card");
+  expect(screen.getByTestId("grade-1-title")).toHaveTextContent("الصف الأول");
+  expect(screen.getByTestId("book-arabic-2")).toHaveTextContent(/قريباً/);
+  expect(screen.getByTestId("book-math-2")).toHaveTextContent(/قريباً/);
+  for (const n of [2, 3, 4, 5, 6])
+    expect(screen.getByTestId(`grade-${n}`)).toHaveTextContent(/قريباً/);
+  expect(screen.queryByTestId("grade-1")).toBeNull();
+  fireEvent.press(screen.getByTestId("book-arabic-2"));
+  expect(router.push).not.toHaveBeenCalled();
+});
+
 test("two due items and a two day streak show the review card and streak badge", async () => {
   await seed(2, ["2026-10-15", "2026-10-16"]);
   renderHome();
