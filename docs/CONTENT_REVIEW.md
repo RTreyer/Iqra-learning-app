@@ -11,6 +11,7 @@ A native Arabic speaker review of all authored content is pending (owner item). 
 | s1 | science | جِسْمِي | placeholder, no source yet | placeholder | | |
 | s2 | science | الْحَيَوَانَات | placeholder, no source yet | placeholder | | |
 | s3 | science | النَّبَاتَات وَالْمَاء | placeholder, no source yet | placeholder | | |
+| lughati-2 u7 (planned) | lughati | الظواهر الصوتية (Unit 7) | لغتي العربية Part 2 (Sana'a 2021), Unit 7, notes in docs/content/textbooks/my-arabic-part2/unit-07.md | not built yet; violent and group-hostile content replaced by owner decision (18 Oct 2026). New wording to check before recording: the ى lesson text and sentences, test items 1, 5, 14, and the alphabet song lines for ج ع ل ن و | | |
 
 ## Rendering notes
 

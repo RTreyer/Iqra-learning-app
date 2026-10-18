@@ -106,4 +106,4 @@ Teacher check: in items 10 and 11 the pigeon picture is used for …ـمَامَ
 - Four letter lessons in the same 7-page template as Unit 5.
 - و is the first non-joining letter in Part 2: the shapes show only two forms; the app's `trace` and shape questions must allow that.
 - Rich Yemeni content for illustrations: the Yemen lesson (mountain terraces, stone villages, jambiya, gazelle, flag), a qamariya in a child's room, the crescent-watching scene.
-- Sentences such as الْجَيْشُ يَحْمِي الْيَمَنَ and the soldier pictures are in the book; whether to use them in the app is an owner decision.
+- Sentences such as الْجَيْشُ يَحْمِي الْيَمَنَ and the soldier pictures (pp. 50, 72, 79) are kept as printed (owner decision, 18 Oct 2026).

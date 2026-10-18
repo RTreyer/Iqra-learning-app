@@ -51,19 +51,19 @@ Part 2 completes the alphabet: **9 letters (ف ق ك ل م ن ه و ي)** in Uni
 - Unit 7 lessons start with a **short connected reading text**, the first in the course.
 - New exercise types: analyse a word into its letters (أُحَلِّلُ الْكَلِمَةَ إِلَى حُرُوفِهَا), extract a letter (أُجَرِّدُ), put the tanween / ى / ة / ه / ال in place.
 
-## Content needing the owner's decision
-Units 5 and 6 are child-friendly and strongly Yemeni. Unit 7 also contains content that is **not suitable for a children's app** and should not be reproduced (details in `unit-07.md`):
+## Content rule (owner decision, 18 Oct 2026)
+Units 5 and 6 are child-friendly and strongly Yemeni and are used as printed (the owner chose to keep the Unit 6 soldier items: جُنُود p. 50, الْجَيْشُ يَحْمِي الْيَمَنَ p. 72, جُنْدِيّ p. 79). Unit 7 also contains content that is **never reproduced in the app**; it is replaced with neutral content listed in `unit-07.md`, section "App replacements (owner-approved)". Replaced content:
 - p. 91 to 96 and p. 121: pictures of soldiers shooting and beating people, wounded and bleeding victims.
 - p. 92: sentence "اعْتَدَى الْيَهُودُ عَلَى الْمُسْلِمِينَ"; p. 122: copy sentence "**اليهود أعداء الله**" (hostile to a religious group).
+- p. 116 and p. 118: test items with الأَقْصَى and "حَرِّرُوا الْمَسْجِدَ الأَقْصَى".
 - Alphabet song: militant lines for ج، ع، ل، ن، و (army, burning the invader, "woe to the enemies").
-- Unit 6, p. 50 and p. 72: soldiers (جُنُود) and "الْجَيْشُ يَحْمِي الْيَمَنَ": neutral in tone, owner's call.
 
-Recommendation: teach the same sounds with the many neutral words the book already offers (listed per lesson) and leave out these scenes and sentences.
+The replacements teach the same sounds, mostly with neutral words the book already offers. New sentences and song lines need an Arabic teacher's check before recording.
 
 ## For the app (course `lughati`, a future book `lughati-2`)
 - Units 5 and 6 use one fixed 7-page template per letter, so lessons can be generated from data, like the Unit 2 builder of أقرأ وأتعلم: scene talk (`story`), short and long vowels (`naming` + `listen_pick`), letter shapes and "circle the letter" (`letter_pick`), picture to sentence and identical words / sentences (`matching`), dots and colouring (`trace`), build a word from tiles (new activity, also needed for أقرأ وأتعلم).
 - About 9 letters × 4 to 5 app lessons + 5 phenomena × 3 + 3 tests ≈ 55 app lessons.
-- Recording: about 20 picture words and 6 sentences per letter, 5 short reading texts in Unit 7, the alphabet song (after the owner decides on the lines).
+- Recording: about 20 picture words and 6 sentences per letter, 5 short reading texts in Unit 7, the alphabet song with the five replaced lines.
 - Yemeni illustration brief: Eid eve with a mother in an embroidered Yemeni dress (p. 28), school assembly with the flag (p. 35), crescent watching on a Sana'a rooftop (p. 55), a child's room with a qamariya (p. 62), mountain terraces with stone villages, a jambiya and an Arabian gazelle (p. 69), Old Sana'a and Bab al-Yemen (p. 102), father and son by a waterfall (p. 103), Yemeni men in prayer with jambiyas (p. 104).
 - Known misprints: test item numbered "2" twice (p. 77); in test items 10 and 11 of Unit 6 the pigeon picture is used for both حَمَامَة and يَمَامَة (p. 79 to 80).
 

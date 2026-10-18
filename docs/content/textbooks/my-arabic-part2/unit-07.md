@@ -2,7 +2,7 @@
 
 Printed pp. 83 to 123 (PDF pp. 84 to 124). No new letters: five lessons on التنوين، الألف المقصورة، التاء المربوطة، الهاء آخر الكلمة، ال الشمسية والقمرية, then the unit test and the alphabet song. Unlike Units 5 and 6, **every lesson opens with a short reading text** under the scene, with the target sound coloured.
 
-> **Content warning for the owner.** Lesson 2 (الألف المقصورة), the unit test and the alphabet song contain scenes of violence (soldiers shooting, wounded and bleeding people), political slogans and one copy sentence that is hostile to a religious group ("اليهود أعداء الله", p. 122). These are recorded below because the notes must be complete. **They are not suitable for a children's learning app and should not be reproduced**; the app can teach the same sound with neutral words. Decision is the owner's.
+> **Content rule (owner decision, 18 Oct 2026).** Lesson 2 (الألف المقصورة), the unit test and the alphabet song contain scenes of violence (soldiers shooting, wounded and bleeding people), political slogans and one copy sentence that is hostile to a religious group ("اليهود أعداء الله", p. 122). They are recorded below only so the notes are complete. **They are never reproduced in the app, its audio or its illustrations.** When building this unit, use the section **"App replacements (owner-approved)"** at the end of this file instead of the printed content.
 
 ## Unit outcomes (p. 83)
 The child can: (1) pronounce تنوين الفتح والكسر والضم; (2) recognise their shapes; (3) learn new words from social situations; (4) read the words in sentences silently and aloud; (5) build words with الألف المقصورة (ى); (6) tell التاء المربوطة (ة) from الهاء (ه); (7) read ى ة ه, know their names and say them; (8) name picture contents stressing the target sound; (9) tell ال الشمسية from ال القمرية; (10) link pictures and letters; (11) draw the letters by colouring and joining dots; (12) use words with ى ة ه orally in sentences.
@@ -153,4 +153,47 @@ No poet is named. App: about 20 of the 28 lines suit an audio alphabet song as t
 - Five short phenomena, each with a reading text: the first connected reading in this course.
 - Fits existing activities: tanween as `letter_pick` with three endings; ى / ة / ه as "complete the word" with three choices; sun and moon ال as a two-way sort.
 - Lesson 1 (flag), 3 (teacher, Old Sana'a photo), 4 (father and son by a waterfall, saving water) and 5 (the young painter) are usable as printed.
-- Lesson 2, test items 12 and 14 and five song lines need the owner's decision; recommendation: replace them with neutral content.
+- Lesson 2, test items 5, 12 and 14 and five song lines are replaced; see below.
+
+---
+
+## App replacements (owner-approved, 18 Oct 2026)
+
+**Use these when building Unit 7. They replace the printed content listed above; the printed version is not used anywhere in the app.** The new sentences and song lines are new wording: an Arabic teacher must check grammar and vowel marks before recording (see `docs/CONTENT_REVIEW.md`).
+
+### Lesson 2: ى (replaces الْمَسْجِدُ الأَقْصَى)
+| Part | Book (not used) | App |
+|---|---|---|
+| Title | الْمَسْجِدُ الأَقْصَى | **يَحْيَى يَذْهَبُ إِلَى الْمَسْجِدِ** |
+| Scene | soldier aiming, wounded man, jeep | Grandpa Yahya in a white turban with his cane walking to a white mosque in Sana'a; two girls (Salwa, Huda) greeting him. Inline SVG in the Unit 2 style (reuse the `mosque` art) |
+| Reading text | رَأَى الْعَمُّ يَحْيَى الْعَدُوَّ … | **ذَهَبَ الْعَمُّ يَحْيَى إِلَى الْمَسْجِدِ، وَصَلَّى مَعَ الْمُسْلِمِينَ. وَفِي الطَّرِيقِ رَأَى سَلْوَى وَهُدَى، فَسَلَّمَ عَلَيْهِمَا.** |
+| Listen and say (p. 92) | يَذْهَبُ يَحْيَى إِلَى الْمَسْجِدِ الأَقْصَى; اعْتَدَى الْيَهُودُ عَلَى الْمُسْلِمِينَ | **يَذْهَبُ يَحْيَى إِلَى الْمَسْجِدِ**; **سَاعَدَتْ بُشْرَى أُمَّهَا**; **زَارَ يَحْيَى الْمُسْتَشْفَى** |
+| Listen and say (p. 93) | يَحْيَى، سَلْوَى | unchanged |
+| Circle the word ending in ى (p. 93) | includes الْمَسْجِدُ الأَقْصَى | صَلَّى الْمُسْلِمُونَ; سَاعَدَتْ بُشْرَى أُمَّهَا; يَحْيَى شَيْخٌ كَبِيرٌ; **ذَهَبَ يَحْيَى إِلَى الْمَسْجِدِ** |
+| Add ى (p. 94) | مُسْتَشْفَـ…، الأَقْصَـ…، هُدَ…، اعْتَدَ… | مُسْتَشْفَـ…، هُدَ…، **يَحْيَـ…** (old man with a cane), **حَلْوَ…** (plate of sweets) |
+| Copy (p. 95) | سلوى تلميذة نشيطة / المسجد الأقصى | سلوى تلميذة نشيطة / **صلى يحيى في المسجد** |
+| Analyse into letters (p. 95) | يُسْرَى، جَرْحَى، ذِكْرَى | يُسْرَى، **حَلْوَى**، ذِكْرَى |
+| Build two words (p. 95) | أَقْصَى، هُدَى | **سَلْوَى** (tiles س ل و ى), هُدَى |
+| Colour ى and the picture (p. 96) | a man carrying a wounded person | **Grandpa Yahya with his cane in front of the mosque** |
+| Sentence to copy (p. 96) | المسجد الأقصى في فلسطين | **صلى يحيى في المسجد** |
+
+### Unit test (pp. 116 to 122)
+| Item | Book (not used) | App |
+|---|---|---|
+| 1 | الأَقْصَى among هَاشِمٌ، الأَقْصَى، الْقَفَصُ | **حَلْوَى** among هَاشِمٌ، حَلْوَى، الْقَفَصُ |
+| 5 | حَرِّرُوا الْمَسْجِدَ الأَقْصَى | **ذَهَبَ يَحْيَى إِلَى الْمَسْجِدِ** |
+| 12 | soldiers with rifles over a bleeding woman | **Salwa in a white headscarf reading a book**; colour the ى |
+| 14 | اليهود أعداء الله | **هُدَى تُحِبُّ الْحَلْوَى** |
+
+All other test items are used as printed.
+
+### Alphabet song (p. 123): five lines replaced
+| Letter | Book (not used) | App |
+|---|---|---|
+| ج | جِيمٌ جَيْشٌ يَحْمِي الثَّوْرَةْ ، وَبِلادِي تَحْيَا مَنْصُورَةْ | **جِيمٌ جَمَلٌ فِي الصَّحْرَاءْ ، يَصْبِرُ يَوْمًا دُونَ الْمَاءْ** |
+| ع | عَيْنٌ عَمَّارٌ نَادَانَا ، وَالأَقْصَى يَشْكُو الْعُدْوَانَا | **عَيْنٌ عَمَّارٌ نَادَانَا ، هَيَّا نَقْرَأْ يَا إِخْوَانَا** |
+| ل | لامٌ لَهَبٌ فِي أَوْطَانِي ، يُحْرِقُ أَذْنَابَ الطُّغْيَانِ | **لامٌ لَوْزٌ فِي أَوْطَانِي ، يُهْدِيهِ جَدِّي لِلْجِيرَانِ** |
+| ن | نُونٌ نَصْرٌ حَقَّقْنَاهُ ، وَالْغَازِي قَدْ أَحْرَقْنَاهُ | **نُونٌ نَخْلٌ فِي وَادِينَا ، يُعْطِي تَمْرًا يَكْفِينَا** |
+| و | وَاوٌ وَيْلٌ لِلأَعْدَاءِ ، مَنْ هَتَكُوا أَرْضَ الإِسْرَاءِ | **وَاوٌ وَرْدٌ يَمْلَأُ دَارِي ، أُهْدِيهِ لِصَدِيقِي وَجَارِي** |
+
+The other 23 lines are used as printed.
