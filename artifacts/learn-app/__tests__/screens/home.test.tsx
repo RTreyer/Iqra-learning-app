@@ -56,6 +56,7 @@ test("grade 1 lists its books and grades 2 to 6 show as coming soon", async () =
   await screen.findByTestId("continue-card");
   expect(screen.getByTestId("grade-1-title")).toHaveTextContent("الصف الأول");
   expect(screen.getByTestId("book-arabic-2")).toHaveTextContent(/قريباً/);
+  expect(screen.getByTestId("book-lughati-1")).toHaveTextContent(/لغتي العربية.*قريباً/);
   expect(screen.getByTestId("book-math-2")).toHaveTextContent(/قريباً/);
   for (const n of [2, 3, 4, 5, 6])
     expect(screen.getByTestId(`grade-${n}`)).toHaveTextContent(/قريباً/);

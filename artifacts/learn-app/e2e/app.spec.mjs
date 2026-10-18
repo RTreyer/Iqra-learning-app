@@ -17,7 +17,7 @@ import {
   traceDiagonal,
 } from "./helpers.mjs";
 
-const BOOK_IDS = ["arabic-1", "arabic-2", "math-1", "math-2", "science-1"];
+const BOOK_IDS = ["arabic-1", "arabic-2", "lughati-1", "math-1", "math-2", "science-1"];
 const AVAILABLE_BOOK_IDS = ["arabic-1", "math-1"];
 
 test.describe("navigation", () => {

@@ -52,6 +52,7 @@ type Gradient = readonly [string, string, ...string[]];
 export const gradients: Record<Subject | "home", Gradient> = {
   home: ["#FFFDE7", "#FFF0A0", "#FFDC70"],
   arabic: ["#E5ECFD", "#FFFBF0"],
+  lughati: ["#FDEBE1", "#FFFBF0"],
   math: ["#EFE7FD", "#FFFBF0"],
   science: ["#E1F2ED", "#FFFBF0"],
 };

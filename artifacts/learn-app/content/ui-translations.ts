@@ -33,6 +33,7 @@ const english: Record<string, string> = {
   الرياضيات: "Math",
   العلوم: "Science",
   "اللغة العربية": "Arabic",
+  "لغتي العربية": "My Arabic Language",
   "أقرأ وأتعلم": "Iqra – Read and learn",
   "الجزء الأول": "Part 1",
   "الجزء الثاني": "Part 2",

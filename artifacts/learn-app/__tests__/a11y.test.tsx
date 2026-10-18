@@ -78,8 +78,8 @@ test("home: language switch, continue, review and book cards", async () => {
   await seed();
   withProgress(<HomeScreen />);
   await screen.findByTestId("review-card");
-  // 2 language buttons, continue, review and the 5 grade 1 book cards.
-  expectAccessiblePressables(9);
+  // 2 language buttons, continue, review and the 6 grade 1 book cards.
+  expectAccessiblePressables(10);
 });
 
 test("book: back button and unit cards", async () => {

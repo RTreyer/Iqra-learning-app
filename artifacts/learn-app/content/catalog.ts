@@ -35,6 +35,17 @@ const grade1Books: Book[] = [
     available: false,
     units: [],
   },
+  // Textbook "لغتي العربية", a separate course from "أقرأ وأتعلم". Lessons follow once the book is read.
+  {
+    id: "lughati-1",
+    subject: "lughati",
+    title: "لغتي العربية",
+    subtitle: "الجزء الأول",
+    emoji: "📝",
+    color: SUBJECT_COLORS.lughati,
+    available: false,
+    units: [],
+  },
   {
     id: "math-1",
     subject: "math",

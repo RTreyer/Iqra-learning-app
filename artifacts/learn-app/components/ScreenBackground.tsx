@@ -66,6 +66,7 @@ const NUMBERS: Config = {
 const SUBJECT_STYLE: Record<BgSubject, Config> = {
   home: HOME,
   arabic: READING,
+  lughati: READING,
   math: NUMBERS,
   science: NUMBERS,
 };

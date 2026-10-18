@@ -1,10 +1,11 @@
 /** Unified content model shared by every subject, book, unit and lesson. */
 
-export type Subject = "arabic" | "math" | "science";
+export type Subject = "arabic" | "lughati" | "math" | "science";
 
 /** Single source of subject colors; theme/tokens.ts re-exports them as `subjects`. */
 export const SUBJECT_COLORS: Record<Subject, string> = {
   arabic: "#2563EB",
+  lughati: "#EA580C",
   math: "#7C3AED",
   science: "#059669",
 };
