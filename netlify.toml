@@ -1,6 +1,10 @@
 # Netlify: build the Expo app as a static website.
 [build]
-  command = "pnpm --filter @workspace/learn-app run build"
+  # The repo installs with node-linker=hoisted (.npmrc). Netlify's dependency
+  # cache can still hold a package-level node_modules from the older isolated
+  # layout, whose .bin/expo shim points at a path that no longer exists. Drop
+  # it and reinstall so the build always uses the hoisted expo CLI.
+  command = "rm -rf artifacts/learn-app/node_modules && pnpm install --frozen-lockfile && pnpm --filter @workspace/learn-app run build"
   publish = "artifacts/learn-app/dist"
 
 [build.environment]
