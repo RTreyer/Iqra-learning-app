@@ -11,13 +11,14 @@ export const VOICE_HINT_KEY = "@iqra_voice_hint_shown";
  * always answered by text. `wrong` is any option that is not the answer.
  */
 export const QUIZ_ROUNDS = {
-  // content/arabic/unit2.ts, letter_pick
-  "u2-3": [
-    { right: "ب", wrong: "ن" },
-    { right: "ت", wrong: "ث" },
-    { right: "ث", wrong: "س" },
-    { right: "ب", wrong: "د" },
-    { right: "ت", wrong: "خ" },
+  // content/arabic/unit2.ts, letter_pick (تدريبات: syllables of the seven letters)
+  "u2-29": [
+    { right: "رَ", wrong: "دَ" },
+    { right: "لَا", wrong: "نَا" },
+    { right: "دَا", wrong: "مَا" },
+    { right: "نَ", wrong: "تَ" },
+    { right: "تَا", wrong: "بَا" },
+    { right: "مَا", wrong: "لَا" },
   ],
   // content/math/unit1.ts, counting (choices shown as Eastern Arabic digits)
   "m1-1": [
@@ -72,7 +73,8 @@ export async function seedStorage(page, entries) {
 }
 
 const READY = [
-  [/^\/$/, (page) => page.getByTestId("book-arabic-1")],
+  [/^\/$/, (page) => page.getByTestId("grade-1")],
+  [/^\/grade\//, (page) => page.getByTestId("book-arabic-1")],
   [/^\/book\//, (page) => page.locator("[data-testid^='unit-']").first()],
   [/^\/unit\//, (page) => page.locator("[data-testid^='lesson-row-']").first()],
   [

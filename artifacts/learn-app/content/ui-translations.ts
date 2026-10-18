@@ -5,6 +5,8 @@ export type UiLanguage = "ar" | "en";
 const english: Record<string, string> = {
   أهلاً: "Hello",
   "اختَر الكتاب": "Choose a book",
+  "اختَر صفّك": "Choose your grade",
+  "الصف غير موجود": "Grade not found",
   "أنت رائع! 🌟": "You're doing great! 🌟",
   رجوع: "Back",
   العودة: "Back",

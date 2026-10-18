@@ -3,7 +3,7 @@ import React from "react";
 import { ListenPickActivity } from "@/components/activities/ListenPickActivity";
 import { lessonOf, renderActivity } from "@/test-utils/activities";
 
-const lesson = lessonOf("u2-5", "listen_pick");
+const lesson = lessonOf("u2-30", "listen_pick");
 /** The choice card for `word` (the listen button may show the same word); revealed cards add "، صحيح/خطأ". */
 const choice = (word: string) => {
   const node = screen
@@ -30,16 +30,19 @@ test("first tap scoring and itemIds per question", () => {
     />,
   );
   expect(screen.getByText(lesson.questions[0].word)).toBeTruthy();
-  for (const word of ["ثَعْلَب", "أَحْمَر", "تُفَّاح وَتِين"]) {
+  for (const word of ["بَـ", "دَا", "تَـ", "لَا", "دَا", "نَا"]) {
     fireEvent.press(choice(word));
     expect(choice(word)).toBeDisabled();
     fireEvent.press(screen.getByTestId("activity-next"));
   }
-  expect(onComplete).toHaveBeenCalledWith({ correct: 2, total: 3 });
+  expect(onComplete).toHaveBeenCalledWith({ correct: 5, total: 6 });
   expect(onRoundResult.mock.calls).toEqual([
-    ["q:u2-5:0", true],
-    ["q:u2-5:1", false],
-    ["q:u2-5:2", true],
+    ["q:u2-30:0", true],
+    ["q:u2-30:1", false],
+    ["q:u2-30:2", true],
+    ["q:u2-30:3", true],
+    ["q:u2-30:4", true],
+    ["q:u2-30:5", true],
   ]);
 });
 

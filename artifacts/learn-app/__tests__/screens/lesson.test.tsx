@@ -50,7 +50,7 @@ const speech = jest.requireMock("expo-speech") as { speak: jest.Mock; stop: jest
 const { router } = jest.requireMock("expo-router") as {
   router: { back: jest.Mock; replace: jest.Mock };
 };
-const lesson = getLesson("u2-3")!.lesson;
+const lesson = getLesson("u2-2")!.lesson;
 
 /** expo-speech finishes every utterance at once. */
 const speechFinishes = () =>
@@ -61,7 +61,7 @@ beforeEach(() => {
   speech.speak.mockReset();
   jest.useFakeTimers();
   mockCanGoBack(true);
-  setParams({ lessonId: "u2-3" });
+  setParams({ lessonId: "u2-2" });
 });
 afterEach(() => jest.useRealTimers());
 
@@ -100,10 +100,10 @@ test("completing the activity shows the completion card with 3 stars", () => {
   renderScreen(<LessonScreen />);
 
   fireEvent.press(screen.getByTestId("stub-complete"));
-  expect(mockCompleteLesson).toHaveBeenCalledWith("u2-3", 3);
+  expect(mockCompleteLesson).toHaveBeenCalledWith("u2-2", 3);
   expect(screen.getByTestId("lesson-complete")).toBeTruthy();
   expect(screen.getAllByTestId("star-earned")).toHaveLength(3);
-  expect(screen.getByText(getLesson("u2-4")!.lesson.title)).toBeTruthy();
+  expect(screen.getByText(getLesson("u2-3")!.lesson.title)).toBeTruthy();
 
   fireEvent.press(screen.getByTestId("repeat-lesson"));
   expect(screen.getByText("stub:letter_pick")).toBeTruthy();

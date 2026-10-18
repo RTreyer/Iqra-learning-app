@@ -88,13 +88,23 @@ export default function UnitScreen() {
         contentContainerStyle={[styles.list, { paddingBottom: pad.bottom + 24 }]}
         showsVerticalScrollIndicator={false}
       >
-        {rows.map(({ lesson, status }) => (
-          <LessonRow
-            key={lesson.id}
-            lesson={lesson}
-            status={status}
-            onPress={() => router.push(routes.lesson(lesson.id))}
-          />
+        {rows.map(({ lesson, status }, i) => (
+          <React.Fragment key={lesson.id}>
+            {lesson.section && lesson.section !== rows[i - 1]?.lesson.section ? (
+              <Text
+                testID={`section-${lesson.id}`}
+                accessibilityRole="header"
+                style={[styles.section, { color: unit.color }]}
+              >
+                {lesson.section}
+              </Text>
+            ) : null}
+            <LessonRow
+              lesson={lesson}
+              status={status}
+              onPress={() => router.push(routes.lesson(lesson.id))}
+            />
+          </React.Fragment>
         ))}
       </ScrollView>
     </ScreenBackground>
@@ -136,4 +146,11 @@ const styles = StyleSheet.create({
   progressTrack: { height: 6, backgroundColor: colors.border, borderRadius: 3, overflow: "hidden" },
   progressFill: { height: 6, borderRadius: 3, minWidth: 6 },
   list: { paddingHorizontal: 16, paddingTop: 4, gap: 12 },
+  section: {
+    fontSize: 20,
+    fontWeight: "900",
+    textAlign: "center",
+    marginTop: 8,
+    writingDirection: "rtl",
+  },
 });

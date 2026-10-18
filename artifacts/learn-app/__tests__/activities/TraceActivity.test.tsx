@@ -7,7 +7,7 @@ import { lessonOf, renderActivity } from "@/test-utils/activities";
 
 const speech = jest.requireMock("expo-speech") as { speak: jest.Mock };
 const haptics = jest.requireMock("expo-haptics") as { notificationAsync: jest.Mock };
-const lesson = lessonOf("u2-6", "trace");
+const lesson = lessonOf("u2-4", "trace");
 
 beforeEach(() => {
   jest.useFakeTimers();
@@ -115,7 +115,7 @@ test("pad exposes the target label and a drawing hint", () => {
 });
 
 test("completes through the latest onComplete when the parent re-renders during the delay", () => {
-  const one = lessonOf("u2-6", "trace");
+  const one = lessonOf("u2-4", "trace");
   const single = { ...one, targets: one.targets.slice(0, 1) };
   const first = jest.fn();
   const latest = jest.fn();

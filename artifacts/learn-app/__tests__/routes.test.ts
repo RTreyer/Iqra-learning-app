@@ -7,6 +7,7 @@ describe("routes", () => {
   });
 
   it("builds parameterised hrefs", () => {
+    expect(routes.grade(1)).toEqual({ pathname: "/grade/[gradeId]", params: { gradeId: "1" } });
     expect(routes.book("b1")).toEqual({ pathname: "/book/[bookId]", params: { bookId: "b1" } });
     expect(routes.unit("u1")).toEqual({ pathname: "/unit/[unitId]", params: { unitId: "u1" } });
     expect(routes.lesson("l1")).toEqual({

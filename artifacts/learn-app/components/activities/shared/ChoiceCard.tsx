@@ -48,7 +48,16 @@ export function ChoiceCard({
         style={[styles.base, cardStyles[variant], (solid ? solidStates : softStates)[state]]}
       >
         {emoji ? <Text style={styles.emoji}>{emoji}</Text> : null}
-        <Text style={[textStyles[variant], (solid ? solidText : softText)[state]]}>{word}</Text>
+        <Text
+          style={[
+            textStyles[variant],
+            // A picture card without a picture shows a syllable or letter: make it large.
+            variant === "picture" && !emoji && styles.textOnly,
+            (solid ? solidText : softText)[state],
+          ]}
+        >
+          {word}
+        </Text>
         {icon ? <Text style={iconStyles[variant]}>{icon}</Text> : null}
       </Pressable>
     </Animated.View>
@@ -63,6 +72,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   emoji: { fontSize: 32 },
+  textOnly: { fontSize: 32, fontWeight: "900", lineHeight: 48 },
 });
 
 const iconStyles = StyleSheet.create({

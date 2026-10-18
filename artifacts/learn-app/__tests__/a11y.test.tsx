@@ -5,6 +5,7 @@ import { StyleSheet, type StyleProp, type ViewStyle } from "react-native";
 
 import HomeScreen from "@/app/index";
 import BookScreen from "@/app/book/[bookId]";
+import GradeScreen from "@/app/grade/[gradeId]";
 import LessonScreen from "@/app/lesson/[lessonId]";
 import UnitScreen from "@/app/unit/[unitId]";
 import { ProgressProvider } from "@/context/ProgressContext";
@@ -74,12 +75,20 @@ beforeEach(async () => {
 });
 afterEach(() => jest.useRealTimers());
 
-test("home: language switch, continue, review and book cards", async () => {
+test("home: language switch, continue, review and grade cards", async () => {
   await seed();
   withProgress(<HomeScreen />);
   await screen.findByTestId("review-card");
-  // 2 language buttons, continue, review and the 6 grade 1 book cards.
+  // 2 language buttons, continue, review and the 6 grade cards.
   expectAccessiblePressables(10);
+});
+
+test("grade: back button and book cards", async () => {
+  setParams({ gradeId: "1" });
+  withProgress(<GradeScreen />);
+  await screen.findAllByTestId(/^book-/);
+  // Back and the 6 grade 1 book cards.
+  expectAccessiblePressables(7);
 });
 
 test("book: back button and unit cards", async () => {
@@ -97,8 +106,8 @@ test("unit: back button and lesson rows, including a completed one", async () =>
   expectAccessiblePressables(6);
 });
 
-test("lesson u2-3: back button and the activity controls", async () => {
-  setParams({ lessonId: "u2-3" });
+test("lesson u2-2: back button and the activity controls", async () => {
+  setParams({ lessonId: "u2-2" });
   withProgress(<LessonScreen />);
   await act(async () => {
     jest.advanceTimersByTime(2000);

@@ -11,15 +11,16 @@ describe("itemsForLesson", () => {
   it("yields Unit 2 letter, word and question items", () => {
     const items = unitItems("a2");
     const letters = items.filter((i) => i.kind === "letter");
-    expect(letters).toHaveLength(5);
-    expect(new Set(letters.map((i) => i.id)).size).toBe(3);
-    expect(items.filter((i) => i.kind === "word")).toHaveLength(5);
-    expect(items.filter((i) => i.kind === "question")).toHaveLength(3);
-    expect(items).toHaveLength(13);
+    // 7 letters × 4 syllable rounds + 6 review rounds, over 14 syllables (fatha and long alif).
+    expect(letters).toHaveLength(34);
+    expect(new Set(letters.map((i) => i.id)).size).toBe(14);
+    expect(items.filter((i) => i.kind === "word")).toHaveLength(33);
+    expect(items.filter((i) => i.kind === "question")).toHaveLength(6);
+    expect(items).toHaveLength(73);
   });
 
   it("returns no items for non quiz lessons", () => {
-    for (const id of ["u2-1", "u2-2", "u2-6"]) {
+    for (const id of ["u2-1", "u2-4", "u2-5"]) {
       const found = getLesson(id);
       expect(found).not.toBeNull();
       expect(itemsForLesson(found!.lesson)).toEqual([]);
@@ -27,7 +28,7 @@ describe("itemsForLesson", () => {
   });
 
   it("uses the same ids as itemIdFor and carries the round data", () => {
-    const lesson = getLesson("u2-5")!.lesson;
+    const lesson = getLesson("u2-30")!.lesson;
     const items = itemsForLesson(lesson);
     items.forEach((item, index) => expect(item.id).toBe(itemIdFor(lesson, index)));
     expect(items[0]).toMatchObject({ kind: "question", correctIndex: 0 });
@@ -57,7 +58,7 @@ describe("allItems", () => {
   });
 
   it("keeps the first occurrence of a repeated id", () => {
-    const first = itemsForLesson(getLesson("u2-3")!.lesson)[0];
-    expect(allItems().get("letter:ب")).toEqual(first);
+    const first = itemsForLesson(getLesson("u2-2")!.lesson)[0];
+    expect(allItems().get("letter:مَ")).toEqual(first);
   });
 });

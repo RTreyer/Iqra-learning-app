@@ -4,7 +4,7 @@ import { NamingActivity } from "@/components/activities/NamingActivity";
 import { lessonOf, renderActivity } from "@/test-utils/activities";
 
 const speech = jest.requireMock("expo-speech") as { speak: jest.Mock };
-const lesson = lessonOf("u2-2", "naming");
+const lesson = lessonOf("u1-1", "naming");
 
 beforeEach(() => jest.clearAllMocks());
 

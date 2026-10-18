@@ -16,7 +16,7 @@ The rebuild left one package with one content model (Book, Unit, Lesson) and one
 
 | Book | Units | Lessons | State |
 |---|---|---|---|
-| Arabic Part 1 (`arabic-1`) | 8 | 47 | Complete. Unit 1: 5 pre reading lessons. Units 2 to 8: 6 lessons each |
+| Arabic Part 1 (`arabic-1`) | 8 | 72 | Unit 2 rebuilt from the textbook: 31 lessons (story, syllables, words, letter forms per letter, plus 3 exercises), grouped by letter, Yemeni SVG art in `components/art/Art.tsx`. Units 1 and 3 to 8: earlier version |
 | Math Part 1 (`math-1`) | 3 | 11 | Exemplary, from textbook Part 1 units 2 to 5 (numbers 0 to 10, add and subtract within 10, plane shapes). Not the full year |
 | Science Part 1 (`science-1`) | 3 | 9 | Placeholder, no textbook source yet. `available: false`, shown as "قريباً" |
 | Arabic Part 2 (`arabic-2`), Math Part 2 (`math-2`) | none | none | `available: false`, shown as "قريباً". Planned for v1.1 |

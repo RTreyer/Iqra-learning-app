@@ -10,6 +10,23 @@ export const SUBJECT_COLORS: Record<Subject, string> = {
   science: "#059669",
 };
 
+/**
+ * Illustrations drawn in the app (components/art) for things emoji cannot show
+ * the Yemeni way: tower houses, qamariya windows, dress, the jambiya.
+ */
+export type ArtId =
+  | "house"
+  | "qamariya"
+  | "door"
+  | "mosque"
+  | "school"
+  | "mother"
+  | "father"
+  | "boy"
+  | "girl"
+  | "dates"
+  | "palm";
+
 export type Choice = { emoji: string; word: string };
 
 export type LessonBase = {
@@ -19,9 +36,12 @@ export type LessonBase = {
   subtitle: string;
   emoji: string;
   color: string;
+  /** Group heading on the unit screen, e.g. the letter and story of a textbook lesson. */
+  section?: string;
 };
 
-export type StoryLine = { text: string; emoji: string };
+/** `art` replaces the emoji when set; the emoji stays as the fallback. */
+export type StoryLine = { text: string; emoji: string; art?: ArtId };
 export type LetterPickRound = { targetLetter: string; letters: string[]; correctIndex: number };
 export type WordReadRound = { word: string; choices: string[]; correctIndex: number };
 export type ListenPickQuestion = { word: string; choices: Choice[]; correctIndex: number };
@@ -39,7 +59,7 @@ export type CountingRound = { emoji: string; count: number; options: number[] };
 export type ArithmeticRound = { a: number; b: number; op: "+" | "-"; options: number[] };
 
 export type LessonBody =
-  | { type: "story"; storyTitle: string; lines: StoryLine[] }
+  | { type: "story"; storyTitle: string; lines: StoryLine[]; scene?: ArtId }
   | { type: "naming"; items: Choice[] }
   | { type: "letter_pick"; rounds: LetterPickRound[] }
   | { type: "word_read"; rounds: WordReadRound[] }
@@ -82,5 +102,8 @@ export type Book = {
 export type Grade = {
   number: number;
   title: string;
+  /** Picture and color of the grade card on the home screen. */
+  emoji: string;
+  color: string;
   books: Book[];
 };

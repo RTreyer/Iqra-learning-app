@@ -27,7 +27,7 @@ describe("shuffleWithSeed", () => {
   it("tracks the correct item and moves it across attempts", () => {
     const positions = new Set<number>();
     for (let attempt = 0; attempt < 30; attempt++) {
-      const s = shuffleWithSeed(ITEMS, 3, seedFor(`u2-3:${attempt}`, 0));
+      const s = shuffleWithSeed(ITEMS, 3, seedFor(`u2-2:${attempt}`, 0));
       expect(s.items[s.correctIndex]).toBe("d");
       expect(s.order[s.correctIndex]).toBe(3);
       positions.add(s.correctIndex);
@@ -66,9 +66,9 @@ describe("itemIdFor", () => {
   const base = { id: "m1", number: 1, title: "", subtitle: "", emoji: "", color: "" };
 
   it("maps quiz lessons to stable ids", () => {
-    expect(itemIdFor(lessonOf("u2-3", "letter_pick"), 0)).toBe("letter:ب");
-    expect(itemIdFor(lessonOf("u2-4", "word_read"), 1)).toBe("word:تِين");
-    expect(itemIdFor(lessonOf("u2-5", "listen_pick"), 2)).toBe("q:u2-5:2");
+    expect(itemIdFor(lessonOf("u2-2", "letter_pick"), 0)).toBe("letter:مَ");
+    expect(itemIdFor(lessonOf("u2-3", "word_read"), 1)).toBe("word:أَنَا");
+    expect(itemIdFor(lessonOf("u2-30", "listen_pick"), 2)).toBe("q:u2-30:2");
     const counting: Lesson = {
       ...base,
       type: "counting",
@@ -86,7 +86,7 @@ describe("itemIdFor", () => {
   it("returns null for other types and missing rounds", () => {
     expect(itemIdFor(lessonOf("u2-1", "story"), 0)).toBeNull();
     expect(itemIdFor(lessonOf("u1-3", "behavior"), 0)).toBeNull();
-    expect(itemIdFor(lessonOf("u2-3", "letter_pick"), 99)).toBeNull();
+    expect(itemIdFor(lessonOf("u2-2", "letter_pick"), 99)).toBeNull();
   });
 });
 

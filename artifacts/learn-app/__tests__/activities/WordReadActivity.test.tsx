@@ -4,7 +4,7 @@ import { WordReadActivity } from "@/components/activities/WordReadActivity";
 import { lessonOf, renderActivity } from "@/test-utils/activities";
 
 const speech = jest.requireMock("expo-speech") as { speak: jest.Mock };
-const lesson = lessonOf("u2-4", "word_read");
+const lesson = lessonOf("u2-3", "word_read");
 
 beforeEach(() => jest.clearAllMocks());
 
@@ -20,7 +20,7 @@ test("scores first taps only and advances with the Next button", () => {
       onRoundResult={onRoundResult}
     />,
   );
-  const picks = ["بَيْت", "بَاب", "ثَعْلَب", "بَاب", "ثَوْر"];
+  const picks = ["مَامَا", "مَامَا", "أُحِبُّ"];
   picks.forEach((word, i) => {
     expect(screen.queryByTestId("activity-next")).toBeNull();
     fireEvent.press(screen.getByRole("button", { name: word }));
@@ -30,13 +30,11 @@ test("scores first taps only and advances with the Next button", () => {
   });
 
   expect(onComplete).toHaveBeenCalledTimes(1);
-  expect(onComplete).toHaveBeenCalledWith({ correct: 3, total: 5 });
+  expect(onComplete).toHaveBeenCalledWith({ correct: 2, total: 3 });
   expect(onRoundResult.mock.calls).toEqual([
-    ["word:بَيْت", true],
-    ["word:تِين", false],
-    ["word:ثَعْلَب", true],
-    ["word:بَاب", true],
-    ["word:تُفَّاحَة", false],
+    ["word:مَامَا", true],
+    ["word:أَنَا", false],
+    ["word:أُحِبُّ", true],
   ]);
 });
 
@@ -44,14 +42,12 @@ test("speaks the right answer after a wrong first tap and shows the score on the
   renderActivity(
     <WordReadActivity lesson={lesson} color="#D97706" attemptKey="w:1" onComplete={jest.fn()} />,
   );
-  fireEvent.press(screen.getByRole("button", { name: "تِين" }));
-  expect(speech.speak).toHaveBeenLastCalledWith("بَيْت", expect.anything());
+  fireEvent.press(screen.getByRole("button", { name: "أَنَا" }));
+  expect(speech.speak).toHaveBeenLastCalledWith("مَامَا", expect.anything());
   expect(screen.getByText("التالي ←")).toBeTruthy();
   fireEvent.press(screen.getByTestId("activity-next"));
-  for (const word of ["تِين", "ثَعْلَب", "بَاب"]) {
-    fireEvent.press(screen.getByRole("button", { name: word }));
-    fireEvent.press(screen.getByTestId("activity-next"));
-  }
-  fireEvent.press(screen.getByRole("button", { name: "تُفَّاحَة" }));
-  expect(screen.getByText("أَحْسَنْت! 4/5 🌟 تابع")).toBeTruthy();
+  fireEvent.press(screen.getByRole("button", { name: "أَنَا" }));
+  fireEvent.press(screen.getByTestId("activity-next"));
+  fireEvent.press(screen.getByRole("button", { name: "أُحِبُّ" }));
+  expect(screen.getByText("أَحْسَنْت! 2/3 🌟 تابع")).toBeTruthy();
 });

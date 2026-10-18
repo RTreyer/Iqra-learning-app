@@ -12,7 +12,7 @@ import { ScreenBackground } from "@/components/ScreenBackground";
 import { StarBadge } from "@/components/StarBadge";
 import { UiText } from "@/components/UiText";
 import { UnitCard } from "@/components/UnitCard";
-import { getBook, unitLessonIds } from "@/content";
+import { getBook, getGradeOfBook, unitLessonIds } from "@/content";
 import { useLanguage } from "@/context/LanguageContext";
 import { useProgress } from "@/context/ProgressContext";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
@@ -27,6 +27,7 @@ export default function BookScreen() {
   const pad = useScreenPadding();
 
   const book = getBook(bookId ?? "");
+  const grade = getGradeOfBook(bookId ?? "");
   const units = useMemo(
     () =>
       book
@@ -43,7 +44,7 @@ export default function BookScreen() {
       style={[styles.container, { paddingTop: pad.top + 4 }]}
     >
       <View style={[styles.header, { flexDirection: language === "en" ? "row" : "row-reverse" }]}>
-        <BackButton fallback={routes.home()} />
+        <BackButton fallback={grade ? routes.grade(grade.number) : routes.home()} />
         <View style={styles.headerCenter}>
           <Text style={styles.bookEmoji}>{book.emoji}</Text>
           <UiText style={styles.bookTitle} numberOfLines={1}>

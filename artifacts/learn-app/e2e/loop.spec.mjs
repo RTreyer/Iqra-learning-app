@@ -12,7 +12,8 @@ import {
 // Local times (Node and the browser share the machine time zone), one calendar day apart.
 const DAY_1 = new Date(2026, 2, 10, 10, 0, 0);
 const DAY_2 = new Date(2026, 2, 11, 10, 0, 0);
-const LETTERS = ["letter:ب", "letter:ت", "letter:ث"];
+// u2-29 rounds in order; the last two are missed on day 1.
+const LETTERS = ["letter:رَ", "letter:لَا", "letter:دَا", "letter:نَ", "letter:تَا", "letter:مَا"];
 
 /** Target letter shown in the current review round. */
 async function reviewTarget(page) {
@@ -38,16 +39,15 @@ test("missed letters come back tomorrow in today's review, and leave once answer
   page,
 }) => {
   await page.clock.setFixedTime(DAY_1);
-  // Rounds 4 and 5 (ب and ت seen a second time) are missed: 3 of 5 gives 2 stars.
-  expect(await completeQuizLesson(page, "u2-3", 3)).toBe(2);
+  // Rounds 5 and 6 (تَا and مَا) are missed: 4 of 6 gives 2 stars.
+  expect(await completeQuizLesson(page, "u2-29", 4)).toBe(2);
   await expect
     .poll(async () => Object.keys((await readProgress(page))?.items ?? {}).sort())
     .toEqual([...LETTERS].sort());
   const { items } = await readProgress(page);
   for (const id of LETTERS) expect(items[id].box, id).toBe(1);
-  expect(items["letter:ب"].lapses).toBe(1);
-  expect(items["letter:ت"].lapses).toBe(1);
-  expect(items["letter:ث"].lapses).toBe(0);
+  // A miss on first sight is not a lapse: every syllable here was new.
+  for (const id of LETTERS) expect(items[id].lapses, id).toBe(0);
 
   await gotoAndWaitReady(page, "/");
   await expect(page.getByTestId("review-card")).toHaveCount(0);
@@ -57,7 +57,7 @@ test("missed letters come back tomorrow in today's review, and leave once answer
   const reviewCard = page.getByTestId("review-card");
   await expect(reviewCard).toContainText("مُرَاجَعَة الْيَوْم");
   // lib/labels.ts itemsLabel(3, "ar")
-  await expect(reviewCard).toContainText("3 عَنَاصِر");
+  await expect(reviewCard).toContainText("6 عَنَاصِر");
 
   await reviewCard.click();
   await expect(page).toHaveURL(/\/review$/);
@@ -71,17 +71,17 @@ test("missed letters come back tomorrow in today's review, and leave once answer
   }
   const complete = page.getByTestId("review-complete");
   await expect(complete).toContainText("أَحْسَنْت! مُرَاجَعَة الْيَوْم مُكْتَمِلَة");
-  await expect(complete).toContainText("3/3");
+  await expect(complete).toContainText("6/6");
   await expect
     .poll(async () => {
       const p = await readProgress(page);
       return LETTERS.map((id) => p.items[id].box);
     })
-    .toEqual([2, 2, 2]);
+    .toEqual([2, 2, 2, 2, 2, 2]);
 
   await gotoAndWaitReady(page, "/");
   await page.reload();
-  await expect(page.getByTestId("book-arabic-1")).toBeVisible();
+  await expect(page.getByTestId("grade-1")).toBeVisible();
   await expect(page.getByTestId("review-card")).toHaveCount(0);
 });
 
@@ -89,18 +89,23 @@ test("streak badge shows 🔥 2 after lessons on two consecutive days", async ({
   await page.clock.setFixedTime(DAY_1);
   await gotoAndWaitReady(page, "/lesson/u2-1");
   await tapAllAndFinish(page, [
-    "هَذَا بَيْتُنَا الْجَمِيل",
-    "بَابُنَا أَبْيَض وَنَظِيف",
-    "عِنْدَنَا تُفَّاح وَتِين لَذِيذ",
-    "أَمَامَ الْبَيْتِ ثَعْلَبٌ صَغِير",
+    "مَامَا تُوصِلُنِي إِلَى الْمَدْرَسَةِ",
+    "أَنَا أَقْرَأُ",
+    "أَنَا أُحِبُّ مَامَا",
+    "أَنَا أَكْتُبُ",
   ]);
   expect(await earnedStars(page)).toBe(3);
   await gotoAndWaitReady(page, "/");
   await expect(page.getByTestId("streak-badge")).toHaveCount(0);
 
   await page.clock.setFixedTime(DAY_2);
-  await gotoAndWaitReady(page, "/lesson/u2-2");
-  await tapAllAndFinish(page, ["بَيْت", "بَاب", "تُفَّاحَة", "تِين", "ثَعْلَب", "ثَوْر"]);
+  await gotoAndWaitReady(page, "/lesson/u2-5");
+  await tapAllAndFinish(page, [
+    "بَابَا يُعَلِّمُنِي",
+    "أَنَا أَقْرَأُ",
+    "أَنَا أُحِبُّ بَابَا",
+    "نَحْنُ نَقْرَأُ",
+  ]);
   expect(await earnedStars(page)).toBe(3);
 
   await page.reload();

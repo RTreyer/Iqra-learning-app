@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
+import { Art } from "@/components/art/Art";
 import { UiText } from "@/components/UiText";
 import * as haptics from "@/lib/haptics";
 import { speak } from "@/lib/speech";
@@ -31,6 +32,11 @@ function Story({ lesson, color, onComplete }: ActivityProps<"story">) {
 
   return (
     <View style={act.container}>
+      {lesson.scene ? (
+        <View style={styles.scene} testID="story-scene">
+          <Art art={lesson.scene} size={120} />
+        </View>
+      ) : null}
       <Text style={styles.title}>{lesson.storyTitle}</Text>
       <UiText style={act.instruction}>اضغط على كل جملة لتسمعها 🔊</UiText>
       <View style={act.fullWidth}>
@@ -52,7 +58,11 @@ function Story({ lesson, color, onComplete }: ActivityProps<"story">) {
                 ]}
                 onPress={() => handleLine(i)}
               >
-                <Text style={styles.emoji}>{line.emoji}</Text>
+                {line.art ? (
+                  <Art art={line.art} size={40} />
+                ) : (
+                  <Text style={styles.emoji}>{line.emoji}</Text>
+                )}
                 <Text style={[styles.text, done && { color: readableFill(color) }]}>
                   {line.text}
                 </Text>
@@ -80,6 +90,14 @@ function Story({ lesson, color, onComplete }: ActivityProps<"story">) {
 export const StoryActivity = withAttemptReset(Story, "StoryActivity");
 
 const styles = StyleSheet.create({
+  scene: {
+    alignSelf: "center",
+    backgroundColor: "rgba(255,255,255,0.9)",
+    borderRadius: 24,
+    padding: 8,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
   title: {
     fontSize: 26,
     fontWeight: "900",

@@ -81,12 +81,12 @@ const grade1Books: Book[] = [
 
 /** Grades 1 to 6 in display order. Grades 2 to 6 have no books yet and show as "قريباً". */
 export const grades: Grade[] = [
-  { number: 1, title: "الصف الأول", books: grade1Books },
-  { number: 2, title: "الصف الثاني", books: [] },
-  { number: 3, title: "الصف الثالث", books: [] },
-  { number: 4, title: "الصف الرابع", books: [] },
-  { number: 5, title: "الصف الخامس", books: [] },
-  { number: 6, title: "الصف السادس", books: [] },
+  { number: 1, title: "الصف الأول", emoji: "🌱", color: "#059669", books: grade1Books },
+  { number: 2, title: "الصف الثاني", emoji: "🌊", color: "#2563EB", books: [] },
+  { number: 3, title: "الصف الثالث", emoji: "🌸", color: "#DB2777", books: [] },
+  { number: 4, title: "الصف الرابع", emoji: "🌟", color: "#D97706", books: [] },
+  { number: 5, title: "الصف الخامس", emoji: "🦋", color: "#7C3AED", books: [] },
+  { number: 6, title: "الصف السادس", emoji: "🔭", color: "#EA580C", books: [] },
 ];
 
 export const books: Book[] = grades.flatMap((grade) => grade.books);
