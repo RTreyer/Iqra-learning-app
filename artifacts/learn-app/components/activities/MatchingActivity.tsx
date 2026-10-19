@@ -85,6 +85,7 @@ function Matching({ lesson, color, attemptKey, onComplete }: ActivityProps<"matc
               }}
               style={[
                 styles.item,
+                !pair.left.emoji && styles.itemTextOnly,
                 state.selectedLeft === i && { borderColor: color, borderWidth: 3 },
                 state.matched.has(i) && {
                   backgroundColor: withAlpha(color, 0.13),
@@ -94,8 +95,10 @@ function Matching({ lesson, color, attemptKey, onComplete }: ActivityProps<"matc
               ]}
               onPress={() => handleLeft(i)}
             >
-              <Text style={styles.emoji}>{pair.left.emoji}</Text>
-              <Text style={styles.word}>{pair.left.word}</Text>
+              {pair.left.emoji ? <Text style={styles.emoji}>{pair.left.emoji}</Text> : null}
+              <Text style={[styles.word, !pair.left.emoji && styles.wordOnly]}>
+                {pair.left.word}
+              </Text>
             </Pressable>
           ))}
         </View>
@@ -121,11 +124,19 @@ function Matching({ lesson, color, attemptKey, onComplete }: ActivityProps<"matc
                 selected: state.matched.has(pairIdx),
                 disabled: state.matched.has(pairIdx),
               }}
-              style={[styles.item, state.matched.has(pairIdx) && styles.itemMatched]}
+              style={[
+                styles.item,
+                !pairs[pairIdx].right.emoji && styles.itemTextOnly,
+                state.matched.has(pairIdx) && styles.itemMatched,
+              ]}
               onPress={() => handleRight(pairIdx)}
             >
-              <Text style={styles.emoji}>{pairs[pairIdx].right.emoji}</Text>
-              <Text style={styles.word}>{pairs[pairIdx].right.word}</Text>
+              {pairs[pairIdx].right.emoji ? (
+                <Text style={styles.emoji}>{pairs[pairIdx].right.emoji}</Text>
+              ) : null}
+              <Text style={[styles.word, !pairs[pairIdx].right.emoji && styles.wordOnly]}>
+                {pairs[pairIdx].right.word}
+              </Text>
             </Pressable>
           ))}
         </View>
@@ -165,9 +176,13 @@ const styles = StyleSheet.create({
     ...shadow.card,
     minHeight: touchTarget,
   },
+  /** Same pitch as the arrows column (68 high) when a card has no picture. */
+  itemTextOnly: { minHeight: 68, justifyContent: "center" },
   itemMatched: { backgroundColor: colors.successSoft, borderColor: colors.success, borderWidth: 2 },
   emoji: { fontSize: 30 },
   word: { fontSize: 15, fontWeight: "700", color: colors.mutedStrong, textAlign: "center" },
+  /** Syllables and words without a picture are what the child reads: make them large. */
+  wordOnly: { fontSize: 22, fontWeight: "800", color: colors.text, lineHeight: 34 },
   arrows: { gap: 10, alignItems: "center" },
   arrow: {
     fontSize: 20,

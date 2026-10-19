@@ -1,141 +1,28 @@
-import type {
-  ArtId,
-  BuildWordRound,
-  LetterPickRound,
-  Lesson,
-  StoryLine,
-  TraceTarget,
-  Unit,
-  WordReadRound,
-} from "../types";
+import type { Unit } from "../types";
+import {
+  COLOR,
+  EXERCISES,
+  firstSound,
+  letterLessons,
+  numberLessons,
+  pick,
+  read,
+  train,
+  type LessonDraft,
+} from "./lessonKit.ts";
 
 // ── Unit 3: ي و أ ── from أَقْرَأُ وَأَتَعَلَّمُ, Part 1, Unit 3 (pp. 60 to 82) ──────────────
 // Source notes: docs/content/textbooks/arabic-part1/unit-03.md.
 // New in this unit: each letter with fatha, damma, kasra and sukun, and the long vowels.
-// Each textbook lesson (one letter, one story) becomes six app lessons:
+// Each textbook lesson (one letter, one story) becomes six app lessons (lessonKit.ts):
 //   story, "which vowel do you hear?", the syllable train (the book's split words,
 //   e.g. بَ / يَا / نُ → بَيَانُ), sight words, writing the letter, writing whole words.
 // Story sentences complete the book's picture words (rebus); a teacher still has to confirm them.
 // The eleven listening stories have no printed text and are not included yet.
 
-const COLOR = "#2563EB";
 const unit3Letters = ["ي", "و", "أ"];
 
-type LetterLesson = {
-  letter: string;
-  /** The letter with fatha, spoken when the child writes it. */
-  sound: string;
-  storyTitle: string;
-  scene?: ArtId;
-  lines: StoryLine[];
-  /** Syllables of the letter heard without their text; the child picks the vowel. */
-  vowels: WordReadRound[];
-  train: BuildWordRound[];
-  sightWords: WordReadRound[];
-  forms: string[];
-  /** The book's word writing page: [as printed, as spoken]. */
-  words: [string, string][];
-};
-
-/** Six lessons for one textbook lesson, numbered from `first`. */
-function letterLessons(first: number, l: LetterLesson): Lesson[] {
-  const section = `${l.letter} · ${l.storyTitle}`;
-  const id = (n: number) => `u3-${first + n}`;
-  const forms: TraceTarget[] = l.forms.map((form) => ({ guide: form, label: form, tts: l.sound }));
-  const words: TraceTarget[] = l.words.map(([guide, tts]) => ({ guide, label: tts, tts }));
-  return [
-    {
-      id: id(0),
-      number: first,
-      section,
-      type: "story",
-      title: "أَقْرَأُ الْقِصَّة",
-      subtitle: l.storyTitle,
-      emoji: "📖",
-      color: COLOR,
-      storyTitle: l.storyTitle,
-      scene: l.scene,
-      lines: l.lines,
-    },
-    {
-      id: id(1),
-      number: first + 1,
-      section,
-      type: "word_read",
-      title: "أَسْمَعُ الْحَرَكَة",
-      subtitle: l.vowels.map((r) => r.word).join("  "),
-      emoji: "👂",
-      color: "#DB2777",
-      rounds: l.vowels,
-    },
-    {
-      id: id(2),
-      number: first + 2,
-      section,
-      type: "build_word",
-      title: "قِطَارُ الْمَقَاطِع",
-      subtitle: "اسمع الكلمة وحمّل القطار",
-      emoji: "🚂",
-      color: "#EA580C",
-      rounds: l.train,
-    },
-    {
-      id: id(3),
-      number: first + 3,
-      section,
-      type: "word_read",
-      title: "أَقْرَأُ الْكَلِمَات",
-      subtitle: "اسمع الكلمة واختر الصواب",
-      emoji: "👁️",
-      color: "#D97706",
-      rounds: l.sightWords,
-    },
-    {
-      id: id(4),
-      number: first + 4,
-      section,
-      type: "trace",
-      title: "أَكْتُبُ الْحَرْف",
-      subtitle: l.forms.join("  ،  "),
-      emoji: "✍️",
-      color: "#7C3AED",
-      targets: forms,
-    },
-    {
-      id: id(5),
-      number: first + 5,
-      section,
-      type: "trace",
-      title: "أَكْتُبُ الْكَلِمَات",
-      subtitle: l.words.map(([guide]) => guide).join("  ،  "),
-      emoji: "📝",
-      color: "#7C3AED",
-      targets: words,
-    },
-  ];
-}
-
-/** Round where `target` is among `letters`; the correct index is found, not typed. */
-const pick = (target: string, letters: string[]): LetterPickRound => ({
-  targetLetter: target,
-  letters,
-  correctIndex: letters.indexOf(target),
-});
-
-const read = (word: string, choices: string[]): WordReadRound => ({
-  word,
-  choices,
-  correctIndex: choices.indexOf(word),
-});
-
-const train = (
-  word: string,
-  syllables: string[],
-  extras: string[],
-  emoji?: string,
-): BuildWordRound => ({ word, syllables, extras, emoji });
-
-const ya = letterLessons(1, {
+const ya = letterLessons({
   letter: "ي",
   sound: "يَ",
   storyTitle: "الْمُعَلِّمَةُ بَيَانُ",
@@ -181,7 +68,7 @@ const ya = letterLessons(1, {
   ],
 });
 
-const waw = letterLessons(7, {
+const waw = letterLessons({
   letter: "و",
   sound: "وَ",
   storyTitle: "أَخِي مَرِيضٌ",
@@ -230,7 +117,7 @@ const waw = letterLessons(7, {
   ],
 });
 
-const alif = letterLessons(13, {
+const alif = letterLessons({
   letter: "أ",
   sound: "أَ",
   storyTitle: "دَارُ الأَيْتَامِ",
@@ -284,17 +171,9 @@ const alif = letterLessons(13, {
 });
 
 /** تَدْرِيبَات, pp. 81 to 82: the syllable honeycomb, unit words, first sound, sight words. */
-const EXERCISES = "تَدْرِيبَات";
-const first = (word: string, answer: string, others: string[]) => ({
-  word,
-  choices: [answer, ...others].map((s) => ({ emoji: "", word: s })),
-  correctIndex: 0,
-});
 
-const exercises: Lesson[] = [
+const exercises: LessonDraft[] = [
   {
-    id: "u3-19",
-    number: 19,
     section: EXERCISES,
     type: "letter_pick",
     title: "خَلِيَّةُ الْمَقَاطِع",
@@ -312,8 +191,6 @@ const exercises: Lesson[] = [
     ],
   },
   {
-    id: "u3-20",
-    number: 20,
     section: EXERCISES,
     type: "build_word",
     title: "قِطَارُ الْوَحْدَة",
@@ -330,8 +207,6 @@ const exercises: Lesson[] = [
     ],
   },
   {
-    id: "u3-21",
-    number: 21,
     section: EXERCISES,
     type: "listen_pick",
     title: "أَقْرَأُ الصَّوْتَ الأَوَّلَ",
@@ -339,19 +214,17 @@ const exercises: Lesson[] = [
     emoji: "👂",
     color: "#DB2777",
     questions: [
-      first("وَادِي", "وَا", ["وِ", "وُ"]),
-      first("وِدَادُ", "وِ", ["وَا", "وُ"]),
-      first("وُرُودٌ", "وُ", ["وِ", "وَا"]),
-      first("أُمَيْمَةُ", "أُ", ["أَ", "إِ"]),
-      first("مَالَ", "مَا", ["مَـ", "مُو"]),
-      first("إِنَارَةٌ", "إِ", ["إِيـ", "أُ"]),
-      first("إِيمَانُ", "إِيـ", ["إِ", "أَ"]),
-      first("أَرَادَ", "أَ", ["أُ", "إِ"]),
+      firstSound("وَادِي", "وَا", ["وِ", "وُ"]),
+      firstSound("وِدَادُ", "وِ", ["وَا", "وُ"]),
+      firstSound("وُرُودٌ", "وُ", ["وِ", "وَا"]),
+      firstSound("أُمَيْمَةُ", "أُ", ["أَ", "إِ"]),
+      firstSound("مَالَ", "مَا", ["مَـ", "مُو"]),
+      firstSound("إِنَارَةٌ", "إِ", ["إِيـ", "أُ"]),
+      firstSound("إِيمَانُ", "إِيـ", ["إِ", "أَ"]),
+      firstSound("أَرَادَ", "أَ", ["أُ", "إِ"]),
     ],
   },
   {
-    id: "u3-22",
-    number: 22,
     section: EXERCISES,
     type: "word_read",
     title: "أَقْرَأُ الْكَلِمَات",
@@ -374,9 +247,9 @@ export const unit3: Unit = {
   number: 3,
   title: "الوحدة الثالثة",
   letters: unit3Letters,
-  theme: "نَتَعَاوَنُ وَنَتَرَاحَمُ",
+  theme: "الْمُعَلِّمَةُ بَيَانُ · أَخِي مَرِيضٌ · دَارُ الأَيْتَامِ",
   emoji: "🤝",
   color: COLOR,
   badgeLabel: "ي و أ",
-  lessons: [...ya, ...waw, ...alif, ...exercises],
+  lessons: numberLessons("u3", [...ya, ...waw, ...alif, ...exercises]),
 };
