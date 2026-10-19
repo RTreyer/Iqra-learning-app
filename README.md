@@ -37,7 +37,7 @@ Progress stays on the device. No server, no accounts. AsyncStorage key `@kidlear
 
 | Book | Units | Lessons | Status |
 |---|---|---|---|
-| Arabic Part 1 | 8 | 72 | Unit 2 rebuilt from the textbook (7 letters م ب ل ن ر د ت, 31 lessons with Yemeni illustrations). Units 1 and 3 to 8 still the earlier version, to be rebuilt from the book. Native speaker review pending |
+| Arabic Part 1 | 8 | 88 | Units 2 and 3 rebuilt from the textbook (Unit 2: 7 letters م ب ل ن ر د ت, 31 lessons with Yemeni illustrations; Unit 3: ي و أ with all vowels, 22 lessons with the syllable train game). Units 1 and 4 to 8 still the earlier version, to be rebuilt from the book. Native speaker review pending |
 | Math Part 1 | 3 | 11 | Exemplary, derived from the textbook outline (numbers 0 to 10, add and subtract within 10, plane shapes). Not the full year |
 | Science Part 1 | 3 | 9 | Placeholder, no textbook source yet. Shown as "قريباً" on home, not part of the release |
 | Arabic Part 2, Math Part 2 | 0 | 0 | Shown as "قريباً". Planned for release v1.1 |

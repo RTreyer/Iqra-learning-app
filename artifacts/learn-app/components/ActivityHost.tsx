@@ -40,6 +40,10 @@ export function ActivityHost({ lesson, ...props }: Props) {
       const Activity = ACTIVITY_COMPONENTS.trace;
       return <Activity lesson={lesson} {...props} />;
     }
+    case "build_word": {
+      const Activity = ACTIVITY_COMPONENTS.build_word;
+      return <Activity lesson={lesson} {...props} />;
+    }
     case "counting": {
       const Activity = ACTIVITY_COMPONENTS.counting;
       return <Activity lesson={lesson} {...props} />;

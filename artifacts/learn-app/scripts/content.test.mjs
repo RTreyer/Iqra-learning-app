@@ -81,6 +81,19 @@ test("trace lessons have non empty targets", () => {
   }
 });
 
+test("build_word syllables spell the word and every tile fits the train", () => {
+  const letters = (s) => s.replace(/[ً-ْـ]/g, "");
+  for (const lesson of byType("build_word")) {
+    for (const r of lesson.rounds) {
+      assert.ok(r.syllables.length >= 2 && r.syllables.length <= 4, `${lesson.id}: ${r.word}`);
+      assert.ok(r.syllables.length + r.extras.length <= 6, `${lesson.id}: ${r.word}`);
+      assert.equal(letters(r.syllables.join("")), letters(r.word), `${lesson.id}: ${r.word}`);
+      for (const extra of r.extras)
+        assert.ok(!r.syllables.includes(extra), `${lesson.id}: decoy ${extra} is in ${r.word}`);
+    }
+  }
+});
+
 test("counting answers are among the options", () => {
   for (const lesson of byType("counting")) {
     for (const r of lesson.rounds) assert.ok(r.options.includes(r.count), lesson.id);

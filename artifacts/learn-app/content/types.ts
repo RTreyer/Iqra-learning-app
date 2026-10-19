@@ -55,6 +55,16 @@ export type TraceTarget = {
   strokeCount?: number;
   emoji?: string;
 };
+/**
+ * The child hears `word` and loads its `syllables` into a train in reading order;
+ * `extras` are decoy tiles, usually the same letter with another vowel.
+ */
+export type BuildWordRound = {
+  word: string;
+  syllables: string[];
+  extras: string[];
+  emoji?: string;
+};
 export type CountingRound = { emoji: string; count: number; options: number[] };
 export type ArithmeticRound = { a: number; b: number; op: "+" | "-"; options: number[] };
 
@@ -67,6 +77,7 @@ export type LessonBody =
   | { type: "behavior"; behaviors: BehaviorItem[] }
   | { type: "matching"; pairs: MatchPair[] }
   | { type: "trace"; targets: TraceTarget[] }
+  | { type: "build_word"; rounds: BuildWordRound[] }
   | { type: "counting"; rounds: CountingRound[] }
   | { type: "arithmetic"; rounds: ArithmeticRound[] };
 

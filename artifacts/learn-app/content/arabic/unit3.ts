@@ -1,131 +1,382 @@
-import type { Unit } from "../types";
+import type {
+  ArtId,
+  BuildWordRound,
+  LetterPickRound,
+  Lesson,
+  StoryLine,
+  TraceTarget,
+  Unit,
+  WordReadRound,
+} from "../types";
 
-const unit3Letters = ["ج", "ح", "خ"];
+// ── Unit 3: ي و أ ── from أَقْرَأُ وَأَتَعَلَّمُ, Part 1, Unit 3 (pp. 60 to 82) ──────────────
+// Source notes: docs/content/textbooks/arabic-part1/unit-03.md.
+// New in this unit: each letter with fatha, damma, kasra and sukun, and the long vowels.
+// Each textbook lesson (one letter, one story) becomes six app lessons:
+//   story, "which vowel do you hear?", the syllable train (the book's split words,
+//   e.g. بَ / يَا / نُ → بَيَانُ), sight words, writing the letter, writing whole words.
+// Story sentences complete the book's picture words (rebus); a teacher still has to confirm them.
+// The eleven listening stories have no printed text and are not included yet.
 
-// ── Unit 3: ج، ح، خ ── فِي الْحَدِيقَة ────────────────────────────────────────
+const COLOR = "#2563EB";
+const unit3Letters = ["ي", "و", "أ"];
+
+type LetterLesson = {
+  letter: string;
+  /** The letter with fatha, spoken when the child writes it. */
+  sound: string;
+  storyTitle: string;
+  scene?: ArtId;
+  lines: StoryLine[];
+  /** Syllables of the letter heard without their text; the child picks the vowel. */
+  vowels: WordReadRound[];
+  train: BuildWordRound[];
+  sightWords: WordReadRound[];
+  forms: string[];
+  /** The book's word writing page: [as printed, as spoken]. */
+  words: [string, string][];
+};
+
+/** Six lessons for one textbook lesson, numbered from `first`. */
+function letterLessons(first: number, l: LetterLesson): Lesson[] {
+  const section = `${l.letter} · ${l.storyTitle}`;
+  const id = (n: number) => `u3-${first + n}`;
+  const forms: TraceTarget[] = l.forms.map((form) => ({ guide: form, label: form, tts: l.sound }));
+  const words: TraceTarget[] = l.words.map(([guide, tts]) => ({ guide, label: tts, tts }));
+  return [
+    {
+      id: id(0),
+      number: first,
+      section,
+      type: "story",
+      title: "أَقْرَأُ الْقِصَّة",
+      subtitle: l.storyTitle,
+      emoji: "📖",
+      color: COLOR,
+      storyTitle: l.storyTitle,
+      scene: l.scene,
+      lines: l.lines,
+    },
+    {
+      id: id(1),
+      number: first + 1,
+      section,
+      type: "word_read",
+      title: "أَسْمَعُ الْحَرَكَة",
+      subtitle: l.vowels.map((r) => r.word).join("  "),
+      emoji: "👂",
+      color: "#DB2777",
+      rounds: l.vowels,
+    },
+    {
+      id: id(2),
+      number: first + 2,
+      section,
+      type: "build_word",
+      title: "قِطَارُ الْمَقَاطِع",
+      subtitle: "اسمع الكلمة وحمّل القطار",
+      emoji: "🚂",
+      color: "#EA580C",
+      rounds: l.train,
+    },
+    {
+      id: id(3),
+      number: first + 3,
+      section,
+      type: "word_read",
+      title: "أَقْرَأُ الْكَلِمَات",
+      subtitle: "اسمع الكلمة واختر الصواب",
+      emoji: "👁️",
+      color: "#D97706",
+      rounds: l.sightWords,
+    },
+    {
+      id: id(4),
+      number: first + 4,
+      section,
+      type: "trace",
+      title: "أَكْتُبُ الْحَرْف",
+      subtitle: l.forms.join("  ،  "),
+      emoji: "✍️",
+      color: "#7C3AED",
+      targets: forms,
+    },
+    {
+      id: id(5),
+      number: first + 5,
+      section,
+      type: "trace",
+      title: "أَكْتُبُ الْكَلِمَات",
+      subtitle: l.words.map(([guide]) => guide).join("  ،  "),
+      emoji: "📝",
+      color: "#7C3AED",
+      targets: words,
+    },
+  ];
+}
+
+/** Round where `target` is among `letters`; the correct index is found, not typed. */
+const pick = (target: string, letters: string[]): LetterPickRound => ({
+  targetLetter: target,
+  letters,
+  correctIndex: letters.indexOf(target),
+});
+
+const read = (word: string, choices: string[]): WordReadRound => ({
+  word,
+  choices,
+  correctIndex: choices.indexOf(word),
+});
+
+const train = (
+  word: string,
+  syllables: string[],
+  extras: string[],
+  emoji?: string,
+): BuildWordRound => ({ word, syllables, extras, emoji });
+
+const ya = letterLessons(1, {
+  letter: "ي",
+  sound: "يَ",
+  storyTitle: "الْمُعَلِّمَةُ بَيَانُ",
+  scene: "school",
+  lines: [
+    {
+      text: "الْمُعَلِّمَةُ بَيَانُ تَكْتُبُ الْكَلِمَاتِ (يُدَارُ - بَيْتٌ - يُولَدُ)",
+      emoji: "👩‍🏫",
+      art: "school",
+    },
+    { text: "أَنَا أَكْتُبُ الْكَلِمَاتِ، أَخِي لَا يَكْتُبُ", emoji: "✏️", art: "boy" },
+    { text: "الْمُعَلِّمَةُ تُمْسِكُ يَدَ أَخِي", emoji: "🤝" },
+    { text: "أَخِي يَكْتُبُ (يُدَارُ - بَيْتٌ - يُولَدُ)", emoji: "📝", art: "boy" },
+    { text: "شَكَرَ أَخِي الْمُعَلِّمَةَ بَيَانَ", emoji: "🙏" },
+    { text: "نَحْنُ سُعَدَاءُ", emoji: "😊" },
+  ],
+  vowels: [
+    read("يَ", ["يَ", "يُ", "يَا"]),
+    read("يَا", ["يُو", "يَا", "يَ"]),
+    read("يُ", ["يَا", "يَ", "يُ"]),
+    read("يُو", ["يُو", "يُ", "يَا"]),
+  ],
+  train: [
+    train("بَيَانُ", ["بَ", "يَا", "نُ"], ["يُو"], "👩‍🏫"),
+    train("يَدُ", ["يَ", "دُ"], ["يُ", "دَا"], "✋"),
+    train("يُولَدُ", ["يُو", "لَـ", "دُ"], ["يَا"], "👶"),
+    train("بَيْتُ", ["بَيْـ", "تُ"], ["بَا", "تَ"], "🏠"),
+    train("يُدَارُ", ["يُـ", "دَا", "رُ"], ["يَـ"]),
+  ],
+  sightWords: [
+    read("الْمُعَلِّمَةُ", ["الْمُعَلِّمَةُ", "الْكَلِمَاتُ", "سُعَدَاءُ"]),
+    read("شَكَرَ", ["أَكْتُبُ", "شَكَرَ", "بَيْتُ"]),
+    read("أَكْتُبُ", ["شَكَرَ", "سُعَدَاءُ", "أَكْتُبُ"]),
+    read("الْكَلِمَاتُ", ["الْكَلِمَاتُ", "الْمُعَلِّمَةُ", "يُولَدُ"]),
+    read("سُعَدَاءُ", ["بَيَانُ", "سُعَدَاءُ", "شَكَرَ"]),
+  ],
+  forms: ["يـ", "ـيـ", "ـي", "ي"],
+  words: [
+    ["يد", "يَدٌ"],
+    ["بيت", "بَيْتٌ"],
+    ["يبني", "يَبْنِي"],
+    ["يدي", "يَدِي"],
+  ],
+});
+
+const waw = letterLessons(7, {
+  letter: "و",
+  sound: "وَ",
+  storyTitle: "أَخِي مَرِيضٌ",
+  scene: "boy",
+  lines: [
+    { text: "قَالَتْ وِدَادُ: بَابَا بَابَا، أَخِي دَاوُودُ مَرِيضٌ", emoji: "🤒", art: "girl" },
+    { text: "بَابَا أَحْضَرَ الطَّبِيبَ", emoji: "🧑‍⚕️", art: "father" },
+    { text: "الطَّبِيبُ فَحَصَ أَخِي", emoji: "🩺" },
+    { text: "مَضَى يَوْمَانِ وَأَخِي لَا يَشْرَبُ الدَّوَاءَ", emoji: "💊", art: "boy" },
+    { text: "خَالَتِي نَوَالُ أَعْطَتْ أَخِي وُرُودًا", emoji: "💐", art: "mother" },
+    { text: "وَنَاوَلَ خَالِي أَخِي الدَّوَاءَ", emoji: "🥄" },
+    { text: "وَقَالَ: الطَّبِيبُ يُدَاوِينَا، وَاللهُ يَشْفِينَا", emoji: "🤲" },
+  ],
+  vowels: [
+    read("وَ", ["وَ", "وُ", "وِ"]),
+    read("وَا", ["وُو", "وَا", "وِي"]),
+    read("وُ", ["وِ", "وَ", "وُ"]),
+    read("وُو", ["وُو", "وِي", "وَا"]),
+    read("وِ", ["وُ", "وِ", "وَ"]),
+    read("وِي", ["وَا", "وُو", "وِي"]),
+  ],
+  train: [
+    train("وِدَادُ", ["وِ", "دَا", "دُ"], ["وُ"], "👧"),
+    train("دَاوُودُ", ["دَا", "وُو", "دُ"], ["وَا"], "👦"),
+    train("وُرُودُ", ["وُ", "رُو", "دُ"], ["وَ"], "💐"),
+    train("نَوَالُ", ["نَ", "وَا", "لُ"], ["وُو"]),
+    train("نَاوَلَ", ["نَا", "وَ", "لَ"], ["وِ"], "🥄"),
+    train("يَوْمَانِ", ["يَوْ", "مَا", "نِ"], ["يَا"], "📅"),
+    train("يُدَاوِينَا", ["يُـ", "دَا", "وِيـ", "نَا"], [], "🧑‍⚕️"),
+  ],
+  sightWords: [
+    read("اللهُ", ["اللهُ", "مَضَى", "قَالَتْ"]),
+    read("يَشْفِينَا", ["يُدَاوِينَا", "يَشْفِينَا", "خَالَتِي"]),
+    read("الطَّبِيبُ", ["مَرِيضٌ", "خَالَتِي", "الطَّبِيبُ"]),
+    read("مَضَى", ["مَضَى", "اللهُ", "مَرِيضٌ"]),
+    read("مَرِيضٌ", ["الطَّبِيبُ", "مَرِيضٌ", "قَالَتْ"]),
+    read("قَالَتْ", ["خَالَتِي", "مَضَى", "قَالَتْ"]),
+    read("خَالَتِي", ["خَالَتِي", "قَالَتْ", "يَشْفِينَا"]),
+  ],
+  forms: ["و", "ـو"],
+  words: [
+    ["وداد", "وِدَادُ"],
+    ["يوم", "يَوْمٌ"],
+    ["ينمو", "يَنْمُو"],
+    ["دود", "دُودٌ"],
+  ],
+});
+
+const alif = letterLessons(13, {
+  letter: "أ",
+  sound: "أَ",
+  storyTitle: "دَارُ الأَيْتَامِ",
+  scene: "house",
+  lines: [
+    { text: "نَزَلَ الْمَطَرُ، وَدَخَلَ الْمَاءُ دَارَ الأَيْتَامِ", emoji: "🌧️", art: "house" },
+    {
+      text: "أَسْرَعَتِ الْمُعَلِّمَةُ إِيمَانُ، وَقَالَتْ: يَا أُمَيْمَةُ نَادِي الْجِيرَانَ",
+      emoji: "🏃‍♀️",
+      art: "mother",
+    },
+    { text: "وَأَخَذَتْ إِنَاءً، وَأَخْرَجَتِ الْمَاءَ", emoji: "🪣" },
+    { text: "نَادَتْ أُمَيْمَةُ الْجِيرَانَ", emoji: "📣", art: "girl" },
+    { text: "أَصْلَحَ الْجِيرَانُ دَارَ الأَيْتَامِ", emoji: "🔨", art: "house" },
+    {
+      text: "قَالَتْ أُمَيْمَةُ: نَحْنُ أَيْتَامٌ، وَالْمُعَلِّمَةُ إِيمَانُ أُمُّنَا",
+      emoji: "❤️",
+      art: "girl",
+    },
+  ],
+  vowels: [
+    read("أَ", ["أَ", "أُ", "إِ"]),
+    read("أُ", ["إِ", "أُ", "أَ"]),
+    read("أُو", ["أُو", "إِي", "أَ"]),
+    read("إِ", ["أُ", "أَ", "إِ"]),
+    read("إِي", ["أُو", "إِي", "إِ"]),
+  ],
+  train: [
+    train("أَيْتَامُ", ["أَيْـ", "تَا", "مُ"], ["إِ"]),
+    train("إِيمَانُ", ["إِيـ", "مَا", "نُ"], ["أُو"], "👩‍🏫"),
+    train("إِنَاءُ", ["إِ", "نَا", "ءُ"], ["أَ"], "🪣"),
+    train("أُمَيْمَةُ", ["أُ", "مَيْـ", "مَـ", "ةُ"], [], "👧"),
+    train("مَأْمَنُ", ["مَأْ", "مَـ", "نُ"], ["مَا"], "🏡"),
+  ],
+  sightWords: [
+    read("أَصْلَحَ", ["أَصْلَحَ", "أَخَذَتْ", "أَسْرَعَتْ"]),
+    read("أَخَذَتْ", ["دَخَلَ", "أَخَذَتْ", "نَزَلَ"]),
+    read("دَخَلَ", ["نَزَلَ", "أُمُّنَا", "دَخَلَ"]),
+    read("الْمَاءُ", ["الْمَاءُ", "الْجِيرَانُ", "الأَيْتَامُ"]),
+    read("أَسْرَعَتْ", ["أَصْلَحَ", "أَسْرَعَتْ", "أَخَذَتْ"]),
+    read("الْجِيرَانُ", ["الأَيْتَامُ", "الْمَاءُ", "الْجِيرَانُ"]),
+    read("أُمُّنَا", ["أُمُّنَا", "دَخَلَ", "الْمَاءُ"]),
+  ],
+  forms: ["أ", "إ", "ـأ"],
+  words: [
+    ["أنا", "أَنَا"],
+    ["إنارة", "إِنَارَةٌ"],
+    ["مأمون", "مَأْمُونٌ"],
+    ["نبأ", "نَبَأٌ"],
+  ],
+});
+
+/** تَدْرِيبَات, pp. 81 to 82: the syllable honeycomb, unit words, first sound, sight words. */
+const EXERCISES = "تَدْرِيبَات";
+const first = (word: string, answer: string, others: string[]) => ({
+  word,
+  choices: [answer, ...others].map((s) => ({ emoji: "", word: s })),
+  correctIndex: 0,
+});
+
+const exercises: Lesson[] = [
+  {
+    id: "u3-19",
+    number: 19,
+    section: EXERCISES,
+    type: "letter_pick",
+    title: "خَلِيَّةُ الْمَقَاطِع",
+    subtitle: "ي و أ مع الحركات",
+    emoji: "🐝",
+    color: "#7C3AED",
+    rounds: [
+      pick("وَا", ["يَا", "وَا", "وُو"]),
+      pick("يُو", ["يُو", "وُو", "يُـ"]),
+      pick("وِيـ", ["إِيـ", "وِ", "وِيـ"]),
+      pick("إِيـ", ["إِيـ", "أُ", "إِ"]),
+      pick("وُ", ["وَ", "وُ", "وِ"]),
+      pick("أُ", ["أَ", "إِ", "أُ"]),
+      pick("يَ", ["يَ", "وَ", "أَ"]),
+    ],
+  },
+  {
+    id: "u3-20",
+    number: 20,
+    section: EXERCISES,
+    type: "build_word",
+    title: "قِطَارُ الْوَحْدَة",
+    subtitle: "كلمات الوحدة الثالثة",
+    emoji: "🚂",
+    color: "#EA580C",
+    rounds: [
+      train("بَيَانُ", ["بَ", "يَا", "نُ"], ["بُو", "يَ"], "👩‍🏫"),
+      train("وِدَادُ", ["وِ", "دَا", "دُ"], ["وَا", "دُو"], "👧"),
+      train("إِيمَانُ", ["إِيـ", "مَا", "نُ"], ["أَ", "مُو"]),
+      train("يَوْمَانِ", ["يَوْ", "مَا", "نِ"], ["يُو", "نَا"], "📅"),
+      train("أُمَيْمَةُ", ["أُ", "مَيْـ", "مَـ", "ةُ"], ["إِ"], "👧"),
+      train("وُرُودُ", ["وُ", "رُو", "دُ"], ["وِ", "رَا"], "💐"),
+    ],
+  },
+  {
+    id: "u3-21",
+    number: 21,
+    section: EXERCISES,
+    type: "listen_pick",
+    title: "أَقْرَأُ الصَّوْتَ الأَوَّلَ",
+    subtitle: "اسمع الكلمة واختر الصوت الأول",
+    emoji: "👂",
+    color: "#DB2777",
+    questions: [
+      first("وَادِي", "وَا", ["وِ", "وُ"]),
+      first("وِدَادُ", "وِ", ["وَا", "وُ"]),
+      first("وُرُودٌ", "وُ", ["وِ", "وَا"]),
+      first("أُمَيْمَةُ", "أُ", ["أَ", "إِ"]),
+      first("مَالَ", "مَا", ["مَـ", "مُو"]),
+      first("إِنَارَةٌ", "إِ", ["إِيـ", "أُ"]),
+      first("إِيمَانُ", "إِيـ", ["إِ", "أَ"]),
+      first("أَرَادَ", "أَ", ["أُ", "إِ"]),
+    ],
+  },
+  {
+    id: "u3-22",
+    number: 22,
+    section: EXERCISES,
+    type: "word_read",
+    title: "أَقْرَأُ الْكَلِمَات",
+    subtitle: "كلمات الوحدة",
+    emoji: "👁️",
+    color: "#D97706",
+    rounds: [
+      read("الطَّبِيبُ", ["الطَّبِيبُ", "الْجِيرَانُ", "الْمُعَلِّمَةُ"]),
+      read("الْجِيرَانُ", ["الْمَاءُ", "الْجِيرَانُ", "الطَّبِيبُ"]),
+      read("سُعَدَاءُ", ["يَشْفِينَا", "أَسْرَعَتْ", "سُعَدَاءُ"]),
+      read("أَسْرَعَتْ", ["أَسْرَعَتْ", "أَصْلَحَ", "أَخَذَتْ"]),
+      read("الْمُعَلِّمَةُ", ["الْجِيرَانُ", "الْمُعَلِّمَةُ", "الأَيْتَامُ"]),
+      read("يَشْفِينَا", ["يُدَاوِينَا", "سُعَدَاءُ", "يَشْفِينَا"]),
+    ],
+  },
+];
 
 export const unit3: Unit = {
   id: "a3",
   number: 3,
   title: "الوحدة الثالثة",
   letters: unit3Letters,
-  theme: "فِي الْحَدِيقَة",
-  emoji: "🌳",
-  color: "#059669",
-  badgeLabel: "ج ح خ",
-  lessons: [
-    {
-      id: "u3-1",
-      number: 1,
-      type: "story",
-      title: "أَقْرَأُ الْقِصَّة",
-      subtitle: "اضغط على كل جملة لتسمعها",
-      emoji: "📖",
-      color: "#059669",
-      storyTitle: "فِي الْحَدِيقَة",
-      lines: [
-        { text: "نَحْنُ فِي الْحَدِيقَةِ الْجَمِيلَة", emoji: "🌳" },
-        { text: "الْجَوُّ جَمِيل وَمُشْمِس", emoji: "☀️" },
-        { text: "نَرَى حِصَانًا وَحَمَامًا يَطِيرَان", emoji: "🐴" },
-        { text: "خَرُوف يَأْكُلُ الْخُضَارَ بِسَعَادَة", emoji: "🐑" },
-      ],
-    },
-    {
-      id: "u3-2",
-      number: 2,
-      type: "naming",
-      title: "الْمُفْرَدَات",
-      subtitle: "اضغط على كل كلمة لتسمعها",
-      emoji: "💬",
-      color: "#047857",
-      items: [
-        { emoji: "🐪", word: "جَمَل" },
-        { emoji: "🏔️", word: "جَبَل" },
-        { emoji: "🐴", word: "حِصَان" },
-        { emoji: "🕊️", word: "حَمَام" },
-        { emoji: "🐑", word: "خَرُوف" },
-        { emoji: "🥦", word: "خُضَار" },
-      ],
-    },
-    {
-      id: "u3-3",
-      number: 3,
-      type: "letter_pick",
-      title: "أَعْرِفُ الْحُرُوف",
-      subtitle: "اختَر الحرف الصحيح في كل سؤال",
-      emoji: "🔤",
-      color: "#7C3AED",
-      rounds: [
-        { targetLetter: "ج", letters: ["ج", "خ", "ح"], correctIndex: 0 },
-        { targetLetter: "ح", letters: ["خ", "ح", "ب"], correctIndex: 1 },
-        { targetLetter: "خ", letters: ["ت", "ج", "خ"], correctIndex: 2 },
-        { targetLetter: "ج", letters: ["ح", "ج", "ن"], correctIndex: 1 },
-        { targetLetter: "خ", letters: ["خ", "ص", "ف"], correctIndex: 0 },
-      ],
-    },
-    {
-      id: "u3-4",
-      number: 4,
-      type: "word_read",
-      title: "أَقْرَأُ الْكَلِمَات",
-      subtitle: "اسمع الكلمة واختر الصواب",
-      emoji: "👁️",
-      color: "#D97706",
-      rounds: [
-        { word: "جَمَل", choices: ["جَمَل", "حِصَان", "خَرُوف"], correctIndex: 0 },
-        { word: "حِصَان", choices: ["جَبَل", "حِصَان", "خُضَار"], correctIndex: 1 },
-        { word: "خَرُوف", choices: ["خَرُوف", "جَمَل", "حَمَام"], correctIndex: 0 },
-        { word: "حَمَام", choices: ["خُضَار", "حَمَام", "جَبَل"], correctIndex: 1 },
-        { word: "جَبَل", choices: ["حِصَان", "خَرُوف", "جَبَل"], correctIndex: 2 },
-      ],
-    },
-    {
-      id: "u3-5",
-      number: 5,
-      type: "listen_pick",
-      title: "أَفْهَمُ الْقِصَّة",
-      subtitle: "أجب عن أسئلة القصة",
-      emoji: "🧠",
-      color: "#DB2777",
-      questions: [
-        {
-          word: "أَيْنَ نَحْن؟",
-          choices: [
-            { emoji: "🌳", word: "الْحَدِيقَة" },
-            { emoji: "🏪", word: "السُّوق" },
-            { emoji: "🏫", word: "الْمَدْرَسَة" },
-          ],
-          correctIndex: 0,
-        },
-        {
-          word: "مَا الَّذِي يَأْكُلُ الْخُضَار؟",
-          choices: [
-            { emoji: "🐑", word: "الْخَرُوف" },
-            { emoji: "🐴", word: "الْحِصَان" },
-            { emoji: "🐪", word: "الْجَمَل" },
-          ],
-          correctIndex: 0,
-        },
-        {
-          word: "كَيْفَ الْجَوّ؟",
-          choices: [
-            { emoji: "☀️", word: "جَمِيل وَمُشْمِس" },
-            { emoji: "🌧️", word: "مُمْطِر" },
-            { emoji: "❄️", word: "بَارِد" },
-          ],
-          correctIndex: 0,
-        },
-      ],
-    },
-    {
-      id: "u3-6",
-      number: 6,
-      type: "trace",
-      title: "أَكْتُبُ الْحُرُوف",
-      subtitle: "تتبّع الحرف بأصبعك",
-      emoji: "✍️",
-      color: "#7C3AED",
-      targets: unit3Letters.map((l) => ({ guide: l, label: l, tts: l })),
-    },
-  ],
+  theme: "نَتَعَاوَنُ وَنَتَرَاحَمُ",
+  emoji: "🤝",
+  color: COLOR,
+  badgeLabel: "ي و أ",
+  lessons: [...ya, ...waw, ...alif, ...exercises],
 };

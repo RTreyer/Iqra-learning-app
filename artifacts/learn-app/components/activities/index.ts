@@ -2,6 +2,7 @@ import type { ComponentType } from "react";
 import type { LessonType } from "@/content/types";
 import { ArithmeticActivity } from "./ArithmeticActivity";
 import { BehaviorActivity } from "./BehaviorActivity";
+import { BuildWordActivity } from "./BuildWordActivity";
 import { CountingActivity } from "./CountingActivity";
 import { LetterPickActivity } from "./LetterPickActivity";
 import { ListenPickActivity } from "./ListenPickActivity";
@@ -26,6 +27,7 @@ export const ACTIVITY_COMPONENTS: ActivityMap = {
   behavior: BehaviorActivity,
   matching: MatchingActivity,
   trace: TraceActivity,
+  build_word: BuildWordActivity,
   counting: CountingActivity,
   arithmetic: ArithmeticActivity,
 };

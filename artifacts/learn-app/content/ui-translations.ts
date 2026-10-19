@@ -83,6 +83,7 @@ const english: Record<string, string> = {
   "اضغط على شيء في اليمين ثم ما يناسبه في اليسار":
     "Tap an item on the left, then its match on the right",
   "ابحث عن الحرف": "Find the letter",
+  "رتّب المقاطع في القطار 🚂": "Load the syllables into the train 🚂",
   "اضغط للاستماع ثم اختر": "Tap to listen, then choose",
   "سلوك صحيح": "Good behavior",
   "سلوك خطأ": "Bad behavior",

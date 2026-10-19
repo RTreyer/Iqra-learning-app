@@ -8,6 +8,7 @@ test("every lesson type in the catalog has an activity component", () => {
   expect(Object.keys(ACTIVITY_COMPONENTS).sort()).toEqual([
     "arithmetic",
     "behavior",
+    "build_word",
     "counting",
     "letter_pick",
     "listen_pick",

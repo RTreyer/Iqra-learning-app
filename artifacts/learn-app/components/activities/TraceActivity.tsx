@@ -26,6 +26,12 @@ import { validateTracing } from "./trace/validate";
 import type { ActivityProps } from "./types";
 
 const ERROR_VISIBLE_MS = 3000;
+
+/** Guide size as a share of the pad: a letter fills it, a whole word (يبني) shrinks to fit. */
+export function guideScale(guide: string): number {
+  const letters = guide.replace(/[ً-ْـ\s]/g, "").length;
+  return letters <= 2 ? 0.55 : Math.max(0.2, 1.1 / letters);
+}
 const PLATFORM_PAD = Platform.OS === "web" ? webPad : null;
 
 function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
@@ -164,7 +170,7 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
   const padDims = { width: padSize, height: padSize };
   const guideFont = {
     color,
-    fontSize: Math.round(padSize * 0.55),
+    fontSize: Math.round(padSize * guideScale(target.guide)),
     lineHeight: Math.round(padSize * 0.75),
   };
 
