@@ -8,6 +8,7 @@ import {
   numberLessons,
   pick,
   read,
+  sentenceLessons,
   split,
   train,
   type LessonDraft,
@@ -17,7 +18,8 @@ import {
 // Source notes: docs/content/textbooks/arabic-part1/unit-07.md.
 // Three new letters, each with all vowels, laid out as Unit 6: eight app lessons per
 // letter (lessonKit.ts) and the story picture redrawn from the book (components/art/scenes).
-// The copy exercise that builds the sentence ذَهَبَ جُبْرَانُ إِلَى الْمَسْجِدِ is not included yet.
+// The copy exercise (p. 167) builds the sentence ذَهَبَ جُبْرَانُ إِلَى الْمَسْجِدِ: a word train,
+// then the words written one by one (sentenceLessons).
 // The listening stories have no printed text and are not included yet.
 
 const unit7Letters = ["ح", "س", "ج"];
@@ -240,7 +242,10 @@ const jim = letterLessons({
   ],
 });
 
-/** تَدْرِيبَات, pp. 165 to 167: the syllable honeycomb, unit words, first sound, sight words. */
+/**
+ * تَدْرِيبَات, pp. 165 to 167: the syllable honeycomb, unit words, first sound, sight words,
+ * and copying the sentence word by word.
+ */
 const exercises: LessonDraft[] = [
   {
     section: EXERCISES,
@@ -319,6 +324,17 @@ const exercises: LessonDraft[] = [
   },
 ];
 
+const sentence = sentenceLessons(
+  [
+    ["ذهب", "ذَهَبَ"],
+    ["جبران", "جُبْرَانُ"],
+    ["إلى", "إِلَى"],
+    ["المسجد", "الْمَسْجِدِ"],
+  ],
+  ["جَارُ"],
+  "🕌",
+);
+
 export const unit7: Unit = {
   id: "a7",
   number: 7,
@@ -328,5 +344,5 @@ export const unit7: Unit = {
   emoji: "🧼",
   color: COLOR,
   badgeLabel: "ح س ج",
-  lessons: numberLessons("u7", [...ha, ...sin, ...jim, ...exercises]),
+  lessons: numberLessons("u7", [...ha, ...sin, ...jim, ...exercises, ...sentence]),
 };

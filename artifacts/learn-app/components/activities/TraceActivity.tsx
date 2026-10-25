@@ -177,6 +177,25 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
   return (
     <View style={trace.container}>
       <ProgressDots count={targets.length} current={targetIndex} color={color} />
+      {lesson.sentence ? (
+        <Text testID="trace-sentence" style={trace.sentence} accessibilityLabel={lesson.sentence}>
+          {lesson.sentence.split(" ").map((word, i, all) => (
+            <Text
+              key={i}
+              style={
+                i < targetIndex || (passed && i === targetIndex)
+                  ? { color: readableFill(color) }
+                  : i === targetIndex
+                    ? [trace.sentenceCurrent, { textDecorationColor: color }]
+                    : trace.sentenceLater
+              }
+            >
+              {word}
+              {i < all.length - 1 ? " " : ""}
+            </Text>
+          ))}
+        </Text>
+      ) : null}
       <View style={trace.header}>
         {target.emoji ? <Text style={trace.emoji}>{target.emoji}</Text> : null}
         <Text style={[trace.label, { color: readableFill(color) }]}>{target.label}</Text>

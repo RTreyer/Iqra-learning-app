@@ -13,6 +13,16 @@ export const trace = StyleSheet.create({
   measure: { width: "100%", alignItems: "center", gap: 12 },
   header: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 12 },
   label: { fontSize: 30, fontWeight: "800", textAlign: "center", color: colors.text },
+  sentence: {
+    fontSize: 24,
+    fontWeight: "800",
+    textAlign: "center",
+    writingDirection: "rtl",
+    color: colors.text,
+    lineHeight: 40,
+  },
+  sentenceCurrent: { textDecorationLine: "underline", color: colors.text },
+  sentenceLater: { color: colors.muted },
   emoji: { fontSize: 36 },
   errorBanner: {
     flexDirection: "row",

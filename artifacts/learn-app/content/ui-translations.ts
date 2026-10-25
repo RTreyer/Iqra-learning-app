@@ -84,6 +84,7 @@ const english: Record<string, string> = {
     "Tap an item on the left, then its match on the right",
   "ابحث عن الحرف": "Find the letter",
   "رتّب المقاطع في القطار 🚂": "Load the syllables into the train 🚂",
+  "رتّب الكلمات في القطار 🚂": "Load the words into the train 🚂",
   "أكمل القطار بالمقطع الناقص 🚂": "Complete the train with the missing syllable 🚂",
   "اضغط للاستماع ثم اختر": "Tap to listen, then choose",
   "سلوك صحيح": "Good behavior",

@@ -102,3 +102,24 @@ test("complete the word: given wagons start full, only the gap is loaded", () =>
   expect(screen.getByTestId("wagon-0")).toHaveProp("accessibilityLabel", "قِدْ");
   expect(screen.getByText("قِدْرُ")).toBeTruthy();
 });
+
+test("sentence train: the words are loaded in reading order", () => {
+  // u7-29: ذَهَبَ جُبْرَانُ إِلَى الْمَسْجِدِ, decoy جَارُ.
+  const sentenceLesson = lessonOf("u7-29", "build_word");
+  const onComplete = jest.fn();
+  renderActivity(
+    <BuildWordActivity
+      lesson={sentenceLesson}
+      color="#EA580C"
+      attemptKey="a:1"
+      onComplete={onComplete}
+    />,
+  );
+  expect(screen.getByText("رتّب الكلمات في القطار 🚂")).toBeTruthy();
+  tap("جُبْرَانُ"); // ذَهَبَ comes first
+  expect(spoken().at(-1)).toBe("ذَهَبَ");
+  for (const word of ["ذَهَبَ", "جُبْرَانُ", "إِلَى", "الْمَسْجِدِ"]) tap(word);
+  expect(screen.getByText("ذَهَبَ جُبْرَانُ إِلَى الْمَسْجِدِ")).toBeTruthy();
+  depart();
+  expect(onComplete).toHaveBeenCalledWith({ correct: 0, total: 1 });
+});

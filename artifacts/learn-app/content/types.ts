@@ -91,7 +91,12 @@ export type LessonBody =
   | { type: "listen_pick"; questions: ListenPickQuestion[] }
   | { type: "behavior"; behaviors: BehaviorItem[] }
   | { type: "matching"; pairs: MatchPair[] }
-  | { type: "trace"; targets: TraceTarget[] }
+  | {
+      type: "trace";
+      targets: TraceTarget[];
+      /** Copying a sentence word by word: the targets are its words, shown filling in above the pad. */
+      sentence?: string;
+    }
   | { type: "build_word"; rounds: BuildWordRound[] }
   | { type: "counting"; rounds: CountingRound[] }
   | { type: "arithmetic"; rounds: ArithmeticRound[] };

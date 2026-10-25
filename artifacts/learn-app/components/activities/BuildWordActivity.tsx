@@ -50,9 +50,11 @@ function BuildWord({
       <ProgressDots count={rounds.length} current={quiz.roundIndex} color={color} />
       <UiText style={act.instruction}>{`سؤال ${quiz.roundIndex + 1} من ${rounds.length}`}</UiText>
       <UiText style={act.hint}>
-        {rounds[quiz.roundIndex].given
-          ? "أكمل القطار بالمقطع الناقص 🚂"
-          : "رتّب المقاطع في القطار 🚂"}
+        {isSentence(rounds[quiz.roundIndex])
+          ? "رتّب الكلمات في القطار 🚂"
+          : rounds[quiz.roundIndex].given
+            ? "أكمل القطار بالمقطع الناقص 🚂"
+            : "رتّب المقاطع في القطار 🚂"}
       </UiText>
       <TrainRound
         key={quiz.roundIndex}
@@ -67,6 +69,9 @@ function BuildWord({
 
 export const BuildWordActivity = withAttemptReset(BuildWord, "BuildWordActivity");
 
+/** A sentence round loads whole words (ذَهَبَ / جُبْرَانُ / ...), drawn smaller to fit the train. */
+const isSentence = (round: BuildWordRound) => round.word.includes(" ");
+
 type RoundProps = {
   round: BuildWordRound;
   color: string;
@@ -76,6 +81,7 @@ type RoundProps = {
 
 function TrainRound({ round, color, seed, onDone }: RoundProps) {
   const { word, syllables, given } = round;
+  const sentence = isSentence(round);
   /** Wagons the child loads, in reading order; given wagons start full. */
   const open = useMemo(
     () => syllables.map((_, i) => i).filter((i) => !given?.includes(i)),
@@ -180,7 +186,13 @@ function TrainRound({ round, color, seed, onDone }: RoundProps) {
                 isFull(i) && { backgroundColor: withAlpha(color, 0.12) },
               ]}
             >
-              <Text style={[styles.wagonText, { color: readableFill(color) }]}>
+              <Text
+                style={[
+                  styles.wagonText,
+                  sentence && styles.wagonWord,
+                  { color: readableFill(color) },
+                ]}
+              >
                 {isFull(i) ? syllable : ""}
               </Text>
               <View style={styles.wheels}>
@@ -199,7 +211,9 @@ function TrainRound({ round, color, seed, onDone }: RoundProps) {
 
       {done ? (
         <View style={styles.result} accessibilityLiveRegion="polite">
-          <Text style={[styles.word, { color: readableFill(color) }]}>{word}</Text>
+          <Text style={[styles.word, sentence && styles.sentence, { color: readableFill(color) }]}>
+            {word}
+          </Text>
           <Text style={styles.cheer}>{missed ? "👏" : "🎉"}</Text>
         </View>
       ) : (
@@ -227,7 +241,7 @@ function TrainRound({ round, color, seed, onDone }: RoundProps) {
                     !gone && syllable === hint && { borderColor: colors.star, borderWidth: 4 },
                   ]}
                 >
-                  <Text style={styles.tileText}>{syllable}</Text>
+                  <Text style={[styles.tileText, sentence && styles.tileWord]}>{syllable}</Text>
                 </Pressable>
               </Animated.View>
             );
@@ -285,6 +299,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   wagonText: { fontSize: 28, fontWeight: "900", lineHeight: 40 },
+  wagonWord: { fontSize: 17, lineHeight: 28 },
   wheels: {
     position: "absolute",
     bottom: -9,
@@ -315,7 +330,9 @@ const styles = StyleSheet.create({
   tileGone: { opacity: 0 },
   tileWrong: { borderColor: colors.danger, backgroundColor: colors.dangerSoft },
   tileText: { fontSize: 32, fontWeight: "900", color: colors.starText, lineHeight: 46 },
+  tileWord: { fontSize: 24, lineHeight: 38 },
   result: { flexDirection: "row", alignItems: "center", gap: 12 },
   word: { fontSize: 48, fontWeight: "900", lineHeight: 72 },
+  sentence: { fontSize: 28, lineHeight: 44, flexShrink: 1, textAlign: "center" },
   cheer: { fontSize: 40 },
 });

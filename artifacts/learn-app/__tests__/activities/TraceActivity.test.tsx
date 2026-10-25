@@ -132,3 +132,28 @@ test("completes through the latest onComplete when the parent re-renders during 
   expect(first).not.toHaveBeenCalled();
   expect(latest).toHaveBeenCalledWith({ correct: 0, total: 0 });
 });
+
+test("sentence copying: the sentence fills in word by word above the pad", () => {
+  // u7-30: ذَهَبَ جُبْرَانُ إِلَى الْمَسْجِدِ, one word per pad.
+  const copy = lessonOf("u7-30", "trace");
+  const onComplete = jest.fn();
+  renderActivity(
+    <TraceActivity lesson={copy} color="#7C3AED" attemptKey="t:1" onComplete={onComplete} />,
+  );
+  const sentence = screen.getByTestId("trace-sentence");
+  expect(sentence).toHaveProp("accessibilityLabel", "ذَهَبَ جُبْرَانُ إِلَى الْمَسْجِدِ");
+  const underlined = () =>
+    screen
+      .getByTestId("trace-sentence")
+      .props.children.filter((word: React.ReactElement<{ style: unknown }>) =>
+        JSON.stringify(word.props.style).includes("underline"),
+      ).length;
+  expect(underlined()).toBe(1);
+  layout();
+  copy.targets.forEach(() => {
+    drawDiagonal();
+    fireEvent.press(screen.getByTestId("trace-done"));
+    act(() => jest.advanceTimersByTime(900));
+  });
+  expect(onComplete).toHaveBeenCalledTimes(1);
+});

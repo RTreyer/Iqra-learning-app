@@ -37,7 +37,7 @@ Progress stays on the device. No server, no accounts. AsyncStorage key `@kidlear
 
 | Book | Units | Lessons | Status |
 |---|---|---|---|
-| Arabic Part 1 | 8 | 177 | Units 2 to 7 rebuilt from the textbook (Unit 2: 7 letters م ب ل ن ر د ت, 31 lessons with Yemeni illustrations; Unit 3: ي و أ with all vowels, 22 lessons with the syllable train game; Unit 4: م ب ل with damma, kasra, sukun and long vowels, 25 lessons; Unit 5: ن ر د ت with all vowels, 32 lessons; Unit 6: the new letters ق ص ف, 28 lessons with story pictures redrawn from the book; Unit 7: the new letters ح س ج, 28 lessons with story pictures). Units 1 and 8 still the earlier version, to be rebuilt from the book. Native speaker review pending |
+| Arabic Part 1 | 8 | 179 | Units 2 to 7 rebuilt from the textbook (Unit 2: 7 letters م ب ل ن ر د ت, 31 lessons with Yemeni illustrations; Unit 3: ي و أ with all vowels, 22 lessons with the syllable train game; Unit 4: م ب ل with damma, kasra, sukun and long vowels, 25 lessons; Unit 5: ن ر د ت with all vowels, 32 lessons; Unit 6: the new letters ق ص ف, 28 lessons with story pictures redrawn from the book; Unit 7: the new letters ح س ج, 30 lessons with story pictures and copying a sentence word by word). Units 1 and 8 still the earlier version, to be rebuilt from the book. Native speaker review pending |
 | Math Part 1 | 3 | 11 | Exemplary, derived from the textbook outline (numbers 0 to 10, add and subtract within 10, plane shapes). Not the full year |
 | Science Part 1 | 3 | 9 | Placeholder, no textbook source yet. Shown as "قريباً" on home, not part of the release |
 | Arabic Part 2, Math Part 2 | 0 | 0 | Shown as "قريباً". Planned for release v1.1 |

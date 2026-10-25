@@ -82,7 +82,8 @@ test("trace lessons have non empty targets", () => {
 });
 
 test("build_word syllables spell the word and every tile fits the train", () => {
-  const letters = (s) => s.replace(/[ً-ْـ]/g, "");
+  // Sentence trains load whole words, so the spaces between them do not count either.
+  const letters = (s) => s.replace(/[ً-ْـ\s]/g, "");
   for (const lesson of byType("build_word")) {
     for (const r of lesson.rounds) {
       assert.ok(r.syllables.length >= 2 && r.syllables.length <= 4, `${lesson.id}: ${r.word}`);
@@ -104,6 +105,16 @@ test("build_word syllables spell the word and every tile fits the train", () => 
           assert.ok(i >= 0 && i < r.syllables.length, `${lesson.id}: ${r.word} given ${i}`);
       }
     }
+  }
+});
+
+test("sentence copying writes exactly the words of its sentence", () => {
+  for (const lesson of byType("trace").filter((l) => l.sentence)) {
+    assert.deepEqual(
+      lesson.targets.map((t) => t.label),
+      lesson.sentence.split(" "),
+      lesson.id,
+    );
   }
 });
 

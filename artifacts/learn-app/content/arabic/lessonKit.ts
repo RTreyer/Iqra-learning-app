@@ -184,3 +184,44 @@ export const gap = (
   extras: string[],
   emoji?: string,
 ): BuildWordRound => ({ word, syllables, extras, given, emoji });
+
+/**
+ * The book's sentence copying (أَنَا أَكْتُبُ, Unit 7 onwards) as two lessons: load the words
+ * into the train in order, then write them one by one while the sentence fills in.
+ * `words` are [as printed, as spoken]; `extras` are decoy words for the train.
+ */
+export function sentenceLessons(
+  words: [string, string][],
+  extras: string[],
+  emoji?: string,
+): LessonDraft[] {
+  const sentence = words.map(([, spoken]) => spoken).join(" ");
+  return [
+    {
+      section: EXERCISES,
+      type: "build_word",
+      title: "قِطَارُ الْجُمْلَة",
+      subtitle: sentence,
+      emoji: "🚂",
+      color: "#EA580C",
+      rounds: [
+        train(
+          sentence,
+          words.map(([, spoken]) => spoken),
+          extras,
+          emoji,
+        ),
+      ],
+    },
+    {
+      section: EXERCISES,
+      type: "trace",
+      title: "أَكْتُبُ الْجُمْلَة",
+      subtitle: words.map(([printed]) => printed).join(" "),
+      emoji: "📝",
+      color: "#7C3AED",
+      sentence,
+      targets: words.map(([guide, tts]) => ({ guide, label: tts, tts })),
+    },
+  ];
+}
