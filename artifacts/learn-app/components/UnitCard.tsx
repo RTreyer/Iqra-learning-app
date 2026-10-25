@@ -62,6 +62,8 @@ const styles = StyleSheet.create({
   title: { fontSize: 22, fontWeight: "800", color: colors.white },
   footer: { alignItems: "center", gap: 8, flexWrap: "wrap" },
   label: {
+    // Long themes (four story titles in Arabic Unit 5) wrap inside the card.
+    maxWidth: "100%",
     backgroundColor: colors.pill,
     borderRadius: 10,
     paddingHorizontal: 8,
