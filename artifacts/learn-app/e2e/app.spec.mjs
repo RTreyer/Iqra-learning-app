@@ -31,7 +31,7 @@ test.describe("navigation", () => {
       await expect(page.getByTestId(`grade-${n}`)).toContainText("قريباً");
       await expect(page.getByTestId(`grade-${n}`)).toHaveAttribute("aria-disabled", "true");
     }
-    await expect(page.getByTestId("star-badge")).toContainText("0");
+    await expect(page.getByTestId("star-badge")).toContainText("٠");
     await expect(page.getByTestId("streak-badge")).toHaveCount(0);
   });
 
@@ -70,7 +70,7 @@ test.describe("navigation", () => {
     await page.getByTestId("book-arabic-1").click();
     await expect(page).toHaveURL(/\/book\/arabic-1$/);
     const unitCard = page.getByTestId("unit-a2");
-    await expect(unitCard).toContainText("0 / 31");
+    await expect(unitCard).toContainText("٠ / ٣١");
     await unitCard.click();
     await expect(page).toHaveURL(/\/unit\/a2$/);
     await page.getByTestId("lesson-row-u2-2").click();
@@ -99,7 +99,7 @@ test.describe("scoring", () => {
     expect(await completeQuizLesson(page, "u2-29", 6)).toBe(3);
     await expect.poll(async () => (await readProgress(page))?.totalStars).toBe(3);
     await gotoAndWaitReady(page, "/book/arabic-1");
-    await expect(page.getByTestId("unit-a2")).toContainText("1 / 31");
+    await expect(page.getByTestId("unit-a2")).toContainText("١ / ٣١");
     await gotoAndWaitReady(page, "/unit/a2");
     await expect(page.getByTestId("lesson-done-u2-29")).toBeVisible();
   });
@@ -124,11 +124,11 @@ test.describe("scoring", () => {
   test("replaying a lesson with a worse score keeps the best stars", async ({ page }) => {
     expect(await completeQuizLesson(page, "u2-29", 6)).toBe(3);
     await page.getByTestId("repeat-lesson").click();
-    await expect(page.getByText("سؤال 1 من 6")).toBeVisible();
+    await expect(page.getByText("سؤال ١ من ٦")).toBeVisible();
     expect(await completeQuizLesson(page, "u2-29", 0, { navigate: false })).toBe(1);
     await expect.poll(async () => (await readProgress(page))?.lessons["u2-29"]?.stars).toBe(3);
     await gotoAndWaitReady(page, "/");
-    await expect(page.getByTestId("star-badge")).toContainText("3");
+    await expect(page.getByTestId("star-badge")).toContainText("٣");
   });
 
   test("shuffled options still complete when answered by text", async ({ page }) => {
@@ -136,7 +136,7 @@ test.describe("scoring", () => {
     await gotoAndWaitReady(page, "/lesson/u2-29");
     for (let attempt = 0; attempt < 3; attempt++) {
       if (attempt > 0) await page.getByTestId("repeat-lesson").click();
-      await expect(page.getByText("سؤال 1 من 6")).toBeVisible();
+      await expect(page.getByText("سؤال ١ من ٦")).toBeVisible();
       firstRoundOrders.push(
         await page.getByRole("button", { name: /^(رَ|دَ|تَ)$/, disabled: false }).allInnerTexts(),
       );
@@ -194,7 +194,7 @@ test.describe("activities", () => {
 
     await page.getByTestId("next-lesson").click();
     await expect(page).toHaveURL(/\/lesson\/s1-2$/);
-    await expect(page.getByText("6 كلمة متبقية")).toBeVisible();
+    await expect(page.getByText("٦ كلمة متبقية")).toBeVisible();
     await tapAllAndFinish(page, ["عَيْن", "أُذُن", "أَنْف", "فَم", "يَد", "قَدَم"]);
     expect(await earnedStars(page)).toBe(3);
     await expect.poll(async () => (await readProgress(page))?.totalStars).toBe(6);
@@ -241,7 +241,7 @@ test.describe("accessibility", () => {
     const found = {};
     for (const path of ["/", "/grade/1", "/book/arabic-1", "/unit/a2", "/lesson/u2-29"]) {
       await gotoAndWaitReady(page, path);
-      if (path.startsWith("/lesson/")) await expect(page.getByText("سؤال 1 من 6")).toBeVisible();
+      if (path.startsWith("/lesson/")) await expect(page.getByText("سؤال ١ من ٦")).toBeVisible();
       await page.addScriptTag({ content: axeSource });
       const violations = await page.evaluate(async () => {
         // axe's own matcher drops text it takes for an icon ligature, and its canvas check flags

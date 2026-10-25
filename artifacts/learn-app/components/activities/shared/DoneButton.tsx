@@ -14,12 +14,12 @@ type Props = {
 
 /** Continue button; the label is interface chrome and goes through UiText. */
 export function DoneButton({ label, color, onPress, testID, disabled }: Props) {
-  const { t } = useLanguage();
+  const { t, digits } = useLanguage();
   return (
     <Pressable
       testID={testID}
       accessibilityRole="button"
-      accessibilityLabel={t(label)}
+      accessibilityLabel={digits(t(label))}
       accessibilityState={{ disabled: !!disabled }}
       disabled={disabled}
       style={[styles.btn, { backgroundColor: readableFill(color) }, disabled && styles.disabled]}

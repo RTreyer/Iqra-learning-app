@@ -19,7 +19,7 @@ test("each behavior is answered once and scored against isCorrect", () => {
     );
     expect(screen.queryByRole("button", { name: `سلوك صحيح: ${item.description}` })).toBeNull();
   });
-  expect(screen.getByText("أَحْسَنْت! 3/5 صحيح 🌟 تابع")).toBeTruthy();
+  expect(screen.getByText("أَحْسَنْت! ٣/٥ صحيح 🌟 تابع")).toBeTruthy();
   fireEvent.press(screen.getByTestId("activity-done"));
   expect(onComplete).toHaveBeenCalledWith({ correct: 3, total: 5 });
 });

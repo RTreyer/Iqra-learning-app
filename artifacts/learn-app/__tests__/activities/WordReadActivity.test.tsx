@@ -49,5 +49,5 @@ test("speaks the right answer after a wrong first tap and shows the score on the
   fireEvent.press(screen.getByRole("button", { name: "أَنَا" }));
   fireEvent.press(screen.getByTestId("activity-next"));
   fireEvent.press(screen.getByRole("button", { name: "أُحِبُّ" }));
-  expect(screen.getByText("أَحْسَنْت! 2/3 🌟 تابع")).toBeTruthy();
+  expect(screen.getByText("أَحْسَنْت! ٢/٣ 🌟 تابع")).toBeTruthy();
 });

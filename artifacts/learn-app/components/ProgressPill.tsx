@@ -1,15 +1,17 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
+import { useLanguage } from "@/context/LanguageContext";
 import type { UnitProgress } from "@/context/ProgressContext";
 import { colors } from "@/theme/tokens";
 
 /** "done / total" plus earned stars, readable on any colored card. */
 export function ProgressPill({ done, total, stars }: UnitProgress) {
+  const { digits } = useLanguage();
   return (
-    <View style={styles.pill} accessibilityLabel={`${done} / ${total}, ${stars} ⭐`}>
-      <Text style={styles.text}>{`${done} / ${total}`}</Text>
-      <Text style={styles.text}>{`⭐ ${stars}`}</Text>
+    <View style={styles.pill} accessibilityLabel={digits(`${done} / ${total}, ${stars} ⭐`)}>
+      <Text style={styles.text}>{digits(`${done} / ${total}`)}</Text>
+      <Text style={styles.text}>{`⭐ ${digits(stars)}`}</Text>
     </View>
   );
 }

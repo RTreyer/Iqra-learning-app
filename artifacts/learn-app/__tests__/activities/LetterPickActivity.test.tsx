@@ -27,7 +27,7 @@ test("first tap scoring: wrong, wrong, right, right", () => {
       onRoundResult={onRoundResult}
     />,
   );
-  expect(screen.getByText("سؤال 1 من 4")).toBeTruthy();
+  expect(screen.getByText("سؤال ١ من ٤")).toBeTruthy();
 
   tap("بَ"); // target مَ
   tap("مَ"); // locked: ignored
@@ -70,11 +70,11 @@ test("resets when attemptKey changes", () => {
   );
   tap("مَ");
   advance();
-  expect(screen.getByText("سؤال 2 من 4")).toBeTruthy();
+  expect(screen.getByText("سؤال ٢ من ٤")).toBeTruthy();
   rerenderActivity(
     <LetterPickActivity lesson={lesson} color="#7C3AED" attemptKey="a:2" onComplete={jest.fn()} />,
   );
-  expect(screen.getByText("سؤال 1 من 4")).toBeTruthy();
+  expect(screen.getByText("سؤال ١ من ٤")).toBeTruthy();
   expect(screen.getByRole("button", { name: "مَ" })).not.toBeDisabled();
 });
 

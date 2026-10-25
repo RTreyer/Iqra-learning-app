@@ -4,14 +4,14 @@ import { useLanguage } from "@/context/LanguageContext";
 
 // Opt-in interface labels only: regular Text still renders Arabic lesson content.
 export function UiText({ children, style, accessibilityLabel, ...props }: TextProps) {
-  const { language, t } = useLanguage();
+  const { language, t, digits } = useLanguage();
   const parts = Children.toArray(children);
   const plain = parts.every((part) => typeof part === "string" || typeof part === "number");
   const alignment = StyleSheet.flatten(style)?.textAlign;
   return (
     <Text
       {...props}
-      accessibilityLabel={accessibilityLabel ? t(accessibilityLabel) : undefined}
+      accessibilityLabel={accessibilityLabel ? digits(t(accessibilityLabel)) : undefined}
       style={[
         style,
         {
@@ -22,7 +22,7 @@ export function UiText({ children, style, accessibilityLabel, ...props }: TextPr
         },
       ]}
     >
-      {plain ? t(parts.join("")) : children}
+      {plain ? digits(t(parts.join(""))) : children}
     </Text>
   );
 }

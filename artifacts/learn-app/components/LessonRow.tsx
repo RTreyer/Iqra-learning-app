@@ -12,7 +12,7 @@ type Props = { lesson: Lesson; status: LessonStatus; onPress: () => void };
 
 /** One lesson in the unit list: number, title, subtitle, emoji and a tick plus stars once done. */
 export function LessonRow({ lesson, status, onPress }: Props) {
-  const { language } = useLanguage();
+  const { language, digits } = useLanguage();
   const en = language === "en";
   const label = status.completed
     ? en
@@ -23,7 +23,7 @@ export function LessonRow({ lesson, status, onPress }: Props) {
     <Pressable
       testID={`lesson-row-${lesson.id}`}
       accessibilityRole="button"
-      accessibilityLabel={label}
+      accessibilityLabel={digits(label)}
       onPress={onPress}
       style={({ pressed }) => [
         styles.card,
@@ -35,7 +35,7 @@ export function LessonRow({ lesson, status, onPress }: Props) {
       ]}
     >
       <View style={[styles.numberBadge, { backgroundColor: withAlpha(lesson.color, 0.18) }]}>
-        <Text style={styles.numberText}>{lesson.number}</Text>
+        <Text style={styles.numberText}>{digits(lesson.number)}</Text>
       </View>
       <View style={styles.center}>
         <Text style={styles.title}>{lesson.title}</Text>

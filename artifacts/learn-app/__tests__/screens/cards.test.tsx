@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { screen } from "@testing-library/react-native";
 import React from "react";
 import { LessonRow } from "@/components/LessonRow";
@@ -23,7 +24,7 @@ test("star labels use Arabic dual and plural forms", () => {
 
 test("StarBadge announces the star count", () => {
   renderScreen(<StarBadge stars={7} />);
-  expect(screen.getByLabelText("7 نجوم")).toBeTruthy();
+  expect(screen.getByLabelText("٧ نجوم")).toBeTruthy();
 });
 
 test("LessonRow announces completion and stars", () => {
@@ -40,5 +41,21 @@ test("LessonRow mirrors for Arabic with the accent border on the right", () => {
   expect(screen.getByTestId(`lesson-row-${lesson.id}`)).toHaveStyle({
     flexDirection: "row-reverse",
     borderRightWidth: 5,
+  });
+});
+
+describe("digits follow the interface language", () => {
+  afterEach(() => AsyncStorage.clear());
+
+  test("Arabic shows Eastern Arabic digits", () => {
+    renderScreen(<StarBadge stars={12} />);
+    expect(screen.getByTestId("star-badge")).toHaveTextContent("⭐١٢");
+  });
+
+  test("English keeps Western digits", async () => {
+    await AsyncStorage.setItem("iqra_ui_language", "en");
+    renderScreen(<StarBadge stars={12} />);
+    expect(await screen.findByLabelText("12 stars")).toBeTruthy();
+    expect(screen.getByTestId("star-badge")).toHaveTextContent("⭐12");
   });
 });

@@ -16,16 +16,16 @@ export function starsLabel(count: number, language: UiLanguage): string {
 
 /** Total stars earned, shown in screen headers. */
 export function StarBadge({ stars }: { stars: number }) {
-  const { language } = useLanguage();
+  const { language, digits } = useLanguage();
   return (
     <View
       style={styles.row}
       testID="star-badge"
       accessible
-      accessibilityLabel={starsLabel(stars, language)}
+      accessibilityLabel={digits(starsLabel(stars, language))}
     >
       <Text style={styles.emoji}>⭐</Text>
-      <Text style={styles.count}>{stars}</Text>
+      <Text style={styles.count}>{digits(stars)}</Text>
     </View>
   );
 }

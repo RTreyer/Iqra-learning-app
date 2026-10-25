@@ -2,7 +2,12 @@ const EASTERN_ARABIC = "٠١٢٣٤٥٦٧٨٩";
 
 /** Formats a number with Eastern Arabic digits, as used in the Yemeni textbooks. */
 export function toArabicDigits(n: number): string {
-  return String(n).replace(/[0-9]/g, (d) => EASTERN_ARABIC[Number(d)]);
+  return arabicDigitsIn(String(n));
+}
+
+/** Replaces every Western digit in `text` with its Eastern Arabic digit. */
+export function arabicDigitsIn(text: string): string {
+  return text.replace(/[0-9]/g, (d) => EASTERN_ARABIC[Number(d)]);
 }
 
 const WORDS = [

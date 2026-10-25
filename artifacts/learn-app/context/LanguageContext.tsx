@@ -9,12 +9,15 @@ import React, {
   type ReactNode,
 } from "react";
 import { translateUi, type UiLanguage } from "@/content/ui-translations";
+import { arabicDigitsIn } from "@/lib/arabicNumbers";
 
 const LANGUAGE_KEY = "iqra_ui_language";
 type LanguageContextValue = {
   language: UiLanguage;
   setLanguage: (language: UiLanguage) => void;
   t: (text: string) => string;
+  /** Numbers as the child reads them: Eastern Arabic digits in Arabic, unchanged in English. */
+  digits: (value: number | string) => string;
   storageError: boolean;
 };
 const LanguageContext = createContext<LanguageContextValue | null>(null);
@@ -52,8 +55,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     });
   }, []);
   const t = useCallback((text: string) => translateUi(text, language), [language]);
+  const digits = useCallback(
+    (value: number | string) => (language === "ar" ? arabicDigitsIn(String(value)) : String(value)),
+    [language],
+  );
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, storageError }}>
+    <LanguageContext.Provider value={{ language, setLanguage, t, digits, storageError }}>
       {children}
     </LanguageContext.Provider>
   );

@@ -95,7 +95,7 @@ test("plays due items, repeats a wrong one once and records first answers only",
   renderReview();
   await screen.findByTestId("review-round");
   expect(screen.getByText("مُرَاجَعَة الْيَوْم")).toBeTruthy();
-  expect(screen.getByText("3 عَنَاصِر")).toBeTruthy();
+  expect(screen.getByText("٣ عَنَاصِر")).toBeTruthy();
 
   const [first, second, third] = order;
   answer(first, false);
@@ -105,7 +105,7 @@ test("plays due items, repeats a wrong one once and records first answers only",
   answer(first, true);
 
   expect(screen.getByTestId("review-complete")).toBeTruthy();
-  expect(screen.getByText("2/3")).toBeTruthy();
+  expect(screen.getByText("٢/٣")).toBeTruthy();
   expect(screen.getByText("أَحْسَنْت! مُرَاجَعَة الْيَوْم مُكْتَمِلَة")).toBeTruthy();
 
   await waitFor(async () =>

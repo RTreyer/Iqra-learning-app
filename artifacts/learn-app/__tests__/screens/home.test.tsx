@@ -55,7 +55,7 @@ test("home shows grades 1 to 6; only grade 1 opens, the others are coming soon",
   renderHome();
   await screen.findByTestId("continue-card");
   expect(screen.getByText("اختَر صفّك")).toBeTruthy();
-  expect(screen.getByTestId("grade-1")).toHaveTextContent(/1.*الصف الأول/);
+  expect(screen.getByTestId("grade-1")).toHaveTextContent(/١.*الصف الأول/);
   expect(screen.getByTestId("grade-1")).not.toHaveTextContent(/قريباً/);
   for (const n of [2, 3, 4, 5, 6])
     expect(screen.getByTestId(`grade-${n}`)).toHaveTextContent(/قريباً/);
@@ -71,7 +71,7 @@ test("two due items and a two day streak show the review card and streak badge",
   renderHome();
   const review = await screen.findByTestId("review-card");
   expect(screen.getByText("عُنْصُرَان")).toBeTruthy();
-  expect(screen.getByTestId("streak-badge")).toHaveTextContent("🔥 2");
+  expect(screen.getByTestId("streak-badge")).toHaveTextContent("🔥 ٢");
   expect(screen.getByLabelText("يَوْمَانِ مُتَتَالِيَانِ")).toBeTruthy();
   fireEvent.press(review);
   expect(router.push).toHaveBeenCalledWith(routes.review());
@@ -89,6 +89,6 @@ test("three due items and a three day streak use the plural", async () => {
   await seed(3, ["2026-10-14", "2026-10-15", "2026-10-16"]);
   renderHome();
   await screen.findByTestId("review-card");
-  expect(screen.getByText("3 عَنَاصِر")).toBeTruthy();
-  expect(screen.getByLabelText("3 أَيَّام مُتَتَالِيَة")).toBeTruthy();
+  expect(screen.getByText("٣ عَنَاصِر")).toBeTruthy();
+  expect(screen.getByLabelText("٣ أَيَّام مُتَتَالِيَة")).toBeTruthy();
 });

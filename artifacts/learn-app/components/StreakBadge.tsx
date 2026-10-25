@@ -7,15 +7,15 @@ import { colors, withAlpha } from "@/theme/tokens";
 
 /** Consecutive active days, shown beside the star badge. */
 export function StreakBadge({ days }: { days: number }) {
-  const { language } = useLanguage();
+  const { language, digits } = useLanguage();
   return (
     <View
       style={styles.row}
       testID="streak-badge"
       accessible
-      accessibilityLabel={streakLabel(days, language)}
+      accessibilityLabel={digits(streakLabel(days, language))}
     >
-      <Text style={styles.count}>{`🔥 ${days}`}</Text>
+      <Text style={styles.count}>{`🔥 ${digits(days)}`}</Text>
     </View>
   );
 }

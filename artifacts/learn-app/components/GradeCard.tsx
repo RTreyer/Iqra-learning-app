@@ -10,7 +10,7 @@ type Props = { grade: Grade; onPress: () => void };
 
 /** Square home card for one grade; a grade without books shows "قريباً" and does not respond. */
 export function GradeCard({ grade, onPress }: Props) {
-  const { t } = useLanguage();
+  const { t, digits } = useLanguage();
   const open = grade.books.length > 0;
   return (
     <Pressable
@@ -32,7 +32,7 @@ export function GradeCard({ grade, onPress }: Props) {
         </View>
       )}
       <Text style={styles.emoji}>{grade.emoji}</Text>
-      <Text style={styles.number}>{grade.number}</Text>
+      <Text style={styles.number}>{digits(grade.number)}</Text>
       <UiText style={styles.title}>{grade.title}</UiText>
     </Pressable>
   );

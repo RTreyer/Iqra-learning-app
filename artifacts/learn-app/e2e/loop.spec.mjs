@@ -57,7 +57,7 @@ test("missed letters come back tomorrow in today's review, and leave once answer
   const reviewCard = page.getByTestId("review-card");
   await expect(reviewCard).toContainText("مُرَاجَعَة الْيَوْم");
   // lib/labels.ts itemsLabel(3, "ar")
-  await expect(reviewCard).toContainText("6 عَنَاصِر");
+  await expect(reviewCard).toContainText("٦ عَنَاصِر");
 
   await reviewCard.click();
   await expect(page).toHaveURL(/\/review$/);
@@ -71,7 +71,7 @@ test("missed letters come back tomorrow in today's review, and leave once answer
   }
   const complete = page.getByTestId("review-complete");
   await expect(complete).toContainText("أَحْسَنْت! مُرَاجَعَة الْيَوْم مُكْتَمِلَة");
-  await expect(complete).toContainText("6/6");
+  await expect(complete).toContainText("٦/٦");
   await expect
     .poll(async () => {
       const p = await readProgress(page);
@@ -85,7 +85,7 @@ test("missed letters come back tomorrow in today's review, and leave once answer
   await expect(page.getByTestId("review-card")).toHaveCount(0);
 });
 
-test("streak badge shows 🔥 2 after lessons on two consecutive days", async ({ page }) => {
+test("streak badge shows 🔥 ٢ after lessons on two consecutive days", async ({ page }) => {
   await page.clock.setFixedTime(DAY_1);
   await gotoAndWaitReady(page, "/lesson/u2-1");
   await tapAllAndFinish(page, [
@@ -111,7 +111,7 @@ test("streak badge shows 🔥 2 after lessons on two consecutive days", async ({
   await page.reload();
   await gotoAndWaitReady(page, "/");
   const badge = page.getByTestId("streak-badge");
-  await expect(badge).toHaveText("🔥 2");
+  await expect(badge).toHaveText("🔥 ٢");
   await expect(badge).toHaveAttribute("aria-label", "يَوْمَانِ مُتَتَالِيَانِ");
   expect((await readProgress(page)).activity.days).toEqual(["2026-03-10", "2026-03-11"]);
 });

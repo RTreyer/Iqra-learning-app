@@ -41,7 +41,7 @@ function startSession(ids: string[]): Session {
 
 function ReviewSession({ initialIds }: { initialIds: string[] }) {
   const { recordReview } = useProgress();
-  const { language } = useLanguage();
+  const { language, digits } = useLanguage();
   // Built once: later changes to the due list (answers recorded here) do not reshuffle the session.
   const [session, setSession] = useState(() => startSession(initialIds));
   const { queue, total, index } = session;
@@ -63,7 +63,7 @@ function ReviewSession({ initialIds }: { initialIds: string[] }) {
     <>
       {total > 0 ? (
         <Text style={styles.count} numberOfLines={1}>
-          {itemsLabel(total, language)}
+          {digits(itemsLabel(total, language))}
         </Text>
       ) : null}
       {current ? (

@@ -14,7 +14,7 @@ type Props = {
 
 /** End of a review session, or the card shown when nothing is due. No stars: review is practice. */
 export function ReviewCompleteCard({ score }: Props) {
-  const { t } = useLanguage();
+  const { t, digits } = useLanguage();
   const backLabel = score ? "تَابِعْ" : "العودة إلى الرئيسية";
   return (
     <View style={styles.card} testID={score ? "review-complete" : "review-empty"}>
@@ -25,8 +25,8 @@ export function ReviewCompleteCard({ score }: Props) {
           : "لا شَيْءَ لِلْمُرَاجَعَةِ الْيَوْم"}
       </UiText>
       {score ? (
-        <Text style={styles.score} accessibilityLabel={`${score.correct} / ${score.total}`}>
-          {`${score.correct}/${score.total}`}
+        <Text style={styles.score} accessibilityLabel={digits(`${score.correct} / ${score.total}`)}>
+          {digits(`${score.correct}/${score.total}`)}
         </Text>
       ) : null}
       <Pressable

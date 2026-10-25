@@ -29,11 +29,15 @@ export function LessonCompleteCard({
   backTo,
   color = colors.success,
 }: Props) {
-  const { language, t } = useLanguage();
+  const { language, t, digits } = useLanguage();
   const fill = readableFill(color);
   return (
     <View style={styles.content} testID="lesson-complete">
-      <View style={styles.starsRow} accessible accessibilityLabel={`${stars} / ${MAX_STARS} ⭐`}>
+      <View
+        style={styles.starsRow}
+        accessible
+        accessibilityLabel={digits(`${stars} / ${MAX_STARS} ⭐`)}
+      >
         {Array.from({ length: MAX_STARS }, (_, i) => (
           <Text
             key={i}
