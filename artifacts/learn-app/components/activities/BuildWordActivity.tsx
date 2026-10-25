@@ -49,7 +49,11 @@ function BuildWord({
     <View style={act.container}>
       <ProgressDots count={rounds.length} current={quiz.roundIndex} color={color} />
       <UiText style={act.instruction}>{`سؤال ${quiz.roundIndex + 1} من ${rounds.length}`}</UiText>
-      <UiText style={act.hint}>رتّب المقاطع في القطار 🚂</UiText>
+      <UiText style={act.hint}>
+        {rounds[quiz.roundIndex].given
+          ? "أكمل القطار بالمقطع الناقص 🚂"
+          : "رتّب المقاطع في القطار 🚂"}
+      </UiText>
       <TrainRound
         key={quiz.roundIndex}
         round={rounds[quiz.roundIndex]}
@@ -71,11 +75,17 @@ type RoundProps = {
 };
 
 function TrainRound({ round, color, seed, onDone }: RoundProps) {
-  const { word, syllables } = round;
-  const tiles = useMemo(
-    () => shuffleWithSeed([...syllables, ...round.extras], 0, seed).items,
-    [syllables, round.extras, seed],
+  const { word, syllables, given } = round;
+  /** Wagons the child loads, in reading order; given wagons start full. */
+  const open = useMemo(
+    () => syllables.map((_, i) => i).filter((i) => !given?.includes(i)),
+    [syllables, given],
   );
+  const tiles = useMemo(
+    () => shuffleWithSeed([...open.map((i) => syllables[i]), ...round.extras], 0, seed).items,
+    [open, syllables, round.extras, seed],
+  );
+  /** How many of the open wagons are loaded. */
   const [loaded, setLoaded] = useState(0);
   const [used, setUsed] = useState<ReadonlySet<number>>(() => new Set());
   const [missed, setMissed] = useState(false);
@@ -84,7 +94,8 @@ function TrainRound({ round, color, seed, onDone }: RoundProps) {
   const [drive] = useState(() => new Animated.Value(0));
   const { values: wagonScale, bounce } = useBounce(syllables.length);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const done = loaded === syllables.length;
+  const done = loaded === open.length;
+  const isFull = (i: number) => !open.includes(i) || open.indexOf(i) < loaded;
   const latestDone = useLatest(onDone);
 
   useEffect(() => {
@@ -103,7 +114,7 @@ function TrainRound({ round, color, seed, onDone }: RoundProps) {
     (index: number) => {
       if (done || used.has(index)) return;
       const syllable = tiles[index];
-      const expected = syllables[loaded];
+      const expected = syllables[open[loaded]];
       if (syllable !== expected) {
         setMissed(true);
         setWrongTile(index);
@@ -120,8 +131,8 @@ function TrainRound({ round, color, seed, onDone }: RoundProps) {
       setWrongTile(null);
       setUsed((prev) => new Set(prev).add(index));
       setLoaded(next);
-      bounce(loaded, 1.12);
-      if (next < syllables.length) {
+      bounce(open[loaded], 1.12);
+      if (next < open.length) {
         haptics.tap();
         speak(spokenSyllable(syllable));
         return;
@@ -138,12 +149,12 @@ function TrainRound({ round, color, seed, onDone }: RoundProps) {
         }).start();
       }, 500);
     },
-    [done, used, tiles, syllables, loaded, missed, word, shake, bounce, drive, latestDone],
+    [done, used, tiles, syllables, open, loaded, missed, word, shake, bounce, drive, latestDone],
   );
 
   const trainX = drive.interpolate({ inputRange: [0, 1], outputRange: [0, -600] });
   const shakeX = shake.interpolate({ inputRange: [-1, 1], outputRange: [-8, 8] });
-  const hint = missed && !done ? syllables[loaded] : null;
+  const hint = missed && !done ? syllables[open[loaded]] : null;
 
   return (
     <View style={styles.round}>
@@ -162,15 +173,15 @@ function TrainRound({ round, color, seed, onDone }: RoundProps) {
               key={i}
               testID={`wagon-${i}`}
               accessible
-              accessibilityLabel={i < loaded ? syllable : "؟"}
+              accessibilityLabel={isFull(i) ? syllable : "؟"}
               style={[
                 styles.wagon,
                 { borderColor: color, transform: [{ scale: wagonScale[i] }] },
-                i < loaded && { backgroundColor: withAlpha(color, 0.12) },
+                isFull(i) && { backgroundColor: withAlpha(color, 0.12) },
               ]}
             >
               <Text style={[styles.wagonText, { color: readableFill(color) }]}>
-                {i < loaded ? syllable : ""}
+                {isFull(i) ? syllable : ""}
               </Text>
               <View style={styles.wheels}>
                 <View style={styles.wheel} />

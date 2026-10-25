@@ -81,3 +81,24 @@ test("tatweel is dropped from spoken syllables", () => {
   expect(spokenSyllable("يُـ")).toBe("يُ");
   expect(spokenSyllable("بَيْـ")).toBe("بَيْ");
 });
+
+test("complete the word: given wagons start full, only the gap is loaded", () => {
+  // u6-5 round 1: قِدْرُ = قِدْ / رُ with رُ given; decoys قَا and قُو.
+  const gapLesson = lessonOf("u6-5", "build_word");
+  const onComplete = jest.fn();
+  renderActivity(
+    <BuildWordActivity
+      lesson={gapLesson}
+      color="#EA580C"
+      attemptKey="a:1"
+      onComplete={onComplete}
+    />,
+  );
+  expect(screen.getByText("أكمل القطار بالمقطع الناقص 🚂")).toBeTruthy();
+  expect(screen.getByTestId("wagon-1")).toHaveProp("accessibilityLabel", "رُ");
+  expect(screen.getByTestId("wagon-0")).toHaveProp("accessibilityLabel", "؟");
+  expect(screen.queryByRole("button", { name: "رُ" })).toBeNull();
+  tap("قِدْ");
+  expect(screen.getByTestId("wagon-0")).toHaveProp("accessibilityLabel", "قِدْ");
+  expect(screen.getByText("قِدْرُ")).toBeTruthy();
+});

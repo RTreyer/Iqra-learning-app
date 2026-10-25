@@ -90,6 +90,19 @@ test("build_word syllables spell the word and every tile fits the train", () => 
       assert.equal(letters(r.syllables.join("")), letters(r.word), `${lesson.id}: ${r.word}`);
       for (const extra of r.extras)
         assert.ok(!r.syllables.includes(extra), `${lesson.id}: decoy ${extra} is in ${r.word}`);
+      // A decoy must not sound like a syllable the child has to load (قُـ and قُ sound the same).
+      const spoken = (s) => s.replace(/ـ/g, "");
+      const open = r.syllables.filter((_, i) => !r.given?.includes(i));
+      for (const extra of r.extras)
+        assert.ok(
+          !open.some((s) => spoken(s) === spoken(extra)),
+          `${lesson.id}: decoy ${extra} sounds like a syllable of ${r.word}`,
+        );
+      if (r.given) {
+        assert.ok(open.length > 0, `${lesson.id}: ${r.word} has nothing to load`);
+        for (const i of r.given)
+          assert.ok(i >= 0 && i < r.syllables.length, `${lesson.id}: ${r.word} given ${i}`);
+      }
     }
   }
 });

@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
 import { Art } from "@/components/art/Art";
+import { Scene } from "@/components/art/scenes/Scene";
 import { UiText } from "@/components/UiText";
 import * as haptics from "@/lib/haptics";
 import { speak } from "@/lib/speech";
@@ -32,7 +33,11 @@ function Story({ lesson, color, onComplete }: ActivityProps<"story">) {
 
   return (
     <View style={act.container}>
-      {lesson.scene ? (
+      {lesson.picture ? (
+        <View style={styles.picture} testID="story-picture">
+          <Scene id={lesson.picture} accessibilityLabel={lesson.storyTitle} />
+        </View>
+      ) : lesson.scene ? (
         <View style={styles.scene} testID="story-scene">
           <Art art={lesson.scene} size={120} />
         </View>
@@ -95,6 +100,15 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.9)",
     borderRadius: 24,
     padding: 8,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  picture: {
+    width: "100%",
+    maxWidth: 420,
+    alignSelf: "center",
+    borderRadius: 20,
+    overflow: "hidden",
     borderWidth: 1,
     borderColor: colors.border,
   },

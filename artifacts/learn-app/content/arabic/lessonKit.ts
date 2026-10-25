@@ -5,6 +5,7 @@ import type {
   Lesson,
   ListenPickQuestion,
   MatchPair,
+  SceneId,
   StoryLine,
   TraceTarget,
   WordReadRound,
@@ -26,6 +27,8 @@ export type LetterLesson = {
   sound: string;
   storyTitle: string;
   scene?: ArtId;
+  /** The book's story picture, redrawn wide (components/art/scenes). */
+  picture?: SceneId;
   lines: StoryLine[];
   /** Syllables of the letter heard without their text; the child picks the vowel. */
   vowels: WordReadRound[];
@@ -33,6 +36,8 @@ export type LetterLesson = {
   train: BuildWordRound[];
   /** The book's "match the split word to the word" exercise (Unit 4 onwards). */
   matching?: MatchPair[];
+  /** The book's "fill in the missing syllable" exercise (Unit 6 onwards): trains with `given` wagons. */
+  fill?: BuildWordRound[];
   sightWords: WordReadRound[];
   forms: string[];
   /** The book's word writing page: [as printed, as spoken]. */
@@ -41,7 +46,7 @@ export type LetterLesson = {
 
 /**
  * One textbook lesson as app lessons: story, "which vowel do you hear?", syllable train,
- * syllables to words (when given), sight words, writing the letter, writing whole words.
+ * syllables to words and the missing syllable (when given), sight words, writing the letter, writing whole words.
  */
 export function letterLessons(l: LetterLesson): LessonDraft[] {
   const section = `${l.letter} · ${l.storyTitle}`;
@@ -57,6 +62,7 @@ export function letterLessons(l: LetterLesson): LessonDraft[] {
       color: COLOR,
       storyTitle: l.storyTitle,
       scene: l.scene,
+      picture: l.picture,
       lines: l.lines,
     },
     {
@@ -87,6 +93,16 @@ export function letterLessons(l: LetterLesson): LessonDraft[] {
       emoji: "🔗",
       color: "#0891B2",
       pairs: l.matching,
+    });
+  if (l.fill)
+    lessons.push({
+      section,
+      type: "build_word",
+      title: "أُكْمِلُ الْكَلِمَة",
+      subtitle: "المقطع الناقص",
+      emoji: "🧩",
+      color: "#EA580C",
+      rounds: l.fill,
     });
   lessons.push(
     {
@@ -159,3 +175,12 @@ export const firstSound = (word: string, answer: string, others: string[]): List
   choices: [answer, ...others].map((s) => ({ emoji: "", word: s })),
   correctIndex: 0,
 });
+
+/** "Fill in the missing syllable": the wagons at `given` start full, the child loads the rest. */
+export const gap = (
+  word: string,
+  syllables: string[],
+  given: number[],
+  extras: string[],
+  emoji?: string,
+): BuildWordRound => ({ word, syllables, extras, given, emoji });

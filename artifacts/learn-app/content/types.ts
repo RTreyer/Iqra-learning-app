@@ -27,6 +27,12 @@ export type ArtId =
   | "dates"
   | "palm";
 
+/**
+ * Wide story pictures (16:10) redrawn from the textbook story page, one per story
+ * (components/art/scenes). Described first in docs/content/textbooks, never copied.
+ */
+export type SceneId = "grocery" | "birdcage" | "kitchen";
+
 export type Choice = { emoji: string; word: string };
 
 export type LessonBase = {
@@ -63,13 +69,22 @@ export type BuildWordRound = {
   word: string;
   syllables: string[];
   extras: string[];
+  /** Indices of syllables already in the train: the child only fills the gaps ("complete the word"). */
+  given?: number[];
   emoji?: string;
 };
 export type CountingRound = { emoji: string; count: number; options: number[] };
 export type ArithmeticRound = { a: number; b: number; op: "+" | "-"; options: number[] };
 
 export type LessonBody =
-  | { type: "story"; storyTitle: string; lines: StoryLine[]; scene?: ArtId }
+  | {
+      type: "story";
+      storyTitle: string;
+      lines: StoryLine[];
+      scene?: ArtId;
+      /** The book's story picture; shown instead of `scene` when set. */
+      picture?: SceneId;
+    }
   | { type: "naming"; items: Choice[] }
   | { type: "letter_pick"; rounds: LetterPickRound[] }
   | { type: "word_read"; rounds: WordReadRound[] }
