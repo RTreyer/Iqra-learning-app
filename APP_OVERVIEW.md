@@ -16,7 +16,7 @@ The rebuild left one package with one content model (Book, Unit, Lesson) and one
 
 | Book | Units | Lessons | State |
 |---|---|---|---|
-| Arabic Part 1 (`arabic-1`) | 8 | 155 | Unit 2 rebuilt from the textbook: 31 lessons (story, syllables, words, letter forms per letter, plus 3 exercises), grouped by letter, Yemeni SVG art in `components/art/Art.tsx`. Unit 3 rebuilt: 22 lessons (story, vowel listening, syllable train, sight words, letter forms, word writing per letter, plus 4 exercises). Unit 4 rebuilt: 25 lessons, the same run plus matching split words to words, built with `content/arabic/lessonKit.ts`. Unit 5 rebuilt the same way: 32 lessons (four letters ن ر د ت). Unit 6 rebuilt: 28 lessons (new letters ق ص ف), adds "complete the word" (a syllable train with given wagons) and a wide story picture per story, redrawn as SVG from the book page (`components/art/scenes`). Units 1, 7 and 8: earlier version |
+| Arabic Part 1 (`arabic-1`) | 8 | 177 | Unit 2 rebuilt from the textbook: 31 lessons (story, syllables, words, letter forms per letter, plus 3 exercises), grouped by letter, Yemeni SVG art in `components/art/Art.tsx`. Unit 3 rebuilt: 22 lessons (story, vowel listening, syllable train, sight words, letter forms, word writing per letter, plus 4 exercises). Unit 4 rebuilt: 25 lessons, the same run plus matching split words to words, built with `content/arabic/lessonKit.ts`. Unit 5 rebuilt the same way: 32 lessons (four letters ن ر د ت). Unit 6 rebuilt: 28 lessons (new letters ق ص ف), adds "complete the word" (a syllable train with given wagons) and a wide story picture per story, redrawn as SVG from the book page (`components/art/scenes`). Unit 7 rebuilt the same way: 28 lessons (new letters ح س ج) with three story pictures. Units 1 and 8: earlier version |
 | Math Part 1 (`math-1`) | 3 | 11 | Exemplary, from textbook Part 1 units 2 to 5 (numbers 0 to 10, add and subtract within 10, plane shapes). Not the full year |
 | Science Part 1 (`science-1`) | 3 | 9 | Placeholder, no textbook source yet. `available: false`, shown as "قريباً" |
 | Arabic Part 2 (`arabic-2`), Math Part 2 (`math-2`) | none | none | `available: false`, shown as "قريباً". Planned for v1.1 |
@@ -26,7 +26,7 @@ Review status per unit: `docs/CONTENT_REVIEW.md`.
 
 `build_word` (the syllable train, `components/activities/BuildWordActivity.tsx`): the child hears a word and loads its syllables into the wagons in reading order, among decoys with the same letter and another vowel. A round counts when no wrong tile was tapped; it is not a review item.
 
-Lesson structure of the earlier Arabic units 7 and 8 (3 letters and a theme story per unit):
+Lesson structure of the earlier Arabic unit 8 (3 letters and a theme story per unit):
 1. `story`: tap each sentence to hear it
 2. `naming`: tap each vocabulary word to hear it
 3. `letter_pick`: find the target letter among 3

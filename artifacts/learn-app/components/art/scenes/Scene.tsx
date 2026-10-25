@@ -10,13 +10,19 @@ import { Svg } from "react-native-svg";
 import type { SceneId } from "@/content/types";
 
 import { Birdcage } from "./Birdcage";
+import { Classroom } from "./Classroom";
 import { Grocery } from "./Grocery";
 import { Kitchen } from "./Kitchen";
+import { Sickbed } from "./Sickbed";
+import { Toothache } from "./Toothache";
 
 const SCENES: Record<SceneId, () => React.JSX.Element> = {
   grocery: Grocery,
   birdcage: Birdcage,
   kitchen: Kitchen,
+  classroom: Classroom,
+  toothache: Toothache,
+  sickbed: Sickbed,
 };
 
 type Props = { id: SceneId; accessibilityLabel?: string };

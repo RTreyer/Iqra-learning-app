@@ -18,7 +18,7 @@ type FaceProps = {
   cx: number;
   cy: number;
   r: number;
-  mood?: "smile" | "open" | "worried" | "calm";
+  mood?: "smile" | "open" | "worried" | "calm" | "cry";
 };
 
 /** Round face with eyes, cheeks and a mouth for the mood. */
@@ -29,7 +29,9 @@ export function Face({ cx, cy, r, mood = "smile" }: FaceProps) {
     calm: `M${cx - r * 0.22},${mouthY + r * 0.05} Q${cx},${mouthY + r * 0.15} ${cx + r * 0.22},${mouthY + r * 0.05}`,
     worried: `M${cx - r * 0.25},${mouthY + r * 0.15} Q${cx},${mouthY - r * 0.05} ${cx + r * 0.25},${mouthY + r * 0.15}`,
     open: "",
+    cry: "",
   }[mood];
+  const crying = mood === "cry";
   return (
     <G>
       <Ellipse
@@ -47,11 +49,36 @@ export function Face({ cx, cy, r, mood = "smile" }: FaceProps) {
         fill={SKIN_SHADE}
       />
       <Ellipse cx={cx} cy={cy} rx={r} ry={r * 1.1} fill={SKIN} />
-      <Ellipse cx={cx - r * 0.36} cy={cy - r * 0.08} rx={r * 0.11} ry={r * 0.14} fill={INK} />
-      <Ellipse cx={cx + r * 0.36} cy={cy - r * 0.08} rx={r * 0.11} ry={r * 0.14} fill={INK} />
-      <Circle cx={cx - r * 0.33} cy={cy - r * 0.12} r={r * 0.035} fill={WHITE} />
-      <Circle cx={cx + r * 0.39} cy={cy - r * 0.12} r={r * 0.035} fill={WHITE} />
-      {mood === "worried" ? (
+      {crying ? (
+        <G>
+          {/* Eyes squeezed shut, tears running down. */}
+          {[-1, 1].map((side) => (
+            <Path
+              key={side}
+              d={`M${cx + side * r * 0.52},${cy - r * 0.06} Q${cx + side * r * 0.36},${cy - r * 0.2} ${cx + side * r * 0.2},${cy - r * 0.06}`}
+              stroke={INK}
+              strokeWidth={r * 0.08}
+              fill="none"
+              strokeLinecap="round"
+            />
+          ))}
+          {[-1, 1].map((side) => (
+            <Path
+              key={`t${side}`}
+              d={`M${cx + side * r * 0.42},${cy + r * 0.02} q${-side * r * 0.12},${r * 0.3} 0,${r * 0.42} q${side * r * 0.12},${-r * 0.12} 0,${-r * 0.42} Z`}
+              fill="#4FC3F7"
+            />
+          ))}
+        </G>
+      ) : (
+        <G>
+          <Ellipse cx={cx - r * 0.36} cy={cy - r * 0.08} rx={r * 0.11} ry={r * 0.14} fill={INK} />
+          <Ellipse cx={cx + r * 0.36} cy={cy - r * 0.08} rx={r * 0.11} ry={r * 0.14} fill={INK} />
+          <Circle cx={cx - r * 0.33} cy={cy - r * 0.12} r={r * 0.035} fill={WHITE} />
+          <Circle cx={cx + r * 0.39} cy={cy - r * 0.12} r={r * 0.035} fill={WHITE} />
+        </G>
+      )}
+      {mood === "worried" || crying ? (
         <G>
           <Path
             d={`M${cx - r * 0.58},${cy - r * 0.3} L${cx - r * 0.2},${cy - r * 0.44}`}
@@ -90,8 +117,14 @@ export function Face({ cx, cy, r, mood = "smile" }: FaceProps) {
         fill="#E39A84"
         opacity={0.6}
       />
-      {mood === "open" ? (
-        <Ellipse cx={cx} cy={mouthY + r * 0.08} rx={r * 0.16} ry={r * 0.12} fill="#7A2E2E" />
+      {mood === "open" || crying ? (
+        <Ellipse
+          cx={cx}
+          cy={mouthY + r * 0.1}
+          rx={crying ? r * 0.24 : r * 0.16}
+          ry={crying ? r * 0.16 : r * 0.12}
+          fill="#7A2E2E"
+        />
       ) : (
         <Path d={mouth} stroke={INK} strokeWidth={r * 0.08} fill="none" strokeLinecap="round" />
       )}

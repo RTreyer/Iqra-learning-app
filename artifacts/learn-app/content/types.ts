@@ -31,7 +31,7 @@ export type ArtId =
  * Wide story pictures (16:10) redrawn from the textbook story page, one per story
  * (components/art/scenes). Described first in docs/content/textbooks, never copied.
  */
-export type SceneId = "grocery" | "birdcage" | "kitchen";
+export type SceneId = "grocery" | "birdcage" | "kitchen" | "classroom" | "toothache" | "sickbed";
 
 export type Choice = { emoji: string; word: string };
 
