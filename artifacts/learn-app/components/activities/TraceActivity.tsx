@@ -22,12 +22,16 @@ import { ADVANCE_MS } from "./shared/useQuiz";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import { PAD_FALLBACK, PAD_MAX, trace, webPad } from "./trace/styles";
 import { addPoint, startStroke, type DrawnStroke } from "./trace/path";
-import { validateTracing } from "./trace/validate";
+import { decodeMask, validateOnGuide, validateTracing } from "./trace/validate";
+import { TRACE_GRID, traceGuides } from "@/content/generated/traceGuides";
 import type { ActivityProps } from "./types";
 
 const ERROR_VISIBLE_MS = 3000;
 
-/** Guide size as a share of the pad: a letter fills it, a whole word (يبني) shrinks to fit. */
+/** Two letters or more (يد، بيت): a word, for the wording of hints. */
+const isWord = (guide: string) => guide.replace(/[ً-ْـ\s]/g, "").length > 1;
+
+/** Text guides only (the Unit 1 line drawings): a letter fills the pad, a word shrinks to fit. */
 export function guideScale(guide: string): number {
   const letters = guide.replace(/[ً-ْـ\s]/g, "").length;
   return letters <= 2 ? 0.55 : Math.max(0.2, 1.1 / letters);
@@ -55,6 +59,8 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
   const errorTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const target = targets[targetIndex];
+  /** Outline and mask of an Arabic guide; the Unit 1 line drawings have none. */
+  const shape = traceGuides[target.guide];
 
   useEffect(
     () => () => {
@@ -127,11 +133,16 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
   const handleDone = useCallback(() => {
     if (locked.current) return;
     const points = strokes.map((s) => s.points);
-    const result = validateTracing(
-      points,
-      { width: padSize, height: padSize },
-      target.strokeCount ?? 1,
-    );
+    const pad = { width: padSize, height: padSize };
+    let result = validateTracing(points, pad, target.strokeCount ?? 1);
+    // Arabic guides: the drawing must also lie on the letter and cover half of it.
+    if (result.valid && shape)
+      result = validateOnGuide(
+        points,
+        pad,
+        decodeMask(shape.mask, TRACE_GRID),
+        isWord(target.guide),
+      );
     if (!result.valid) {
       setError(result.msg);
       setPadError(true);
@@ -164,7 +175,17 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
       setPassed(false);
       setTargetIndex(targetIndex + 1);
     }, ADVANCE_MS);
-  }, [strokes, padSize, target.strokeCount, shake, targetIndex, targets.length, completeRef]);
+  }, [
+    strokes,
+    padSize,
+    target.strokeCount,
+    target.guide,
+    shape,
+    shake,
+    targetIndex,
+    targets.length,
+    completeRef,
+  ]);
 
   const translateX = shake.interpolate({ inputRange: [0, 1], outputRange: [0, 8] });
   const padDims = { width: padSize, height: padSize };
@@ -227,7 +248,19 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
               PLATFORM_PAD,
             ]}
           >
-            <Text style={[trace.guide, guideFont]}>{target.guide}</Text>
+            {shape ? (
+              <Svg
+                testID="trace-guide"
+                style={StyleSheet.absoluteFill}
+                width={padSize}
+                height={padSize}
+                viewBox="0 0 100 100"
+              >
+                <Path d={shape.d} fill={color} opacity={0.18} />
+              </Svg>
+            ) : (
+              <Text style={[trace.guide, guideFont]}>{target.guide}</Text>
+            )}
             <Svg style={StyleSheet.absoluteFill} width={padSize} height={padSize}>
               {strokes.map((s, i) => (
                 <Path

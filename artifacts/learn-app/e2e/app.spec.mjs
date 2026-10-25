@@ -15,6 +15,7 @@ import {
   tapAllAndFinish,
   test,
   traceDiagonal,
+  traceGuide,
 } from "./helpers.mjs";
 
 const BOOK_IDS = ["arabic-1", "arabic-2", "lughati-1", "math-1", "math-2", "science-1"];
@@ -157,7 +158,7 @@ test.describe("scoring", () => {
 });
 
 test.describe("activities", () => {
-  test("trace: a 5 px drag shows the error banner, diagonal drags complete the lesson", async ({
+  test("trace: a tiny drag or a line off the letter is refused, tracing the letters completes", async ({
     page,
   }) => {
     await gotoAndWaitReady(page, "/lesson/u2-24");
@@ -167,9 +168,15 @@ test.describe("activities", () => {
     expect(await page.evaluate(() => window.__spoken)).toContain("حاول مرة أخرى");
 
     await page.getByTestId("trace-clear").click();
+    // A line across the pad is not the letter.
+    await traceDiagonal(page);
+    await page.getByTestId("trace-done").click();
+    await expect(page.getByTestId("trace-error")).toHaveText("اُكتب فوق الحرف المرسوم ✏️");
+    await page.getByTestId("trace-clear").click();
+
     for (const letter of ["د", "ـد"]) {
       await expect(page.getByTestId("trace-pad")).toHaveAttribute("aria-label", letter);
-      await traceDiagonal(page);
+      await traceGuide(page, letter);
       await page.getByTestId("trace-done").click();
     }
     expect(await earnedStars(page)).toBe(3);

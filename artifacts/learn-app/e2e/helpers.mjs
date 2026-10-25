@@ -1,5 +1,7 @@
 // Shared fixtures and helpers for the end to end suite (see playwright.config.ts).
 import { test as base, expect } from "@playwright/test";
+import { decodeMask } from "../components/activities/trace/validate.ts";
+import { TRACE_GRID, traceGuides } from "../content/generated/traceGuides.ts";
 
 export { expect };
 
@@ -145,6 +147,35 @@ export async function traceDiagonal(page, { length } = {}) {
   await page.mouse.down();
   await page.mouse.move(x1, y1, { steps: length ? 3 : 25 });
   await page.mouse.up();
+}
+
+/**
+ * Traces a guide the way a careful child would: along every row of the letter's cells
+ * (content/generated/traceGuides.ts), one mouse stroke per run of cells.
+ */
+export async function traceGuide(page, guide) {
+  const pad = page.getByTestId("trace-pad");
+  await expect(pad).toBeVisible();
+  const box = await pad.boundingBox();
+  const { cells, grid } = decodeMask(traceGuides[guide].mask, TRACE_GRID);
+  const at = (row, col) => [
+    box.x + ((col + 0.5) * box.width) / grid,
+    box.y + ((row + 0.5) * box.height) / grid,
+  ];
+  for (let row = 0; row < grid; row++) {
+    let start = -1;
+    for (let col = 0; col <= grid; col++) {
+      const on = col < grid && cells[row * grid + col];
+      if (on && start < 0) start = col;
+      if (!on && start >= 0) {
+        await page.mouse.move(...at(row, start));
+        await page.mouse.down();
+        await page.mouse.move(...at(row, col - 1), { steps: Math.max(2, col - start) });
+        await page.mouse.up();
+        start = -1;
+      }
+    }
+  }
 }
 
 /** The stored progress blob, or null before the first write. */

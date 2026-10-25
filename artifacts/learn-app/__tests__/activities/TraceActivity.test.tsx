@@ -4,6 +4,7 @@ import { State, type PanGesture } from "react-native-gesture-handler";
 import { fireGestureHandler, getByGestureTestId } from "react-native-gesture-handler/jest-utils";
 import { TraceActivity } from "@/components/activities/TraceActivity";
 import { lessonOf, renderActivity } from "@/test-utils/activities";
+import { strokesOnGuide } from "@/test-utils/trace";
 
 const speech = jest.requireMock("expo-speech") as { speak: jest.Mock };
 const haptics = jest.requireMock("expo-haptics") as { notificationAsync: jest.Mock };
@@ -35,11 +36,27 @@ function drawDiagonal() {
   act(() => jest.runOnlyPendingTimers());
 }
 
+/** Traces the letters of a guide row by row, as a careful child would (see test-utils/trace). */
+function drawGuide(guide: string) {
+  for (const stroke of strokesOnGuide(guide)) {
+    const last = stroke[stroke.length - 1];
+    act(() =>
+      fireGestureHandler<PanGesture>(getByGestureTestId("trace-pad"), [
+        { state: State.BEGAN, ...stroke[0] },
+        ...stroke.slice(1).map((p) => ({ state: State.ACTIVE, ...p })),
+        { state: State.END, ...last },
+      ]),
+    );
+    act(() => jest.runOnlyPendingTimers());
+  }
+}
+
 test("renders the guide and label and speaks the first target", () => {
   renderActivity(
     <TraceActivity lesson={lesson} color="#7C3AED" attemptKey="t:1" onComplete={jest.fn()} />,
   );
-  expect(screen.getAllByText(lesson.targets[0].guide).length).toBeGreaterThanOrEqual(2); // label + guide
+  expect(screen.getByText(lesson.targets[0].label)).toBeTruthy();
+  expect(screen.getByTestId("trace-guide")).toBeTruthy(); // the letter outline
   expect(speech.speak).toHaveBeenCalledWith(lesson.targets[0].tts, expect.anything());
   expect(screen.getByText("مسح")).toBeTruthy();
   expect(screen.getByText("تم")).toBeTruthy();
@@ -67,7 +84,7 @@ test("valid strokes advance through every target and complete with an empty scor
   layout();
   lesson.targets.forEach((target, i) => {
     expect(speech.speak).toHaveBeenCalledWith(target.tts, expect.anything());
-    drawDiagonal();
+    drawGuide(target.guide);
     fireEvent.press(screen.getByTestId("trace-done"));
     expect(screen.queryByTestId("trace-error")).toBeNull();
     // Locked while the success feedback shows.
@@ -123,7 +140,7 @@ test("completes through the latest onComplete when the parent re-renders during 
     <TraceActivity lesson={single} color="#7C3AED" attemptKey="t:1" onComplete={first} />,
   );
   layout();
-  drawDiagonal();
+  drawGuide(single.targets[0].guide);
   fireEvent.press(screen.getByTestId("trace-done"));
   view.rerenderActivity(
     <TraceActivity lesson={single} color="#7C3AED" attemptKey="t:1" onComplete={latest} />,
@@ -150,10 +167,28 @@ test("sentence copying: the sentence fills in word by word above the pad", () =>
       ).length;
   expect(underlined()).toBe(1);
   layout();
-  copy.targets.forEach(() => {
-    drawDiagonal();
+  copy.targets.forEach((target) => {
+    drawGuide(target.guide);
     fireEvent.press(screen.getByTestId("trace-done"));
     act(() => jest.advanceTimersByTime(900));
   });
   expect(onComplete).toHaveBeenCalledTimes(1);
+});
+
+test("a line across the pad or a different letter is not accepted", () => {
+  const onComplete = jest.fn();
+  renderActivity(
+    <TraceActivity lesson={lesson} color="#7C3AED" attemptKey="t:1" onComplete={onComplete} />,
+  );
+  layout();
+  drawDiagonal();
+  fireEvent.press(screen.getByTestId("trace-done"));
+  expect(screen.getByTestId("trace-error")).toHaveTextContent("اُكتب فوق الحرف المرسوم ✏️");
+
+  fireEvent.press(screen.getByTestId("trace-clear"));
+  drawGuide("ب"); // the guide shows م
+  fireEvent.press(screen.getByTestId("trace-done"));
+  expect(screen.getByTestId("trace-error")).toBeTruthy();
+  act(() => jest.advanceTimersByTime(900));
+  expect(onComplete).not.toHaveBeenCalled();
 });

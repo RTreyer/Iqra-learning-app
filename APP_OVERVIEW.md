@@ -42,7 +42,7 @@ Unit 1 uses `naming`, `listen_pick`, `behavior`, `matching` and `trace`. Math us
 - App: Expo SDK 54, expo-router 6, React Native 0.81, React 19, New Architecture. Typed routes are off, a `lib/routes.ts` helper builds paths.
 - Storage: AsyncStorage only. Key `@kidlearn_progress_v1` (schema v2) for progress, `iqra_ui_language` for language.
 - Audio: expo-speech with Arabic locale. Haptics: expo-haptics.
-- Graphics and input: react-native-svg and react-native-gesture-handler (Pan) for letter tracing. No icon fonts, no `expo-font`, no custom fonts. Icons are inline SVG or emoji.
+- Graphics and input: react-native-svg and react-native-gesture-handler (Pan) for letter tracing. No icon fonts, no `expo-font`, no custom fonts at runtime. Icons are inline SVG or emoji. Arabic trace guides are SVG outlines generated at build time from Noto Naskh Arabic (SIL OFL, `scripts/fonts/`) with HarfBuzz (`harfbuzzjs`, dev dependency): `npm run guides` writes `content/generated/traceGuides.ts`, and `test:data` fails when it is out of date.
 - Tests: jest-expo with Testing Library for unit and component tests, Node test runner for content and translation data, Playwright for web end to end.
 - CI: GitHub Actions (`.github/workflows/ci.yml`) runs typecheck, lint, test, test:data and test:e2e.
 - Targets: Android (Expo Go for dev, EAS APK for release), static web (Netlify, SPA redirect).
@@ -59,6 +59,7 @@ artifacts/learn-app/                the Expo app
   app/                  routes: _layout, index, book/[bookId], unit/[unitId], lesson/[lessonId], review, +not-found
   components/           shared UI: cards, badges, BackButton, UiText (auto translating Text), ErrorBoundary, ActivityHost
   components/activities/  one component per activity type, ReviewRound, shared/ (useQuiz, shuffle, ChoiceCard...), math/, trace/ (validate.ts, path.ts)
+  content/generated/     traceGuides.ts: outlines and masks of the Arabic trace guides (generated, do not edit)
   content/              types.ts, catalog.ts, index.ts, ui-translations.ts, arabic/ (8 units), math/ (3), science/ (3)
   context/              ProgressContext (progress, hydration, persistence), LanguageContext
   hooks/                useLessonAttempt, useVoiceHint, useScreenPadding
@@ -89,7 +90,7 @@ artifacts/learn-app/                the Expo app
 - Review session: items due today (Leitner boxes 1 to 5, intervals 1, 2, 4, 7, 14 days, local day). Up to 10 items, interleaved by kind, wrong items repeat once at the end, only the first answer is recorded. Correct promotes only when due, wrong resets to box 1. Review awards no stars.
 - Home guidance: a continue card for the next lesson below 3 stars, a review card with the due count, a streak badge from 2 days.
 - Voice hint banner appears when the device has no Arabic TTS voice.
-- Tracing: gesture handler Pan draws strokes on an SVG pad. A heuristic checks stroke count, path length (50 percent of the shorter pad side), bounding box (20 percent of width or 15 percent of height) and centroid (within 35 percent of centre). It is an effort check, not shape matching.
+- Tracing: gesture handler Pan draws strokes on an SVG pad. A heuristic first checks stroke count, path length (50 percent of the shorter pad side), bounding box (20 percent of width or 15 percent of height) and centroid (within 35 percent of centre). For Arabic guides the drawing is then checked against the letter itself (`validateOnGuide`): at least 90 percent of the drawn points must lie on the letter (tolerance 2 cells of a 50 × 50 grid, about 4 percent of the pad) and at least 50 percent of the letter must be traced. All guides share one letter size, in book proportions. Letters that differ only by dots (ح ج، س ص) cannot be told apart by shape. The Unit 1 line drawings keep the heuristic only.
 - Opening a lesson speaks the title first, then the activity mounts.
 - Language switch persists and affects only strings wrapped in `UiText` or passed through `translateUi`.
 - Progress is stored with a corrupt blob backup. Storage read errors never overwrite saved stars.
@@ -147,7 +148,7 @@ Product (13 proposals in `docs/UI_PROPOSALS.md`)
 - Medium: dark mode via tokens, adaptive Android icon (needs owner asset), big text toggle, progress ring, RTL audit in English mode, first launch onboarding, Arabic Part 2 return, mastery badges per letter.
 - Low: daily review reminder.
 - A shared small `settings` store serves proposals 1, 4, 6, 10 and 12.
-- Tracing: heuristic now, graded shape matching against guide paths later.
+- Tracing: shape matching against generated guide outlines (on the letter, half of it traced); stroke order and direction are not checked.
 
 Content
 - Fill Arabic Part 2, the rest of Math (Part 1 and Part 2), Science from the real textbook, then Islamic Education and Social Studies.

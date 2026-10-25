@@ -1,5 +1,12 @@
 import { MAX_STROKE_POINTS, addPoint, startStroke } from "@/components/activities/trace/path";
-import { validateTracing, type Stroke } from "@/components/activities/trace/validate";
+import {
+  decodeMask,
+  validateOnGuide,
+  validateTracing,
+  type Stroke,
+} from "@/components/activities/trace/validate";
+import { TRACE_GRID, traceGuides } from "@/content/generated/traceGuides";
+import { strokesOnGuide } from "@/test-utils/trace";
 
 const PAD = { width: 300, height: 300 };
 
@@ -116,5 +123,42 @@ describe("stroke path building", () => {
     const s = startStroke({ x: 0, y: 0 });
     for (let i = 1; i < MAX_STROKE_POINTS + 50; i++) addPoint(s, { x: i * 3, y: 0 });
     expect(s.points).toHaveLength(MAX_STROKE_POINTS);
+  });
+});
+
+describe("validateOnGuide", () => {
+  const shape = (guide: string) => decodeMask(traceGuides[guide].mask, TRACE_GRID);
+
+  it("passes a trace along the letter", () => {
+    expect(validateOnGuide(strokesOnGuide("د"), PAD, shape("د"))).toEqual({ valid: true });
+  });
+
+  it("fails a line across the pad: it is not on the letter", () => {
+    expect(validateOnGuide([line(30, 30, 270, 270)], PAD, shape("د"))).toEqual({
+      valid: false,
+      msg: "اُكتب فوق الحرف المرسوم ✏️",
+    });
+  });
+
+  it("fails a different letter written on the guide", () => {
+    expect(validateOnGuide(strokesOnGuide("ق"), PAD, shape("د")).valid).toBe(false);
+    expect(validateOnGuide(strokesOnGuide("ب"), PAD, shape("م")).valid).toBe(false);
+  });
+
+  it("fails when less than half of the letter is traced", () => {
+    const strokes = strokesOnGuide("ل");
+    const top = strokes.slice(0, Math.floor(strokes.length * 0.3));
+    expect(validateOnGuide(top, PAD, shape("ل"))).toEqual({
+      valid: false,
+      msg: "أكمل كتابة الحرف كله 📏",
+    });
+  });
+
+  it("speaks of the word for word guides", () => {
+    expect(validateOnGuide([line(30, 30, 270, 270)], PAD, shape("بيت"), true)).toEqual({
+      valid: false,
+      msg: "اُكتب فوق الكلمة المرسومة ✏️",
+    });
+    expect(validateOnGuide(strokesOnGuide("بيت"), PAD, shape("بيت"), true).valid).toBe(true);
   });
 });

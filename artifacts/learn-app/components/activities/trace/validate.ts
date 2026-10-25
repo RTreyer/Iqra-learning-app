@@ -76,3 +76,135 @@ export function validateTracing(
 
   return { valid: true };
 }
+
+// ── On the guide ─────────────────────────────────────────────────────────────────────────
+// For Arabic guides the outline is known (content/generated/traceGuides.ts), so the check is
+// about the letter itself, not just the size of the drawing:
+//  5. On the letter: at least ON_LETTER of the drawn points lie on the letter (with a
+//     finger's tolerance), so a different letter or a scribble next to it fails.
+//  6. Covered: at least COVERED of the letter lies under the drawn path.
+
+/** Share of drawn points that must lie on the letter. */
+export const ON_LETTER = 0.9;
+/** Share of the letter that must be traced. */
+export const COVERED = 0.5;
+/** Finger tolerance in mask cells (a cell is 2 % of the pad). */
+const REACH = 2;
+
+export type GuideMask = { grid: number; cells: Uint8Array; near: Uint8Array; count: number };
+
+const masks = new Map<string, GuideMask>();
+
+/** Decodes a base64 bit mask once; `near` marks every cell within REACH of the letter. */
+export function decodeMask(mask: string, grid: number): GuideMask {
+  const cached = masks.get(mask);
+  if (cached) return cached;
+  const bytes = base64Bytes(mask);
+  const cells = new Uint8Array(grid * grid);
+  let count = 0;
+  for (let i = 0; i < cells.length; i++) {
+    if (bytes[i >> 3] & (1 << (i & 7))) {
+      cells[i] = 1;
+      count++;
+    }
+  }
+  const near = new Uint8Array(grid * grid);
+  forEachCell(cells, grid, (row, col) =>
+    forEachWithin(row, col, grid, (i) => {
+      near[i] = 1;
+    }),
+  );
+  const decoded = { grid, cells, near, count };
+  masks.set(mask, decoded);
+  return decoded;
+}
+
+/** Checks 5 and 6 for a guide mask; `word` only changes the wording of the hint. */
+export function validateOnGuide(
+  strokes: Stroke[],
+  pad: PadSize,
+  guide: GuideMask,
+  word = false,
+): ValidationResult {
+  const { grid, cells, near, count } = guide;
+  const cellOf = (p: Point) => {
+    const col = Math.floor((p.x / pad.width) * grid);
+    const row = Math.floor((p.y / pad.height) * grid);
+    return row >= 0 && row < grid && col >= 0 && col < grid ? row * grid + col : -1;
+  };
+  // Points every half cell along each stroke, so fast swipes leave no gaps.
+  const step = Math.min(pad.width, pad.height) / grid / 2;
+  const points: Point[] = [];
+  for (const stroke of strokes) {
+    stroke.forEach((p, i) => {
+      if (i === 0) return void points.push(p);
+      const prev = stroke[i - 1];
+      const n = Math.max(1, Math.ceil(Math.hypot(p.x - prev.x, p.y - prev.y) / step));
+      for (let k = 1; k <= n; k++)
+        points.push({ x: prev.x + ((p.x - prev.x) * k) / n, y: prev.y + ((p.y - prev.y) * k) / n });
+    });
+  }
+  if (points.length === 0) return { valid: false, msg: COVER_MORE(word) };
+
+  const onLetter = points.filter((p) => {
+    const i = cellOf(p);
+    return i >= 0 && near[i] === 1;
+  }).length;
+  if (onLetter / points.length < ON_LETTER) return { valid: false, msg: ON_THE_LETTER(word) };
+
+  const covered = new Uint8Array(grid * grid);
+  let coveredCount = 0;
+  for (const p of points) {
+    const i = cellOf(p);
+    if (i < 0) continue;
+    forEachWithin(Math.floor(i / grid), i % grid, grid, (j) => {
+      if (cells[j] && !covered[j]) {
+        covered[j] = 1;
+        coveredCount++;
+      }
+    });
+  }
+  if (coveredCount / count < COVERED) return { valid: false, msg: COVER_MORE(word) };
+  return { valid: true };
+}
+
+const ON_THE_LETTER = (word: boolean) =>
+  word ? "اُكتب فوق الكلمة المرسومة ✏️" : "اُكتب فوق الحرف المرسوم ✏️";
+const COVER_MORE = (word: boolean) =>
+  word ? "أكمل كتابة الكلمة كلها 📏" : "أكمل كتابة الحرف كله 📏";
+
+function forEachCell(cells: Uint8Array, grid: number, fn: (row: number, col: number) => void) {
+  for (let i = 0; i < cells.length; i++) if (cells[i]) fn(Math.floor(i / grid), i % grid);
+}
+
+/** Calls `fn` for every cell index within REACH (a disc) of (row, col). */
+function forEachWithin(row: number, col: number, grid: number, fn: (i: number) => void) {
+  for (let dr = -REACH; dr <= REACH; dr++) {
+    for (let dc = -REACH; dc <= REACH; dc++) {
+      if (dr * dr + dc * dc > REACH * REACH) continue;
+      const r = row + dr;
+      const c = col + dc;
+      if (r >= 0 && r < grid && c >= 0 && c < grid) fn(r * grid + c);
+    }
+  }
+}
+
+const BASE64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+/** Base64 to bytes without atob or Buffer, so it runs the same on native, web and Jest. */
+function base64Bytes(text: string): Uint8Array {
+  const clean = text.replace(/=+$/, "");
+  const out = new Uint8Array(Math.floor((clean.length * 3) / 4));
+  let bits = 0;
+  let value = 0;
+  let o = 0;
+  for (const ch of clean) {
+    value = (value << 6) | BASE64.indexOf(ch);
+    bits += 6;
+    if (bits >= 8) {
+      bits -= 8;
+      out[o++] = (value >> bits) & 0xff;
+    }
+  }
+  return out;
+}

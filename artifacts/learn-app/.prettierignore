@@ -2,3 +2,4 @@ dist
 node_modules
 .expo
 pnpm-lock.yaml
+content/generated
