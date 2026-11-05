@@ -3,6 +3,8 @@ import { test as base, expect } from "@playwright/test";
 import { toArabicDigits } from "../lib/arabicNumbers.ts";
 import { decodeMask } from "../components/activities/trace/validate.ts";
 import { compareAnswer, numberFillAnswer } from "../content/math/answers.ts";
+import { groupLabel } from "../content/math/picLabel.ts";
+import { mathBookUnit1 } from "../content/math/bookUnit1.ts";
 import { mathBookUnit2 } from "../content/math/bookUnit2.ts";
 import { TRACE_GRID, traceGuides } from "../content/generated/traceGuides.ts";
 
@@ -159,6 +161,17 @@ export async function completeMathLesson(page, lesson, answerFor) {
   }
   return earnedStars(page);
 }
+
+/** The first math-u1 lesson of a type. */
+export function mathUnit1Lesson(type, predicate = () => true) {
+  const lesson = mathBookUnit1.lessons.find((l) => l.type === type && predicate(l));
+  if (!lesson) throw new Error(`no math-u1 ${type} lesson`);
+  return lesson;
+}
+
+/** The correct picture card of a shuffled round, by its spoken name (the choices' names differ). */
+export const pictureChoiceByName = (page) => (round) =>
+  page.getByRole("button", { name: groupLabel(round.choices[round.correctIndex]), exact: true });
 
 /** The correct picture card (ordered rows keep their order, so the index is fixed). */
 export const pictureChoiceAnswer = (page) => (round) =>

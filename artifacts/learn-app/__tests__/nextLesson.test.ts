@@ -31,7 +31,7 @@ test("lessons below three stars are not finished", () => {
 });
 
 test("all Arabic at three stars moves on to Math", () => {
-  expect(nextLesson(withStars((b) => b.subject === "arabic"))?.lesson.id).toBe("math-u2-1");
+  expect(nextLesson(withStars((b) => b.subject === "arabic"))?.lesson.id).toBe("math-u1-1");
 });
 
 test("everything at three stars returns null", () => {
@@ -40,5 +40,5 @@ test("everything at three stars returns null", () => {
 
 test("unavailable books are skipped", () => {
   const catalog = books.map((b) => (b.subject === "arabic" ? { ...b, available: false } : b));
-  expect(nextLesson(createEmptyState(), catalog)?.lesson.id).toBe("math-u2-1");
+  expect(nextLesson(createEmptyState(), catalog)?.lesson.id).toBe("math-u1-1");
 });
