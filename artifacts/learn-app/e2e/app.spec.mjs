@@ -4,6 +4,8 @@
 import fs from "node:fs";
 import { createRequire } from "node:module";
 
+import { mathBookUnit5 } from "../content/math/bookUnit5.ts";
+
 import {
   QUIZ_ROUNDS,
   answerRound,
@@ -210,6 +212,19 @@ test.describe("activities", () => {
       await expect.poll(async () => (await readProgress(page))?.lessons[lesson.id]?.stars).toBe(3);
     });
   }
+
+  // The first math-u5 sort lesson: tap each item, then its box (answers come from content/).
+  test("math sort lesson completes with 3 stars", async ({ page }) => {
+    const lesson = mathBookUnit5.lessons.find((l) => l.type === "sort");
+    await gotoAndWaitReady(page, `/lesson/${lesson.id}`);
+    for (const [i, item] of lesson.items.entries()) {
+      await page.getByTestId(`sort-item-${i}`).click();
+      await page.getByTestId(`sort-box-${item.box}`).click();
+      await expect(page.getByTestId(`sort-item-${i}`)).toHaveCount(0);
+    }
+    expect(await earnedStars(page)).toBe(3);
+    await expect.poll(async () => (await readProgress(page))?.lessons[lesson.id]?.stars).toBe(3);
+  });
 
   // Science is hidden behind "قريباً" on the grade screen, but its lessons still open by URL.
   test("science story and naming lessons complete", async ({ page }) => {
