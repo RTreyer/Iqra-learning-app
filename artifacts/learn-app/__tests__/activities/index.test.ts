@@ -14,6 +14,7 @@ test("every lesson type in the catalog has an activity component", () => {
     "listen_pick",
     "matching",
     "naming",
+    "picture_choice",
     "story",
     "trace",
     "word_read",

@@ -52,6 +52,10 @@ export function ActivityHost({ lesson, ...props }: Props) {
       const Activity = ACTIVITY_COMPONENTS.arithmetic;
       return <Activity lesson={lesson} {...props} />;
     }
+    case "picture_choice": {
+      const Activity = ACTIVITY_COMPONENTS.picture_choice;
+      return <Activity lesson={lesson} {...props} />;
+    }
     default:
       return assertNever(lesson);
   }

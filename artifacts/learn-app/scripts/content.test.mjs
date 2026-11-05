@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { validatePictureChoice } from "../content/math/validate.ts";
 import { books, getBook, getLesson, getUnit, unitLessonIds } from "../content/index.ts";
 
 const units = books.flatMap((book) => book.units);
@@ -122,6 +123,13 @@ test("counting answers are among the options", () => {
   for (const lesson of byType("counting")) {
     for (const r of lesson.rounds) assert.ok(r.options.includes(r.count), lesson.id);
   }
+});
+
+test("picture_choice rounds are valid", () => {
+  for (const lesson of byType("picture_choice"))
+    lesson.rounds.forEach((round, i) =>
+      assert.deepEqual(validatePictureChoice(round), [], `${lesson.id} round ${i + 1}`),
+    );
 });
 
 test("arithmetic results are non negative and among the options", () => {

@@ -91,6 +91,16 @@ export type MathPic =
       shaded?: "half" | "quarter";
     };
 
+export type PictureChoiceRound = {
+  /** The task, spoken and shown: the child cannot read yet. */
+  prompt: string;
+  /** Picture to compare against, shown above the choices ("same as this one"). */
+  model?: MathPic;
+  /** 2 to 4 choices; a choice may be a group of pictures. */
+  choices: MathPic[][];
+  correctIndex: number;
+};
+
 export type LessonBody =
   | {
       type: "story";
@@ -114,7 +124,8 @@ export type LessonBody =
     }
   | { type: "build_word"; rounds: BuildWordRound[] }
   | { type: "counting"; rounds: CountingRound[] }
-  | { type: "arithmetic"; rounds: ArithmeticRound[] };
+  | { type: "arithmetic"; rounds: ArithmeticRound[] }
+  | { type: "picture_choice"; rounds: PictureChoiceRound[] };
 
 export type LessonType = LessonBody["type"];
 
