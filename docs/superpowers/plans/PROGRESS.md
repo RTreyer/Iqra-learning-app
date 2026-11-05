@@ -97,6 +97,8 @@ To make it self-resuming after a usage limit reset, run inside the session (loca
 
 ## Decision log
 
+- 2026-11-05: Math foundation (spec 2026-11-05-math-foundation-design.md, plan 2026-11-05-math-foundation.md) on branch `feat/math-foundation`: four generic math activity types (picture_choice, compare, number_fill, sort), MathPic with SVG shapes, math lesson kit, validators in content/math/validate.ts. Old math progress dropped when units are replaced (math unreleased). Voice gives only the task; no voice input. Next steps: book Units 2, 3, 4, 5, then 1, each replacing the matching old unit.
+
 - 2026-10-16: Work on main instead of a feature branch (owner).
 - 2026-10-16: Code quality review skipped for Task 1.1 because the diff is deletions and JSON edits already verified line by line by the spec review.
 - 2026-10-16: Execution paused by owner after Task 1.1 to preserve usage limit. Resume with the prompt above.

@@ -26,6 +26,14 @@ Review status per unit: `docs/CONTENT_REVIEW.md`.
 
 `build_word` (the syllable train, `components/activities/BuildWordActivity.tsx`): the child hears a word and loads its syllables into the wagons in reading order, among decoys with the same letter and another vowel. A round counts when no wrong tile was tapped; it is not a review item.
 
+Math activities for the textbook rebuild (`components/activities/`, spec `docs/superpowers/specs/2026-11-05-math-foundation-design.md`), no lessons use them yet:
+- `picture_choice`: tap the right picture or group (odd one out, same as the model, what comes next, the bigger group).
+- `compare`: two groups or numbers, the first on the right; answer with أَكْثَرُ / أَقَلُّ / يُسَاوِي or drawn signs > < =.
+- `number_fill`: the missing number in a sum, a vertical sum or a counting sequence.
+- `sort`: tap an item, then its box.
+
+Pictures are `MathPic` (emoji or SVG shape with a named colour, size, crossing out, half or quarter shading). The voice speaks only the task, once per change (`useInstruction`); number sentences are not read aloud. The new types have no review items yet. Lesson ids for rebuilt math are `math-u{bookUnit}-{n}`; old math progress (`m1-1` to `m3-3`) is dropped when units are replaced.
+
 Lesson structure of the earlier Arabic unit 8 (3 letters and a theme story per unit):
 1. `story`: tap each sentence to hear it
 2. `naming`: tap each vocabulary word to hear it
