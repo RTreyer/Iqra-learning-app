@@ -22,9 +22,18 @@ function ShapePath({ shape, fill, stroke }: { shape: ShapeId; fill: string; stro
 }
 
 /** One math picture: an emoji, or an SVG shape with colour, size, shading and crossing out. */
-export function MathPic({ pic, decorative }: { pic: Pic; decorative?: boolean }) {
+export function MathPic({
+  pic,
+  decorative,
+  size: fixedSize,
+}: {
+  pic: Pic;
+  decorative?: boolean;
+  /** Overrides the size from the picture, for compact rows. */
+  size?: number;
+}) {
   const clipId = "clip" + useId().replace(/[^A-Za-z0-9_-]/g, "");
-  const size = SIZES[pic.size ?? "normal"];
+  const size = fixedSize ?? SIZES[pic.size ?? "normal"];
   const label = picLabel(pic);
   return (
     <View
@@ -80,7 +89,16 @@ export function MathPic({ pic, decorative }: { pic: Pic; decorative?: boolean })
 }
 
 /** Several pictures side by side, wrapping, read right to left. */
-export function PicGroup({ pics, decorative }: { pics: Pic[]; decorative?: boolean }) {
+export function PicGroup({
+  pics,
+  decorative,
+  size,
+}: {
+  pics: Pic[];
+  decorative?: boolean;
+  size?: number;
+}) {
+  if (pics.length === 0) return null;
   return (
     <View
       {...(decorative
@@ -89,7 +107,7 @@ export function PicGroup({ pics, decorative }: { pics: Pic[]; decorative?: boole
       style={styles.group}
     >
       {pics.map((pic, i) => (
-        <MathPic key={i} pic={pic} decorative={decorative} />
+        <MathPic key={i} pic={pic} decorative={decorative} size={size} />
       ))}
     </View>
   );

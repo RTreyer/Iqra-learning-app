@@ -2,7 +2,6 @@ import React, { useCallback } from "react";
 import { StyleSheet, View } from "react-native";
 import { speak } from "@/lib/speech";
 import { colors } from "@/theme/tokens";
-import { MAX_CHOICES } from "@/content/math/validate";
 import { MathPic } from "./math/MathPic";
 import { PicCard } from "./math/PicCard";
 import { useInstruction } from "./math/useInstruction";
@@ -27,8 +26,16 @@ function PictureChoice({
   const quiz = useQuiz({ lesson, total, onComplete, onRoundResult, autoAdvanceMs: ADVANCE_MS });
   const { pick } = quiz;
   const round = lesson.rounds[quiz.roundIndex];
-  const shuffled = useShuffled(round.choices, round.correctIndex, attemptKey, quiz.roundIndex);
-  const { values, bounce } = useBounce(MAX_CHOICES);
+  const shuffledChoices = useShuffled(
+    round.choices,
+    round.correctIndex,
+    attemptKey,
+    quiz.roundIndex,
+  );
+  const shuffled = round.ordered
+    ? { items: round.choices, correctIndex: round.correctIndex }
+    : shuffledChoices;
+  const { values, bounce } = useBounce(10);
   useInstruction(round.prompt);
 
   const handlePick = useCallback(
@@ -52,7 +59,7 @@ function PictureChoice({
           <MathPic pic={round.model} />
         </View>
       ) : null}
-      <View style={[act.choicesRow, styles.rtl]}>
+      <View style={[act.choicesRow, styles.rtl, round.ordered && styles.nowrap]}>
         {shuffled.items.map((pics, idx) => (
           <PicCard
             key={idx}
@@ -63,6 +70,7 @@ function PictureChoice({
             locked={quiz.locked}
             onPick={handlePick}
             scale={values[idx]}
+            compact={round.ordered}
           />
         ))}
       </View>
@@ -80,5 +88,6 @@ const styles = StyleSheet.create({
     borderStyle: "dashed",
     borderColor: colors.border,
   },
+  nowrap: { flexWrap: "nowrap", gap: 4 },
   rtl: { flexDirection: "row-reverse" },
 });

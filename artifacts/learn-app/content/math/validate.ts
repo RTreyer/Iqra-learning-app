@@ -28,9 +28,11 @@ export function checkPic(pic: MathPic): string[] {
 export function validatePictureChoice(round: PictureChoiceRound): string[] {
   const problems = checkPrompt(round.prompt);
   const n = round.choices.length;
-  if (n < 2 || n > MAX_CHOICES) problems.push("needs 2 to 4 choices");
+  const max = round.ordered ? 10 : MAX_CHOICES;
+  if (n < 2 || n > max) problems.push(`needs 2 to ${max} choices`);
   if (round.correctIndex < 0 || round.correctIndex >= n) problems.push("correctIndex out of range");
-  if (round.choices.some((c) => c.length === 0)) problems.push("empty choice");
+  if (round.choices.filter((c) => c.length === 0).length > 1)
+    problems.push("more than one empty choice");
   if (round.model) problems.push(...checkPic(round.model));
   for (const choice of round.choices) for (const pic of choice) problems.push(...checkPic(pic));
   return problems;

@@ -96,9 +96,11 @@ export type PictureChoiceRound = {
   prompt: string;
   /** Picture to compare against, shown above the choices ("same as this one"). */
   model?: MathPic;
-  /** 2 to 4 choices; a choice may be a group of pictures. */
+  /** 2 to 4 choices (up to 10 when ordered); a choice may be a group of pictures, none is zero. */
   choices: MathPic[][];
   correctIndex: number;
+  /** Keep the choices in reading order (first on the right) as one row, up to 10: ordinal numbers. */
+  ordered?: boolean;
 };
 
 /** One side of a comparison: a group of pictures or a number. */

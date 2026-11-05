@@ -48,6 +48,10 @@ export function picLabel(pic: MathPic): string {
   return label;
 }
 
+/** Spoken name of the empty group, which stands for zero. */
+export const EMPTY_GROUP = "فَارِغٌ";
+
 export function groupLabel(pics: MathPic[]): string {
+  if (pics.length === 0) return EMPTY_GROUP;
   return pics.map(picLabel).join(" ");
 }

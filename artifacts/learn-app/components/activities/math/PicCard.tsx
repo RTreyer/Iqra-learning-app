@@ -9,6 +9,8 @@ import { PicGroup } from "./MathPic";
 const ICON: Record<ChoiceState, string | null> = { idle: null, correct: "✅", wrong: "❌" };
 const SPOKEN: Record<ChoiceState, string> = { idle: "", correct: "، صحيح", wrong: "، خطأ" };
 
+const COMPACT_PIC = 36;
+
 type Props = {
   index: number;
   pics: MathPic[];
@@ -17,10 +19,12 @@ type Props = {
   locked: boolean;
   onPick: (index: number) => void;
   scale?: Animated.Value;
+  /** Small card for rows of up to 10. */
+  compact?: boolean;
 };
 
 /** A tappable card holding one picture or a group, with the same feedback as ChoiceCard. */
-export function PicCard({ index, pics, state, selected, locked, onPick, scale }: Props) {
+export function PicCard({ index, pics, state, selected, locked, onPick, scale, compact }: Props) {
   return (
     <Animated.View style={scale ? { transform: [{ scale }] } : undefined}>
       <Pressable
@@ -30,9 +34,9 @@ export function PicCard({ index, pics, state, selected, locked, onPick, scale }:
         accessibilityState={{ disabled: locked, selected }}
         disabled={locked}
         onPress={() => onPick(index)}
-        style={[styles.card, stateStyles[state]]}
+        style={[styles.card, compact && styles.compact, stateStyles[state]]}
       >
-        <PicGroup pics={pics} decorative />
+        <PicGroup pics={pics} decorative size={compact ? COMPACT_PIC : undefined} />
         {ICON[state] ? <Text style={styles.icon}>{ICON[state]}</Text> : null}
       </Pressable>
     </Animated.View>
@@ -48,6 +52,13 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: "center",
     justifyContent: "center",
+  },
+  compact: {
+    minWidth: touchTarget,
+    minHeight: touchTarget,
+    padding: 4,
+    borderWidth: 2,
+    borderRadius: 12,
   },
   icon: { position: "absolute", top: -8, right: -8, fontSize: 18 },
 });

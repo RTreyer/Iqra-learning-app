@@ -24,8 +24,23 @@ test("picture choice problems are reported", () => {
     "needs 2 to 4 choices",
     "correctIndex out of range",
   ]);
-  expect(validatePictureChoice({ prompt: "x", choices: [[apple], []], correctIndex: 0 })).toEqual([
-    "empty choice",
+});
+
+test("ordered rows take up to 10 choices, others up to MAX_CHOICES", () => {
+  const ten = Array.from({ length: 10 }, () => [{ emoji: "🐇" }]);
+  expect(
+    validatePictureChoice({ prompt: "x", choices: ten, correctIndex: 3, ordered: true }),
+  ).toEqual([]);
+  expect(validatePictureChoice({ prompt: "x", choices: ten, correctIndex: 3 })).toEqual([
+    "needs 2 to 4 choices",
+  ]);
+});
+
+test("one empty choice stands for zero, two are an error", () => {
+  const fish = [{ emoji: "🐟" }];
+  expect(validatePictureChoice({ prompt: "x", choices: [fish, []], correctIndex: 1 })).toEqual([]);
+  expect(validatePictureChoice({ prompt: "x", choices: [[], []], correctIndex: 1 })).toEqual([
+    "more than one empty choice",
   ]);
 });
 

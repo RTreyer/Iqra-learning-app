@@ -31,3 +31,7 @@ test("an emoji names its size, then crossing out", () => {
 test("a group is its labels joined", () => {
   expect(groupLabel([{ emoji: "🍎" }, { emoji: "🍎" }])).toBe("🍎 🍎");
 });
+
+test("the empty group is spoken as empty", () => {
+  expect(groupLabel([])).toBe("فَارِغٌ");
+});

@@ -66,3 +66,54 @@ test("speaks the task once, scores the first tap and completes", () => {
   act(() => jest.advanceTimersByTime(900));
   expect(onComplete).toHaveBeenCalledWith({ correct: 1, total: 2 });
 });
+
+const orderedLesson: Extract<Lesson, { type: "picture_choice" }> = {
+  ...lesson,
+  rounds: [
+    {
+      prompt: "أَيْنَ الرَّابِعُ؟",
+      ordered: true,
+      choices: ["🐇", "🐢", "🐐", "🐄", "🐓"].map((emoji) => [{ emoji }]),
+      correctIndex: 3,
+    },
+    {
+      prompt: "كَمْ سَمَكَةً؟",
+      choices: [[{ emoji: "🐟" }, { emoji: "🐟" }], []],
+      correctIndex: 1,
+    },
+  ],
+};
+
+test("an ordered round keeps reading order and completes on the right card", () => {
+  for (const key of ["a:1", "b:2"]) {
+    const onComplete = jest.fn();
+    const { unmount } = renderActivity(
+      <PictureChoiceActivity
+        lesson={{ ...orderedLesson, rounds: [orderedLesson.rounds[0]] }}
+        color="#7C3AED"
+        attemptKey={key}
+        onComplete={onComplete}
+      />,
+    );
+    expect(screen.getByTestId("pic-card-3").props.accessibilityLabel).toBe("🐄");
+    fireEvent.press(screen.getByTestId("pic-card-3"));
+    act(() => jest.advanceTimersByTime(900));
+    expect(onComplete).toHaveBeenCalledWith({ correct: 1, total: 1 });
+    unmount();
+  }
+});
+
+test("the empty card is a button named empty and can be the answer", () => {
+  const onComplete = jest.fn();
+  renderActivity(
+    <PictureChoiceActivity
+      lesson={{ ...orderedLesson, rounds: [orderedLesson.rounds[1]] }}
+      color="#7C3AED"
+      attemptKey="c:1"
+      onComplete={onComplete}
+    />,
+  );
+  fireEvent.press(screen.getByRole("button", { name: "فَارِغٌ" }));
+  act(() => jest.advanceTimersByTime(900));
+  expect(onComplete).toHaveBeenCalledWith({ correct: 1, total: 1 });
+});
