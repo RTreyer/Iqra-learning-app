@@ -18,7 +18,7 @@ The book's method is kept: taken objects are **crossed out** (`number_fill` roun
 | 4-4 الطرح ضمن ١٠ | the six crossed pictures of p. 102 (10 - 1, 10 - 3, 8 - 2, 7 - 0, 9 - 3, 6 - 6); the race لنتسابق في الحل (six vertical subtractions) |
 | 4-5 حقائق الطرح ضمن ١٠ | balloons and flowers (7 - 3, 7 - 2, 6 - 2, 7 - 4); facts from 6 to 10 across and down; which picture leaves 4, 1, 7 (the join task); أفكر: complete the sentence from the picture, missing whole or missing part |
 | 4-6 حل المسألة | the countryside (bird flies off, apples fall, rabbits hop away, players leave) and the schoolyard of the unit opener (8 children, a boy and a girl leave); the falling bricks |
-| 4-7 اكتشاف الأنماط | 2 - 1, 3 - 1, 4 - 1, 5 - 1 and same difference 9 - 7, 8 - 6; counting back by 1 and by 2 (`number_fill` sequence) |
+| 4-7 اكتشاف الأنماط | Built as "أَطْرَحُ وَاحِدًا": 2 - 1 up to 7 - 1 one per screen, since a pattern across screens is never visible at once; counting back by 1 and by 2 (`number_fill` sequence). The same difference rounds (9 - 7, 8 - 6) were left out |
 | 4-8 تدريبات عامة | triangles, pens, balloons (4 - 0), footballs, two plain facts; the butterflies (- 5, - 2) and the star with ٣ (missing part, missing whole) |
 | اختبار الوحدة | crossed pictures (birds, apples, tennis balls, triangles); six facts across and down; the pattern ٢ ٤ ٦ and counting back |
 
