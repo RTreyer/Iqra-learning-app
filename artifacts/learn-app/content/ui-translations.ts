@@ -71,6 +71,7 @@ const english: Record<string, string> = {
   "الْوَحْدَة الثَّالِثَة": "Unit 3",
   "الْوَحْدَةُ الثَّانِيَةُ": "Unit 2",
   "الْوَحْدَةُ الثَّالِثَةُ": "Unit 3",
+  "الْوَحْدَةُ الرَّابِعَةُ": "Unit 4",
   "الْوَحْدَةُ الْخَامِسَةُ": "Unit 5",
   مُرَاجَعَة: "Review",
   "مُرَاجَعَة الْيَوْم": "Today's review",
@@ -118,7 +119,10 @@ export function translateUi(text: string, language: UiLanguage): string {
   if (unitComplete) return `🎉 Completed ${translateUi(unitComplete[1], language)}!`;
   // Book metadata is translated for navigation without modifying its source.
   // An Arabic comma joins two parts ("اللغة العربية، الجزء الأول"), a full stop two sentences.
-  for (const [arabic, english] of [["، ", ", "], [". ", ". "]])
+  for (const [arabic, english] of [
+    ["، ", ", "],
+    [". ", ". "],
+  ])
     if (value.includes(arabic))
       return value
         .split(arabic)
