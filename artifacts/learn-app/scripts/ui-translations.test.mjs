@@ -109,8 +109,5 @@ test("Catalog unit themes and badge labels translate, letter badges stay Arabic"
     }
   }
   assert.equal(translateUi("الأَعْدَادُ مِنْ ٠ إِلَى ١٠", "en"), "Numbers 0 to 10");
-  assert.equal(
-    translateUi("الْجَمْع وَالطَّرْح ضِمْنَ ١٠", "en"),
-    "Adding and subtracting within 10",
-  );
+  assert.equal(translateUi("الطَّرْحُ ضِمْنَ الْعَدَدِ ١٠", "en"), "Subtracting within 10");
 });
