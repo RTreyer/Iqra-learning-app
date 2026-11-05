@@ -17,7 +17,7 @@ export function ReviewCard({ count, onPress }: Props) {
     <Pressable
       testID="review-card"
       accessibilityRole="button"
-      accessibilityLabel={`${t("مُرَاجَعَة الْيَوْم")} · ${items}`}
+      accessibilityLabel={`${t("مُرَاجَعَة الْيَوْم")}: ${items}`}
       onPress={onPress}
       style={({ pressed }) => [
         styles.card,

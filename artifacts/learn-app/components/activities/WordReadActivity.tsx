@@ -56,7 +56,7 @@ function WordRead({
       <ProgressDots count={rounds.length} current={quiz.roundIndex} color={color} />
       <UiText
         style={act.instruction}
-      >{`سؤال ${quiz.roundIndex + 1} من ${rounds.length} — اضغط للاستماع ثم اختر`}</UiText>
+      >{`سؤال ${quiz.roundIndex + 1} من ${rounds.length}. اضغط للاستماع ثم اختر`}</UiText>
       <ListenButton text={round.word} color={color} />
       <View style={act.wordChoicesCol}>
         {options.items.map((choice, idx) => (

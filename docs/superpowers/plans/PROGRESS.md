@@ -1,4 +1,4 @@
-# Iqra Rebuild – Execution Progress
+# Iqra Rebuild: Execution Progress
 
 Plan: `docs/superpowers/plans/2026-10-16-iqra-rebuild.md`
 Branch: `main` (owner decision 2026-10-16: commit directly to main, one commit per task, no feature branches, no pushes unless asked)

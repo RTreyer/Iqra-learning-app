@@ -12,7 +12,7 @@ test("lessons get math-u ids and positions", () => {
 });
 
 test("section headings use the book lesson code in Eastern Arabic digits", () => {
-  expect(bookSection(2, 1, "الأَعْدَادُ ١، ٢، ٣")).toBe("٢-١ · الأَعْدَادُ ١، ٢، ٣");
+  expect(bookSection(2, 1, "الأَعْدَادُ ١، ٢، ٣")).toBe("٢-١: الأَعْدَادُ ١، ٢، ٣");
 });
 
 test("picture builders", () => {

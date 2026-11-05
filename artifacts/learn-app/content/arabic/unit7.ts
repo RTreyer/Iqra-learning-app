@@ -340,7 +340,7 @@ export const unit7: Unit = {
   number: 7,
   title: "الوحدة السابعة",
   letters: unit7Letters,
-  theme: "النَّظَافَةُ · أَسْنَانُ وَسِيمٍ · جَارُ الْمَسْجِدِ",
+  theme: "النَّظَافَةُ، أَسْنَانُ وَسِيمٍ، جَارُ الْمَسْجِدِ",
   emoji: "🧼",
   color: COLOR,
   badgeLabel: "ح س ج",

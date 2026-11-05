@@ -259,7 +259,7 @@ export const unit4: Unit = {
   number: 4,
   title: "الوحدة الرابعة",
   letters: unit4Letters,
-  theme: "بَيْتٌ مِنْ رَمْلٍ · ابْنَةٌ أَمِينَةٌ · الْبَقَرَةُ",
+  theme: "بَيْتٌ مِنْ رَمْلٍ، ابْنَةٌ أَمِينَةٌ، الْبَقَرَةُ",
   emoji: "🏖️",
   color: COLOR,
   badgeLabel: "م ب ل",

@@ -1,5 +1,5 @@
 /**
- * ProgressContext — tracks completed lessons, earned stars and review items.
+ * ProgressContext: tracks completed lessons, earned stars and review items.
  *
  * Fully offline: progress lives in React state and is persisted to
  * AsyncStorage on the device. There is no server, login or sync.

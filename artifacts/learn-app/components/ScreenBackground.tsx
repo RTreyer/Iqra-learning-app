@@ -1,5 +1,5 @@
 /**
- * ScreenBackground — gradient backdrop with floating decorative emoji.
+ * ScreenBackground: gradient backdrop with floating decorative emoji.
  *
  * Used on every screen to create a warm, inviting atmosphere.
  * Decorations are subtle (very low opacity) so they don't distract.
@@ -88,7 +88,7 @@ export function ScreenBackground({ subject = "home", children, style }: Props) {
       end={cfg.end}
       style={[styles.base, style]}
     >
-      {/* Floating decorative emoji — purely visual */}
+      {/* Floating decorative emoji, purely visual */}
       {cfg.decos.map((d, i) => (
         <Text
           key={i}

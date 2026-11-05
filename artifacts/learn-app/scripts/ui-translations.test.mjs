@@ -17,7 +17,7 @@ test("English controls and book menus", () => {
   assert.equal(translateUi("إعادة الدرس", "en"), "Repeat lesson");
   assert.equal(translateUi("3 جملة متبقية", "en"), "3 sentences left");
   assert.equal(translateUi("2 كلمة متبقية", "en"), "2 words left");
-  assert.equal(translateUi("اللغة العربية — الجزء الثاني", "en"), "Arabic — Part 2");
+  assert.equal(translateUi("اللغة العربية، الجزء الثاني", "en"), "Arabic, Part 2");
 });
 test("Every grade title translates", async () => {
   const { grades } = await import("../content/index.ts");
@@ -46,8 +46,8 @@ test("Activity instructions are chrome and translate", () => {
   assert.equal(translateUi("سؤال 2 من 5", "en"), "Question 2 of 5");
   assert.equal(translateUi("سؤال 2 من 5", "ar"), "سؤال 2 من 5");
   assert.equal(
-    translateUi("سؤال 1 من 4 — اضغط للاستماع ثم اختر", "en"),
-    "Question 1 of 4 — Tap to listen, then choose",
+    translateUi("سؤال 1 من 4. اضغط للاستماع ثم اختر", "en"),
+    "Question 1 of 4. Tap to listen, then choose",
   );
   assert.equal(translateUi("ابحث عن الحرف", "en"), "Find the letter");
   assert.equal(translateUi("اضغط على كل جملة لتسمعها 🔊", "en"), "Tap each sentence to hear it 🔊");

@@ -31,7 +31,7 @@ type LetterLesson = {
 
 /** Four lessons for one textbook lesson, numbered from `first`. */
 function letterLessons(first: number, l: LetterLesson): Lesson[] {
-  const section = `${l.letter} · ${l.storyTitle}`;
+  const section = `${l.letter}: ${l.storyTitle}`;
   const id = (n: number) => `u2-${first + n}`;
   const forms: TraceTarget[] = l.forms.map((form) => ({ guide: form, label: form, tts: l.sound }));
   return [

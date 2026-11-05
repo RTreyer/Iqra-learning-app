@@ -313,7 +313,7 @@ export const unit6: Unit = {
   number: 6,
   title: "الوحدة السادسة",
   letters: unit6Letters,
-  theme: "مُنِيرٌ وَالْقِرَاءَةُ · صَابِرٌ وَالْبُلْبُلُ · مِصْيَدَةُ مُفِيدٍ",
+  theme: "مُنِيرٌ وَالْقِرَاءَةُ، صَابِرٌ وَالْبُلْبُلُ، مِصْيَدَةُ مُفِيدٍ",
   emoji: "📚",
   color: COLOR,
   badgeLabel: "ق ص ف",

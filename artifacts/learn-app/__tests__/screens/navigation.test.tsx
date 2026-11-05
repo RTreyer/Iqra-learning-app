@@ -66,7 +66,7 @@ test("unit screen renders one row per lesson and opens a lesson", () => {
   expect(screen.getAllByTestId(/^lesson-row-/)).toHaveLength(31);
   // Lessons are grouped by textbook lesson: one heading per letter plus the exercises.
   expect(screen.getAllByTestId(/^section-/)).toHaveLength(8);
-  expect(screen.getByTestId("section-u2-1")).toHaveTextContent("م · أُحِبُّ مَامَا");
+  expect(screen.getByTestId("section-u2-1")).toHaveTextContent("م: أُحِبُّ مَامَا");
   fireEvent.press(screen.getByTestId("lesson-row-u2-3"));
   expect(router.push).toHaveBeenCalledWith(routes.lesson("u2-3"));
 });

@@ -15,7 +15,7 @@ import { shadow } from "@/theme/tokens";
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-/** Widest the app gets in a browser — keeps the phone-portrait layout intact. */
+/** Widest the app gets in a browser: keeps the phone-portrait layout intact. */
 const WEB_MAX_WIDTH = 480;
 
 function RootLayoutNav() {

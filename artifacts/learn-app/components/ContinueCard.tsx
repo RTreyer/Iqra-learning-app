@@ -14,7 +14,7 @@ export function ContinueCard({ next, onPress }: Props) {
   const { t, language } = useLanguage();
   const { book, unit, lesson } = next;
   const accent = subjects[book.subject];
-  const detail = `${t(unit.title)} · ${t(lesson.title)}`;
+  const detail = `${t(unit.title)}: ${t(lesson.title)}`;
   const row = language === "en" ? "row" : "row-reverse";
   const align = language === "en" ? "flex-start" : "flex-end";
   return (

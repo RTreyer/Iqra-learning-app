@@ -16,9 +16,9 @@ export function numberMathLessons(unit: number, drafts: MathLessonDraft[]): Less
   return drafts.map((d, i) => ({ ...d, id: `math-u${unit}-${i + 1}`, number: i + 1 }) as Lesson);
 }
 
-/** Section heading from the book lesson, e.g. "٢-١ · الأَعْدَادُ ١، ٢، ٣". */
+/** Section heading from the book lesson, e.g. "٢-١: الأَعْدَادُ ١، ٢، ٣". */
 export function bookSection(unit: number, lesson: number, title: string): string {
-  return `${toArabicDigits(unit)}-${toArabicDigits(lesson)} · ${title}`;
+  return `${toArabicDigits(unit)}-${toArabicDigits(lesson)}: ${title}`;
 }
 
 export function pics(emoji: string, count: number): MathPic[] {

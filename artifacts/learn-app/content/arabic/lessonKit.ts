@@ -49,7 +49,7 @@ export type LetterLesson = {
  * syllables to words and the missing syllable (when given), sight words, writing the letter, writing whole words.
  */
 export function letterLessons(l: LetterLesson): LessonDraft[] {
-  const section = `${l.letter} · ${l.storyTitle}`;
+  const section = `${l.letter}: ${l.storyTitle}`;
   const forms: TraceTarget[] = l.forms.map((form) => ({ guide: form, label: form, tts: l.sound }));
   const words: TraceTarget[] = l.words.map(([guide, tts]) => ({ guide, label: tts, tts }));
   const lessons: LessonDraft[] = [

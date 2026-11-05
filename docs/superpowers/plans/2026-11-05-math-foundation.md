@@ -1563,7 +1563,7 @@ test("lessons get math-u ids and positions", () => {
 });
 
 test("section headings use the book lesson code in Eastern Arabic digits", () => {
-  expect(bookSection(2, 1, "الأَعْدَادُ ١، ٢، ٣")).toBe("٢-١ · الأَعْدَادُ ١، ٢، ٣");
+  expect(bookSection(2, 1, "الأَعْدَادُ ١، ٢، ٣")).toBe("٢-١, الأَعْدَادُ ١، ٢، ٣");
 });
 
 test("picture builders", () => {
@@ -1597,9 +1597,9 @@ export function numberMathLessons(unit: number, drafts: MathLessonDraft[]): Less
   return drafts.map((d, i) => ({ ...d, id: `math-u${unit}-${i + 1}`, number: i + 1 }) as Lesson);
 }
 
-/** Section heading from the book lesson, e.g. "٢-١ · الأَعْدَادُ ١، ٢، ٣". */
+/** Section heading from the book lesson, e.g. "٢-١, الأَعْدَادُ ١، ٢، ٣". */
 export function bookSection(unit: number, lesson: number, title: string): string {
-  return `${eastern(unit)}-${eastern(lesson)} · ${title}`;
+  return `${eastern(unit)}-${eastern(lesson)}, ${title}`;
 }
 
 export function pics(emoji: string, count: number): MathPic[] {

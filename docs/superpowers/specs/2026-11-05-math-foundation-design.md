@@ -101,7 +101,7 @@ Like `content/arabic/lessonKit.ts`:
 
 - `MATH_COLOR = SUBJECT_COLORS.math`
 - `numberMathLessons(unit, drafts)` assigns `math-u{n}-{k}` ids and `number`.
-- `bookSection(unit, lesson, title)` builds the section heading from the book lesson, e.g. `٢-١ · الأعداد ١، ٢، ٣`.
+- `bookSection(unit, lesson, title)` builds the section heading from the book lesson, e.g. `٢-١, الأعداد ١، ٢، ٣`.
 - Small builders for common rounds (e.g. `pics(emoji, count)`, `shape(id, color, size)`) so unit files stay readable.
 
 ## Validation (`scripts/content.test.mjs`)

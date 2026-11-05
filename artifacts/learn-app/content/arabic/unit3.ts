@@ -247,7 +247,7 @@ export const unit3: Unit = {
   number: 3,
   title: "الوحدة الثالثة",
   letters: unit3Letters,
-  theme: "الْمُعَلِّمَةُ بَيَانُ · أَخِي مَرِيضٌ · دَارُ الأَيْتَامِ",
+  theme: "الْمُعَلِّمَةُ بَيَانُ، أَخِي مَرِيضٌ، دَارُ الأَيْتَامِ",
   emoji: "🤝",
   color: COLOR,
   badgeLabel: "ي و أ",
