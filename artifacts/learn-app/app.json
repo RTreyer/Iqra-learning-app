@@ -7,11 +7,6 @@
     "icon": "./assets/images/icon.png",
     "scheme": "learn-app",
     "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/images/icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#FFFBF0"
-    },
     "android": {
       "package": "com.iqra.yemenlearn",
       "versionCode": 1
@@ -19,7 +14,17 @@
     "web": {
       "favicon": "./assets/images/icon.png"
     },
-    "plugins": ["expo-router"],
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#FFFBF0"
+        }
+      ]
+    ],
     "experiments": {
       "reactCompiler": true
     },

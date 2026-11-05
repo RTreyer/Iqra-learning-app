@@ -3,7 +3,7 @@
  */
 
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useMemo } from "react";
+import React from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { BackButton } from "@/components/BackButton";
@@ -28,13 +28,9 @@ export default function BookScreen() {
 
   const book = getBook(bookId ?? "");
   const grade = getGradeOfBook(bookId ?? "");
-  const units = useMemo(
-    () =>
-      book
-        ? book.units.map((unit) => ({ unit, progress: getUnitProgress(unitLessonIds(unit)) }))
-        : [],
-    [book, getUnitProgress],
-  );
+  const units = book
+    ? book.units.map((unit) => ({ unit, progress: getUnitProgress(unitLessonIds(unit)) }))
+    : [];
 
   if (!book) return <NotFoundCard message="الكتاب غير موجود" />;
 

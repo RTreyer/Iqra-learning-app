@@ -75,6 +75,9 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
     speak(target.tts);
   }, [target.tts, targetIndex]);
 
+  // The compiler lint takes the gesture builder's callbacks for code that runs during render,
+  // so it flags their ref access. They only run on touch, so the rules are off for this block.
+  /* eslint-disable react-hooks/refs, react-hooks/preserve-manual-memoization */
   const gesture = useMemo(() => {
     const flush = () => {
       frame.current = null;
@@ -107,6 +110,7 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
         if (stroke) setStrokes((prev) => [...prev, stroke]);
       });
   }, []);
+  /* eslint-enable react-hooks/refs, react-hooks/preserve-manual-memoization */
 
   const handleLayout = useCallback((e: LayoutChangeEvent) => {
     const next = Math.min(PAD_MAX, Math.floor(e.nativeEvent.layout.width));

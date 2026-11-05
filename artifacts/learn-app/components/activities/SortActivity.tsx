@@ -23,7 +23,7 @@ function Sort({ lesson, color, onComplete }: ActivityProps<"sort">) {
   const [placed, setPlaced] = useState<boolean[]>(() => lesson.items.map(() => false));
   const missed = useRef<Set<number>>(new Set());
   const [wrongBox, setWrongBox] = useState<number | null>(null);
-  const shakes = useRef<Animated.Value[]>([new Animated.Value(0), new Animated.Value(0)]).current;
+  const [shakes] = useState(() => [new Animated.Value(0), new Animated.Value(0)]);
   const wrongTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const callbacks = useLatest({ onComplete });
   useInstruction(lesson.prompt);
