@@ -197,3 +197,24 @@ test("sort checks every item and box picture", () => {
     }),
   ).toEqual(["quarter not allowed on a triangle", "quarter not allowed on a triangle"]);
 });
+
+test("a pattern row has 2 to 8 valid pictures", () => {
+  const round = {
+    prompt: "مَا التَّالِي؟",
+    choices: [[apple], [{ emoji: "🍏" }]],
+    correctIndex: 0,
+  };
+  expect(validatePictureChoice({ ...round, pattern: [apple, { emoji: "🍏" }] })).toEqual([]);
+  expect(validatePictureChoice({ ...round, pattern: [apple] })).toEqual([
+    "pattern needs 2 to 8 pictures",
+  ]);
+  expect(validatePictureChoice({ ...round, pattern: Array(9).fill(apple) })).toEqual([
+    "pattern needs 2 to 8 pictures",
+  ]);
+  expect(
+    validatePictureChoice({
+      ...round,
+      pattern: [apple, { shape: "triangle", color: "red", shaded: "quarter" }],
+    }),
+  ).toEqual(["quarter not allowed on a triangle"]);
+});

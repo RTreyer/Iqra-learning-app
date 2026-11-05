@@ -101,6 +101,8 @@ export type PictureChoiceRound = {
   correctIndex: number;
   /** Keep the choices in reading order (first on the right) as one row, up to 10: ordinal numbers. */
   ordered?: boolean;
+  /** A row shown above the choices in reading order, then an empty slot: "what comes next?". 2 to 8 pictures. */
+  pattern?: MathPic[];
 };
 
 /** One side of a comparison: a group of pictures or a number. */

@@ -19,6 +19,9 @@ export function checkPrompt(prompt: string): string[] {
 export const MAX_CHOICES = 4;
 /** Ordered rows (ordinal numbers) show up to ten pictures. */
 export const MAX_ORDERED_CHOICES = 10;
+/** A pattern row ("what comes next?") shows 2 to 8 pictures and its empty slot on one line. */
+export const MIN_PATTERN = 2;
+export const MAX_PATTERN = 8;
 
 /** Quarter shading is drawn as the top right 50x50 square, which only fits circle, square, rectangle. */
 export function checkPic(pic: MathPic): string[] {
@@ -36,6 +39,12 @@ export function validatePictureChoice(round: PictureChoiceRound): string[] {
   if (round.choices.filter((c) => c.length === 0).length > 1)
     problems.push("more than one empty choice");
   if (round.model) problems.push(...checkPic(round.model));
+  if (round.pattern) {
+    const len = round.pattern.length;
+    if (len < MIN_PATTERN || len > MAX_PATTERN)
+      problems.push(`pattern needs ${MIN_PATTERN} to ${MAX_PATTERN} pictures`);
+    for (const pic of round.pattern) problems.push(...checkPic(pic));
+  }
   for (const choice of round.choices) for (const pic of choice) problems.push(...checkPic(pic));
   return problems;
 }
