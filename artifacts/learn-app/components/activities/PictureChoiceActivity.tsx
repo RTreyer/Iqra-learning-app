@@ -14,6 +14,16 @@ import { useShuffled } from "./shared/useShuffled";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import type { ActivityProps } from "./types";
 
+const ORDERED_GAP = 4;
+const ORDERED_CARD = 48;
+const ORDERED_PER_LINE = 5;
+
+/** Width that fits up to 5 compact cards per line, so 10 read 1 to 5, then 6 to 10. */
+function orderedRowWidth(count: number) {
+  const n = Math.min(count, ORDERED_PER_LINE);
+  return n * ORDERED_CARD + (n - 1) * ORDERED_GAP;
+}
+
 /** Tap the right picture: odd one out, same as the model, what comes next, the bigger group. */
 function PictureChoice({
   lesson,
@@ -59,7 +69,14 @@ function PictureChoice({
           <MathPic pic={round.model} />
         </View>
       ) : null}
-      <View style={[act.choicesRow, styles.rtl, round.ordered && styles.nowrap]}>
+      <View
+        testID={round.ordered ? "picture-choice-ordered-row" : undefined}
+        style={[
+          act.choicesRow,
+          styles.rtl,
+          round.ordered && [styles.ordered, { width: orderedRowWidth(shuffled.items.length) }],
+        ]}
+      >
         {shuffled.items.map((pics, idx) => (
           <PicCard
             key={idx}
@@ -88,6 +105,11 @@ const styles = StyleSheet.create({
     borderStyle: "dashed",
     borderColor: colors.border,
   },
-  nowrap: { flexWrap: "nowrap", gap: 4 },
+  ordered: {
+    flexWrap: "wrap",
+    justifyContent: "flex-start",
+    gap: ORDERED_GAP,
+    alignSelf: "center",
+  },
   rtl: { flexDirection: "row-reverse" },
 });

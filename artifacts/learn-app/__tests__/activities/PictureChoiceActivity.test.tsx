@@ -117,3 +117,20 @@ test("the empty card is a button named empty and can be the answer", () => {
   act(() => jest.advanceTimersByTime(900));
   expect(onComplete).toHaveBeenCalledWith({ correct: 1, total: 1 });
 });
+
+test("an ordered row wraps in reading order, five cards per line", () => {
+  renderActivity(
+    <PictureChoiceActivity
+      lesson={{ ...orderedLesson, rounds: [orderedLesson.rounds[0]] }}
+      color="#7C3AED"
+      attemptKey="d:1"
+      onComplete={jest.fn()}
+    />,
+  );
+  expect(screen.getByTestId("picture-choice-ordered-row")).toHaveStyle({
+    flexDirection: "row-reverse",
+    flexWrap: "wrap",
+    justifyContent: "flex-start",
+    width: 256,
+  });
+});
