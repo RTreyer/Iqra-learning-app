@@ -123,7 +123,7 @@ const drafts: MathLessonDraft[] = [
     section: s1,
     type: "picture_choice",
     title: "لَهُ الشَّكْلُ نَفْسُهُ",
-    subtitle: "أُحَوِّطُ الشَّيْءَ الَّذِي يُشْبِهُ الْمُجَسَّمَ",
+    subtitle: "أَخْتَارُ الشَّيْءَ الَّذِي يُشْبِهُ الْمُجَسَّمَ",
     emoji: "🥫",
     color,
     rounds: [
@@ -643,7 +643,7 @@ const drafts: MathLessonDraft[] = [
     section: s5,
     type: "picture_choice",
     title: "أَيُّ شَكْلٍ نِصْفُهُ مُلَوَّنٌ؟",
-    subtitle: "أُحَوِّطُ النِّصْفَ",
+    subtitle: "أَخْتَارُ النِّصْفَ",
     emoji: "🌓",
     color,
     rounds: [
@@ -709,7 +709,7 @@ const drafts: MathLessonDraft[] = [
     section: s6,
     type: "picture_choice",
     title: "أَيُّ شَكْلٍ رُبْعُهُ مُلَوَّنٌ؟",
-    subtitle: "أُحَوِّطُ الرُّبْعَ",
+    subtitle: "أَخْتَارُ الرُّبْعَ",
     emoji: "🟦",
     color,
     rounds: [
@@ -851,8 +851,8 @@ const drafts: MathLessonDraft[] = [
   {
     section: TEST,
     type: "listen_pick",
-    title: "الْمُجَسَّمَاتُ",
-    subtitle: "أَسْمَعُ الاسْمَ وَأَخْتَارُ",
+    title: "اخْتِبَارُ الْوَحْدَةِ",
+    subtitle: "الْمُجَسَّمَاتُ: أَسْمَعُ الاسْمَ وَأَخْتَارُ",
     emoji: "📝",
     color,
     questions: [
@@ -866,7 +866,7 @@ const drafts: MathLessonDraft[] = [
     section: TEST,
     type: "picture_choice",
     title: "الأَشْكَالُ وَالْكُسُورُ",
-    subtitle: "أُحَوِّطُ الْجَوَابَ",
+    subtitle: "أَخْتَارُ الْجَوَابَ",
     emoji: "📝",
     color,
     rounds: [

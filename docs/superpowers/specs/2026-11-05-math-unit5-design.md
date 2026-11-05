@@ -32,6 +32,7 @@ File `content/math/bookUnit5.ts`, built with `mathKit.ts`. Unit number 5, title 
 
 - **Unequal parts** (Ahmad's mistake, the triangle cut into 4 with a middle piece): `shaded` always draws equal parts, so "is it a half?" is asked with halves, quarters and whole shapes instead.
 - **Patterns**: `picture_choice` shows one model, not a row, so the child picks the row whose last picture continues the pattern (3 rows of 5 small pictures, under the ten frame limit of 6).
+- **Ringing the answer** (أُحَوِّطُ) is tapping in the app, so subtitles say أَخْتَارُ, as in Units 2 to 4. The first unit test lesson is titled اخْتِبَارُ الْوَحْدَةِ, as in the other units.
 - **Colouring** (5-2, 5-4, unit test car): became choosing the shape coloured by the key.
 - **Who ate more**: the book's equal halves round plus three rounds comparing a half with a quarter (bread, orange) and two quarters (cake).
 - Left out: building a cuboid from 8 cubes (needs real cubes), the tangram fox (p. 129), the fraction missing from a circle, the quarter circle patterns, the enrichment bars of 8 parts, the reteaching page.

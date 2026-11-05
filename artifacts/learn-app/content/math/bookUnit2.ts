@@ -1,4 +1,4 @@
-// Book Unit 2 الأعداد (٠ - ١٠), الرياضيات Part 1 (Sana'a 2026), pp. 33 to 64.
+// Book Unit 2 الأعداد (٠ إلى ١٠), الرياضيات Part 1 (Sana'a 2026), pp. 33 to 64.
 // Notes: docs/content/textbooks/math-part1/unit-02.md. Review status: docs/CONTENT_REVIEW.md
 // Every book lesson is a section of app lessons, in book order. The objects, numbers and
 // examples are the book's; the Egyptian pyramids (9, p. 46) are left out for Yemeni and
@@ -78,7 +78,10 @@ const GEN = [
 ];
 
 const COUNT_SUBTITLE = "أَعُدُّ وَأَخْتَارُ الْعَدَدَ";
-const MISSING = "مَا الْعَدَدُ النَّاقِصُ؟";
+/** Fill in the missing number: the prompt, and the subtitle without the full stop. */
+const MISSING = "أُكْمِلُ بِالْعَدَدِ الْمُنَاسِبِ.";
+const MISSING_SUBTITLE = "أُكْمِلُ بِالْعَدَدِ الْمُنَاسِبِ";
+const BY_TWOS = "أَعُدُّ اثْنَيْنِ اثْنَيْنِ وَأُكْمِلُ.";
 
 /** A counting round: `count` pictures of `emoji`, answered from `options`. */
 const count = (emoji: string, n: number, options: number[]): CountingRound => ({
@@ -431,7 +434,7 @@ const drafts: MathLessonDraft[] = [
     section: s7,
     type: "number_fill",
     title: "أُرَتِّبُ الأَعْدَادَ",
-    subtitle: MISSING,
+    subtitle: MISSING_SUBTITLE,
     emoji: "🧮",
     color,
     rounds: [
@@ -512,14 +515,14 @@ const drafts: MathLessonDraft[] = [
     section: s10,
     type: "number_fill",
     title: "أَعُدُّ اثْنَيْنِ اثْنَيْنِ",
-    subtitle: MISSING,
+    subtitle: MISSING_SUBTITLE,
     emoji: "🦶",
     color,
     rounds: [
-      row([2, 4, "?", 8], [6, 5, 7], "أَعُدُّ اثْنَيْنِ اثْنَيْنِ: مَا الْعَدَدُ النَّاقِصُ؟"),
-      row([4, 6, 8, "?"], [9, 10, 8], "أَعُدُّ اثْنَيْنِ اثْنَيْنِ: مَا الْعَدَدُ النَّاقِصُ؟"),
-      row([9, 7, "?", 3], [6, 4, 5], "أَعُدُّ اثْنَيْنِ اثْنَيْنِ: مَا الْعَدَدُ النَّاقِصُ؟"),
-      row([5, "?", 1], [2, 3, 4], "أَعُدُّ اثْنَيْنِ اثْنَيْنِ: مَا الْعَدَدُ النَّاقِصُ؟"),
+      row([2, 4, "?", 8], [6, 5, 7], BY_TWOS),
+      row([4, 6, 8, "?"], [9, 10, 8], BY_TWOS),
+      row([9, 7, "?", 3], [6, 4, 5], BY_TWOS),
+      row([5, "?", 1], [2, 3, 4], BY_TWOS),
     ],
   },
   {
@@ -573,7 +576,7 @@ const drafts: MathLessonDraft[] = [
     section: TEST,
     type: "number_fill",
     title: "أُكْمِلُ الأَعْدَادَ",
-    subtitle: MISSING,
+    subtitle: MISSING_SUBTITLE,
     emoji: "📝",
     color,
     rounds: [

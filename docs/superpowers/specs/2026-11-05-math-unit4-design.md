@@ -8,7 +8,7 @@ Source: الرياضيات، الصف الأول، الجزء الأول (Sana'a
 
 File `content/math/bookUnit4.ts`, built with `mathKit.ts`. Unit number 4, title الْوَحْدَةُ الرَّابِعَةُ, theme الطَّرْحُ ضِمْنَ الْعَدَدِ ١٠, badge أَطْرَحُ, 23 lessons. Every lesson has a `section` from `bookSection(4, n, title)`; the test lessons have اخْتِبَارُ الْوَحْدَةِ. No foundation changes: only the existing types are used.
 
-The book's method is kept: taken objects are **crossed out** (`number_fill` rounds with `pics`, the last `b` pictures `crossed: true`), and the child reads the sentence `a - b = c` under the picture. Groups of 6 or more show as a ten frame. Only the task is spoken (كَمِ الْبَاقِي؟، أَطْرَحُ رَأْسِيًّا: كَمْ يُسَاوِي؟، أُكْمِلُ بِالْعَدَدِ الْمُنَاسِبِ.); story prompts name what happened without numbers (طَارَتْ بَالُونَاتٌ. كَمِ الْبَاقِي؟).
+The book's method is kept: taken objects are **crossed out** (`number_fill` rounds with `pics`, the last `b` pictures `crossed: true`), and the child reads the sentence `a - b = c` under the picture. Groups of 6 or more show as a ten frame. Only the task is spoken (كَمِ الْبَاقِي؟، أَطْرَحُ رَأْسِيًّا: كَمِ الْبَاقِي؟، أُكْمِلُ بِالْعَدَدِ الْمُنَاسِبِ.); story prompts name what happened without numbers (طَارَتْ بَالُونَاتٌ. كَمِ الْبَاقِي؟).
 
 | Book lesson | App lessons (type) |
 |---|---|
@@ -24,6 +24,7 @@ The book's method is kept: taken objects are **crossed out** (`number_fill` roun
 
 ## Adapted or left out
 
+- Prompts match Unit 3: a plain difference asks كَمِ الْبَاقِي؟ (أَطْرَحُ أُفُقِيًّا / رَأْسِيًّا: كَمِ الْبَاقِي؟ where the book contrasts the two forms), as a plain sum asks كَمِ الْمَجْمُوعُ؟; a missing number is أُكْمِلُ بِالْعَدَدِ الْمُنَاسِبِ. in Units 2 to 4.
 - Word form ٥ نَاقِص ٢ يُسَاوِي ٣ appears as a lesson subtitle (shown, not spoken), so prompts never read the sentence aloud. `arithmetic` is not used: it speaks the whole sentence.
 - Joining lines (join subtractions to ٢، ٤، ١، ٧) became `picture_choice`: in which crossed picture is n left.
 - The book's tables (العدد، ناقص، العدد، يساوي، الناتج) became short runs of facts, not all of them: 3 to 6 rounds per lesson.

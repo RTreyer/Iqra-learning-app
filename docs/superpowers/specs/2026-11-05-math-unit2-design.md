@@ -2,7 +2,7 @@
 
 Date: 2026-11-05. Status: approved by the owner. Step 2 of the math rebuild (see `2026-11-05-math-foundation-design.md`).
 
-Source: الرياضيات، الصف الأول، الجزء الأول (Sana'a 2026), Unit 2 الأعداد (٠ - ١٠), printed pp. 33 to 64. Notes: `docs/content/textbooks/math-part1/unit-02.md`.
+Source: الرياضيات، الصف الأول، الجزء الأول (Sana'a 2026), Unit 2 الأعداد (٠ إلى ١٠), printed pp. 33 to 64. Notes: `docs/content/textbooks/math-part1/unit-02.md`.
 
 ## Foundation additions
 
@@ -31,7 +31,7 @@ File `content/math/bookUnit2.ts`, built with `mathKit.ts`. Unit number 2, title 
 
 Left out: the bar chart (enrichment), counting letters in words, dot to dot, colouring, colour patterns, the race and the children on the stairs. Adapted: the 9 pyramids (Egyptian) replaced by cars, sweets and keys; the rabbits for the 4th, 6th and 8th became cats; number rows have at most 4 cells (a row does not wrap).
 
-Content rules: Eastern Arabic digits; prompts in fully vowelled Arabic using the book's terms (أَعُدُّ، أُحَوِّطُ، أَصِلُ، أَكْبَرُ مِنْ، أَصْغَرُ مِنْ، يُسَاوِي، الأَوَّلُ … الْعَاشِرُ); 3 to 6 rounds per lesson; pictures are emoji, Yemeni where possible (✈️ Yemenia aircraft, 🌾 sorghum, 🇾🇪 flags, 🐦 hoopoe stamp). The `<` sign follows the book: the open side faces the bigger number, `first` is on the right (`CompareSymbol`). Compare prompts name the first side first and, in words mode, offer all three answers aloud, since the child cannot read the buttons: "الدَّعَاسِيقُ أَكْثَرُ أَمْ أَقَلُّ أَمْ تُسَاوِي السَّلَاحِفَ؟", "الْخَمْسَةُ أَكْبَرُ أَمْ أَصْغَرُ أَمْ تُسَاوِي الثَّلَاثَةَ؟"; symbols mode asks "أَيُّ إِشَارَةٍ بَيْنَ خَمْسَةٍ وَثَلَاثَةٍ؟".
+Content rules: Eastern Arabic digits; prompts in fully vowelled Arabic using the book's terms (أَعُدُّ، أُحَوِّطُ، أَصِلُ، أَكْبَرُ مِنْ، أَصْغَرُ مِنْ، يُسَاوِي، الأَوَّلُ … الْعَاشِرُ); 3 to 6 rounds per lesson; pictures are emoji, Yemeni where possible (✈️ Yemenia aircraft, 🌾 sorghum, 🇾🇪 flags, 🐦 hoopoe stamp). The `<` sign follows the book: the open side faces the bigger number, `first` is on the right (`CompareSymbol`). Compare prompts name the first side first and, in words mode, offer all three answers aloud, since the child cannot read the buttons: "الدَّعَاسِيقُ أَكْثَرُ أَمْ أَقَلُّ أَمْ تُسَاوِي السَّلَاحِفَ؟", "الْخَمْسَةُ أَكْبَرُ أَمْ أَصْغَرُ أَمْ تُسَاوِي الثَّلَاثَةَ؟"; symbols mode asks "أَيُّ إِشَارَةٍ بَيْنَ خَمْسَةٍ وَثَلَاثَةٍ؟". Missing number rows say "أُكْمِلُ بِالْعَدَدِ الْمُنَاسِبِ." (counting in twos: "أَعُدُّ اثْنَيْنِ اثْنَيْنِ وَأُكْمِلُ."), the same wording as Units 3 and 4; "مَا الْعَدَدُ النَّاقِصُ؟" is not used, since نَاقِص is the word for minus.
 
 ## Replacing the old units
 

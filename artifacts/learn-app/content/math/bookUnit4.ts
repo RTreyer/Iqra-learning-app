@@ -31,14 +31,14 @@ const NOM = [
 ];
 
 const LEFT = "كَمِ الْبَاقِي؟";
-const ROW = "أَطْرَحُ: كَمْ يُسَاوِي؟";
-const ACROSS = "أَطْرَحُ أُفُقِيًّا: كَمْ يُسَاوِي؟";
-const DOWN = "أَطْرَحُ رَأْسِيًّا: كَمْ يُسَاوِي؟";
+const ACROSS = "أَطْرَحُ أُفُقِيًّا: كَمِ الْبَاقِي؟";
+const DOWN = "أَطْرَحُ رَأْسِيًّا: كَمِ الْبَاقِي؟";
 const COMPLETE = "أُكْمِلُ بِالْعَدَدِ الْمُنَاسِبِ.";
 const AT_START = "كَمْ كَانَ فِي الْبِدَايَةِ؟";
 const TAKEN = "كَمْ ذَهَبَ؟";
-const PATTERN = "أُلَاحِظُ النَّمَطَ: كَمْ يُسَاوِي؟";
+const PATTERN = "أُلَاحِظُ النَّمَطَ: كَمِ الْبَاقِي؟";
 const BACK = "أَعُدُّ إِلَى الْوَرَاءِ وَأُكْمِلُ.";
+const BY_TWOS = "أَعُدُّ اثْنَيْنِ اثْنَيْنِ وَأُكْمِلُ.";
 const BACK_2 = "أَعُدُّ إِلَى الْوَرَاءِ اثْنَيْنِ اثْنَيْنِ وَأُكْمِلُ.";
 
 /** `total` pictures; the last `taken` are crossed out (taken away). */
@@ -202,7 +202,7 @@ const drafts: MathLessonDraft[] = [
     color,
     rounds: [
       fact(5, 2, ACROSS),
-      fact(5, 2, "الْجَوَابُ نَفْسُهُ. أَطْرَحُ رَأْسِيًّا: كَمْ يُسَاوِي؟", "vertical"),
+      fact(5, 2, `الْجَوَابُ نَفْسُهُ. ${DOWN}`, "vertical"),
       fact(4, 1, ACROSS),
       fact(4, 1, DOWN, "vertical"),
       fact(3, 2, DOWN, "vertical"),
@@ -361,11 +361,11 @@ const drafts: MathLessonDraft[] = [
     emoji: "➖",
     color,
     rounds: [
-      fact(8, 3, ROW),
+      fact(8, 3, LEFT),
       fact(9, 4, DOWN, "vertical"),
-      fact(10, 6, ROW),
+      fact(10, 6, LEFT),
       fact(6, 4, DOWN, "vertical"),
-      fact(7, 5, ROW),
+      fact(7, 5, LEFT),
       fact(9, 9, DOWN, "vertical"),
     ],
   },
@@ -490,7 +490,7 @@ const drafts: MathLessonDraft[] = [
       story(LEFT, "✏️", 6, 2),
       story("لَمْ يَطِرْ أَيُّ بَالُونٍ. كَمِ الْبَاقِي؟", "🎈", 4, 0),
       story(LEFT, "⚽", 5, 3),
-      fact(10, 4, ROW),
+      fact(10, 4, LEFT),
       fact(8, 7, DOWN, "vertical"),
     ],
   },
@@ -502,10 +502,10 @@ const drafts: MathLessonDraft[] = [
     emoji: "🦋",
     color,
     rounds: [
-      fact(7, 5, ROW),
-      fact(9, 5, ROW),
-      fact(8, 2, ROW),
-      fact(10, 2, ROW),
+      fact(7, 5, LEFT),
+      fact(9, 5, LEFT),
+      fact(8, 2, LEFT),
+      fact(10, 2, LEFT),
       fact(8, 5, "الْبَاقِي ثَلَاثَةٌ. أُكْمِلُ بِالْعَدَدِ الْمُنَاسِبِ.", "row", "b"),
       fact(6, 3, "الْبَاقِي ثَلَاثَةٌ. أُكْمِلُ بِالْعَدَدِ الْمُنَاسِبِ.", "row", "a"),
     ],
@@ -534,11 +534,11 @@ const drafts: MathLessonDraft[] = [
     emoji: "📝",
     color,
     rounds: [
-      fact(8, 4, ROW),
-      fact(7, 1, ROW),
+      fact(8, 4, LEFT),
+      fact(7, 1, LEFT),
       fact(9, 5, DOWN, "vertical"),
       fact(10, 3, DOWN, "vertical"),
-      fact(6, 0, ROW),
+      fact(6, 0, LEFT),
       fact(5, 5, DOWN, "vertical"),
     ],
   },
@@ -550,7 +550,7 @@ const drafts: MathLessonDraft[] = [
     emoji: "📝",
     color,
     rounds: [
-      row([2, 4, 6, "?"], 8, "أَعُدُّ اثْنَيْنِ اثْنَيْنِ وَأُكْمِلُ."),
+      row([2, 4, 6, "?"], 8, BY_TWOS),
       row([9, 8, "?", 6], 7, BACK),
       row([8, 6, "?", 2], 4, BACK_2),
       row([5, 4, 3, "?"], 2, BACK),

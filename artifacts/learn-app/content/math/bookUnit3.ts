@@ -2,15 +2,9 @@
 // Notes: docs/content/textbooks/math-part1/unit-03.md. Review status: docs/CONTENT_REVIEW.md
 // Every book lesson is a section of app lessons, in book order, with the book's objects and
 // sums. Sums are cells in reading order: [3, "+", 2, "=", "?"] shows ٣ + ٢ = ؟ from the right.
-// Prompts give the task only; the child reads the number sentence. The two `arithmetic`
-// lessons keep their spoken word form, the book's "٣ زائد ٢ يساوي ٥".
-import type {
-  ArithmeticRound,
-  MathPic,
-  NumberFillRound,
-  PictureChoiceRound,
-  Unit,
-} from "../types.ts";
+// Prompts give the task only; the child reads the number sentence. The book's word form
+// "٣ زائد ٢ يساوي ٥" is a subtitle, shown and not spoken.
+import type { MathPic, NumberFillRound, PictureChoiceRound, Unit } from "../types.ts";
 import {
   MATH_COLOR,
   bookSection,
@@ -23,10 +17,15 @@ import {
 const color = MATH_COLOR;
 
 const SUM = "كَمِ الْمَجْمُوعُ؟";
-const MISSING = "مَا الْعَدَدُ النَّاقِصُ؟";
-const COMPLETE = "أُكْمِلُ: مَا الْعَدَدُ النَّاقِصُ؟";
+const DOWN = "أَجْمَعُ رَأْسِيًّا: كَمِ الْمَجْمُوعُ؟";
+/** Fill in the missing number: the prompt, and the subtitle without the full stop. */
+const COMPLETE = "أُكْمِلُ بِالْعَدَدِ الْمُنَاسِبِ.";
+const COMPLETE_SUBTITLE = "أُكْمِلُ بِالْعَدَدِ الْمُنَاسِبِ";
 const SWAPPED = "بَدَّلْنَا الْعَدَدَيْنِ. كَمِ الْمَجْمُوعُ؟";
-const PICK_GROUP = "أَسْتَمِعُ وَأَخْتَارُ الْمَجْمُوعَةَ";
+const PICK_GROUP = "أَسْمَعُ وَأَخْتَارُ الْمَجْمُوعَةَ";
+const OTHER_PART = "مَا الْجُزْءُ الآخَرُ؟";
+/** "أَعُدُّ الأَزْهَارَ الصَّفْرَاءَ وَأُكْمِلُ.": count one colour, then fill in the gap. */
+const countAndComplete = (nounAcc: string) => `أَعُدُّ ${nounAcc} وَأُكْمِلُ.`;
 
 /** "أَجْمَعُ الزَّرَافَاتِ. كَمِ الْمَجْمُوعُ؟" for a picture story; the noun is accusative. */
 const addThe = (nounAcc: string) => `أَجْمَعُ ${nounAcc}. ${SUM}`;
@@ -35,7 +34,10 @@ type Opts = { prompt?: string; pics?: MathPic[]; vertical?: boolean };
 
 /** a + b = ?, in a row or vertical, with an optional picture story. */
 function add(a: number, b: number, options: number[], opts: Opts = {}): NumberFillRound {
-  return sentence([a, "+", b, "=", "?"], options, { prompt: SUM, ...opts });
+  return sentence([a, "+", b, "=", "?"], options, {
+    prompt: opts.vertical ? DOWN : SUM,
+    ...opts,
+  });
 }
 
 /** A sum with one addend missing: a + ? = c or ? + b = c. */
@@ -61,7 +63,7 @@ function sentence(cells: NumberFillRound["cells"], options: number[], opts: Opts
 
 /** A counting row with one gap. */
 const pattern = (cells: NumberFillRound["cells"], options: number[]): NumberFillRound => ({
-  prompt: "أَكْتَشِفُ النَّمَطَ. مَا الْعَدَدُ النَّاقِصُ؟",
+  prompt: "أُلَاحِظُ النَّمَطَ وَأُكْمِلُ.",
   cells,
   layout: "sequence",
   options,
@@ -88,13 +90,6 @@ const parts = (
 function joinStory(prompt: string, emoji: string, n: number, counts: number[]): PictureChoiceRound {
   return { prompt, choices: counts.map((c) => pics(emoji, c)), correctIndex: counts.indexOf(n) };
 }
-
-const plus = (a: number, b: number, options: number[]): ArithmeticRound => ({
-  a,
-  b,
-  op: "+",
-  options,
-});
 
 const s1 = bookSection(3, 1, "التَّهْيِئَةُ لِلْجَمْعِ");
 const s2 = bookSection(3, 2, "الْجَمْعُ ضِمْنَ ٥");
@@ -177,7 +172,7 @@ const drafts: MathLessonDraft[] = [
     section: s2,
     type: "number_fill",
     title: "أَجْمَعُ ضِمْنَ ٥",
-    subtitle: "٣ زَائِدُ ٢ يُسَاوِي ٥",
+    subtitle: "٣ زَائِد ٢ يُسَاوِي ٥",
     emoji: "➕",
     color,
     rounds: [
@@ -213,24 +208,24 @@ const drafts: MathLessonDraft[] = [
   },
   {
     section: s2,
-    type: "arithmetic",
-    title: "زَائِدُ وَيُسَاوِي",
-    subtitle: "٣ زَائِدُ ٢ يُسَاوِي ٥",
-    emoji: "🗣️",
+    type: "number_fill",
+    title: "زَائِد وَيُسَاوِي",
+    subtitle: "٣ زَائِد ٢ يُسَاوِي ٥",
+    emoji: "➕",
     color,
     rounds: [
-      plus(1, 2, [3, 2, 4]),
-      plus(2, 2, [4, 3, 5]),
-      plus(3, 2, [5, 4, 6]),
-      plus(1, 4, [5, 6, 4]),
-      plus(2, 3, [4, 5, 6]),
+      add(1, 2, [3, 2, 4]),
+      add(2, 2, [4, 3, 5]),
+      add(3, 2, [5, 4, 6]),
+      add(1, 4, [5, 6, 4]),
+      add(2, 3, [4, 5, 6]),
     ],
   },
   {
     section: s2,
     type: "number_fill",
-    title: "أُفَكِّرُ: الْعَدَدُ النَّاقِصُ",
-    subtitle: "أُكْمِلُ الْجُمْلَةَ",
+    title: "أُفَكِّرُ",
+    subtitle: COMPLETE_SUBTITLE,
     emoji: "🤔",
     color,
     rounds: [
@@ -314,8 +309,8 @@ const drafts: MathLessonDraft[] = [
   {
     section: s4,
     type: "number_fill",
-    title: "أُفَكِّرُ: الْعَدَدُ النَّاقِصُ",
-    subtitle: "أُكْمِلُ الْجُمْلَةَ",
+    title: "أُفَكِّرُ",
+    subtitle: COMPLETE_SUBTITLE,
     emoji: "🤔",
     color,
     rounds: [
@@ -384,27 +379,27 @@ const drafts: MathLessonDraft[] = [
     color,
     rounds: [
       addend(0, "?", 6, [6, 5, 0], {
-        prompt: `أَعُدُّ الأَزْهَارَ الصَّفْرَاءَ. ${MISSING}`,
+        prompt: countAndComplete("الأَزْهَارَ الصَّفْرَاءَ"),
         pics: pics("🌼", 6),
       }),
       addend(1, "?", 6, [4, 5, 6], {
-        prompt: `أَعُدُّ الأَزْهَارَ الصَّفْرَاءَ. ${MISSING}`,
+        prompt: countAndComplete("الأَزْهَارَ الصَّفْرَاءَ"),
         pics: two("🌹", 1, "🌼", 5),
       }),
       addend(2, "?", 6, [4, 3, 5], {
-        prompt: `أَعُدُّ الأَزْهَارَ الصَّفْرَاءَ. ${MISSING}`,
+        prompt: countAndComplete("الأَزْهَارَ الصَّفْرَاءَ"),
         pics: two("🌹", 2, "🌼", 4),
       }),
       addend(3, "?", 6, [2, 3, 4], {
-        prompt: `أَعُدُّ الأَزْهَارَ الصَّفْرَاءَ. ${MISSING}`,
+        prompt: countAndComplete("الأَزْهَارَ الصَّفْرَاءَ"),
         pics: two("🌹", 3, "🌼", 3),
       }),
       addend(2, "?", 7, [5, 4, 6], {
-        prompt: `أَعُدُّ الدَّوَائِرَ الزَّرْقَاءَ. ${MISSING}`,
+        prompt: countAndComplete("الدَّوَائِرَ الزَّرْقَاءَ"),
         pics: parts("circle", 2, 5),
       }),
       addend(4, "?", 7, [2, 3, 4], {
-        prompt: `أَعُدُّ الدَّوَائِرَ الزَّرْقَاءَ. ${MISSING}`,
+        prompt: countAndComplete("الدَّوَائِرَ الزَّرْقَاءَ"),
         pics: parts("circle", 4, 3),
       }),
     ],
@@ -451,16 +446,16 @@ const drafts: MathLessonDraft[] = [
     rounds: [
       add(3, 4, [7, 6, 8], { prompt: "مَا الْكُلُّ؟", pics: parts("circle", 3, 4) }),
       addend(3, "?", 7, [3, 4, 5], {
-        prompt: "مَا الْجُزْءُ النَّاقِصُ؟",
+        prompt: OTHER_PART,
         pics: pics("🟡", 7),
       }),
       add(2, 4, [5, 6, 7], { prompt: "مَا الْكُلُّ؟", pics: parts("circle", 2, 4) }),
       addend(5, "?", 8, [3, 2, 4], {
-        prompt: "مَا الْجُزْءُ النَّاقِصُ؟",
+        prompt: OTHER_PART,
         pics: pics("🟡", 8),
       }),
       addend("?", 4, 9, [4, 5, 6], {
-        prompt: "مَا الْجُزْءُ النَّاقِصُ؟",
+        prompt: OTHER_PART,
         pics: pics("🟡", 9),
       }),
     ],
@@ -512,23 +507,23 @@ const drafts: MathLessonDraft[] = [
     color,
     rounds: [
       addend(5, "?", 5, [0, 1, 5], {
-        prompt: `أَعُدُّ الْمُكَعَّبَاتِ الزَّرْقَاءَ. ${MISSING}`,
+        prompt: countAndComplete("الْمُكَعَّبَاتِ الزَّرْقَاءَ"),
         pics: parts("square", 5, 0),
       }),
       addend(4, "?", 5, [1, 0, 2], {
-        prompt: `أَعُدُّ الْمُكَعَّبَاتِ الزَّرْقَاءَ. ${MISSING}`,
+        prompt: countAndComplete("الْمُكَعَّبَاتِ الزَّرْقَاءَ"),
         pics: parts("square", 4, 1),
       }),
       addend(3, "?", 5, [2, 1, 3], {
-        prompt: `أَعُدُّ الْمُكَعَّبَاتِ الزَّرْقَاءَ. ${MISSING}`,
+        prompt: countAndComplete("الْمُكَعَّبَاتِ الزَّرْقَاءَ"),
         pics: parts("square", 3, 2),
       }),
       addend(2, "?", 5, [3, 2, 4], {
-        prompt: `أَعُدُّ الْمُكَعَّبَاتِ الزَّرْقَاءَ. ${MISSING}`,
+        prompt: countAndComplete("الْمُكَعَّبَاتِ الزَّرْقَاءَ"),
         pics: parts("square", 2, 3),
       }),
       addend(1, "?", 5, [4, 3, 5], {
-        prompt: `أَعُدُّ الْمُكَعَّبَاتِ الزَّرْقَاءَ. ${MISSING}`,
+        prompt: countAndComplete("الْمُكَعَّبَاتِ الزَّرْقَاءَ"),
         pics: parts("square", 1, 4),
       }),
     ],
@@ -572,18 +567,18 @@ const drafts: MathLessonDraft[] = [
   },
   {
     section: s9,
-    type: "arithmetic",
+    type: "number_fill",
     title: "أَقْرَأُ وَأَجْمَعُ",
     subtitle: SUM,
     emoji: "➕",
     color,
     rounds: [
-      plus(5, 3, [8, 7, 9]),
-      plus(2, 7, [8, 9, 10]),
-      plus(6, 4, [10, 9, 8]),
-      plus(8, 1, [7, 8, 9]),
-      plus(0, 7, [7, 0, 8]),
-      plus(3, 3, [5, 7, 6]),
+      add(5, 3, [8, 7, 9]),
+      add(2, 7, [8, 9, 10]),
+      add(6, 4, [10, 9, 8]),
+      add(8, 1, [7, 8, 9]),
+      add(0, 7, [7, 0, 8]),
+      add(3, 3, [5, 7, 6]),
     ],
   },
 
@@ -623,7 +618,7 @@ const drafts: MathLessonDraft[] = [
     section: TEST,
     type: "number_fill",
     title: "أُكْمِلُ الْجُمْلَةَ",
-    subtitle: "أُكْمِلُ: مَا الْعَدَدُ النَّاقِصُ؟",
+    subtitle: COMPLETE_SUBTITLE,
     emoji: "📝",
     color,
     rounds: [
