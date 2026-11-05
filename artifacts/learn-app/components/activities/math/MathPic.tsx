@@ -88,8 +88,8 @@ export function MathPic({
   );
 }
 
-/** From this many pictures a group is drawn small, five to a line, like a ten frame. */
-const TEN_FRAME_FROM = 7;
+/** From this many pictures a group is drawn small, five to a line, like a ten frame (6 reads 5 + 1). */
+const TEN_FRAME_FROM = 6;
 const TEN_FRAME_PER_LINE = 5;
 const GROUP_GAP = 6;
 
