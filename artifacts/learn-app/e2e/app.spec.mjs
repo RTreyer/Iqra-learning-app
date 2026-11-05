@@ -7,12 +7,17 @@ import { createRequire } from "node:module";
 import {
   QUIZ_ROUNDS,
   answerRound,
+  completeMathLesson,
   completeQuizLesson,
   earnedStars,
   expect,
   gotoAndWaitReady,
+  mathLesson,
   readProgress,
   tapAllAndFinish,
+  compareAnswerButton,
+  numberFillAnswerButton,
+  pictureChoiceAnswer,
   test,
   traceDiagonal,
   traceGuide,
@@ -187,6 +192,24 @@ test.describe("activities", () => {
     expect(await completeQuizLesson(page, "math-u2-1", 6)).toBe(3);
     await expect.poll(async () => (await readProgress(page))?.lessons["math-u2-1"]?.stars).toBe(3);
   });
+
+  // Each lesson below is the first math-u2 lesson of its type; the answers come from content/.
+  const mathPaths = [
+    [
+      "ordered picture choice",
+      () => mathLesson("picture_choice", (l) => l.rounds[0].ordered),
+      pictureChoiceAnswer,
+    ],
+    ["compare", () => mathLesson("compare"), compareAnswerButton],
+    ["number fill", () => mathLesson("number_fill"), numberFillAnswerButton],
+  ];
+  for (const [name, find, tapFor] of mathPaths) {
+    test(`math ${name} lesson completes with 3 stars`, async ({ page }) => {
+      const lesson = find();
+      expect(await completeMathLesson(page, lesson, tapFor(page))).toBe(3);
+      await expect.poll(async () => (await readProgress(page))?.lessons[lesson.id]?.stars).toBe(3);
+    });
+  }
 
   // Science is hidden behind "قريباً" on the grade screen, but its lessons still open by URL.
   test("science story and naming lessons complete", async ({ page }) => {

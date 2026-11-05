@@ -1,6 +1,9 @@
 // Shared fixtures and helpers for the end to end suite (see playwright.config.ts).
 import { test as base, expect } from "@playwright/test";
+import { toArabicDigits } from "../lib/arabicNumbers.ts";
 import { decodeMask } from "../components/activities/trace/validate.ts";
+import { compareAnswer, numberFillAnswer } from "../content/math/answers.ts";
+import { mathBookUnit2 } from "../content/math/bookUnit2.ts";
 import { TRACE_GRID, traceGuides } from "../content/generated/traceGuides.ts";
 
 export { expect };
@@ -128,6 +131,50 @@ export async function completeQuizLesson(page, lessonId, correctCount, { navigat
   }
   return earnedStars(page);
 }
+
+/** The first math-u2 lesson of a type (answers are derived from content/, never stored here). */
+export function mathLesson(type, predicate = () => true) {
+  const lesson = mathBookUnit2.lessons.find((l) => l.type === type && predicate(l));
+  if (!lesson) throw new Error(`no math-u2 ${type} lesson`);
+  return lesson;
+}
+
+/**
+ * Plays every round of a math lesson with all answers right. `answerFor(round)` returns the
+ * locator of the right answer; it is tapped once enabled, then the round locks until auto
+ * advance shows the next one. Returns the stars shown.
+ */
+export async function completeMathLesson(page, lesson, answerFor) {
+  await gotoAndWaitReady(page, `/lesson/${lesson.id}`);
+  for (let i = 0; i < lesson.rounds.length; i++) {
+    const answer = answerFor(lesson.rounds[i]);
+    await expect(answer).toHaveCount(1);
+    await expect(answer).toBeEnabled();
+    await answer.click();
+    // Locked means gone (matched by an enabled name) or disabled; the next round unlocks it.
+    if (i < lesson.rounds.length - 1)
+      await expect
+        .poll(async () => (await answer.count()) === 0 || (await answer.isDisabled()))
+        .toBe(true);
+  }
+  return earnedStars(page);
+}
+
+/** The correct picture card (ordered rows keep their order, so the index is fixed). */
+export const pictureChoiceAnswer = (page) => (round) =>
+  page.getByTestId(`pic-card-${round.correctIndex}`);
+
+/** The more, less or equal button, derived from the round's two sides. */
+export const compareAnswerButton = (page) => (round) =>
+  page.getByTestId(`compare-answer-${compareAnswer(round.first, round.second)}`);
+
+/** The option button named by the Eastern Arabic digit of the missing number. */
+export const numberFillAnswerButton = (page) => (round) =>
+  page.getByRole("button", {
+    name: toArabicDigits(numberFillAnswer(round.cells)),
+    exact: true,
+    disabled: false,
+  });
 
 /** Taps every listed item (story lines or naming words), then the done button. */
 export async function tapAllAndFinish(page, labels) {
