@@ -199,3 +199,8 @@ test("quiz options are unique within each round", () => {
       );
   }
 });
+
+test("math lessons rebuilt from the book use math-u ids", () => {
+  for (const lesson of lessons.filter((l) => l.id.startsWith("math-")))
+    assert.match(lesson.id, /^math-u\d+-\d+$/, lesson.id);
+});
