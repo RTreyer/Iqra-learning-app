@@ -17,7 +17,7 @@ The rebuild left one package with one content model (Book, Unit, Lesson) and one
 | Book | Units | Lessons | State |
 |---|---|---|---|
 | Arabic Part 1 (`arabic-1`) | 8 | 179 | Unit 2 rebuilt from the textbook: 31 lessons (story, syllables, words, letter forms per letter, plus 3 exercises), grouped by letter, Yemeni SVG art in `components/art/Art.tsx`. Unit 3 rebuilt: 22 lessons (story, vowel listening, syllable train, sight words, letter forms, word writing per letter, plus 4 exercises). Unit 4 rebuilt: 25 lessons, the same run plus matching split words to words, built with `content/arabic/lessonKit.ts`. Unit 5 rebuilt the same way: 32 lessons (four letters ن ر د ت). Unit 6 rebuilt: 28 lessons (new letters ق ص ف), adds "complete the word" (a syllable train with given wagons) and a wide story picture per story, redrawn as SVG from the book page (`components/art/scenes`). Unit 7 rebuilt the same way: 30 lessons (new letters ح س ج) with three story pictures, plus the book's sentence copying as a word train and word-by-word writing with the sentence filling in (`sentenceLessons` in lessonKit). Units 1 and 8: earlier version |
-| Math Part 1 (`math-1`) | 3 | 11 | Exemplary, from textbook Part 1 units 2 to 5 (numbers 0 to 10, add and subtract within 10, plane shapes). Not the full year |
+| Math Part 1 (`math-1`) | 3 | 35 | Unit 2 rebuilt from the textbook (`math-u2`, `content/math/bookUnit2.ts`): 28 lessons in the book's sections 2-1 to 2-10 plus a three lesson unit test (counting, group choice, digit tracing ١ to ١٠, compare with words and signs, missing numbers, ordinal rows, counting in twos). Units 3 and 5 (`m2`, `m3`): earlier exemplary version (add and subtract within 10, plane shapes), to be rebuilt. Not the full year |
 | Science Part 1 (`science-1`) | 3 | 9 | Placeholder, no textbook source yet. `available: false`, shown as "قريباً" |
 | Arabic Part 2 (`arabic-2`), Math Part 2 (`math-2`) | none | none | `available: false`, shown as "قريباً". Planned for v1.1 |
 | Grades 2 to 6 | none | none | Listed on home as "قريباً" (`grades` in `content/catalog.ts`) |
@@ -26,13 +26,13 @@ Review status per unit: `docs/CONTENT_REVIEW.md`.
 
 `build_word` (the syllable train, `components/activities/BuildWordActivity.tsx`): the child hears a word and loads its syllables into the wagons in reading order, among decoys with the same letter and another vowel. A round counts when no wrong tile was tapped; it is not a review item.
 
-Math activities for the textbook rebuild (`components/activities/`, spec `docs/superpowers/specs/2026-11-05-math-foundation-design.md`), no lessons use them yet:
-- `picture_choice`: tap the right picture or group (odd one out, same as the model, what comes next, the bigger group).
+Math activities for the textbook rebuild (`components/activities/`, spec `docs/superpowers/specs/2026-11-05-math-foundation-design.md`), used by Math Unit 2:
+- `picture_choice`: tap the right picture or group (odd one out, same as the model, what comes next, the bigger group). An `ordered` round keeps up to 10 pictures in reading order, five per line, first on the right (ordinal numbers); one choice may be the empty group, a card labelled فَارِغٌ, for zero.
 - `compare`: two groups or numbers, the first on the right; answer with أَكْثَرُ / أَقَلُّ / يُسَاوِي or drawn signs > < =.
 - `number_fill`: the missing number in a sum, a vertical sum or a counting sequence.
 - `sort`: tap an item, then its box.
 
-Pictures are `MathPic` (emoji or SVG shape with a named colour, size, crossing out, half or quarter shading). The voice speaks only the task, once per change (`useInstruction`); number sentences are not read aloud. The new types have no review items yet. Lesson ids for rebuilt math are `math-u{bookUnit}-{n}`; old math progress (`m1-1` to `m3-3`) is dropped when units are replaced.
+Pictures are `MathPic` (emoji or SVG shape with a named colour, size, crossing out, half or quarter shading). A group of 6 or more is drawn small, five to a line, like a ten frame (9 reads 5 + 4). Digits are traced on guides generated like the letters but scaled to fill the box. The voice speaks only the task, once per change (`useInstruction`); number sentences are not read aloud. The new types have no review items yet. Lesson ids for rebuilt math are `math-u{bookUnit}-{n}`; old math progress (`m1-1` to `m3-3`) is dropped when units are replaced.
 
 Lesson structure of the earlier Arabic unit 8 (3 letters and a theme story per unit):
 1. `story`: tap each sentence to hear it
@@ -42,7 +42,7 @@ Lesson structure of the earlier Arabic unit 8 (3 letters and a theme story per u
 5. `listen_pick`: comprehension questions about the story
 6. `trace`: draw the letters on screen
 
-Unit 1 uses `naming`, `listen_pick`, `behavior`, `matching` and `trace`. Math uses `counting`, `arithmetic`, `naming`, `matching` and `listen_pick`. Science placeholder uses `story`, `naming` and `listen_pick`.
+Unit 1 uses `naming`, `listen_pick`, `behavior`, `matching` and `trace`. Math Unit 2 uses `counting`, `picture_choice`, `trace`, `compare` and `number_fill`; the older math units use `arithmetic`, `naming`, `matching` and `listen_pick`. Science placeholder uses `story`, `naming` and `listen_pick`.
 
 ## 3. Tech stack
 
@@ -128,7 +128,7 @@ The ten defects of the earlier prototype are fixed or removed (stars ignored sco
 1. Device verification pending: TTS, haptics, tracing and persistence are not yet checked on a real Android phone (Task 6.4).
 2. Science content is a placeholder until the owner provides the textbook.
 3. Native Arabic speaker review of all authored content is pending.
-4. Playwright covers navigation, scoring, tracing, math, science, English mode, axe contrast and the spaced repetition loop (18 tests); device verification of the APK is pending.
+4. Playwright covers navigation, scoring, tracing, math, science, English mode, axe contrast and the spaced repetition loop (23 tests); device verification of the APK is pending.
 5. Accessibility pass pending (Task 6.1): back link colour on gradients, header rows mirrored in Arabic, activity instruction strings in `UiText`.
 6. Backlog from `docs/superpowers/plans/PROGRESS.md`: speech `onDone` guard, title fallback by text length, stop speech before `router.replace`, `withAlpha` dev assertion, a shared `useChoiceRound`, retry hydration when both storage reads fail, one rewrite of a v2 blob per launch.
 7. Arabic dual and plural wording for review and streak counts was fixed in the last commits. Keep using the shared label helper (`lib/labels.ts`).

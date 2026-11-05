@@ -98,6 +98,7 @@ To make it self-resuming after a usage limit reset, run inside the session (loca
 ## Decision log
 
 - 2026-11-05: Math foundation (spec 2026-11-05-math-foundation-design.md, plan 2026-11-05-math-foundation.md) on branch `feat/math-foundation`: four generic math activity types (picture_choice, compare, number_fill, sort), MathPic with SVG shapes, math lesson kit, validators in content/math/validate.ts. Old math progress dropped when units are replaced (math unreleased). Voice gives only the task; no voice input. Next steps: book Units 2, 3, 4, 5, then 1, each replacing the matching old unit.
+- 2026-11-05: Math Unit 2 rebuilt from the book (spec 2026-11-05-math-unit2-design.md, plan 2026-11-05-math-unit2.md) on branch `feat/math-unit2`: `math-u2`, 28 lessons, replaces `m1` (old progress dropped); old `m2`, `m3` renumbered to Units 3 and 5. Ordered picture rows, the empty group for zero, ten frame groups from 6 pictures, digit trace guides scaled to fill the box; no counting with 0 (empty screen); compare prompts name the first side and offer all three answers; 🧕 for the girls by owner decision. Native speaker review pending (docs/CONTENT_REVIEW.md).
 
 - 2026-10-16: Work on main instead of a feature branch (owner).
 - 2026-10-16: Code quality review skipped for Task 1.1 because the diff is deletions and JSON edits already verified line by line by the spec review.
