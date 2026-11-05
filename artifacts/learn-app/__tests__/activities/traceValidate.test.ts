@@ -162,3 +162,29 @@ describe("validateOnGuide", () => {
     expect(validateOnGuide(strokesOnGuide("بيت"), PAD, shape("بيت"), true).valid).toBe(true);
   });
 });
+
+describe("digit guides", () => {
+  const shape = (guide: string) => decodeMask(traceGuides[guide].mask, TRACE_GRID);
+  const passes = (guide: string, strokes: Stroke[]) => {
+    expect(validateTracing(strokes, PAD)).toEqual({ valid: true });
+    expect(validateOnGuide(strokes, PAD, shape(guide))).toEqual({ valid: true });
+  };
+
+  it("passes ١ written as one stroke from top to bottom", () => {
+    const { cells, grid } = shape("١");
+    const cell = PAD.width / grid;
+    const stroke: Stroke = [];
+    for (let row = 0; row < grid; row++) {
+      const cols = Array.from({ length: grid }, (_, c) => c).filter((c) => cells[row * grid + c]);
+      if (cols.length) {
+        const mid = (cols[0] + cols[cols.length - 1]) / 2;
+        stroke.push({ x: (mid + 0.5) * cell, y: (row + 0.5) * cell });
+      }
+    }
+    passes("١", [stroke]);
+  });
+
+  it("passes ٢ and ٦ traced along their outline", () => {
+    for (const digit of ["٢", "٦"]) passes(digit, strokesOnGuide(digit));
+  });
+});

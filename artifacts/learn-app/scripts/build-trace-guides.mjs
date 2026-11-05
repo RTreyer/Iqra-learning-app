@@ -194,11 +194,22 @@ for (const book of books)
         for (const target of lesson.targets)
           if (ARABIC.test(target.guide)) guides.add(target.guide);
 
+/**
+ * Arabic-Indic digits (٠ to ٩). At letter size they would be about a third of the box, too
+ * small to trace in one stroke, so a guide made only of digits fills the box on its own,
+ * with the same free margin as the tallest letter.
+ */
+const DIGITS = /^[\u0660-\u0669]+$/;
+
 const font = loadFont();
 const letterScale = Math.min(
-  ...[...guides].filter((text) => letterCount(text) === 1).map((text) => measure(font, text).fit),
+  ...[...guides]
+    .filter((text) => !DIGITS.test(text) && letterCount(text) === 1)
+    .map((text) => measure(font, text).fit),
 );
-const entries = [...guides].sort().map((text) => [text, buildGuide(font, text, letterScale)]);
+const entries = [...guides]
+  .sort()
+  .map((text) => [text, buildGuide(font, text, DIGITS.test(text) ? Infinity : letterScale)]);
 const body = entries
   .map(
     ([text, { d, mask }]) =>
