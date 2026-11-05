@@ -60,6 +60,10 @@ export function ActivityHost({ lesson, ...props }: Props) {
       const Activity = ACTIVITY_COMPONENTS.compare;
       return <Activity lesson={lesson} {...props} />;
     }
+    case "number_fill": {
+      const Activity = ACTIVITY_COMPONENTS.number_fill;
+      return <Activity lesson={lesson} {...props} />;
+    }
     default:
       return assertNever(lesson);
   }

@@ -1,4 +1,11 @@
-import type { CompareRound, CompareSide, MathPic, PictureChoiceRound } from "../types.ts";
+import type {
+  CompareRound,
+  CompareSide,
+  MathPic,
+  NumberFillRound,
+  PictureChoiceRound,
+} from "../types.ts";
+import { numberFillAnswer } from "./answers.ts";
 
 // Pure checks of math rounds, used by Jest and by scripts/content.test.mjs on the catalog.
 // Each returns the problems found; [] means valid.
@@ -40,4 +47,19 @@ function checkSide(side: CompareSide): string[] {
 
 export function validateCompare(round: CompareRound): string[] {
   return [...checkPrompt(round.prompt), ...checkSide(round.first), ...checkSide(round.second)];
+}
+
+export function validateNumberFill(round: NumberFillRound): string[] {
+  const problems = [...checkPrompt(round.prompt), ...(round.pics ?? []).flatMap(checkPic)];
+  if (round.layout !== "sequence" && (round.cells.length !== 5 || round.cells[3] !== "=")) {
+    problems.push("row and vertical need a op b = c");
+    return problems;
+  }
+  const answer = numberFillAnswer(round.cells);
+  if (answer === null || answer < 0) problems.push("no answer or negative answer");
+  const numbers = round.cells.filter((c): c is number => typeof c === "number");
+  if (numbers.some((n) => n < 0)) problems.push("negative number");
+  if (!round.options.includes(answer as number)) problems.push(`answer ${answer} not in options`);
+  if (new Set(round.options).size !== round.options.length) problems.push("options not unique");
+  return problems;
 }

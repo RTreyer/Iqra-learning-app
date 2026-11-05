@@ -1,4 +1,9 @@
-import { checkPic, validateCompare, validatePictureChoice } from "@/content/math/validate";
+import {
+  checkPic,
+  validateCompare,
+  validateNumberFill,
+  validatePictureChoice,
+} from "@/content/math/validate";
 
 const apple = { emoji: "🍎" };
 
@@ -45,5 +50,44 @@ test("compare runs the picture checks on every pic of a side", () => {
   const bad = { shape: "triangle" as const, color: "red" as const, shaded: "quarter" as const };
   expect(
     validateCompare({ prompt: "x", first: { pics: [bad] }, second: { number: 1 }, mode: "words" }),
+  ).toEqual(["quarter not allowed on a triangle"]);
+});
+
+test("number fill needs a solvable sentence whose answer is an option", () => {
+  expect(
+    validateNumberFill({
+      prompt: "x",
+      cells: [3, "+", "?", "=", 5],
+      layout: "row",
+      options: [1, 2, 3],
+    }),
+  ).toEqual([]);
+  expect(
+    validateNumberFill({
+      prompt: "x",
+      cells: [3, "+", "?", "=", 5],
+      layout: "row",
+      options: [1, 3, 3],
+    }),
+  ).toEqual(["answer 2 not in options", "options not unique"]);
+  expect(
+    validateNumberFill({ prompt: "x", cells: [3, "?", 5], layout: "row", options: [4] }),
+  ).toEqual(["row and vertical need a op b = c"]);
+  expect(
+    validateNumberFill({
+      prompt: "x",
+      cells: [5, "-", 7, "=", "?"],
+      layout: "vertical",
+      options: [2],
+    }),
+  ).toEqual(["no answer or negative answer", "answer -2 not in options"]);
+  expect(
+    validateNumberFill({
+      prompt: "x",
+      cells: [3, "+", "?", "=", 5],
+      layout: "row",
+      options: [2, 3],
+      pics: [{ shape: "triangle", color: "red", shaded: "quarter" }],
+    }),
   ).toEqual(["quarter not allowed on a triangle"]);
 });

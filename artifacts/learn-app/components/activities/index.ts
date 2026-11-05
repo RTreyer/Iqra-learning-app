@@ -9,6 +9,7 @@ import { LetterPickActivity } from "./LetterPickActivity";
 import { ListenPickActivity } from "./ListenPickActivity";
 import { MatchingActivity } from "./MatchingActivity";
 import { NamingActivity } from "./NamingActivity";
+import { NumberFillActivity } from "./NumberFillActivity";
 import { PictureChoiceActivity } from "./PictureChoiceActivity";
 import { StoryActivity } from "./StoryActivity";
 import { TraceActivity } from "./TraceActivity";
@@ -34,6 +35,7 @@ export const ACTIVITY_COMPONENTS: ActivityMap = {
   arithmetic: ArithmeticActivity,
   picture_choice: PictureChoiceActivity,
   compare: CompareActivity,
+  number_fill: NumberFillActivity,
 };
 
 export function activityFor<K extends LessonType>(type: K): ComponentType<ActivityProps<K>> {

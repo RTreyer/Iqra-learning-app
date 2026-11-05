@@ -112,6 +112,20 @@ export type CompareRound = {
   mode: "words" | "symbols";
 };
 
+export type FillCell = number | "+" | "-" | "=" | "?";
+export type NumberFillRound = {
+  prompt: string;
+  /**
+   * In reading order (right to left on screen), exactly one "?".
+   * row and vertical: `a op b = c`; sequence: numbers with a constant step, e.g. [2, 3, "?", 5].
+   */
+  cells: FillCell[];
+  layout: "row" | "vertical" | "sequence";
+  options: number[];
+  /** Optional picture story above the sentence. */
+  pics?: MathPic[];
+};
+
 export type LessonBody =
   | {
       type: "story";
@@ -137,7 +151,8 @@ export type LessonBody =
   | { type: "counting"; rounds: CountingRound[] }
   | { type: "arithmetic"; rounds: ArithmeticRound[] }
   | { type: "picture_choice"; rounds: PictureChoiceRound[] }
-  | { type: "compare"; rounds: CompareRound[] };
+  | { type: "compare"; rounds: CompareRound[] }
+  | { type: "number_fill"; rounds: NumberFillRound[] };
 
 export type LessonType = LessonBody["type"];
 
