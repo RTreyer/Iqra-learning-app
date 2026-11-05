@@ -36,7 +36,7 @@ const NOM = [
   "تِسْعَةٌ",
   "عَشَرَةٌ",
 ];
-/** The same numbers with the article, for "الْخَمْسَةُ أَكْبَرُ أَمْ أَصْغَرُ مِنَ الثَّلَاثَةِ؟". */
+/** The same numbers with the article, for "الْخَمْسَةُ أَكْبَرُ أَمْ أَصْغَرُ أَمْ تُسَاوِي الثَّلَاثَةَ؟". */
 const DEF_NOM = [
   "الصِّفْرُ",
   "الْوَاحِدُ",
@@ -50,18 +50,18 @@ const DEF_NOM = [
   "التِّسْعَةُ",
   "الْعَشَرَةُ",
 ];
-const DEF_GEN = [
-  "الصِّفْرِ",
-  "الْوَاحِدِ",
+const DEF_ACC = [
+  "الصِّفْرَ",
+  "الْوَاحِدَ",
   "الاثْنَيْنِ",
-  "الثَّلَاثَةِ",
-  "الأَرْبَعَةِ",
-  "الْخَمْسَةِ",
-  "السِّتَّةِ",
-  "السَّبْعَةِ",
-  "الثَّمَانِيَةِ",
-  "التِّسْعَةِ",
-  "الْعَشَرَةِ",
+  "الثَّلَاثَةَ",
+  "الأَرْبَعَةَ",
+  "الْخَمْسَةَ",
+  "السِّتَّةَ",
+  "السَّبْعَةَ",
+  "الثَّمَانِيَةَ",
+  "التِّسْعَةَ",
+  "الْعَشَرَةَ",
 ];
 const GEN = [
   "صِفْرٍ",
@@ -107,30 +107,35 @@ function digits(...ns: number[]): TraceTarget[] {
 
 /**
  * Two groups with words: أَكْثَرُ / أَقَلُّ / يُسَاوِي, about the first group (on the right).
- * The question names the first group first: "الدَّعَاسِيقُ أَكْثَرُ أَمْ أَقَلُّ مِنَ السَّلَاحِفِ؟".
+ * The question names the first group first and offers all three buttons:
+ * "الدَّعَاسِيقُ أَكْثَرُ أَمْ أَقَلُّ أَمْ تُسَاوِي السَّلَاحِفَ؟" (plural of animals: تُسَاوِي).
  */
 function compareGroups(
   [firstEmoji, firstNoun, a]: [string, string, number],
-  [secondEmoji, secondNoun, b]: [string, string, number],
+  [secondEmoji, secondNounAcc, b]: [string, string, number],
 ): CompareRound {
   return {
-    prompt: `${firstNoun} أَكْثَرُ أَمْ أَقَلُّ مِنَ ${secondNoun}؟`,
+    prompt: `${firstNoun} أَكْثَرُ أَمْ أَقَلُّ أَمْ تُسَاوِي ${secondNounAcc}؟`,
     first: { pics: pics(firstEmoji, a) },
     second: { pics: pics(secondEmoji, b) },
     mode: "words",
   };
 }
 
+/** "Equals" agreeing with the first number: الصِّفْرُ / الْوَاحِدُ يُسَاوِي, الاثْنَانِ يُسَاوِيَانِ, الْخَمْسَةُ تُسَاوِي. */
+const equalsVerb = (n: number) => (n <= 1 ? "يُسَاوِي" : n === 2 ? "يُسَاوِيَانِ" : "تُسَاوِي");
+
 /**
  * Two numbers, the first on the right, asked about the first: in words mode
- * "الْخَمْسَةُ أَكْبَرُ أَمْ أَصْغَرُ مِنَ الثَّلَاثَةِ؟", in symbols mode "أَيُّ إِشَارَةٍ بَيْنَ خَمْسَةٍ وَثَلَاثَةٍ؟".
+ * "الْخَمْسَةُ أَكْبَرُ أَمْ أَصْغَرُ أَمْ تُسَاوِي الثَّلَاثَةَ؟", in symbols mode
+ * "أَيُّ إِشَارَةٍ بَيْنَ خَمْسَةٍ وَثَلَاثَةٍ؟".
  */
 function compareNumbers(a: number, b: number, mode: "words" | "symbols"): CompareRound {
   return {
     prompt:
       mode === "symbols"
         ? `أَيُّ إِشَارَةٍ بَيْنَ ${GEN[a]} وَ${GEN[b]}؟`
-        : `${DEF_NOM[a]} أَكْبَرُ أَمْ أَصْغَرُ مِنَ ${DEF_GEN[b]}؟`,
+        : `${DEF_NOM[a]} أَكْبَرُ أَمْ أَصْغَرُ أَمْ ${equalsVerb(a)} ${DEF_ACC[b]}؟`,
     first: { number: a },
     second: { number: b },
     mode,
@@ -170,6 +175,7 @@ const s7 = bookSection(2, 7, "تَرْتِيبُ الأَعْدَادِ");
 const s8 = bookSection(2, 8, "الأَعْدَادُ التَّرْتِيبِيَّةُ");
 const s9 = bookSection(2, 9, "حَلُّ الْمَسْأَلَةِ");
 const s10 = bookSection(2, 10, "تَدْرِيبَاتٌ عَامَّةٌ");
+const TEST = "اخْتِبَارُ الْوَحْدَةِ";
 
 const drafts: MathLessonDraft[] = [
   // ── 2-1 الأعداد ١، ٢، ٣ (pp. 34 to 37): birds, fish, balls, candles, glasses, rabbits ──
@@ -218,17 +224,16 @@ const drafts: MathLessonDraft[] = [
   {
     section: s2,
     type: "counting",
-    title: "أَعُدُّ: ٤، ٥، ٠",
+    title: "أَعُدُّ: ٤، ٥",
     subtitle: COUNT_SUBTITLE,
     emoji: "🐟",
     color,
     rounds: [
       count("🐟", 4, [4, 5, 0]),
       count("🐄", 5, [0, 4, 5]),
-      count("🐄", 0, [5, 0, 4]),
       count("🇾🇪", 4, [5, 4, 0]),
       count("🥛", 5, [4, 0, 5]),
-      count("🍊", 0, [0, 5, 4]),
+      count("🍊", 4, [0, 5, 4]),
     ],
   },
   {
@@ -367,7 +372,7 @@ const drafts: MathLessonDraft[] = [
       count("🐝", 3, [2, 3, 4]),
       count("🌸", 10, [10, 9, 8]),
       count("🦋", 6, [5, 7, 6]),
-      count("🐔", 0, [0, 1, 2]),
+      count("🐔", 2, [0, 1, 2]),
       count("🐪", 1, [2, 1, 0]),
       count("🐦", 8, [8, 6, 9]),
     ],
@@ -382,11 +387,11 @@ const drafts: MathLessonDraft[] = [
     emoji: "🐞",
     color,
     rounds: [
-      compareGroups(["🐞", "الدَّعَاسِيقُ", 5], ["🐢", "السَّلَاحِفِ", 3]),
-      compareGroups(["🐞", "الدَّعَاسِيقُ", 2], ["🐢", "السَّلَاحِفِ", 4]),
-      compareGroups(["🐞", "الدَّعَاسِيقُ", 4], ["🐢", "السَّلَاحِفِ", 4]),
-      compareGroups(["🐇", "الأَرَانِبُ", 6], ["🐐", "الْمَاعِزِ", 3]),
-      compareGroups(["🐇", "الأَرَانِبُ", 2], ["🐐", "الْمَاعِزِ", 5]),
+      compareGroups(["🐞", "الدَّعَاسِيقُ", 5], ["🐢", "السَّلَاحِفَ", 3]),
+      compareGroups(["🐞", "الدَّعَاسِيقُ", 2], ["🐢", "السَّلَاحِفَ", 4]),
+      compareGroups(["🐞", "الدَّعَاسِيقُ", 4], ["🐢", "السَّلَاحِفَ", 4]),
+      compareGroups(["🐇", "الأَرَانِبُ", 6], ["🐐", "الْمَاعِزَ", 3]),
+      compareGroups(["🐇", "الأَرَانِبُ", 2], ["🐐", "الْمَاعِزَ", 5]),
     ],
   },
   {
@@ -400,7 +405,7 @@ const drafts: MathLessonDraft[] = [
       compareNumbers(5, 3, "words"),
       compareNumbers(4, 6, "words"),
       compareNumbers(7, 4, "words"),
-      compareNumbers(2, 3, "words"),
+      compareNumbers(3, 5, "words"),
       compareNumbers(4, 4, "words"),
     ],
   },
@@ -448,7 +453,7 @@ const drafts: MathLessonDraft[] = [
     emoji: "🚌",
     color,
     rounds: [
-      nth("أَرْوَى هِيَ الأُولَى. أَيْنَ أَرْوَى؟", GIRLS, 1),
+      nth("أَعُدُّ مِنَ الْيَمِينِ. أَرْوَى هِيَ الأُولَى. أَيْنَ أَرْوَى؟", GIRLS, 1),
       nth("مَنِ الثَّالِثَةُ فِي الصَّفِّ؟", GIRLS, 3),
       nth("سَارَةُ هِيَ الرَّابِعَةُ. أَيْنَ سَارَةُ؟", GIRLS, 4),
       nth("مَنِ الْخَامِسَةُ فِي الصَّفِّ؟", GIRLS, 5),
@@ -463,7 +468,7 @@ const drafts: MathLessonDraft[] = [
     emoji: "🐪",
     color,
     rounds: [
-      nth("أَيُّ حَيَوَانٍ هُوَ الأَوَّلُ؟", ANIMALS, 1),
+      nth("أَعُدُّ مِنَ الْيَمِينِ. أَيُّ حَيَوَانٍ هُوَ الأَوَّلُ؟", ANIMALS, 1),
       nth("أَيُّ حَيَوَانٍ هُوَ الْخَامِسُ؟", ANIMALS, 5),
       nth("أَيُّ حَيَوَانٍ هُوَ التَّاسِعُ؟", ANIMALS, 9),
       nth("أَيُّ حَيَوَانٍ هُوَ الثَّالِثُ؟", ANIMALS, 3),
@@ -479,7 +484,7 @@ const drafts: MathLessonDraft[] = [
     emoji: "🐈",
     color,
     rounds: [
-      nth("أَيْنَ الْقِطُّ الرَّابِعُ؟", CATS, 4),
+      nth("أَعُدُّ مِنَ الْيَمِينِ. أَيْنَ الْقِطُّ الرَّابِعُ؟", CATS, 4),
       nth("أَيْنَ الْقِطُّ الثَّانِي؟", CATS, 2),
       nth("أَيْنَ الْقِطُّ السَّادِسُ؟", CATS, 6),
       nth("أَيْنَ الْقِطُّ الثَّامِنُ؟", CATS, 8),
@@ -548,9 +553,10 @@ const drafts: MathLessonDraft[] = [
     ],
   },
 
-  // ── اختبار الوحدة (p. 62): frogs, roosters, bananas, strawberries ──
+  // ── اختبار الوحدة (p. 62): frogs, roosters, bananas, strawberries; missing numbers; the
+  // 3rd and 7th cat. One type per lesson, so the test is three short lessons. ──
   {
-    section: "اخْتِبَارُ الْوَحْدَةِ",
+    section: TEST,
     type: "counting",
     title: "اخْتِبَارُ الْوَحْدَةِ",
     subtitle: COUNT_SUBTITLE,
@@ -561,7 +567,33 @@ const drafts: MathLessonDraft[] = [
       count("🐓", 4, [4, 3, 5]),
       count("🍌", 7, [8, 7, 6]),
       count("🍓", 9, [10, 8, 9]),
-      count("🐸", 0, [1, 0, 2]),
+    ],
+  },
+  {
+    section: TEST,
+    type: "number_fill",
+    title: "أُكْمِلُ الأَعْدَادَ",
+    subtitle: MISSING,
+    emoji: "📝",
+    color,
+    rounds: [
+      row([5, 6, "?", 8], [7, 9, 6]),
+      row(["?", 2, 3, 4], [0, 5, 1]),
+      row([8, "?", 10], [7, 9, 6]),
+      row([2, 3, "?"], [4, 5, 1]),
+    ],
+  },
+  {
+    section: TEST,
+    type: "picture_choice",
+    title: "أَيُّ قِطٍّ؟",
+    subtitle: "أَعُدُّ مِنَ الْيَمِينِ",
+    emoji: "📝",
+    color,
+    rounds: [
+      nth("أَعُدُّ مِنَ الْيَمِينِ. أَيْنَ الْقِطُّ الثَّالِثُ؟", CATS, 3),
+      nth("أَيْنَ الْقِطُّ السَّابِعُ؟", CATS, 7),
+      nth("أَيْنَ الْقِطُّ الْخَامِسُ؟", CATS, 5),
     ],
   },
 ];
