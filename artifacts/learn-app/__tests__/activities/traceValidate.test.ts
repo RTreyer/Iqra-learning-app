@@ -1,5 +1,6 @@
 import { MAX_STROKE_POINTS, addPoint, startStroke } from "@/components/activities/trace/path";
 import {
+  ON_LETTER,
   decodeMask,
   validateOnGuide,
   validateTracing,
@@ -207,6 +208,63 @@ describe("digit guides", () => {
     expect(validateOnGuide(leftPart, PAD, shape3)).toEqual({
       valid: false,
       msg: "أكمل كتابة الحرف كله 📏",
+    });
+  });
+
+  it("fails a stroke that runs off the letter, even when a heavy scribble on it outweighs it", () => {
+    // Drawn on a phone (pad 800 px from (62, 468)): ٣ gone over several times, plus a stroke
+    // beyond its last hook.
+    const p = (x: number, y: number) => ({ x: ((x - 62) * 300) / 800, y: ((y - 468) * 300) / 800 });
+    const path = (corners: [number, number][]): Stroke =>
+      corners.slice(1).flatMap(([x, y], k) => {
+        const [x0, y0] = corners[k];
+        return Array.from({ length: 21 }, (_, i) =>
+          p(x0 + ((x - x0) * i) / 20, y0 + ((y - y0) * i) / 20),
+        );
+      });
+    const digit = [
+      path([
+        [305, 615],
+        [335, 760],
+        [395, 1000],
+        [405, 1140],
+      ]),
+      path([
+        [370, 745],
+        [600, 772],
+        [650, 760],
+      ]),
+      path([
+        [510, 590],
+        [540, 650],
+        [548, 720],
+      ]),
+      path([
+        [650, 595],
+        [620, 700],
+        [575, 760],
+      ]),
+    ];
+    const scribble = [...digit, ...digit, ...digit];
+    const extra = path([
+      [650, 760],
+      [700, 745],
+      [730, 650],
+      [760, 600],
+    ]);
+    const three = shape("٣");
+    expect(validateOnGuide(scribble, PAD, three)).toEqual({ valid: true });
+    const drawn = [...scribble, extra].flat();
+    const onLetter = drawn.filter((q) => {
+      const i =
+        Math.floor((q.y / 300) * TRACE_GRID) * TRACE_GRID + Math.floor((q.x / 300) * TRACE_GRID);
+      return three.near[i] === 1;
+    }).length;
+    // The share on the letter alone would let it pass.
+    expect(onLetter / drawn.length).toBeGreaterThan(ON_LETTER);
+    expect(validateOnGuide([...scribble, extra], PAD, three)).toEqual({
+      valid: false,
+      msg: "اُكتب فوق الحرف المرسوم ✏️",
     });
   });
 

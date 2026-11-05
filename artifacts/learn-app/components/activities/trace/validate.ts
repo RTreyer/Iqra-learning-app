@@ -81,7 +81,9 @@ export function validateTracing(
 // For Arabic guides the outline is known (content/generated/traceGuides.ts), so the check is
 // about the letter itself, not just the size of the drawing:
 //  5. On the letter: at least ON_LETTER of the drawn points lie on the letter (with a
-//     finger's tolerance), so a different letter or a scribble next to it fails.
+//     finger's tolerance), so a different letter or a scribble next to it fails. No stretch
+//     of one stroke may run off the letter for more than OFF_LETTER of the pad, so an extra
+//     stroke next to the letter fails even when the rest of a large scribble is on it.
 //  6. Covered: at least COVERED of the letter lies under the drawn path.
 //  7. Whole letter: at least ALONG of the letter's centre line was passed, and at least
 //     BRANCH_PASSED of each of its branches (stem, bar, hook). A thick letter is half covered
@@ -89,6 +91,8 @@ export function validateTracing(
 
 /** Share of drawn points that must lie on the letter. */
 export const ON_LETTER = 0.9;
+/** Longest stretch of a stroke off the letter, as a share of the pad side. */
+export const OFF_LETTER = 0.1;
 /** Share of the letter that must be traced. */
 export const COVERED = 0.5;
 /** Share of the letter's centre line the drawing must pass. */
@@ -159,23 +163,34 @@ export function validateOnGuide(
   };
   // Points every half cell along each stroke, so fast swipes leave no gaps.
   const step = Math.min(pad.width, pad.height) / grid / 2;
+  const isNear = (p: Point) => {
+    const i = cellOf(p);
+    return i >= 0 && near[i] === 1;
+  };
   const points: Point[] = [];
+  let offRun = 0;
+  let longestOff = 0;
   for (const stroke of strokes) {
+    offRun = 0;
+    const add = (p: Point) => {
+      points.push(p);
+      offRun = isNear(p) ? 0 : offRun + 1;
+      longestOff = Math.max(longestOff, offRun);
+    };
     stroke.forEach((p, i) => {
-      if (i === 0) return void points.push(p);
+      if (i === 0) return add(p);
       const prev = stroke[i - 1];
       const n = Math.max(1, Math.ceil(Math.hypot(p.x - prev.x, p.y - prev.y) / step));
       for (let k = 1; k <= n; k++)
-        points.push({ x: prev.x + ((p.x - prev.x) * k) / n, y: prev.y + ((p.y - prev.y) * k) / n });
+        add({ x: prev.x + ((p.x - prev.x) * k) / n, y: prev.y + ((p.y - prev.y) * k) / n });
     });
   }
   if (points.length === 0) return { valid: false, msg: COVER_MORE(word) };
 
-  const onLetter = points.filter((p) => {
-    const i = cellOf(p);
-    return i >= 0 && near[i] === 1;
-  }).length;
+  const onLetter = points.filter(isNear).length;
   if (onLetter / points.length < ON_LETTER) return { valid: false, msg: ON_THE_LETTER(word) };
+  // Points are half a cell apart, and a cell is 1 / grid of the pad side.
+  if (longestOff / (2 * grid) > OFF_LETTER) return { valid: false, msg: ON_THE_LETTER(word) };
 
   const covered = new Uint8Array(grid * grid);
   let coveredCount = 0;
