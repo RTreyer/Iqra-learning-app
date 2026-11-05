@@ -8,7 +8,7 @@ Offline-first learning app for children in Yemen, primary school grades 1 to 6. 
 
 - Curriculum: official Yemen Ministry of Education primary subjects (Arabic, Math, Islamic Education, Science, Social Studies, English from grade 4).
 - Teaching style: short playful activities, emoji based visuals, Arabic text to speech, haptic feedback, star rewards, instant quiz feedback.
-- Interface: Arabic by default. English is available for menus and buttons only. Learning content always stays Arabic.
+- Interface: Arabic by default. English is available for menus, buttons and the labels on book and unit cards only. Learning content always stays Arabic.
 
 ## 2. What exists today
 
@@ -17,7 +17,7 @@ The rebuild left one package with one content model (Book, Unit, Lesson) and one
 | Book | Units | Lessons | State |
 |---|---|---|---|
 | Arabic Part 1 (`arabic-1`) | 8 | 179 | Unit 2 rebuilt from the textbook: 31 lessons (story, syllables, words, letter forms per letter, plus 3 exercises), grouped by letter, Yemeni SVG art in `components/art/Art.tsx`. Unit 3 rebuilt: 22 lessons (story, vowel listening, syllable train, sight words, letter forms, word writing per letter, plus 4 exercises). Unit 4 rebuilt: 25 lessons, the same run plus matching split words to words, built with `content/arabic/lessonKit.ts`. Unit 5 rebuilt the same way: 32 lessons (four letters ن ر د ت). Unit 6 rebuilt: 28 lessons (new letters ق ص ف), adds "complete the word" (a syllable train with given wagons) and a wide story picture per story, redrawn as SVG from the book page (`components/art/scenes`). Unit 7 rebuilt the same way: 30 lessons (new letters ح س ج) with three story pictures, plus the book's sentence copying as a word train and word-by-word writing with the sentence filling in (`sentenceLessons` in lessonKit). Units 1 and 8: earlier version |
-| Math Part 1 (`math-1`) | 3 | 35 | Unit 2 rebuilt from the textbook (`math-u2`, `content/math/bookUnit2.ts`): 28 lessons in the book's sections 2-1 to 2-10 plus a three lesson unit test (counting, group choice, digit tracing ١ to ١٠, compare with words and signs, missing numbers, ordinal rows, counting in twos). Units 3 and 5 (`m2`, `m3`): earlier exemplary version (add and subtract within 10, plane shapes), to be rebuilt. Not the full year |
+| Math Part 1 (`math-1`) | 5 | 119 | All five units rebuilt from the textbook, one file each (`content/math/bookUnit1.ts` to `bookUnit5.ts`), lessons grouped by the book's sections. Unit 1 (`math-u1`, 19 lessons): sorting, same and different, patterns, comparing groups. Unit 2 (`math-u2`, 28 lessons): numbers 0 to 10 with counting, digit tracing ١ to ١٠, compare with words and signs, missing numbers, ordinal rows, counting in twos, a three lesson unit test. Unit 3 (`math-u3`, 25 lessons): adding within 10. Unit 4 (`math-u4`, 23 lessons): subtracting within 10. Unit 5 (`math-u5`, 24 lessons): plane and solid shapes, halves and quarters |
 | Science Part 1 (`science-1`) | 3 | 9 | Placeholder, no textbook source yet. `available: false`, shown as "قريباً" |
 | Arabic Part 2 (`arabic-2`), Math Part 2 (`math-2`) | none | none | `available: false`, shown as "قريباً". Planned for v1.1 |
 | Grades 2 to 6 | none | none | Listed on home as "قريباً" (`grades` in `content/catalog.ts`) |
@@ -26,13 +26,13 @@ Review status per unit: `docs/CONTENT_REVIEW.md`.
 
 `build_word` (the syllable train, `components/activities/BuildWordActivity.tsx`): the child hears a word and loads its syllables into the wagons in reading order, among decoys with the same letter and another vowel. A round counts when no wrong tile was tapped; it is not a review item.
 
-Math activities for the textbook rebuild (`components/activities/`, spec `docs/superpowers/specs/2026-11-05-math-foundation-design.md`), used by Math Unit 2:
+Math section. Math Part 1 follows the book unit by unit (specs `docs/superpowers/specs/2026-11-05-math-*.md`). Every task is a picture or a number; there is no reading. It uses four math activities (`components/activities/`):
 - `picture_choice`: tap the right picture or group (odd one out, same as the model, what comes next, the bigger group). An `ordered` round keeps up to 10 pictures in reading order, five per line, first on the right (ordinal numbers); one choice may be the empty group, a card labelled فَارِغٌ, for zero.
 - `compare`: two groups or numbers, the first on the right; answer with أَكْثَرُ / أَقَلُّ / يُسَاوِي or drawn signs > < =.
 - `number_fill`: the missing number in a sum, a vertical sum or a counting sequence.
 - `sort`: tap an item, then its box.
 
-Pictures are `MathPic` (emoji or SVG shape with a named colour, size, crossing out, half or quarter shading). A group of 6 or more is drawn small, five to a line, like a ten frame (9 reads 5 + 4). Digits are traced on guides generated like the letters but scaled to fill the box. The voice speaks only the task, once per change (`useInstruction`); number sentences are not read aloud. The new types have no review items yet. Lesson ids for rebuilt math are `math-u{bookUnit}-{n}`; old math progress (`m1-1` to `m3-3`) is dropped when units are replaced.
+Pictures are `MathPic` (emoji or SVG shape with a named colour, size, crossing out, half or quarter shading). A group of 6 or more is drawn small, five to a line, like a ten frame (9 reads 5 + 4). Digits are traced on guides generated like the letters but scaled to fill the box. The voice speaks only the task, once per change (`useInstruction`); it never reads a number sentence aloud, so the child must solve it. In English mode only menus and unit labels are translated; prompts and speech stay Arabic. The new types have no review items yet. Lesson ids are `math-u{bookUnit}-{n}`. The old sample math units and their progress (`m1-1` to `m3-3`) are dropped. Units missing from the book get no coming soon card.
 
 Lesson structure of the earlier Arabic unit 8 (3 letters and a theme story per unit):
 1. `story`: tap each sentence to hear it
@@ -42,7 +42,7 @@ Lesson structure of the earlier Arabic unit 8 (3 letters and a theme story per u
 5. `listen_pick`: comprehension questions about the story
 6. `trace`: draw the letters on screen
 
-Unit 1 uses `naming`, `listen_pick`, `behavior`, `matching` and `trace`. Math Unit 2 uses `counting`, `picture_choice`, `trace`, `compare` and `number_fill`; the older math units use `arithmetic`, `naming`, `matching` and `listen_pick`. Science placeholder uses `story`, `naming` and `listen_pick`.
+Unit 1 uses `naming`, `listen_pick`, `behavior`, `matching` and `trace`. Math Unit 1 uses `picture_choice`, `compare` and `sort`. Unit 2 adds `counting`, `trace` and `number_fill`. Units 3 and 4 are mostly `number_fill` with some `picture_choice`. Unit 5 uses `picture_choice` and `sort`, plus `story`, `naming` and `listen_pick` for the shape stories. Science placeholder uses `story`, `naming` and `listen_pick`.
 
 ## 3. Tech stack
 
@@ -68,7 +68,7 @@ artifacts/learn-app/                the Expo app
   components/           shared UI: cards, badges, BackButton, UiText (auto translating Text), ErrorBoundary, ActivityHost
   components/activities/  one component per activity type, ReviewRound, shared/ (useQuiz, shuffle, ChoiceCard...), math/, trace/ (validate.ts, path.ts)
   content/generated/     traceGuides.ts: outlines and masks of the Arabic trace guides (generated, do not edit)
-  content/              types.ts, catalog.ts, index.ts, ui-translations.ts, arabic/ (8 units), math/ (3), science/ (3)
+  content/              types.ts, catalog.ts, index.ts, ui-translations.ts, arabic/ (8 units), math/ (5 book units, mathKit, validate), science/ (3)
   context/              ProgressContext (progress, hydration, persistence), LanguageContext
   hooks/                useLessonAttempt, useVoiceHint, useScreenPadding
   lib/                  scoring, srs, progressState, reviewItems, nextLesson, streak, dates, routes, params, labels, arabicNumbers, speech, haptics
@@ -84,7 +84,7 @@ artifacts/learn-app/                the Expo app
 /                       home: continue card, review card, streak, star badge, grades 1 to 6 (grade 1 books, others "قريباً"), language switch
 /book/[bookId]          units of a book
 /unit/[unitId]          lessons of a unit
-/lesson/[lessonId]      lesson (ids u1-1 .. u8-6, m1-1 .. m3-3, s1-1 .. s3-3), globally unique
+/lesson/[lessonId]      lesson (ids u1-1 .. u8-6, math-u1-1 .. math-u5-24, s1-1 .. s3-3), globally unique
 /review                 today's review session
 +not-found              fallback screen
 ```
@@ -133,7 +133,7 @@ The ten defects of the earlier prototype are fixed or removed (stars ignored sco
 6. Backlog from `docs/superpowers/plans/PROGRESS.md`: speech `onDone` guard, title fallback by text length, stop speech before `router.replace`, `withAlpha` dev assertion, a shared `useChoiceRound`, retry hydration when both storage reads fail, one rewrite of a v2 blob per launch.
 7. Arabic dual and plural wording for review and streak counts was fixed in the last commits. Keep using the shared label helper (`lib/labels.ts`).
 8. Shape emoji for square and rectangle render poorly on some Android fonts. Replace with inline SVG (UI proposal 3).
-9. Math covers part of Part 1 only. Part 2 (units 6 to 10) is not started.
+9. Math Part 1 (units 1 to 5) is complete. Part 2 (units 6 to 10) is not started. Unit 1 position words and the Unit 5 pyramid wait for drawn pictures.
 
 ## 9. Constraints and conventions to respect
 
