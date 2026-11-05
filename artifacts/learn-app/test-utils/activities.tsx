@@ -1,5 +1,6 @@
 import { render } from "@testing-library/react-native";
 import React from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { getLesson } from "@/content";
 import type { Lesson, LessonType } from "@/content/types";
 import { LanguageProvider } from "@/context/LanguageContext";
@@ -11,12 +12,20 @@ export function lessonOf<T extends LessonType>(id: string, type: T): Extract<Les
   return lesson as Extract<Lesson, { type: T }>;
 }
 
-/** Renders an activity inside the providers UiText needs. */
+/** The providers an activity needs: language for UiText, the gesture root for the trace pad. */
+function withProviders(ui: React.ReactElement) {
+  return (
+    <LanguageProvider>
+      <GestureHandlerRootView>{ui}</GestureHandlerRootView>
+    </LanguageProvider>
+  );
+}
+
+/** Renders an activity inside the providers it needs. */
 export function renderActivity(ui: React.ReactElement) {
-  const result = render(<LanguageProvider>{ui}</LanguageProvider>);
+  const result = render(withProviders(ui));
   return {
     ...result,
-    rerenderActivity: (next: React.ReactElement) =>
-      result.rerender(<LanguageProvider>{next}</LanguageProvider>),
+    rerenderActivity: (next: React.ReactElement) => result.rerender(withProviders(next)),
   };
 }

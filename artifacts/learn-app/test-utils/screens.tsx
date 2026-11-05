@@ -1,5 +1,6 @@
 import { render } from "@testing-library/react-native";
 import React from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { LanguageProvider } from "@/context/LanguageContext";
 
@@ -8,11 +9,13 @@ const metrics = {
   insets: { top: 0, left: 0, right: 0, bottom: 0 },
 };
 
-/** Renders a screen inside the providers screens need (safe area and language). */
+/** Renders a screen inside the providers screens need (safe area, language, gesture root). */
 export function renderScreen(ui: React.ReactElement) {
   return render(
     <SafeAreaProvider initialMetrics={metrics}>
-      <LanguageProvider>{ui}</LanguageProvider>
+      <LanguageProvider>
+        <GestureHandlerRootView>{ui}</GestureHandlerRootView>
+      </LanguageProvider>
     </SafeAreaProvider>,
   );
 }

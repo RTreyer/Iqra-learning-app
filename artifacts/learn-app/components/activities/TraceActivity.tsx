@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
   Platform,
@@ -8,7 +8,7 @@ import {
   View,
   type LayoutChangeEvent,
 } from "react-native";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { GestureDetector, usePanGesture } from "react-native-gesture-handler";
 import { Path, Svg } from "react-native-svg";
 import { UiText } from "@/components/UiText";
 import { useLanguage } from "@/context/LanguageContext";
@@ -75,42 +75,39 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
     speak(target.tts);
   }, [target.tts, targetIndex]);
 
-  // The compiler lint takes the gesture builder's callbacks for code that runs during render,
-  // so it flags their ref access. They only run on touch, so the rules are off for this block.
-  /* eslint-disable react-hooks/refs, react-hooks/preserve-manual-memoization */
-  const gesture = useMemo(() => {
-    const flush = () => {
+  /** Draws the stroke in progress at most once per frame. */
+  const scheduleFlush = () => {
+    if (frame.current !== null) return;
+    frame.current = requestAnimationFrame(() => {
       frame.current = null;
       setLivePath(current.current ? current.current.d : "");
-    };
-    const schedule = () => {
-      if (frame.current === null) frame.current = requestAnimationFrame(flush);
-    };
-    return Gesture.Pan()
-      .minDistance(0)
-      .shouldCancelWhenOutside(false)
-      .runOnJS(true)
-      .withTestId("trace-pad")
-      .onBegin((e) => {
-        if (locked.current || measuredSize.current === null) return;
-        if (!Number.isFinite(e.x) || !Number.isFinite(e.y)) return;
-        current.current = startStroke({ x: e.x, y: e.y });
-        setPadError(false);
-        schedule();
-      })
-      .onUpdate((e) => {
-        if (current.current && addPoint(current.current, { x: e.x, y: e.y })) schedule();
-      })
-      .onFinalize(() => {
-        const stroke = current.current;
-        current.current = null;
-        if (frame.current !== null) cancelAnimationFrame(frame.current);
-        frame.current = null;
-        setLivePath("");
-        if (stroke) setStrokes((prev) => [...prev, stroke]);
-      });
-  }, []);
-  /* eslint-enable react-hooks/refs, react-hooks/preserve-manual-memoization */
+    });
+  };
+
+  const gesture = usePanGesture({
+    minDistance: 0,
+    shouldCancelWhenOutside: false,
+    runOnJS: true,
+    testID: "trace-pad",
+    onBegin: (e) => {
+      if (locked.current || measuredSize.current === null) return;
+      if (!Number.isFinite(e.x) || !Number.isFinite(e.y)) return;
+      current.current = startStroke({ x: e.x, y: e.y });
+      setPadError(false);
+      scheduleFlush();
+    },
+    onUpdate: (e) => {
+      if (current.current && addPoint(current.current, { x: e.x, y: e.y })) scheduleFlush();
+    },
+    onFinalize: () => {
+      const stroke = current.current;
+      current.current = null;
+      if (frame.current !== null) cancelAnimationFrame(frame.current);
+      frame.current = null;
+      setLivePath("");
+      if (stroke) setStrokes((prev) => [...prev, stroke]);
+    },
+  });
 
   const handleLayout = useCallback((e: LayoutChangeEvent) => {
     const next = Math.min(PAD_MAX, Math.floor(e.nativeEvent.layout.width));

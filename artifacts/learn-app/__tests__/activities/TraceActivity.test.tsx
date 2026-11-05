@@ -1,6 +1,6 @@
 import { act, fireEvent, screen } from "@testing-library/react-native";
 import React from "react";
-import { State, type PanGesture } from "react-native-gesture-handler";
+import { State } from "react-native-gesture-handler";
 import { fireGestureHandler, getByGestureTestId } from "react-native-gesture-handler/jest-utils";
 import { TraceActivity } from "@/components/activities/TraceActivity";
 import { lessonOf, renderActivity } from "@/test-utils/activities";
@@ -27,7 +27,7 @@ function layout(width = 300) {
 function drawDiagonal() {
   const points = Array.from({ length: 12 }, (_, i) => ({ x: 30 + i * 20, y: 30 + i * 20 }));
   act(() =>
-    fireGestureHandler<PanGesture>(getByGestureTestId("trace-pad"), [
+    fireGestureHandler(getByGestureTestId("trace-pad"), [
       { state: State.BEGAN, ...points[0] },
       ...points.slice(1, -1).map((p) => ({ state: State.ACTIVE, ...p })),
       { state: State.END, ...points[points.length - 1] },
@@ -41,7 +41,7 @@ function drawGuide(guide: string) {
   for (const stroke of strokesOnGuide(guide)) {
     const last = stroke[stroke.length - 1];
     act(() =>
-      fireGestureHandler<PanGesture>(getByGestureTestId("trace-pad"), [
+      fireGestureHandler(getByGestureTestId("trace-pad"), [
         { state: State.BEGAN, ...stroke[0] },
         ...stroke.slice(1).map((p) => ({ state: State.ACTIVE, ...p })),
         { state: State.END, ...last },
