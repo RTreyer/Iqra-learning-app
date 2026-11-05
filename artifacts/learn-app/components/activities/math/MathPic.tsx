@@ -88,7 +88,12 @@ export function MathPic({
   );
 }
 
-/** Several pictures side by side, wrapping, read right to left. */
+/** From this many pictures a group is drawn small, five to a line, like a ten frame. */
+const TEN_FRAME_FROM = 7;
+const TEN_FRAME_PER_LINE = 5;
+const GROUP_GAP = 6;
+
+/** Several pictures side by side, wrapping, read right to left; 9 reads as 5 + 4, 10 as 5 + 5. */
 export function PicGroup({
   pics,
   decorative,
@@ -99,15 +104,22 @@ export function PicGroup({
   size?: number;
 }) {
   if (pics.length === 0) return null;
+  const tenFrame = pics.length >= TEN_FRAME_FROM;
+  const picSize = tenFrame ? (size ?? SIZES.small) : size;
+  const frame =
+    tenFrame && picSize !== undefined
+      ? { maxWidth: TEN_FRAME_PER_LINE * picSize + (TEN_FRAME_PER_LINE - 1) * GROUP_GAP }
+      : null;
   return (
     <View
       {...(decorative
         ? { accessible: false, importantForAccessibility: "no-hide-descendants" as const }
         : { accessible: true, accessibilityLabel: groupLabel(pics) })}
-      style={styles.group}
+      testID="pic-group"
+      style={[styles.group, frame]}
     >
       {pics.map((pic, i) => (
-        <MathPic key={i} pic={pic} decorative={decorative} size={size} />
+        <MathPic key={i} pic={pic} decorative={decorative} size={picSize} />
       ))}
     </View>
   );
@@ -119,7 +131,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "center",
     alignItems: "center",
-    gap: 6,
+    gap: GROUP_GAP,
     maxWidth: 260,
   },
 });

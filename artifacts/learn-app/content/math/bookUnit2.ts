@@ -298,7 +298,8 @@ const drafts: MathLessonDraft[] = [
   },
 
   // ── 2-4 العددان ٩، ١٠ (pp. 46 to 49): cars, Yemenia aircraft, straw hats, keys, limes ──
-  // Groups of 9 and 10 are big, so the group choices come in twos to fit a phone screen.
+  // Groups of 9 and 10 are drawn small, five to a line (PicGroup), but three such cards still
+  // reach the bottom of a 360 × 640 screen, so the group choices come in twos.
   {
     section: s4,
     type: "counting",

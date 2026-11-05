@@ -16,3 +16,17 @@ test("a group renders every picture", () => {
   render(<PicGroup pics={[{ emoji: "🐟" }, { emoji: "🐟" }, { emoji: "🐟" }]} />);
   expect(screen.getAllByText("🐟")).toHaveLength(3);
 });
+
+test("groups of 7 or more are small and wrap at five, like a ten frame", () => {
+  const ten = Array.from({ length: 10 }, () => ({ emoji: "🐟" }));
+  render(<PicGroup pics={ten} />);
+  expect(screen.getByTestId("pic-group")).toHaveStyle({ maxWidth: 5 * 36 + 4 * 6 });
+  expect(screen.getAllByText("🐟")[0]).toHaveStyle({ fontSize: 36 * 0.8 });
+});
+
+test("groups of 6 or fewer keep the normal size", () => {
+  const six = Array.from({ length: 6 }, () => ({ emoji: "🐟" }));
+  render(<PicGroup pics={six} />);
+  expect(screen.getByTestId("pic-group")).toHaveStyle({ maxWidth: 260 });
+  expect(screen.getAllByText("🐟")[0]).toHaveStyle({ fontSize: 52 * 0.8 });
+});

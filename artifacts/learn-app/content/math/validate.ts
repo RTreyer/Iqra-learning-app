@@ -17,6 +17,8 @@ export function checkPrompt(prompt: string): string[] {
 }
 
 export const MAX_CHOICES = 4;
+/** Ordered rows (ordinal numbers) show up to ten pictures. */
+export const MAX_ORDERED_CHOICES = 10;
 
 /** Quarter shading is drawn as the top right 50x50 square, which only fits circle, square, rectangle. */
 export function checkPic(pic: MathPic): string[] {
@@ -28,7 +30,7 @@ export function checkPic(pic: MathPic): string[] {
 export function validatePictureChoice(round: PictureChoiceRound): string[] {
   const problems = checkPrompt(round.prompt);
   const n = round.choices.length;
-  const max = round.ordered ? 10 : MAX_CHOICES;
+  const max = round.ordered ? MAX_ORDERED_CHOICES : MAX_CHOICES;
   if (n < 2 || n > max) problems.push(`needs 2 to ${max} choices`);
   if (round.correctIndex < 0 || round.correctIndex >= n) problems.push("correctIndex out of range");
   if (round.choices.filter((c) => c.length === 0).length > 1)

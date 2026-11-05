@@ -1,5 +1,6 @@
 import React, { useCallback } from "react";
 import { StyleSheet, View } from "react-native";
+import { MAX_ORDERED_CHOICES } from "@/content/math/validate";
 import { speak } from "@/lib/speech";
 import { colors } from "@/theme/tokens";
 import { MathPic } from "./math/MathPic";
@@ -45,7 +46,7 @@ function PictureChoice({
   const shuffled = round.ordered
     ? { items: round.choices, correctIndex: round.correctIndex }
     : shuffledChoices;
-  const { values, bounce } = useBounce(10);
+  const { values, bounce } = useBounce(MAX_ORDERED_CHOICES);
   useInstruction(round.prompt);
 
   const handlePick = useCallback(
