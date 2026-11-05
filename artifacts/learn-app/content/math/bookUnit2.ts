@@ -22,7 +22,7 @@ import {
 
 const color = MATH_COLOR;
 
-/** Numbers 0 to 10 as spoken nouns: nominative, accusative and genitive. */
+/** Numbers 0 to 10 as spoken nouns: nominative and genitive. */
 const NOM = [
   "صِفْرٌ",
   "وَاحِدٌ",
@@ -36,18 +36,32 @@ const NOM = [
   "تِسْعَةٌ",
   "عَشَرَةٌ",
 ];
-const ACC = [
-  "صِفْرًا",
-  "وَاحِدًا",
-  "اثْنَيْنِ",
-  "ثَلَاثَةً",
-  "أَرْبَعَةً",
-  "خَمْسَةً",
-  "سِتَّةً",
-  "سَبْعَةً",
-  "ثَمَانِيَةً",
-  "تِسْعَةً",
-  "عَشَرَةً",
+/** The same numbers with the article, for "الْخَمْسَةُ أَكْبَرُ أَمْ أَصْغَرُ مِنَ الثَّلَاثَةِ؟". */
+const DEF_NOM = [
+  "الصِّفْرُ",
+  "الْوَاحِدُ",
+  "الاثْنَانِ",
+  "الثَّلَاثَةُ",
+  "الأَرْبَعَةُ",
+  "الْخَمْسَةُ",
+  "السِّتَّةُ",
+  "السَّبْعَةُ",
+  "الثَّمَانِيَةُ",
+  "التِّسْعَةُ",
+  "الْعَشَرَةُ",
+];
+const DEF_GEN = [
+  "الصِّفْرِ",
+  "الْوَاحِدِ",
+  "الاثْنَيْنِ",
+  "الثَّلَاثَةِ",
+  "الأَرْبَعَةِ",
+  "الْخَمْسَةِ",
+  "السِّتَّةِ",
+  "السَّبْعَةِ",
+  "الثَّمَانِيَةِ",
+  "التِّسْعَةِ",
+  "الْعَشَرَةِ",
 ];
 const GEN = [
   "صِفْرٍ",
@@ -91,25 +105,32 @@ function digits(...ns: number[]): TraceTarget[] {
   }));
 }
 
-/** Two groups with words: أَكْثَرُ / أَقَلُّ / يُسَاوِي, about the first group (on the right). */
+/**
+ * Two groups with words: أَكْثَرُ / أَقَلُّ / يُسَاوِي, about the first group (on the right).
+ * The question names the first group first: "الدَّعَاسِيقُ أَكْثَرُ أَمْ أَقَلُّ مِنَ السَّلَاحِفِ؟".
+ */
 function compareGroups(
-  prompt: string,
-  [firstEmoji, a]: [string, number],
-  [secondEmoji, b]: [string, number],
+  [firstEmoji, firstNoun, a]: [string, string, number],
+  [secondEmoji, secondNoun, b]: [string, string, number],
 ): CompareRound {
   return {
-    prompt,
+    prompt: `${firstNoun} أَكْثَرُ أَمْ أَقَلُّ مِنَ ${secondNoun}؟`,
     first: { pics: pics(firstEmoji, a) },
     second: { pics: pics(secondEmoji, b) },
     mode: "words",
   };
 }
 
-/** Two numbers, the first on the right: "أُقَارِنُ خَمْسَةً بِثَلَاثَةٍ". */
+/**
+ * Two numbers, the first on the right, asked about the first: in words mode
+ * "الْخَمْسَةُ أَكْبَرُ أَمْ أَصْغَرُ مِنَ الثَّلَاثَةِ؟", in symbols mode "أَيُّ إِشَارَةٍ بَيْنَ خَمْسَةٍ وَثَلَاثَةٍ؟".
+ */
 function compareNumbers(a: number, b: number, mode: "words" | "symbols"): CompareRound {
-  const prompt = `أُقَارِنُ ${ACC[a]} بِ${GEN[b]}`;
   return {
-    prompt: mode === "symbols" ? `${prompt}، وَأَخْتَارُ الإِشَارَةَ` : prompt,
+    prompt:
+      mode === "symbols"
+        ? `أَيُّ إِشَارَةٍ بَيْنَ ${GEN[a]} وَ${GEN[b]}؟`
+        : `${DEF_NOM[a]} أَكْبَرُ أَمْ أَصْغَرُ مِنَ ${DEF_GEN[b]}؟`,
     first: { number: a },
     second: { number: b },
     mode,
@@ -360,11 +381,11 @@ const drafts: MathLessonDraft[] = [
     emoji: "🐞",
     color,
     rounds: [
-      compareGroups("أُقَارِنُ الدَّعَاسِيقَ بِالسَّلَاحِفِ", ["🐞", 5], ["🐢", 3]),
-      compareGroups("أُقَارِنُ الدَّعَاسِيقَ بِالسَّلَاحِفِ", ["🐞", 2], ["🐢", 4]),
-      compareGroups("أُقَارِنُ الدَّعَاسِيقَ بِالسَّلَاحِفِ", ["🐞", 4], ["🐢", 4]),
-      compareGroups("أُقَارِنُ الأَرَانِبَ بِالْمَاعِزِ", ["🐇", 6], ["🐐", 3]),
-      compareGroups("أُقَارِنُ الأَرَانِبَ بِالْمَاعِزِ", ["🐇", 2], ["🐐", 5]),
+      compareGroups(["🐞", "الدَّعَاسِيقُ", 5], ["🐢", "السَّلَاحِفِ", 3]),
+      compareGroups(["🐞", "الدَّعَاسِيقُ", 2], ["🐢", "السَّلَاحِفِ", 4]),
+      compareGroups(["🐞", "الدَّعَاسِيقُ", 4], ["🐢", "السَّلَاحِفِ", 4]),
+      compareGroups(["🐇", "الأَرَانِبُ", 6], ["🐐", "الْمَاعِزِ", 3]),
+      compareGroups(["🐇", "الأَرَانِبُ", 2], ["🐐", "الْمَاعِزِ", 5]),
     ],
   },
   {
