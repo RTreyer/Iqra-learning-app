@@ -47,14 +47,14 @@ export default function UnitScreen() {
         <View style={styles.headerCenter}>
           <UiText style={styles.title}>{unit.title}</UiText>
           <View style={[styles.badge, { borderColor: unit.color }]}>
-            <Text style={styles.badgeText}>{unit.badgeLabel}</Text>
+            <UiText style={styles.badgeText}>{unit.badgeLabel}</UiText>
           </View>
         </View>
         <Text style={styles.headerEmoji}>{unit.emoji}</Text>
       </View>
 
       <View style={styles.themeRow}>
-        <Text style={styles.themeText}>{unit.theme}</Text>
+        <UiText style={styles.themeText}>{unit.theme}</UiText>
         {unit.letters ? (
           <View style={styles.lettersRow}>
             {unit.letters.map((letter) => (

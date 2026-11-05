@@ -31,11 +31,11 @@ export function UnitCard({ unit, progress, onPress }: Props) {
         <UiText style={styles.title}>{unit.title}</UiText>
         <View style={[styles.footer, { flexDirection: row }]}>
           <View style={styles.label}>
-            <Text style={styles.labelText}>{unit.theme}</Text>
+            <UiText style={styles.labelText}>{unit.theme}</UiText>
           </View>
           {unit.badgeLabel !== unit.theme ? (
             <View style={styles.label}>
-              <Text style={styles.labelText}>{unit.badgeLabel}</Text>
+              <UiText style={styles.labelText}>{unit.badgeLabel}</UiText>
             </View>
           ) : null}
           <ProgressPill {...progress} />

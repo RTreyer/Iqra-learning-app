@@ -72,6 +72,30 @@ const english: Record<string, string> = {
   "الْوَحْدَةُ الثَّانِيَةُ": "Unit 2",
   "الْوَحْدَةُ الثَّالِثَةُ": "Unit 3",
   "الْوَحْدَةُ الْخَامِسَةُ": "Unit 5",
+  // Unit card chips (theme and badge). Letter badges such as "م ب ل" are lesson content and stay Arabic.
+  "أُحِبُّ مَامَا وَبَابَا": "I love Mama and Baba",
+  "الْمُعَلِّمَةُ بَيَانُ، أَخِي مَرِيضٌ، دَارُ الأَيْتَامِ":
+    "Teacher Bayan, My Brother Is Sick, The Orphanage",
+  "بَيْتٌ مِنْ رَمْلٍ، ابْنَةٌ أَمِينَةٌ، الْبَقَرَةُ":
+    "A House of Sand, An Honest Daughter, The Cow",
+  "تَرْتِيبُ الصَّفِّ، رَجُلُ الْمُرُورِ، بَدْرٌ وَاللُّعْبَةُ، مَنَالُ وَالْمَزْرَعَةُ":
+    "Lining Up, The Traffic Officer, Badr and the Toy, Manal and the Farm",
+  "مُنِيرٌ وَالْقِرَاءَةُ، صَابِرٌ وَالْبُلْبُلُ، مِصْيَدَةُ مُفِيدٍ":
+    "Munir and Reading, Sabir and the Nightingale, Mufid's Mousetrap",
+  "النَّظَافَةُ، أَسْنَانُ وَسِيمٍ، جَارُ الْمَسْجِدِ":
+    "Cleanliness, Waseem's Teeth, The Mosque Neighbor",
+  "فِي الْقَرْيَة": "In the Village",
+  "الأَعْدَادُ مِنْ ٠ إِلَى ١٠": "Numbers 0 to 10",
+  أَعُدُّ: "Count",
+  "الْجَمْع وَالطَّرْح ضِمْنَ ١٠": "Adding and subtracting within 10",
+  "أَجْمَعُ وَأَطْرَحُ": "Add and subtract",
+  "الأَشْكَال الْهَنْدَسِيَّة": "Geometric shapes",
+  أَشْكَال: "Shapes",
+  جِسْمِي: "My body",
+  الْحَيَوَانَات: "Animals",
+  حَيَوَانَات: "Animals",
+  "النَّبَاتَات وَالْمَاء": "Plants and water",
+  نَبَات: "Plants",
   مُرَاجَعَة: "Review",
   "مُرَاجَعَة الْيَوْم": "Today's review",
   تَابِعْ: "Continue",
@@ -118,7 +142,10 @@ export function translateUi(text: string, language: UiLanguage): string {
   if (unitComplete) return `🎉 Completed ${translateUi(unitComplete[1], language)}!`;
   // Book metadata is translated for navigation without modifying its source.
   // An Arabic comma joins two parts ("اللغة العربية، الجزء الأول"), a full stop two sentences.
-  for (const [arabic, english] of [["، ", ", "], [". ", ". "]])
+  for (const [arabic, english] of [
+    ["، ", ", "],
+    [". ", ". "],
+  ])
     if (value.includes(arabic))
       return value
         .split(arabic)

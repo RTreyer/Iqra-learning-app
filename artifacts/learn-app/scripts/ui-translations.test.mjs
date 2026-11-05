@@ -94,3 +94,23 @@ test("Review session chrome translates", () => {
   assert.equal(translateUi("يَوْم مُتَتَالٍ", "en"), "day streak");
   assert.equal(translateUi("3 يَوْم مُتَتَالٍ", "en"), "3 day streak");
 });
+test("Catalog unit themes and badge labels translate, letter badges stay Arabic", async () => {
+  const { books } = await import("../content/index.ts");
+  const arabic = /[؀-ۿ]/;
+  for (const book of books) {
+    for (const unit of book.units) {
+      assert.doesNotMatch(translateUi(unit.theme, "en"), arabic, unit.id);
+      // Letters introduced by a unit are lesson content, shown as they are.
+      if (/^\p{L}( \p{L})+$/u.test(unit.badgeLabel)) {
+        assert.equal(translateUi(unit.badgeLabel, "en"), unit.badgeLabel, unit.id);
+      } else {
+        assert.doesNotMatch(translateUi(unit.badgeLabel, "en"), arabic, unit.id);
+      }
+    }
+  }
+  assert.equal(translateUi("الأَعْدَادُ مِنْ ٠ إِلَى ١٠", "en"), "Numbers 0 to 10");
+  assert.equal(
+    translateUi("الْجَمْع وَالطَّرْح ضِمْنَ ١٠", "en"),
+    "Adding and subtracting within 10",
+  );
+});

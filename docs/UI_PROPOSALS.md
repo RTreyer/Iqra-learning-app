@@ -2,7 +2,7 @@
 
 Status: proposals only. Nothing here is implemented.
 
-Constraints that apply to every proposal: offline only, no login, Arabic UI (English only for menus and buttons), children in Yemen, low-end Android, keep the current visual style (gradient backgrounds, big rounded cards, emoji, star badge, language switch). Touch targets stay at 48 px or more (`touchTarget` in `theme/tokens.ts`).
+Constraints that apply to every proposal: offline only, no login, Arabic UI (English only for menus, buttons and the labels on book and unit cards; lessons and speech stay Arabic), children in Yemen, low-end Android, keep the current visual style (gradient backgrounds, big rounded cards, emoji, star badge, language switch). Touch targets stay at 48 px or more (`touchTarget` in `theme/tokens.ts`).
 
 ## Implemented accessibility baseline (2026-10-17)
 

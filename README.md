@@ -62,7 +62,7 @@ Home lists grades 1 to 6 (`grades` in `content/catalog.ts`). Grade 1 shows its b
 
 ## Owner rule
 
-Do not change Arabic lesson content (stories, vocabulary, quiz text, answer data, layouts, navigation) unless the owner explicitly asks. English stays limited to menus and buttons.
+Do not change Arabic lesson content (stories, vocabulary, quiz text, answer data, layouts, navigation) unless the owner explicitly asks. English stays limited to menus, buttons and the labels on book and unit cards; lessons and speech stay Arabic.
 
 ## Docs
 
