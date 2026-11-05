@@ -23,7 +23,7 @@ function ShapePath({ shape, fill, stroke }: { shape: ShapeId; fill: string; stro
 
 /** One math picture: an emoji, or an SVG shape with colour, size, shading and crossing out. */
 export function MathPic({ pic }: { pic: Pic }) {
-  const clipId = useId().replace(/:/g, "");
+  const clipId = "clip" + useId().replace(/[^A-Za-z0-9_-]/g, "");
   const size = SIZES[pic.size ?? "normal"];
   const label = picLabel(pic);
   return (
