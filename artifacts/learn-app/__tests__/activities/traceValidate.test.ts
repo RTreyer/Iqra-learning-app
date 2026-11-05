@@ -129,6 +129,13 @@ describe("stroke path building", () => {
 describe("validateOnGuide", () => {
   const shape = (guide: string) => decodeMask(traceGuides[guide].mask, TRACE_GRID);
 
+  it("passes every guide traced along its outline", () => {
+    const failing = Object.keys(traceGuides).filter(
+      (guide) => !validateOnGuide(strokesOnGuide(guide), PAD, shape(guide)).valid,
+    );
+    expect(failing).toEqual([]);
+  });
+
   it("passes a trace along the letter", () => {
     expect(validateOnGuide(strokesOnGuide("د"), PAD, shape("د"))).toEqual({ valid: true });
   });
@@ -186,5 +193,18 @@ describe("digit guides", () => {
 
   it("passes ٢ and ٦ traced along their outline", () => {
     for (const digit of ["٢", "٦"]) passes(digit, strokesOnGuide(digit));
+  });
+
+  it("fails ٣ with its last hook skipped, although half of it is covered", () => {
+    const shape3 = shape("٣");
+    const leftPart = strokesOnGuide("٣")
+      .map((stroke) => stroke.filter((p) => p.x < 170))
+      .filter((stroke) => stroke.length > 0);
+    // Without the centre line check this drawing passes.
+    expect(validateOnGuide(leftPart, PAD, { ...shape3, spine: [] })).toEqual({ valid: true });
+    expect(validateOnGuide(leftPart, PAD, shape3)).toEqual({
+      valid: false,
+      msg: "أكمل كتابة الحرف كله 📏",
+    });
   });
 });

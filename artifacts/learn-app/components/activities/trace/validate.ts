@@ -83,15 +83,30 @@ export function validateTracing(
 //  5. On the letter: at least ON_LETTER of the drawn points lie on the letter (with a
 //     finger's tolerance), so a different letter or a scribble next to it fails.
 //  6. Covered: at least COVERED of the letter lies under the drawn path.
+//  7. Whole letter: at least ALONG of the letter's centre line was passed. A thick letter is
+//     half covered by a line through part of it, so check 6 alone lets a skipped hook pass.
 
 /** Share of drawn points that must lie on the letter. */
 export const ON_LETTER = 0.9;
 /** Share of the letter that must be traced. */
 export const COVERED = 0.5;
+/** Share of the letter's centre line the drawing must pass. */
+export const ALONG = 0.85;
 /** Finger tolerance in mask cells (a cell is 2 % of the pad). */
 const REACH = 2;
 
-export type GuideMask = { grid: number; cells: Uint8Array; near: Uint8Array; count: number };
+/**
+ * `spine` is the letter's centre line (cell indices) and `width` its half width there: a
+ * centre line cell counts as passed when the drawing comes within that half width plus a cell.
+ */
+export type GuideMask = {
+  grid: number;
+  cells: Uint8Array;
+  near: Uint8Array;
+  count: number;
+  spine: number[];
+  width: Float32Array;
+};
 
 const masks = new Map<string, GuideMask>();
 
@@ -114,19 +129,21 @@ export function decodeMask(mask: string, grid: number): GuideMask {
       near[i] = 1;
     }),
   );
-  const decoded = { grid, cells, near, count };
+  const width = halfWidths(cells, grid);
+  const spine = centreLine(cells, grid);
+  const decoded = { grid, cells, near, count, spine, width };
   masks.set(mask, decoded);
   return decoded;
 }
 
-/** Checks 5 and 6 for a guide mask; `word` only changes the wording of the hint. */
+/** Checks 5 to 7 for a guide mask; `word` only changes the wording of the hint. */
 export function validateOnGuide(
   strokes: Stroke[],
   pad: PadSize,
   guide: GuideMask,
   word = false,
 ): ValidationResult {
-  const { grid, cells, near, count } = guide;
+  const { grid, cells, near, count, spine, width } = guide;
   const cellOf = (p: Point) => {
     const col = Math.floor((p.x / pad.width) * grid);
     const row = Math.floor((p.y / pad.height) * grid);
@@ -165,7 +182,102 @@ export function validateOnGuide(
     });
   }
   if (coveredCount / count < COVERED) return { valid: false, msg: COVER_MORE(word) };
+
+  const drawn = new Uint8Array(grid * grid);
+  for (const p of points) {
+    const i = cellOf(p);
+    if (i >= 0) drawn[i] = 1;
+  }
+  const passed = spine.filter((i) => {
+    const row = Math.floor(i / grid);
+    const col = i % grid;
+    const reach = width[i] + 1;
+    const span = Math.ceil(reach);
+    for (let dr = -span; dr <= span; dr++) {
+      for (let dc = -span; dc <= span; dc++) {
+        const r = row + dr;
+        const c = col + dc;
+        if (r < 0 || r >= grid || c < 0 || c >= grid || dr * dr + dc * dc > reach * reach) continue;
+        if (drawn[r * grid + c]) return true;
+      }
+    }
+    return false;
+  }).length;
+  if (spine.length > 0 && passed / spine.length < ALONG)
+    return { valid: false, msg: COVER_MORE(word) };
   return { valid: true };
+}
+
+/** Distance of every letter cell to the nearest empty cell (two pass chamfer). */
+function halfWidths(cells: Uint8Array, grid: number): Float32Array {
+  const d = new Float32Array(grid * grid);
+  for (let i = 0; i < d.length; i++) d[i] = cells[i] ? Infinity : 0;
+  const relax = (i: number, j: number, cost: number) => {
+    if (d[j] + cost < d[i]) d[i] = d[j] + cost;
+  };
+  for (let r = 0; r < grid; r++) {
+    for (let c = 0; c < grid; c++) {
+      const i = r * grid + c;
+      if (r > 0) relax(i, i - grid, 1);
+      if (c > 0) relax(i, i - 1, 1);
+      if (r > 0 && c > 0) relax(i, i - grid - 1, Math.SQRT2);
+      if (r > 0 && c < grid - 1) relax(i, i - grid + 1, Math.SQRT2);
+    }
+  }
+  for (let r = grid - 1; r >= 0; r--) {
+    for (let c = grid - 1; c >= 0; c--) {
+      const i = r * grid + c;
+      if (r < grid - 1) relax(i, i + grid, 1);
+      if (c < grid - 1) relax(i, i + 1, 1);
+      if (r < grid - 1 && c < grid - 1) relax(i, i + grid + 1, Math.SQRT2);
+      if (r < grid - 1 && c > 0) relax(i, i + grid - 1, Math.SQRT2);
+    }
+  }
+  // Cells on the pad edge count as one cell from the outside.
+  for (let i = 0; i < d.length; i++) if (d[i] === Infinity) d[i] = 1;
+  return d;
+}
+
+/** The letter thinned to a one cell centre line (Zhang and Suen). */
+function centreLine(cells: Uint8Array, grid: number): number[] {
+  const m = Uint8Array.from(cells);
+  const at = (r: number, c: number) =>
+    r < 0 || c < 0 || r >= grid || c >= grid ? 0 : m[r * grid + c];
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const pass of [0, 1]) {
+      const remove: number[] = [];
+      forEachCell(m, grid, (r, c) => {
+        // Neighbours clockwise from the top.
+        const n = [
+          at(r - 1, c),
+          at(r - 1, c + 1),
+          at(r, c + 1),
+          at(r + 1, c + 1),
+          at(r + 1, c),
+          at(r + 1, c - 1),
+          at(r, c - 1),
+          at(r - 1, c - 1),
+        ];
+        const filled = n.reduce((a, b) => a + b, 0);
+        if (filled < 2 || filled > 6) return;
+        let turns = 0;
+        for (let k = 0; k < 8; k++) if (!n[k] && n[(k + 1) % 8]) turns++;
+        if (turns !== 1) return;
+        const keep =
+          pass === 0
+            ? n[0] * n[2] * n[4] || n[2] * n[4] * n[6]
+            : n[0] * n[2] * n[6] || n[0] * n[4] * n[6];
+        if (!keep) remove.push(r * grid + c);
+      });
+      for (const i of remove) m[i] = 0;
+      if (remove.length) changed = true;
+    }
+  }
+  const out: number[] = [];
+  for (let i = 0; i < m.length; i++) if (m[i]) out.push(i);
+  return out;
 }
 
 const ON_THE_LETTER = (word: boolean) =>
