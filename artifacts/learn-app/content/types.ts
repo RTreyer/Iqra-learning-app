@@ -76,6 +76,21 @@ export type BuildWordRound = {
 export type CountingRound = { emoji: string; count: number; options: number[] };
 export type ArithmeticRound = { a: number; b: number; op: "+" | "-"; options: number[] };
 
+/** Named colours of math pictures; picLabel.ts maps them to hex and Arabic words. */
+export type MathColor = "red" | "blue" | "green" | "yellow" | "orange" | "pink";
+export type ShapeId = "circle" | "square" | "triangle" | "rectangle";
+/** One math picture: an emoji or a drawn shape. `crossed` marks a taken away object. */
+export type MathPic =
+  | { emoji: string; size?: "small" | "big"; crossed?: boolean }
+  | {
+      shape: ShapeId;
+      color: MathColor;
+      size?: "small" | "big";
+      crossed?: boolean;
+      /** Shaded part of the shape, for half and quarter. */
+      shaded?: "half" | "quarter";
+    };
+
 export type LessonBody =
   | {
       type: "story";
