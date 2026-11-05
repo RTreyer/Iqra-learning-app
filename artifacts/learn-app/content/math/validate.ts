@@ -1,4 +1,4 @@
-import type { MathPic, PictureChoiceRound } from "../types.ts";
+import type { CompareRound, CompareSide, MathPic, PictureChoiceRound } from "../types.ts";
 
 // Pure checks of math rounds, used by Jest and by scripts/content.test.mjs on the catalog.
 // Each returns the problems found; [] means valid.
@@ -25,4 +25,19 @@ export function validatePictureChoice(round: PictureChoiceRound): string[] {
   if (round.model) problems.push(...checkPic(round.model));
   for (const choice of round.choices) for (const pic of choice) problems.push(...checkPic(pic));
   return problems;
+}
+
+function checkSide(side: CompareSide): string[] {
+  if ("pics" in side) {
+    if (side.pics.length === 0) return ["empty group"];
+    return [
+      ...(side.pics.length > 10 ? ["value outside 0 to 10"] : []),
+      ...side.pics.flatMap(checkPic),
+    ];
+  }
+  return side.number < 0 || side.number > 10 ? ["value outside 0 to 10"] : [];
+}
+
+export function validateCompare(round: CompareRound): string[] {
+  return [...checkPrompt(round.prompt), ...checkSide(round.first), ...checkSide(round.second)];
 }

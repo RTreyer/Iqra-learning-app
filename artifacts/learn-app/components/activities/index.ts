@@ -3,6 +3,7 @@ import type { LessonType } from "@/content/types";
 import { ArithmeticActivity } from "./ArithmeticActivity";
 import { BehaviorActivity } from "./BehaviorActivity";
 import { BuildWordActivity } from "./BuildWordActivity";
+import { CompareActivity } from "./CompareActivity";
 import { CountingActivity } from "./CountingActivity";
 import { LetterPickActivity } from "./LetterPickActivity";
 import { ListenPickActivity } from "./ListenPickActivity";
@@ -32,6 +33,7 @@ export const ACTIVITY_COMPONENTS: ActivityMap = {
   counting: CountingActivity,
   arithmetic: ArithmeticActivity,
   picture_choice: PictureChoiceActivity,
+  compare: CompareActivity,
 };
 
 export function activityFor<K extends LessonType>(type: K): ComponentType<ActivityProps<K>> {

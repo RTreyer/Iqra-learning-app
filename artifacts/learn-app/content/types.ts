@@ -101,6 +101,17 @@ export type PictureChoiceRound = {
   correctIndex: number;
 };
 
+/** One side of a comparison: a group of pictures or a number. */
+export type CompareSide = { pics: MathPic[] } | { number: number };
+/** `first` sits on the right and is read first; the answer says how it relates to `second`. */
+export type CompareRound = {
+  prompt: string;
+  first: CompareSide;
+  second: CompareSide;
+  /** Word buttons (أَكْثَرُ / أَقَلُّ / يُسَاوِي, or أَكْبَرُ / أَصْغَرُ for numbers) or the symbols > < =. */
+  mode: "words" | "symbols";
+};
+
 export type LessonBody =
   | {
       type: "story";
@@ -125,7 +136,8 @@ export type LessonBody =
   | { type: "build_word"; rounds: BuildWordRound[] }
   | { type: "counting"; rounds: CountingRound[] }
   | { type: "arithmetic"; rounds: ArithmeticRound[] }
-  | { type: "picture_choice"; rounds: PictureChoiceRound[] };
+  | { type: "picture_choice"; rounds: PictureChoiceRound[] }
+  | { type: "compare"; rounds: CompareRound[] };
 
 export type LessonType = LessonBody["type"];
 

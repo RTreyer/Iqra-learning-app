@@ -1,4 +1,4 @@
-import { checkPic, validatePictureChoice } from "@/content/math/validate";
+import { checkPic, validateCompare, validatePictureChoice } from "@/content/math/validate";
 
 const apple = { emoji: "🍎" };
 
@@ -30,4 +30,20 @@ test("quarter shading is not allowed on a triangle", () => {
   expect(
     validatePictureChoice({ prompt: "x", model: tri, choices: [[apple], [tri]], correctIndex: 0 }),
   ).toEqual(["quarter not allowed on a triangle", "quarter not allowed on a triangle"]);
+});
+
+test("compare sides must be non empty and within 0 to 10", () => {
+  expect(
+    validateCompare({ prompt: "x", first: { number: 3 }, second: { number: 10 }, mode: "symbols" }),
+  ).toEqual([]);
+  expect(
+    validateCompare({ prompt: "x", first: { pics: [] }, second: { number: 11 }, mode: "words" }),
+  ).toEqual(["empty group", "value outside 0 to 10"]);
+});
+
+test("compare runs the picture checks on every pic of a side", () => {
+  const bad = { shape: "triangle" as const, color: "red" as const, shaded: "quarter" as const };
+  expect(
+    validateCompare({ prompt: "x", first: { pics: [bad] }, second: { number: 1 }, mode: "words" }),
+  ).toEqual(["quarter not allowed on a triangle"]);
 });

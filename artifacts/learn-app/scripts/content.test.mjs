@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { validatePictureChoice } from "../content/math/validate.ts";
+import { validateCompare, validatePictureChoice } from "../content/math/validate.ts";
 import { books, getBook, getLesson, getUnit, unitLessonIds } from "../content/index.ts";
 
 const units = books.flatMap((book) => book.units);
@@ -129,6 +129,13 @@ test("picture_choice rounds are valid", () => {
   for (const lesson of byType("picture_choice"))
     lesson.rounds.forEach((round, i) =>
       assert.deepEqual(validatePictureChoice(round), [], `${lesson.id} round ${i + 1}`),
+    );
+});
+
+test("compare rounds are valid", () => {
+  for (const lesson of byType("compare"))
+    lesson.rounds.forEach((round, i) =>
+      assert.deepEqual(validateCompare(round), [], `${lesson.id} round ${i + 1}`),
     );
 });
 
