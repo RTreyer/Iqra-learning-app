@@ -4,6 +4,7 @@ import {
   validateCompare,
   validateNumberFill,
   validatePictureChoice,
+  validateSort,
 } from "../content/math/validate.ts";
 import { books, getBook, getLesson, getUnit, unitLessonIds } from "../content/index.ts";
 
@@ -148,6 +149,10 @@ test("number_fill rounds are valid", () => {
     lesson.rounds.forEach((round, i) =>
       assert.deepEqual(validateNumberFill(round), [], `${lesson.id} round ${i + 1}`),
     );
+});
+
+test("sort lessons are valid", () => {
+  for (const lesson of byType("sort")) assert.deepEqual(validateSort(lesson), [], lesson.id);
 });
 
 test("arithmetic results are non negative and among the options", () => {

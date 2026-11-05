@@ -112,6 +112,9 @@ export type CompareRound = {
   mode: "words" | "symbols";
 };
 
+export type SortBox = { label: string; pic?: MathPic };
+export type SortItem = { pic: MathPic; box: 0 | 1 };
+
 export type FillCell = number | "+" | "-" | "=" | "?";
 export type NumberFillRound = {
   prompt: string;
@@ -152,7 +155,8 @@ export type LessonBody =
   | { type: "arithmetic"; rounds: ArithmeticRound[] }
   | { type: "picture_choice"; rounds: PictureChoiceRound[] }
   | { type: "compare"; rounds: CompareRound[] }
-  | { type: "number_fill"; rounds: NumberFillRound[] };
+  | { type: "number_fill"; rounds: NumberFillRound[] }
+  | { type: "sort"; prompt: string; boxes: [SortBox, SortBox]; items: SortItem[] };
 
 export type LessonType = LessonBody["type"];
 

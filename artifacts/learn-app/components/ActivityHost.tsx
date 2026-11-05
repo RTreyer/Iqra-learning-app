@@ -64,6 +64,10 @@ export function ActivityHost({ lesson, ...props }: Props) {
       const Activity = ACTIVITY_COMPONENTS.number_fill;
       return <Activity lesson={lesson} {...props} />;
     }
+    case "sort": {
+      const Activity = ACTIVITY_COMPONENTS.sort;
+      return <Activity lesson={lesson} {...props} />;
+    }
     default:
       return assertNever(lesson);
   }

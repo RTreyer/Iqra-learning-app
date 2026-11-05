@@ -11,6 +11,7 @@ import { MatchingActivity } from "./MatchingActivity";
 import { NamingActivity } from "./NamingActivity";
 import { NumberFillActivity } from "./NumberFillActivity";
 import { PictureChoiceActivity } from "./PictureChoiceActivity";
+import { SortActivity } from "./SortActivity";
 import { StoryActivity } from "./StoryActivity";
 import { TraceActivity } from "./TraceActivity";
 import type { ActivityProps } from "./types";
@@ -36,6 +37,7 @@ export const ACTIVITY_COMPONENTS: ActivityMap = {
   picture_choice: PictureChoiceActivity,
   compare: CompareActivity,
   number_fill: NumberFillActivity,
+  sort: SortActivity,
 };
 
 export function activityFor<K extends LessonType>(type: K): ComponentType<ActivityProps<K>> {

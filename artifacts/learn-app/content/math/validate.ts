@@ -4,6 +4,8 @@ import type {
   MathPic,
   NumberFillRound,
   PictureChoiceRound,
+  SortBox,
+  SortItem,
 } from "../types.ts";
 import { numberFillAnswer } from "./answers.ts";
 
@@ -61,5 +63,20 @@ export function validateNumberFill(round: NumberFillRound): string[] {
   if (numbers.some((n) => n < 0)) problems.push("negative number");
   if (!round.options.includes(answer as number)) problems.push(`answer ${answer} not in options`);
   if (new Set(round.options).size !== round.options.length) problems.push("options not unique");
+  return problems;
+}
+
+export function validateSort(lesson: {
+  prompt: string;
+  boxes: [SortBox, SortBox];
+  items: SortItem[];
+}): string[] {
+  const problems = [...checkPrompt(lesson.prompt)];
+  if (lesson.items.length < 2) problems.push("needs at least 2 items");
+  if (!lesson.items.some((i) => i.box === 0) || !lesson.items.some((i) => i.box === 1))
+    problems.push("both boxes must be used");
+  if (lesson.boxes.some((b) => !b.label.trim())) problems.push("empty box label");
+  for (const item of lesson.items) problems.push(...checkPic(item.pic));
+  for (const box of lesson.boxes) if (box.pic) problems.push(...checkPic(box.pic));
   return problems;
 }

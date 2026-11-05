@@ -1,0 +1,135 @@
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { picLabel } from "@/content/math/picLabel";
+import * as haptics from "@/lib/haptics";
+import { speak } from "@/lib/speech";
+import { colors, touchTarget } from "@/theme/tokens";
+import { MathPic } from "./math/MathPic";
+import { useInstruction } from "./math/useInstruction";
+import { ListenButton } from "./shared/ListenButton";
+import { PRAISE } from "./shared/strings";
+import { act } from "./shared/styles";
+import { useLatest } from "./shared/useLatest";
+import { ADVANCE_MS } from "./shared/useQuiz";
+import { withAttemptReset } from "./shared/withAttemptReset";
+import type { ActivityProps } from "./types";
+
+/**
+ * Tap an item, then the box it belongs in. A wrong box keeps the item in place; only an
+ * item's first placement counts. The lesson ends when every item is in its box.
+ */
+function Sort({ lesson, color, onComplete }: ActivityProps<"sort">) {
+  const [selected, setSelected] = useState<number | null>(null);
+  const [placed, setPlaced] = useState<boolean[]>(() => lesson.items.map(() => false));
+  const missed = useRef<Set<number>>(new Set());
+  const callbacks = useLatest({ onComplete });
+  useInstruction(lesson.prompt);
+
+  const done = placed.every(Boolean);
+  useEffect(() => {
+    if (!done) return;
+    speak(PRAISE);
+    const total = lesson.items.length;
+    const t = setTimeout(
+      () => callbacks.current.onComplete({ correct: total - missed.current.size, total }),
+      ADVANCE_MS,
+    );
+    return () => clearTimeout(t);
+  }, [done, lesson.items.length, callbacks]);
+
+  const handleBox = useCallback(
+    (box: 0 | 1) => {
+      if (selected === null) return;
+      if (lesson.items[selected].box !== box) {
+        missed.current.add(selected);
+        haptics.error();
+        return;
+      }
+      haptics.success();
+      setPlaced((p) => p.map((v, i) => v || i === selected));
+      setSelected(null);
+    },
+    [selected, lesson.items],
+  );
+
+  return (
+    <View style={act.container}>
+      <ListenButton text={lesson.prompt} color={color} showText />
+      <View style={styles.boxes}>
+        {lesson.boxes.map((box, b) => (
+          <Pressable
+            key={b}
+            testID={`sort-box-${b}`}
+            accessibilityRole="button"
+            accessibilityLabel={box.label}
+            onPress={() => handleBox(b as 0 | 1)}
+            style={[styles.box, selected !== null && { borderColor: color }]}
+          >
+            {box.pic ? <MathPic pic={box.pic} decorative /> : null}
+            <Text style={styles.boxLabel}>{box.label}</Text>
+            <View style={styles.inBox}>
+              {lesson.items.map((item, i) =>
+                placed[i] && item.box === b ? (
+                  <MathPic key={i} pic={{ ...item.pic, size: "small" }} decorative />
+                ) : null,
+              )}
+            </View>
+          </Pressable>
+        ))}
+      </View>
+      <View style={styles.items}>
+        {lesson.items.map((item, i) =>
+          placed[i] ? null : (
+            <Pressable
+              key={i}
+              testID={`sort-item-${i}`}
+              accessibilityRole="button"
+              accessibilityLabel={picLabel(item.pic)}
+              accessibilityState={{ selected: selected === i }}
+              onPress={() => {
+                haptics.tap();
+                setSelected(i);
+              }}
+              style={[
+                styles.item,
+                selected === i && { borderColor: color, backgroundColor: colors.successSoft },
+              ]}
+            >
+              <MathPic pic={item.pic} decorative />
+            </Pressable>
+          ),
+        )}
+      </View>
+    </View>
+  );
+}
+
+export const SortActivity = withAttemptReset(Sort, "SortActivity");
+
+const styles = StyleSheet.create({
+  boxes: { flexDirection: "row-reverse", gap: 12, width: "100%" },
+  box: {
+    flex: 1,
+    minHeight: 160,
+    borderRadius: 20,
+    borderWidth: 3,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    alignItems: "center",
+    padding: 10,
+    gap: 6,
+  },
+  boxLabel: { fontSize: 20, fontWeight: "800", color: colors.text },
+  inBox: { flexDirection: "row-reverse", flexWrap: "wrap", justifyContent: "center", gap: 4 },
+  items: { flexDirection: "row-reverse", flexWrap: "wrap", justifyContent: "center", gap: 12 },
+  item: {
+    minWidth: touchTarget * 1.5,
+    minHeight: touchTarget * 1.5,
+    borderRadius: 16,
+    borderWidth: 3,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});

@@ -3,6 +3,7 @@ import {
   validateCompare,
   validateNumberFill,
   validatePictureChoice,
+  validateSort,
 } from "@/content/math/validate";
 
 const apple = { emoji: "🍎" };
@@ -90,4 +91,43 @@ test("number fill needs a solvable sentence whose answer is an option", () => {
       pics: [{ shape: "triangle", color: "red", shaded: "quarter" }],
     }),
   ).toEqual(["quarter not allowed on a triangle"]);
+});
+
+test("sort needs two used boxes and at least two items", () => {
+  const big = { emoji: "⚽", size: "big" as const };
+  const small = { emoji: "⚽", size: "small" as const };
+  const boxes: [{ label: string }, { label: string }] = [{ label: "كَبِير" }, { label: "صَغِير" }];
+  expect(
+    validateSort({
+      prompt: "x",
+      boxes,
+      items: [
+        { pic: big, box: 0 },
+        { pic: small, box: 1 },
+      ],
+    }),
+  ).toEqual([]);
+  expect(validateSort({ prompt: "x", boxes, items: [{ pic: big, box: 0 }] })).toEqual([
+    "needs at least 2 items",
+    "both boxes must be used",
+  ]);
+});
+
+test("sort checks every item and box picture", () => {
+  const bad = { shape: "triangle" as const, color: "red" as const, shaded: "quarter" as const };
+  const ok = { emoji: "⚽" };
+  const boxes: [{ label: string; pic?: typeof bad }, { label: string }] = [
+    { label: "a", pic: bad },
+    { label: "b" },
+  ];
+  expect(
+    validateSort({
+      prompt: "x",
+      boxes,
+      items: [
+        { pic: bad, box: 0 },
+        { pic: ok, box: 1 },
+      ],
+    }),
+  ).toEqual(["quarter not allowed on a triangle", "quarter not allowed on a triangle"]);
 });
