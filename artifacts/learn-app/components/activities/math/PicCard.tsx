@@ -24,6 +24,7 @@ export function PicCard({ index, pics, state, selected, locked, onPick, scale }:
   return (
     <Animated.View style={scale ? { transform: [{ scale }] } : undefined}>
       <Pressable
+        testID={`pic-card-${index}`}
         accessibilityRole="button"
         accessibilityLabel={groupLabel(pics) + SPOKEN[state]}
         accessibilityState={{ disabled: locked, selected }}
@@ -31,7 +32,7 @@ export function PicCard({ index, pics, state, selected, locked, onPick, scale }:
         onPress={() => onPick(index)}
         style={[styles.card, stateStyles[state]]}
       >
-        <PicGroup pics={pics} />
+        <PicGroup pics={pics} decorative />
         {ICON[state] ? <Text style={styles.icon}>{ICON[state]}</Text> : null}
       </Pressable>
     </Animated.View>

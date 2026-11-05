@@ -15,6 +15,17 @@ test("names shading and crossing out", () => {
     "دَائِرَةٌ صَفْرَاءُ، النِّصْفُ مُلَوَّنٌ",
   );
   expect(picLabel({ emoji: "🍎", crossed: true })).toBe("🍎 مَشْطُوبٌ");
+  expect(picLabel({ shape: "circle", color: "blue", crossed: true })).toBe(
+    "دَائِرَةٌ زَرْقَاءُ مَشْطُوبَةٌ",
+  );
+  expect(picLabel({ shape: "square", color: "red", crossed: true, shaded: "half" })).toBe(
+    "مُرَبَّعٌ أَحْمَرُ مَشْطُوبٌ، النِّصْفُ مُلَوَّنٌ",
+  );
+});
+
+test("an emoji names its size, then crossing out", () => {
+  expect(picLabel({ emoji: "🍎", size: "big" })).toBe("🍎 كَبِيرٌ");
+  expect(picLabel({ emoji: "🍎", size: "small", crossed: true })).toBe("🍎 صَغِيرٌ مَشْطُوبٌ");
 });
 
 test("a group is its labels joined", () => {

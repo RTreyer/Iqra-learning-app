@@ -28,18 +28,23 @@ const COLOR_WORDS: Record<MathColor, [string, string]> = {
 
 const SIZE_WORDS = { big: ["كَبِيرٌ", "كَبِيرَةٌ"], small: ["صَغِيرٌ", "صَغِيرَةٌ"] } as const;
 const SHADED = { half: "النِّصْفُ مُلَوَّنٌ", quarter: "الرُّبْعُ مُلَوَّنٌ" } as const;
-const CROSSED = "مَشْطُوبٌ";
+const CROSSED = ["مَشْطُوبٌ", "مَشْطُوبَةٌ"] as const;
 
 /** Spoken and accessibility label of one picture, e.g. "مُثَلَّثٌ أَحْمَرُ كَبِيرٌ". */
 export function picLabel(pic: MathPic): string {
-  if ("emoji" in pic) return pic.crossed ? `${pic.emoji} ${CROSSED}` : pic.emoji;
+  if ("emoji" in pic) {
+    const parts: string[] = [pic.emoji];
+    if (pic.size) parts.push(SIZE_WORDS[pic.size][0]);
+    if (pic.crossed) parts.push(CROSSED[0]);
+    return parts.join(" ");
+  }
   const { word, feminine } = SHAPES[pic.shape];
   const g = feminine ? 1 : 0;
-  const parts = [word, COLOR_WORDS[pic.color][g]];
+  const parts: string[] = [word, COLOR_WORDS[pic.color][g]];
   if (pic.size) parts.push(SIZE_WORDS[pic.size][g]);
+  if (pic.crossed) parts.push(CROSSED[g]);
   let label = parts.join(" ");
   if (pic.shaded) label += `، ${SHADED[pic.shaded]}`;
-  if (pic.crossed) label += ` ${CROSSED}`;
   return label;
 }
 

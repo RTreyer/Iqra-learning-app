@@ -22,15 +22,15 @@ function ShapePath({ shape, fill, stroke }: { shape: ShapeId; fill: string; stro
 }
 
 /** One math picture: an emoji, or an SVG shape with colour, size, shading and crossing out. */
-export function MathPic({ pic }: { pic: Pic }) {
+export function MathPic({ pic, decorative }: { pic: Pic; decorative?: boolean }) {
   const clipId = "clip" + useId().replace(/[^A-Za-z0-9_-]/g, "");
   const size = SIZES[pic.size ?? "normal"];
   const label = picLabel(pic);
   return (
     <View
-      accessible
-      accessibilityRole="image"
-      accessibilityLabel={label}
+      {...(decorative
+        ? { accessible: false, importantForAccessibility: "no-hide-descendants" as const }
+        : { accessible: true, accessibilityRole: "image" as const, accessibilityLabel: label })}
       style={{ width: size, height: size, alignItems: "center", justifyContent: "center" }}
     >
       {"emoji" in pic ? (
@@ -44,7 +44,7 @@ export function MathPic({ pic }: { pic: Pic }) {
                   <ShapePath shape={pic.shape} fill="#000" stroke="none" />
                 </ClipPath>
               </Defs>
-              <ShapePath shape={pic.shape} fill={colors.white} stroke={MATH_COLORS[pic.color]} />
+              <ShapePath shape={pic.shape} fill={colors.white} stroke="none" />
               <G clipPath={`url(#${clipId})`}>
                 {/* Half: the right half; quarter: the top right quarter (the book's RTL reading start). */}
                 <Rect
@@ -55,7 +55,7 @@ export function MathPic({ pic }: { pic: Pic }) {
                   fill={MATH_COLORS[pic.color]}
                 />
               </G>
-              <ShapePath shape={pic.shape} fill="none" stroke={MATH_COLORS[pic.color]} />
+              <ShapePath shape={pic.shape} fill="none" stroke={colors.text} />
             </>
           ) : (
             <ShapePath shape={pic.shape} fill={MATH_COLORS[pic.color]} stroke={colors.text} />
@@ -80,11 +80,16 @@ export function MathPic({ pic }: { pic: Pic }) {
 }
 
 /** Several pictures side by side, wrapping, read right to left. */
-export function PicGroup({ pics }: { pics: Pic[] }) {
+export function PicGroup({ pics, decorative }: { pics: Pic[]; decorative?: boolean }) {
   return (
-    <View accessible accessibilityLabel={groupLabel(pics)} style={styles.group}>
+    <View
+      {...(decorative
+        ? { accessible: false, importantForAccessibility: "no-hide-descendants" as const }
+        : { accessible: true, accessibilityLabel: groupLabel(pics) })}
+      style={styles.group}
+    >
       {pics.map((pic, i) => (
-        <MathPic key={i} pic={pic} />
+        <MathPic key={i} pic={pic} decorative={decorative} />
       ))}
     </View>
   );

@@ -53,13 +53,15 @@ test("speaks the task once, scores the first tap and completes", () => {
   expect(speech.speak).toHaveBeenCalledWith("مَا الشَّكْلُ الْمُخْتَلِفُ؟", expect.anything());
   fireEvent.press(screen.getByRole("button", { name: "مُثَلَّثٌ أَحْمَرُ" }));
   expect(screen.getByRole("button", { name: "دَائِرَةٌ زَرْقَاءُ" })).toBeDisabled();
+  // A second tap in the same round is ignored.
+  fireEvent.press(screen.getByRole("button", { name: "دَائِرَةٌ زَرْقَاءُ" }));
   speech.speak.mockClear();
   act(() => jest.advanceTimersByTime(900));
   act(() => jest.advanceTimersByTime(400));
   // Same prompt in round 2: not spoken again.
   expect(speech.speak).not.toHaveBeenCalledWith("مَا الشَّكْلُ الْمُخْتَلِفُ؟", expect.anything());
-  // The model and the matching choice both carry the apple label.
-  expect(screen.getAllByLabelText("🍎").length).toBeGreaterThanOrEqual(2);
+  // Only the model carries the picture label; the choice cards are buttons.
+  expect(screen.getByRole("image", { name: "🍎" })).toBeTruthy();
   fireEvent.press(screen.getByRole("button", { name: "🍌" }));
   act(() => jest.advanceTimersByTime(900));
   expect(onComplete).toHaveBeenCalledWith({ correct: 1, total: 2 });

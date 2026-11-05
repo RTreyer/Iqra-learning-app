@@ -2,6 +2,7 @@ import React, { useCallback } from "react";
 import { StyleSheet, View } from "react-native";
 import { speak } from "@/lib/speech";
 import { colors } from "@/theme/tokens";
+import { MAX_CHOICES } from "@/content/math/validate";
 import { MathPic } from "./math/MathPic";
 import { PicCard } from "./math/PicCard";
 import { useInstruction } from "./math/useInstruction";
@@ -27,7 +28,7 @@ function PictureChoice({
   const { pick } = quiz;
   const round = lesson.rounds[quiz.roundIndex];
   const shuffled = useShuffled(round.choices, round.correctIndex, attemptKey, quiz.roundIndex);
-  const { values, bounce } = useBounce(4);
+  const { values, bounce } = useBounce(MAX_CHOICES);
   useInstruction(round.prompt);
 
   const handlePick = useCallback(
@@ -47,7 +48,7 @@ function PictureChoice({
       <ProgressDots count={total} current={quiz.roundIndex} color={color} />
       <ListenButton text={round.prompt} color={color} showText />
       {round.model ? (
-        <View style={styles.model}>
+        <View style={styles.model} testID="picture-choice-model">
           <MathPic pic={round.model} />
         </View>
       ) : null}
