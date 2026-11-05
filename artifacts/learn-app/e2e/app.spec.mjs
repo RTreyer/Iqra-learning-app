@@ -15,6 +15,8 @@ import {
   expect,
   gotoAndWaitReady,
   mathLesson,
+  mathUnit1Lesson,
+  pictureChoiceByName,
   readProgress,
   tapAllAndFinish,
   compareAnswerButton,
@@ -204,6 +206,11 @@ test.describe("activities", () => {
     ],
     ["compare", () => mathLesson("compare"), compareAnswerButton],
     ["number fill", () => mathLesson("number_fill"), numberFillAnswerButton],
+    [
+      "pattern",
+      () => mathUnit1Lesson("picture_choice", (l) => l.rounds[0].pattern),
+      pictureChoiceByName,
+    ],
   ];
   for (const [name, find, tapFor] of mathPaths) {
     test(`math ${name} lesson completes with 3 stars`, async ({ page }) => {

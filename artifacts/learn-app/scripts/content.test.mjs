@@ -137,6 +137,19 @@ test("picture_choice rounds are valid", () => {
     );
 });
 
+// Ordered rows (ordinal numbers) repeat one picture on purpose: the answer is its place.
+test("picture_choice answers are unique and match their model", () => {
+  const key = (pics) => JSON.stringify(pics);
+  for (const lesson of byType("picture_choice"))
+    lesson.rounds.forEach((round, i) => {
+      const where = `${lesson.id} round ${i + 1}`;
+      const answer = key(round.choices[round.correctIndex]);
+      if (!round.ordered)
+        assert.equal(round.choices.filter((c) => key(c) === answer).length, 1, where);
+      if (round.model) assert.equal(key([round.model]), answer, where);
+    });
+});
+
 test("compare rounds are valid", () => {
   for (const lesson of byType("compare"))
     lesson.rounds.forEach((round, i) =>
