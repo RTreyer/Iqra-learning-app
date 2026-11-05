@@ -71,6 +71,7 @@ const english: Record<string, string> = {
   "الْوَحْدَة الثَّالِثَة": "Unit 3",
   "الْوَحْدَةُ الثَّانِيَةُ": "Unit 2",
   "الْوَحْدَةُ الثَّالِثَةُ": "Unit 3",
+  "الْوَحْدَةُ الرَّابِعَةُ": "Unit 4",
   "الْوَحْدَةُ الْخَامِسَةُ": "Unit 5",
   // Unit card chips (theme and badge). Letter badges such as "م ب ل" are lesson content and stay Arabic.
   "أُحِبُّ مَامَا وَبَابَا": "I love Mama and Baba",
