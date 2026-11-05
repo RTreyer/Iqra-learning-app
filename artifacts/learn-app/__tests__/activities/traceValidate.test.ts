@@ -201,8 +201,34 @@ describe("digit guides", () => {
       .map((stroke) => stroke.filter((p) => p.x < 170))
       .filter((stroke) => stroke.length > 0);
     // Without the centre line check this drawing passes.
-    expect(validateOnGuide(leftPart, PAD, { ...shape3, spine: [] })).toEqual({ valid: true });
+    expect(validateOnGuide(leftPart, PAD, { ...shape3, spine: [], branches: [] })).toEqual({
+      valid: true,
+    });
     expect(validateOnGuide(leftPart, PAD, shape3)).toEqual({
+      valid: false,
+      msg: "أكمل كتابة الحرف كله 📏",
+    });
+  });
+
+  it("fails ٣ scribbled thick along the stem and bar with the hook left out", () => {
+    // Drawn on a phone (pad 800 px from (62, 468)): it covered most of the digit but not the hook.
+    const p = (x: number, y: number) => ({ x: ((x - 62) * 300) / 800, y: ((y - 468) * 300) / 800 });
+    const band = (from: [number, number], to: [number, number], width: number): Stroke[] =>
+      [-1, -0.5, 0, 0.5, 1].map((o) =>
+        Array.from({ length: 31 }, (_, i) =>
+          p(
+            from[0] + o * width + ((to[0] - from[0]) * i) / 30,
+            from[1] + ((to[1] - from[1]) * i) / 30,
+          ),
+        ),
+      );
+    const drawing = [
+      ...band([335, 630], [395, 1000], 30),
+      ...band([395, 1000], [415, 1135], 20),
+      ...band([400, 725], [580, 740], 12),
+      ...band([515, 585], [520, 760], 10),
+    ];
+    expect(validateOnGuide(drawing, PAD, shape("٣"))).toEqual({
       valid: false,
       msg: "أكمل كتابة الحرف كله 📏",
     });

@@ -83,21 +83,27 @@ export function validateTracing(
 //  5. On the letter: at least ON_LETTER of the drawn points lie on the letter (with a
 //     finger's tolerance), so a different letter or a scribble next to it fails.
 //  6. Covered: at least COVERED of the letter lies under the drawn path.
-//  7. Whole letter: at least ALONG of the letter's centre line was passed. A thick letter is
-//     half covered by a line through part of it, so check 6 alone lets a skipped hook pass.
+//  7. Whole letter: at least ALONG of the letter's centre line was passed, and at least
+//     BRANCH_PASSED of each of its branches (stem, bar, hook). A thick letter is half covered
+//     by a line through part of it, so check 6 alone lets a skipped hook pass.
 
 /** Share of drawn points that must lie on the letter. */
 export const ON_LETTER = 0.9;
 /** Share of the letter that must be traced. */
 export const COVERED = 0.5;
 /** Share of the letter's centre line the drawing must pass. */
-export const ALONG = 0.85;
+export const ALONG = 0.9;
+/** Share of each branch of the centre line the drawing must pass. */
+export const BRANCH_PASSED = 0.5;
+/** Shorter branches (in cells) are thinning noise at thick corners and are not checked. */
+const MIN_BRANCH = 4;
 /** Finger tolerance in mask cells (a cell is 2 % of the pad). */
 const REACH = 2;
 
 /**
- * `spine` is the letter's centre line (cell indices) and `width` its half width there: a
- * centre line cell counts as passed when the drawing comes within that half width plus a cell.
+ * `spine` is the letter's centre line (cell indices), split into `branches` at its junctions,
+ * and `width` the letter's half width at each cell: a centre line cell counts as passed when
+ * the drawing comes within 80 % of that half width plus a cell.
  */
 export type GuideMask = {
   grid: number;
@@ -105,6 +111,7 @@ export type GuideMask = {
   near: Uint8Array;
   count: number;
   spine: number[];
+  branches: number[][];
   width: Float32Array;
 };
 
@@ -131,7 +138,8 @@ export function decodeMask(mask: string, grid: number): GuideMask {
   );
   const width = halfWidths(cells, grid);
   const spine = centreLine(cells, grid);
-  const decoded = { grid, cells, near, count, spine, width };
+  const branches = splitBranches(spine, grid);
+  const decoded = { grid, cells, near, count, spine, branches, width };
   masks.set(mask, decoded);
   return decoded;
 }
@@ -143,7 +151,7 @@ export function validateOnGuide(
   guide: GuideMask,
   word = false,
 ): ValidationResult {
-  const { grid, cells, near, count, spine, width } = guide;
+  const { grid, cells, near, count, spine, branches, width } = guide;
   const cellOf = (p: Point) => {
     const col = Math.floor((p.x / pad.width) * grid);
     const row = Math.floor((p.y / pad.height) * grid);
@@ -188,10 +196,10 @@ export function validateOnGuide(
     const i = cellOf(p);
     if (i >= 0) drawn[i] = 1;
   }
-  const passed = spine.filter((i) => {
+  const isPassed = (i: number) => {
     const row = Math.floor(i / grid);
     const col = i % grid;
-    const reach = width[i] + 1;
+    const reach = width[i] * 0.8 + 1;
     const span = Math.ceil(reach);
     for (let dr = -span; dr <= span; dr++) {
       for (let dc = -span; dc <= span; dc++) {
@@ -202,10 +210,51 @@ export function validateOnGuide(
       }
     }
     return false;
-  }).length;
-  if (spine.length > 0 && passed / spine.length < ALONG)
+  };
+  const share = (part: number[]) => part.filter(isPassed).length / part.length;
+  if (spine.length > 0 && share(spine) < ALONG) return { valid: false, msg: COVER_MORE(word) };
+  if (branches.some((branch) => share(branch) < BRANCH_PASSED))
     return { valid: false, msg: COVER_MORE(word) };
   return { valid: true };
+}
+
+/** The centre line cut at its junctions (cells with three or more neighbours on it). */
+function splitBranches(spine: number[], grid: number): number[][] {
+  const on = new Set(spine);
+  const neighbours = (i: number) => {
+    const row = Math.floor(i / grid);
+    const col = i % grid;
+    const out: number[] = [];
+    for (let dr = -1; dr <= 1; dr++) {
+      for (let dc = -1; dc <= 1; dc++) {
+        const r = row + dr;
+        const c = col + dc;
+        if ((dr || dc) && r >= 0 && r < grid && c >= 0 && c < grid && on.has(r * grid + c))
+          out.push(r * grid + c);
+      }
+    }
+    return out;
+  };
+  const junction = new Set(spine.filter((i) => neighbours(i).length >= 3));
+  const seen = new Set<number>();
+  const branches: number[][] = [];
+  for (const start of spine) {
+    if (junction.has(start) || seen.has(start)) continue;
+    seen.add(start);
+    const branch: number[] = [];
+    const queue = [start];
+    while (queue.length) {
+      const i = queue.pop()!;
+      branch.push(i);
+      for (const j of neighbours(i)) {
+        if (junction.has(j) || seen.has(j)) continue;
+        seen.add(j);
+        queue.push(j);
+      }
+    }
+    if (branch.length >= MIN_BRANCH) branches.push(branch);
+  }
+  return branches;
 }
 
 /** Distance of every letter cell to the nearest empty cell (two pass chamfer). */
