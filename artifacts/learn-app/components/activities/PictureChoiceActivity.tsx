@@ -9,7 +9,7 @@ import { PicCard } from "./math/PicCard";
 import { useInstruction } from "./math/useInstruction";
 import { ListenButton } from "./shared/ListenButton";
 import { ProgressDots } from "./shared/ProgressDots";
-import { PRAISE } from "./shared/strings";
+import { EMPTY_BOX, PRAISE } from "./shared/strings";
 import { act } from "./shared/styles";
 import { ADVANCE_MS, choiceState, useBounce, useQuiz } from "./shared/useQuiz";
 import { useShuffled } from "./shared/useShuffled";
@@ -61,7 +61,8 @@ function PatternRow({ pattern }: { pattern: Pic[] }) {
       <View
         testID="pattern-slot"
         style={[styles.slot, { width: size, height: size }]}
-        accessible={false}
+        accessible
+        accessibilityLabel={EMPTY_BOX}
       />
     </View>
   );

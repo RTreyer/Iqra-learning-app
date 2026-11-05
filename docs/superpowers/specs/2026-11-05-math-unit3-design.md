@@ -30,11 +30,11 @@ File `content/math/bookUnit3.ts`, built with `mathKit.ts`. Unit number 3, title 
 - **Number rows** have at most 4 cells (Unit 2 rule); the odd row ١ ٣ ؟ ٧ ٩ is cut to four numbers.
 - **Book order.** Cells follow reading order, so the book's "٥ = ٢ + ٣" is `[3, "+", 2, "=", 5]`. The vertical "٠ + ١٠" is taken as ١٠ + ٠.
 
-Left out: the egg characters of the opener, the addition table with gaps and the shape number pattern (3-8), the colouring steps, drawing dots, the reteaching page (p. 89, same sums as the unit) and the enrichment diamond (p. 90). Shirt colours cannot be shown with one shirt emoji, so the story names them only.
+Left out: the egg characters of the opener, the addition table with gaps and the shape number pattern (3-8), the colouring steps, drawing dots, the reteaching page (p. 89, same sums as the unit) and the enrichment diamond (p. 90). The shirts are shown as 👕 4 and 👚 4, and the story names boys' and girls' shirts instead of colours. Two part stories show each part with its own picture (rabbits 🐇 🐰, apples 🍎 🍏, stars ⭐ 🌟, balls ⚽ 🏀, chicks 🐤 🐥, a big giraffe and small ones, birds 🐦 🕊️, tomatoes and carrots as vegetables, flags 🇾🇪 🚩).
 
 ## Replacing the old unit
 
-Old `m2` (`content/math/unit2.ts`, sample addition and subtraction) is deleted; its progress is dropped as decided in the foundation spec. Book Unit 4 (subtraction) is rebuilt separately. Catalog order: `math-u2`, `math-u3`, `m3`.
+Old `m2` (`content/math/unit2.ts`, sample addition and subtraction) is deleted; its progress is dropped as decided in the foundation spec. Book Unit 4 (subtraction) is rebuilt separately. Catalog: the `math-1` units are `math-u1` to `math-u5`.
 
 ## Testing
 

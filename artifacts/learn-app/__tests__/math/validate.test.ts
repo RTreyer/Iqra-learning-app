@@ -218,3 +218,18 @@ test("a pattern row has 2 to 8 valid pictures", () => {
     }),
   ).toEqual(["quarter not allowed on a triangle"]);
 });
+
+test("a pattern round cannot also have a model or ordered rows", () => {
+  const round = {
+    prompt: "مَا التَّالِي؟",
+    choices: [[apple], [{ emoji: "🍏" }]],
+    correctIndex: 0,
+    pattern: [apple, { emoji: "🍏" }],
+  };
+  expect(validatePictureChoice({ ...round, model: apple })).toEqual([
+    "pattern cannot go with model or ordered",
+  ]);
+  expect(validatePictureChoice({ ...round, ordered: true })).toEqual([
+    "pattern cannot go with model or ordered",
+  ]);
+});

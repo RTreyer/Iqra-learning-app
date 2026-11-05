@@ -2,7 +2,7 @@
 // Notes: docs/content/textbooks/math-part1/unit-05.md. Review status: docs/CONTENT_REVIEW.md
 // Every book lesson is a section of app lessons, in book order. Solids have no drawing in
 // the app: each is shown by an everyday object from the book (dice, tin can, ice cream cone,
-// butter, sponge, orange). The pyramid has no fitting emoji and is left out of the pictures.
+// box, sponge, orange). The pyramid has no fitting emoji and is left out of the pictures.
 // Plane shapes, halves and quarters are drawn shapes (MathPic); shading is always in equal
 // parts, so the book's unequal halves are left out.
 import type {
@@ -50,15 +50,24 @@ function chooseGroup(
   return { prompt, choices, correctIndex };
 }
 
-/** A pattern row: four pictures and the one that continues them, drawn small to fit one line. */
-const patternRow = (pics: MathPic[]): MathPic[] => pics.map((p) => ({ ...p, size: "small" }));
+/** "What comes next?": the row is shown, then one picture per choice (as in Unit 1). */
+const NEXT = "مَا التَّالِي فِي النَّمَطِ؟";
+const NEXT_SUBTITLE = "مَا التَّالِي؟";
+function next(
+  pattern: MathPic[],
+  choices: MathPic[],
+  correctIndex: number,
+  prompt = NEXT,
+): PictureChoiceRound {
+  return { prompt, pattern, choices: choices.map((p) => [p]), correctIndex };
+}
 
 // The everyday objects of the book's solids (pp. 118 to 120).
 const SPHERE = { emoji: "⚽", word: "كُرَةٌ" };
 const CUBE = { emoji: "🎲", word: "مُكَعَّبٌ" };
 const CYLINDER = { emoji: "🥫", word: "أُسْطُوَانَةٌ" };
 const CONE = { emoji: "🍦", word: "مَخْرُوطٌ" };
-const CUBOID = { emoji: "🧈", word: "مُتَوَازِي مُسْتَطِيلَاتٍ" };
+const CUBOID = { emoji: "📦", word: "مُتَوَازِي مُسْتَطِيلَاتٍ" };
 
 const listen = (
   word: string,
@@ -66,7 +75,6 @@ const listen = (
   correctIndex: number,
 ): ListenPickQuestion => ({ word, choices, correctIndex });
 
-const PATTERN = "أَيُّ صَفٍّ يُكْمِلُ النَّمَطَ صَحِيحًا؟";
 const IS_HALF = "هَلِ الْجُزْءُ الْمُلَوَّنُ نِصْفُ الشَّكْلِ؟ نَعَمْ أَمْ لَا؟";
 const IS_QUARTER = "هَلِ الْجُزْءُ الْمُلَوَّنُ رُبْعُ الشَّكْلِ؟ نَعَمْ أَمْ لَا؟";
 const YES = e("👍");
@@ -153,7 +161,7 @@ const drafts: MathLessonDraft[] = [
       ),
       choose(
         "أَيُّ شَيْءٍ لَهُ شَكْلُ هَذَا الْمُجَسَّمِ؟",
-        [e("🧈"), e("🏀"), e("🔋")],
+        [e("📦"), e("🏀"), e("🔋")],
         1,
         e("🍊"),
       ),
@@ -194,9 +202,8 @@ const drafts: MathLessonDraft[] = [
     ],
     items: [
       { pic: e("🧊"), box: 0 },
-      { pic: e("🧈"), box: 1 },
       { pic: e("📕"), box: 1 },
-      { pic: e("🎁"), box: 0 },
+      { pic: e("🎲"), box: 0 },
       { pic: e("🧽"), box: 1 },
     ],
   },
@@ -426,161 +433,70 @@ const drafts: MathLessonDraft[] = [
     ],
   },
 
-  // ── 5-3 اكتشاف الأنماط (pp. 126 to 127): which row continues the pattern ──
+  // ── 5-3 اكتشاف الأنماط (pp. 126 to 127): the row is shown, then what comes next. The book's
+  // green and red colour pattern is green and yellow here, so red and green are never the cue. ──
   {
     section: s3,
     type: "picture_choice",
     title: "أُكْمِلُ نَمَطَ الْمُجَسَّمَاتِ",
-    subtitle: "مَاذَا يَأْتِي بَعْدُ؟",
+    subtitle: NEXT_SUBTITLE,
     emoji: "🎲",
     color,
     rounds: [
-      chooseGroup(
-        PATTERN,
-        [
-          patternRow([e("⚽"), e("🎲"), e("⚽"), e("🎲"), e("⚽")]),
-          patternRow([e("⚽"), e("🎲"), e("⚽"), e("🎲"), e("🎲")]),
-          patternRow([e("⚽"), e("🎲"), e("⚽"), e("🎲"), e("🥫")]),
-        ],
-        0,
-      ),
-      chooseGroup(
-        PATTERN,
-        [
-          patternRow([e("🥫"), e("🥫"), e("🎲"), e("🥫"), e("🎲")]),
-          patternRow([e("🥫"), e("🥫"), e("🎲"), e("🥫"), e("⚽")]),
-          patternRow([e("🥫"), e("🥫"), e("🎲"), e("🥫"), e("🥫")]),
-        ],
-        2,
-      ),
-      chooseGroup(
-        PATTERN,
-        [
-          patternRow([e("🍦"), e("⚽"), e("🍦"), e("⚽"), e("⚽")]),
-          patternRow([e("🍦"), e("⚽"), e("🍦"), e("⚽"), e("🍦")]),
-          patternRow([e("🍦"), e("⚽"), e("🍦"), e("⚽"), e("📦")]),
-        ],
-        1,
-      ),
-      chooseGroup(
-        PATTERN,
-        [
-          patternRow([e("📦"), e("🎲"), e("🎲"), e("📦"), e("📦")]),
-          patternRow([e("📦"), e("🎲"), e("🎲"), e("📦"), e("🍦")]),
-          patternRow([e("📦"), e("🎲"), e("🎲"), e("📦"), e("🎲")]),
-        ],
-        2,
-      ),
+      next([e("⚽"), e("🎲"), e("⚽"), e("🎲")], [e("🎲"), e("⚽"), e("🥫")], 1),
+      next([e("🥫"), e("🥫"), e("🎲"), e("🥫")], [e("🎲"), e("⚽"), e("🥫")], 2),
+      next([e("🍦"), e("⚽"), e("🍦"), e("⚽")], [e("⚽"), e("🍦"), e("📦")], 1),
+      next([e("📦"), e("🎲"), e("🎲"), e("📦")], [e("📦"), e("🍦"), e("🎲")], 2),
     ],
   },
   {
     section: s3,
     type: "picture_choice",
     title: "أُكْمِلُ نَمَطَ الأَشْكَالِ",
-    subtitle: "مَاذَا يَأْتِي بَعْدُ؟",
+    subtitle: NEXT_SUBTITLE,
     emoji: "🔺",
     color,
     rounds: [
-      chooseGroup(
-        PATTERN,
+      next(
         [
-          patternRow([
-            shape("rectangle", "blue"),
-            shape("circle", "yellow"),
-            shape("triangle", "red"),
-            shape("rectangle", "blue"),
-            shape("triangle", "red"),
-          ]),
-          patternRow([
-            shape("rectangle", "blue"),
-            shape("circle", "yellow"),
-            shape("triangle", "red"),
-            shape("rectangle", "blue"),
-            shape("circle", "yellow"),
-          ]),
-          patternRow([
-            shape("rectangle", "blue"),
-            shape("circle", "yellow"),
-            shape("triangle", "red"),
-            shape("rectangle", "blue"),
-            shape("rectangle", "blue"),
-          ]),
+          shape("rectangle", "blue"),
+          shape("circle", "yellow"),
+          shape("triangle", "red"),
+          shape("rectangle", "blue"),
         ],
+        [shape("triangle", "red"), shape("circle", "yellow"), shape("rectangle", "blue")],
         1,
       ),
-      chooseGroup(
+      next(
         // The book's colour pattern: the prompt names the colours, the shapes are all the same.
-        "مُثَلَّثَانِ أَخْضَرَانِ، ثُمَّ مُثَلَّثٌ أَحْمَرُ. أَيُّ صَفٍّ يُكْمِلُ النَّمَطَ صَحِيحًا؟",
         [
-          patternRow([
-            shape("triangle", "green"),
-            shape("triangle", "green"),
-            shape("triangle", "red"),
-            shape("triangle", "green"),
-            shape("triangle", "red"),
-          ]),
-          patternRow([
-            shape("triangle", "green"),
-            shape("triangle", "green"),
-            shape("triangle", "red"),
-            shape("triangle", "green"),
-            shape("triangle", "green"),
-          ]),
+          shape("triangle", "green"),
+          shape("triangle", "green"),
+          shape("triangle", "yellow"),
+          shape("triangle", "green"),
         ],
+        [shape("triangle", "yellow"), shape("triangle", "green")],
         1,
+        "مُثَلَّثَانِ أَخْضَرَانِ، ثُمَّ مُثَلَّثٌ أَصْفَرُ. مَا التَّالِي؟",
       ),
-      chooseGroup(
-        PATTERN,
+      next(
         [
-          patternRow([
-            shape("circle", "yellow"),
-            shape("square", "blue"),
-            shape("circle", "yellow"),
-            shape("square", "blue"),
-            shape("circle", "yellow"),
-          ]),
-          patternRow([
-            shape("circle", "yellow"),
-            shape("square", "blue"),
-            shape("circle", "yellow"),
-            shape("square", "blue"),
-            shape("square", "blue"),
-          ]),
-          patternRow([
-            shape("circle", "yellow"),
-            shape("square", "blue"),
-            shape("circle", "yellow"),
-            shape("square", "blue"),
-            shape("triangle", "red"),
-          ]),
+          shape("circle", "yellow"),
+          shape("square", "blue"),
+          shape("circle", "yellow"),
+          shape("square", "blue"),
         ],
+        [shape("circle", "yellow"), shape("square", "blue"), shape("triangle", "red")],
         0,
       ),
-      chooseGroup(
-        PATTERN,
+      next(
         [
-          patternRow([
-            shape("square", "blue"),
-            shape("triangle", "red"),
-            shape("triangle", "red"),
-            shape("square", "blue"),
-            shape("square", "blue"),
-          ]),
-          patternRow([
-            shape("square", "blue"),
-            shape("triangle", "red"),
-            shape("triangle", "red"),
-            shape("square", "blue"),
-            shape("triangle", "red"),
-          ]),
-          patternRow([
-            shape("square", "blue"),
-            shape("triangle", "red"),
-            shape("triangle", "red"),
-            shape("square", "blue"),
-            shape("circle", "yellow"),
-          ]),
+          shape("square", "blue"),
+          shape("triangle", "red"),
+          shape("triangle", "red"),
+          shape("square", "blue"),
         ],
+        [shape("square", "blue"), shape("triangle", "red"), shape("circle", "yellow")],
         1,
       ),
     ],

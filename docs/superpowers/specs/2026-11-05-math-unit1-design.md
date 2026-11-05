@@ -6,9 +6,9 @@ Source: الرياضيات، الصف الأول، الجزء الأول (Sana'a
 
 ## Foundation addition: pattern rows
 
-`PictureChoiceRound.pattern?: MathPic[]`. When set, the row is shown above the choices in reading order (first on the right, `row-reverse`), followed by a dashed empty slot for what comes next. The row's pictures are accessible images with their labels (not decorative), so a screen reader reads the pattern. Pictures shrink so that the row and its slot fit one line of a 360 px phone (`patternPicSize`: at most 52 px, 29 px for 8 pictures). A pattern that uses sizes (tall and short candles, cow and calf) keeps them apart inside equal cells: big 100 %, normal 80 %, small 55 % of the cell. Validator: 2 to 8 pictures, `checkPic` on each. Jest covers render order, the slot, shrinking, size patterns and validation; Playwright plays the first pattern lesson.
+`PictureChoiceRound.pattern?: MathPic[]`. When set, the row is shown above the choices in reading order (first on the right, `row-reverse`), followed by a dashed empty slot for what comes next. The row's pictures are accessible images with their labels (not decorative), so a screen reader reads the pattern. Pictures shrink so that the row and its slot fit one line of a 360 px phone (`patternPicSize`: at most 52 px, 29 px for 8 pictures). A pattern that uses sizes (tall and short candles, cow and calf) keeps them apart inside equal cells: big 100 %, normal 80 %, small 55 % of the cell. Validator: 2 to 8 pictures, `checkPic` on each, and no `model` or `ordered` in the same round. Unit 5's pattern lessons use the same rows, subtitle مَا التَّالِي؟ and prompt مَا التَّالِي فِي النَّمَطِ؟. Jest covers render order, the slot, shrinking, size patterns and validation; Playwright plays the first pattern lesson.
 
-A data test now also checks that every non ordered `picture_choice` answer is unique among its choices and equals its `model` when there is one.
+A data test now also checks that every non ordered `picture_choice` answer is unique among its choices.
 
 ## Unit `math-u1`
 
@@ -41,6 +41,6 @@ Lesson 1-4 (فَوْقَ، تَحْتَ، دَاخِلَ، خَارِجَ) and t
 
 ## Wiring and tests
 
-- `content/catalog.ts`: `math-1` units are `math-u1`, `math-u2`, `m2`, `m3`. `nextLesson` after Arabic is now `math-u1-1`.
+- `content/catalog.ts`: `math-1` units are `math-u1` to `math-u5`. `nextLesson` after Arabic is now `math-u1-1`.
 - `content/ui-translations.ts`: الْوَحْدَةُ الأُولَى → Unit 1.
 - Playwright: the first `math-u1` pattern lesson completes with 3 stars, answering each round by the spoken name of its right card.

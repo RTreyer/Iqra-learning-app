@@ -36,7 +36,6 @@ const DOWN = "أَطْرَحُ رَأْسِيًّا: كَمِ الْبَاقِي
 const COMPLETE = "أُكْمِلُ بِالْعَدَدِ الْمُنَاسِبِ.";
 const AT_START = "كَمْ كَانَ فِي الْبِدَايَةِ؟";
 const TAKEN = "كَمْ ذَهَبَ؟";
-const PATTERN = "أُلَاحِظُ النَّمَطَ: كَمِ الْبَاقِي؟";
 const BACK = "أَعُدُّ إِلَى الْوَرَاءِ وَأُكْمِلُ.";
 const BY_TWOS = "أَعُدُّ اثْنَيْنِ اثْنَيْنِ وَأُكْمِلُ.";
 const BACK_2 = "أَعُدُّ إِلَى الْوَرَاءِ اثْنَيْنِ اثْنَيْنِ وَأُكْمِلُ.";
@@ -202,7 +201,7 @@ const drafts: MathLessonDraft[] = [
     color,
     rounds: [
       fact(5, 2, ACROSS),
-      fact(5, 2, `الْجَوَابُ نَفْسُهُ. ${DOWN}`, "vertical"),
+      fact(5, 2, DOWN, "vertical"),
       fact(4, 1, ACROSS),
       fact(4, 1, DOWN, "vertical"),
       fact(3, 2, DOWN, "vertical"),
@@ -444,21 +443,23 @@ const drafts: MathLessonDraft[] = [
     ],
   },
 
-  // ── 4-7 اكتشاف الأنماط (pp. 110 to 111): one more each time, same difference, counting back ──
+  // ── 4-7 اكتشاف الأنماط (pp. 110 to 111): one more each time, counting back. One round is on
+  // screen at a time, so the book's pattern of differences cannot be seen at once: the first
+  // lesson is plain "take away one" with growing numbers. ──
   {
     section: s7,
     type: "number_fill",
-    title: "أَكْتَشِفُ النَّمَطَ",
-    subtitle: "أُلَاحِظُ وَأُكْمِلُ",
+    title: "أَطْرَحُ وَاحِدًا",
+    subtitle: LEFT,
     emoji: "🔁",
     color,
     rounds: [
-      fact(2, 1, PATTERN),
-      fact(3, 1, PATTERN),
-      fact(4, 1, PATTERN),
-      fact(5, 1, PATTERN),
-      fact(9, 7, PATTERN),
-      fact(8, 6, PATTERN),
+      fact(2, 1, LEFT),
+      fact(3, 1, LEFT),
+      fact(4, 1, LEFT),
+      fact(5, 1, LEFT),
+      fact(6, 1, LEFT),
+      fact(7, 1, LEFT),
     ],
   },
   {
@@ -506,8 +507,8 @@ const drafts: MathLessonDraft[] = [
       fact(9, 5, LEFT),
       fact(8, 2, LEFT),
       fact(10, 2, LEFT),
-      fact(8, 5, "الْبَاقِي ثَلَاثَةٌ. أُكْمِلُ بِالْعَدَدِ الْمُنَاسِبِ.", "row", "b"),
-      fact(6, 3, "الْبَاقِي ثَلَاثَةٌ. أُكْمِلُ بِالْعَدَدِ الْمُنَاسِبِ.", "row", "a"),
+      fact(8, 5, COMPLETE, "row", "b"),
+      fact(6, 3, COMPLETE, "row", "a"),
     ],
   },
 

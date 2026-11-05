@@ -4,6 +4,7 @@ import {
   PictureChoiceActivity,
   patternPicSize,
 } from "@/components/activities/PictureChoiceActivity";
+import { EMPTY_BOX } from "@/components/activities/shared/strings";
 import type { Lesson } from "@/content/types";
 import { renderActivity } from "@/test-utils/activities";
 
@@ -169,6 +170,8 @@ test("a pattern row is shown in reading order with an empty slot after it", () =
     .getAllByTestId(/^pattern-(pic|slot)/)
     .map((v) => v.props.testID);
   expect(order).toEqual(["pattern-pic-0", "pattern-pic-1", "pattern-pic-2", "pattern-slot"]);
+  // The empty slot is announced, so a screen reader user knows something comes next.
+  expect(screen.getByLabelText(EMPTY_BOX)).toBe(screen.getByTestId("pattern-slot"));
   fireEvent.press(screen.getByRole("button", { name: "🐢" }));
   act(() => jest.advanceTimersByTime(900));
   expect(onComplete).toHaveBeenCalledWith({ correct: 1, total: 1 });

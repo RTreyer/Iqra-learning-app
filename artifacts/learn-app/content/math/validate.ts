@@ -44,6 +44,7 @@ export function validatePictureChoice(round: PictureChoiceRound): string[] {
     if (len < MIN_PATTERN || len > MAX_PATTERN)
       problems.push(`pattern needs ${MIN_PATTERN} to ${MAX_PATTERN} pictures`);
     for (const pic of round.pattern) problems.push(...checkPic(pic));
+    if (round.model || round.ordered) problems.push("pattern cannot go with model or ordered");
   }
   for (const choice of round.choices) for (const pic of choice) problems.push(...checkPic(pic));
   return problems;

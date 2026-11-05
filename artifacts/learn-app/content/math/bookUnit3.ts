@@ -75,6 +75,10 @@ const two = (first: string, a: number, second: string, b: number): MathPic[] => 
   ...pics(second, b),
 ];
 
+/** `n` copies of one picture at one size, such as small giraffes beside a big one. */
+const sized = (emoji: string, n: number, size: "small" | "big"): MathPic[] =>
+  Array.from({ length: n }, () => ({ emoji, size }));
+
 /** Two coloured parts of drawn shapes (cubes, dots, circles). */
 const parts = (
   id: "circle" | "square",
@@ -180,13 +184,16 @@ const drafts: MathLessonDraft[] = [
         prompt: `الأُسْرَةُ حَوْلَ الْمَائِدَةِ. ${SUM}`,
         pics: [{ emoji: "👨" }, { emoji: "🧕" }, { emoji: "🧕" }, { emoji: "👧" }, { emoji: "👦" }],
       }),
-      add(1, 3, [4, 3, 5], { prompt: addThe("الزَّرَافَاتِ"), pics: pics("🦒", 4) }),
+      add(1, 3, [4, 3, 5], {
+        prompt: addThe("الزَّرَافَاتِ"),
+        pics: [{ emoji: "🦒", size: "big" }, ...sized("🦒", 3, "small")],
+      }),
       add(4, 1, [5, 4, 3], { prompt: addThe("الأَزْهَارَ"), pics: two("🌷", 4, "🌹", 1) }),
       add(2, 3, [4, 6, 5], { prompt: addThe("الأَطْفَالَ"), pics: two("👦", 2, "👧", 3) }),
-      add(3, 2, [5, 4, 6], { prompt: addThe("الأَرَانِبَ"), pics: pics("🐇", 5) }),
+      add(3, 2, [5, 4, 6], { prompt: addThe("الأَرَانِبَ"), pics: two("🐇", 3, "🐰", 2) }),
       add(4, 1, [3, 5, 4], {
-        prompt: `الْبِنْتُ تَحْمِلُ أَعْلَامَ الْيَمَنِ. ${SUM}`,
-        pics: pics("🇾🇪", 5),
+        prompt: `الْبِنْتُ تَحْمِلُ أَعْلَامًا. ${SUM}`,
+        pics: two("🇾🇪", 4, "🚩", 1),
       }),
     ],
   },
@@ -198,12 +205,12 @@ const drafts: MathLessonDraft[] = [
     emoji: "🍎",
     color,
     rounds: [
-      add(1, 1, [2, 1, 3], { prompt: addThe("الْبَنَاتِ"), pics: pics("👧", 2) }),
-      add(2, 1, [3, 2, 4], { prompt: addThe("التُّفَّاحَ"), pics: pics("🍎", 3) }),
-      add(3, 1, [4, 5, 3], { prompt: addThe("النُّجُومَ"), pics: pics("⭐", 4) }),
+      add(1, 1, [2, 1, 3], { prompt: addThe("الْبَنَاتِ"), pics: two("👧", 1, "🧕", 1) }),
+      add(2, 1, [3, 2, 4], { prompt: addThe("التُّفَّاحَ"), pics: two("🍎", 2, "🍏", 1) }),
+      add(3, 1, [4, 5, 3], { prompt: addThe("النُّجُومَ"), pics: two("⭐", 3, "🌟", 1) }),
       add(2, 2, [3, 4, 5], { prompt: addThe("الْمُكَعَّبَاتِ"), pics: parts("square", 2, 2) }),
-      add(3, 1, [5, 3, 4], { prompt: addThe("الْعَصَافِيرَ"), pics: pics("🐦", 4) }),
-      add(3, 2, [5, 6, 4], { prompt: addThe("الطَّمَاطِمَ"), pics: pics("🍅", 5) }),
+      add(3, 1, [5, 3, 4], { prompt: addThe("الطُّيُورَ"), pics: two("🐦", 3, "🕊️", 1) }),
+      add(3, 2, [5, 6, 4], { prompt: addThe("الْخُضَارَ"), pics: two("🍅", 3, "🥕", 2) }),
     ],
   },
   {
@@ -286,8 +293,8 @@ const drafts: MathLessonDraft[] = [
         prompt: `صَحْنٌ فِيهِ تُفَّاحٌ، وَصَحْنٌ فَارِغٌ. ${SUM}`,
         pics: pics("🍎", 5),
       }),
-      add(4, 3, [6, 7, 8], { prompt: addThe("الطُّيُورَ"), pics: pics("🐦", 7) }),
-      add(5, 3, [8, 9, 7], { prompt: addThe("الْكُرَاتِ"), pics: pics("⚽", 8) }),
+      add(4, 3, [6, 7, 8], { prompt: addThe("الطُّيُورَ"), pics: two("🐦", 4, "🕊️", 3) }),
+      add(5, 3, [8, 9, 7], { prompt: addThe("الْكُرَاتِ"), pics: two("⚽", 5, "🏀", 3) }),
     ],
   },
   {
@@ -337,8 +344,12 @@ const drafts: MathLessonDraft[] = [
         pics: two("🌹", 4, "🌼", 3),
         vertical: true,
       }),
-      add(6, 2, [7, 8, 9], { prompt: addThe("الْكُرَاتِ"), pics: pics("⚽", 8), vertical: true }),
-      add(2, 6, [8, 9, 7], { prompt: SWAPPED, pics: pics("⚽", 8), vertical: true }),
+      add(6, 2, [7, 8, 9], {
+        prompt: addThe("الْكُرَاتِ"),
+        pics: two("⚽", 6, "🏀", 2),
+        vertical: true,
+      }),
+      add(2, 6, [8, 9, 7], { prompt: SWAPPED, pics: two("🏀", 2, "⚽", 6), vertical: true }),
       add(3, 5, [8, 7, 9], {
         prompt: addThe("الدَّوَائِرَ"),
         pics: parts("circle", 3, 5),
@@ -349,7 +360,7 @@ const drafts: MathLessonDraft[] = [
         pics: two("🌹", 3, "🌼", 4),
         vertical: true,
       }),
-      add(4, 3, [8, 6, 7], { prompt: SWAPPED, pics: two("🌹", 4, "🌼", 3), vertical: true }),
+      add(4, 3, [8, 6, 7], { prompt: SWAPPED, pics: two("🌼", 4, "🌹", 3), vertical: true }),
     ],
   },
   {
@@ -472,15 +483,15 @@ const drafts: MathLessonDraft[] = [
     rounds: [
       add(4, 2, [6, 5, 7], {
         prompt: "يَضَعُ الْوَلَدُ الْكُرَاتِ فِي السَّلَّةِ. كَمْ كُرَةً صَارَتْ فِي السَّلَّةِ؟",
-        pics: pics("⚽", 6),
+        pics: two("⚽", 4, "🏀", 2),
       }),
       add(5, 0, [5, 6, 0], {
         prompt: "سَلَّةٌ فِيهَا كُرَاتٌ، وَسَلَّةٌ فَارِغَةٌ. كَمْ كُرَةً فِي السَّلَّتَيْنِ؟",
         pics: pics("⚽", 5),
       }),
       add(4, 4, [7, 8, 9], {
-        prompt: "قُمْصَانٌ صَفْرَاءُ وَقُمْصَانٌ زَرْقَاءُ. كَمْ قَمِيصًا مَعًا؟",
-        pics: pics("👕", 8),
+        prompt: "قُمْصَانٌ لِلأَوْلَادِ، وَقُمْصَانٌ لِلْبَنَاتِ. كَمْ قَمِيصًا مَعًا؟",
+        pics: two("👕", 4, "👚", 4),
       }),
       add(2, 3, [5, 4, 6], {
         prompt: "مَعَ الْبِنْتِ مَسَاطِرُ، وَمَعَ الْوَلَدِ مَسَاطِرُ. كَمْ مِسْطَرَةً مَعَهُمَا؟",
@@ -488,7 +499,7 @@ const drafts: MathLessonDraft[] = [
       }),
       add(4, 3, [8, 7, 6], {
         prompt: "مَعَ الْبِنْتِ أَقْلَامٌ، وَمَعَ الْوَلَدِ أَقْلَامٌ. كَمْ قَلَمًا مَعَهُمَا؟",
-        pics: pics("✏️", 7),
+        pics: two("✏️", 4, "🖍️", 3),
       }),
       add(1, 1, [2, 1, 3], {
         prompt: "لِلْبِنْتِ حَقِيبَةٌ، وَلِلْوَلَدِ حَقِيبَةٌ. كَمْ حَقِيبَةً مَعَهُمَا؟",
@@ -607,7 +618,11 @@ const drafts: MathLessonDraft[] = [
     emoji: "📝",
     color,
     rounds: [
-      add(5, 2, [7, 6, 8], { prompt: addThe("الْكَتَاكِيتَ"), pics: pics("🐤", 7) }),
+      add(5, 2, [7, 6, 8], {
+        prompt: addThe("الْكَتَاكِيتَ"),
+        pics: two("🐤", 5, "🐥", 2),
+        vertical: true,
+      }),
       add(5, 1, [6, 5, 7], { vertical: true }),
       add(1, 5, [5, 6, 7], { vertical: true }),
       add(4, 2, [6, 7, 5], { vertical: true }),

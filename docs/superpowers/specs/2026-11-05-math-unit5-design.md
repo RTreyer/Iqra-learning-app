@@ -12,7 +12,7 @@ File `content/math/bookUnit5.ts`, built with `mathKit.ts`. Unit number 5, title 
 |---|---|
 | 5-1 الْمُجَسَّمَاتُ | مَنْ أَنَا؟ the solids say their names, "أَنَا الْكُرَةُ" (`naming`); hear a solid, tap it (`listen_pick`); the object with the same shape as the model (`picture_choice` with model); sphere or cylinder, cube or cuboid (`sort`, two lessons) |
 | 5-2 الأَشْكَالُ الْمُسْتَوِيَةُ | where is the circle, square, triangle, rectangle (`picture_choice`); door, window, road sign, clock, Yemeni flag: which shape is it like (`picture_choice` with model); circles and triangles, squares and rectangles (`sort`, two lessons); which group has three circles, two triangles, three squares (the book's example), four rectangles (`picture_choice` with groups) |
-| 5-3 اكْتِشَافُ الأَنْمَاطِ | which row continues the pattern: solids (ball, cube…; cylinder, cylinder, cube…), plane shapes (rectangle, circle, triangle…; the book's two green triangles and a red one) (`picture_choice`, rows of 5) |
+| 5-3 اكْتِشَافُ الأَنْمَاطِ | what comes next: solids (ball, cube…; cylinder, cylinder, cube…), plane shapes (rectangle, circle, triangle…; the book's two green triangles and a red one, drawn as green and yellow) (`picture_choice` with a pattern row of 4 and single picture choices, as in Unit 1) |
 | 5-4 حَلُّ الْمَسْأَلَةِ | colour the boat by the key, rectangles yellow, triangles green, circles red: which shape is coloured right, where is the sail, the porthole (`picture_choice`) |
 | 5-5 النِّصْفُ | the orange and apple cut in two equal parts (`story`); which shape has half coloured (`picture_choice`); is the coloured part a half? 👍 / 👎 (`picture_choice` with model) |
 | 5-6 الرُّبْعُ | the apple cut in four equal parts (`story`); which shape has a quarter coloured; is it a quarter? 👍 / 👎 |
@@ -22,7 +22,7 @@ File `content/math/bookUnit5.ts`, built with `mathKit.ts`. Unit number 5, title 
 
 ## Pictures
 
-- **Solids are emoji** of the book's everyday objects: sphere ⚽ 🍊 🏀 🎱; cube 🎲 🧊 🎁; cylinder 🥫 🔋 🪵 🕯️; cone 🍦; cuboid 📦 🧈 🧽 📕 (butter and sponge are the book's). No SVG solids were added.
+- **Solids are emoji** of the book's everyday objects: sphere ⚽ 🍊 🏀 🎱; cube 🎲 🧊; cylinder 🥫 🔋 🪵 🕯️; cone 🍦; cuboid 📦 🧽 📕 (the sponge is the book's; 📦 is the one cuboid object of the listen and pick rounds). No SVG solids were added.
 - **The pyramid (الْهَرَمُ) is left out**: no emoji shows a pyramid (🔺 is the plane triangle, ⛺ a prism). It needs a drawn picture first.
 - Plane shapes, halves and quarters are `MathPic` shapes with named colours. Colour is never the only cue, except in the colour pattern and the colour key lessons, whose prompts name the colours.
 - Yes / no is 👍 / 👎, said in the prompt ("نَعَمْ أَمْ لَا؟").
@@ -31,7 +31,7 @@ File `content/math/bookUnit5.ts`, built with `mathKit.ts`. Unit number 5, title 
 ## Adapted or left out
 
 - **Unequal parts** (Ahmad's mistake, the triangle cut into 4 with a middle piece): `shaded` always draws equal parts, so "is it a half?" is asked with halves, quarters and whole shapes instead.
-- **Patterns**: `picture_choice` shows one model, not a row, so the child picks the row whose last picture continues the pattern (3 rows of 5 small pictures, under the ten frame limit of 6).
+- **Patterns**: the row is shown with its dashed empty slot (`PictureChoiceRound.pattern`, as in Unit 1), and the child picks the picture that comes next. Subtitle مَا التَّالِي؟, prompt مَا التَّالِي فِي النَّمَطِ؟; the colour pattern names its colours.
 - **Ringing the answer** (أُحَوِّطُ) is tapping in the app, so subtitles say أَخْتَارُ, as in Units 2 to 4. The first unit test lesson is titled اخْتِبَارُ الْوَحْدَةِ, as in the other units.
 - **Colouring** (5-2, 5-4, unit test car): became choosing the shape coloured by the key.
 - **Who ate more**: the book's equal halves round plus three rounds comparing a half with a quarter (bread, orange) and two quarters (cake).
@@ -39,7 +39,7 @@ File `content/math/bookUnit5.ts`, built with `mathKit.ts`. Unit number 5, title 
 
 ## Wiring and tests
 
-- `content/catalog.ts`: `math-1` units are `math-u2`, `m2`, `math-u5`. The old `m3` (`content/math/unit3.ts`) is deleted; its progress is dropped, as decided in the foundation spec. The unit title already has an English entry (Unit 5).
+- `content/catalog.ts`: `math-1` units are `math-u1` to `math-u5`. The old `m3` (`content/math/unit3.ts`) is deleted; its progress is dropped, as decided in the foundation spec. The unit title already has an English entry (Unit 5).
 - Data tests: all `picture_choice` and `sort` validators pass (at most 4 choices, no quarter on a triangle).
 - Playwright: the first `math-u5` sort lesson (first `sort` path in the suite).
-- Layout checked at 360 px: rows of 5 small pictures, groups of 4, two sort boxes with the long label مُتَوَازِي مُسْتَطِيلَاتٍ.
+- Layout checked at 360 px: pattern rows of 4 pictures and a slot, groups of 4, two sort boxes with the long label مُتَوَازِي مُسْتَطِيلَاتٍ.
