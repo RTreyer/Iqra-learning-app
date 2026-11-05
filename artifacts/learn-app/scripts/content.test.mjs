@@ -138,15 +138,18 @@ test("picture_choice rounds are valid", () => {
 });
 
 // Ordered rows (ordinal numbers) repeat one picture on purpose: the answer is its place.
-test("picture_choice answers are unique and match their model", () => {
+// The model is not always the answer: "an object with the same shape as this solid" shows a different picture.
+test("picture_choice answers are unique among their choices", () => {
   const key = (pics) => JSON.stringify(pics);
   for (const lesson of byType("picture_choice"))
     lesson.rounds.forEach((round, i) => {
-      const where = `${lesson.id} round ${i + 1}`;
       const answer = key(round.choices[round.correctIndex]);
       if (!round.ordered)
-        assert.equal(round.choices.filter((c) => key(c) === answer).length, 1, where);
-      if (round.model) assert.equal(key([round.model]), answer, where);
+        assert.equal(
+          round.choices.filter((c) => key(c) === answer).length,
+          1,
+          `${lesson.id} round ${i + 1}`,
+        );
     });
 });
 

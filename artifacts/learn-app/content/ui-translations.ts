@@ -90,6 +90,8 @@ const english: Record<string, string> = {
   "الأَعْدَادُ مِنْ ٠ إِلَى ١٠": "Numbers 0 to 10",
   أَعُدُّ: "Count",
   "الْجَمْعُ ضِمْنَ الْعَدَدِ ١٠": "Adding within 10",
+  "التَّصْنِيفُ وَالأَنْمَاطُ": "Sorting and patterns",
+  أُصَنِّفُ: "Sort",
   أَجْمَعُ: "Add",
   "الطَّرْحُ ضِمْنَ الْعَدَدِ ١٠": "Subtracting within 10",
   أَطْرَحُ: "Subtract",
