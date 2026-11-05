@@ -184,8 +184,8 @@ test.describe("activities", () => {
   });
 
   test("math counting lesson completes with 3 stars", async ({ page }) => {
-    expect(await completeQuizLesson(page, "m1-1", 5)).toBe(3);
-    await expect.poll(async () => (await readProgress(page))?.lessons["m1-1"]?.stars).toBe(3);
+    expect(await completeQuizLesson(page, "math-u2-1", 6)).toBe(3);
+    await expect.poll(async () => (await readProgress(page))?.lessons["math-u2-1"]?.stars).toBe(3);
   });
 
   // Science is hidden behind "قريباً" on the grade screen, but its lessons still open by URL.

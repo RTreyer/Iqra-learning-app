@@ -10,8 +10,8 @@ const rectangle = { emoji: "▬", word: "مُسْتَطِيل" };
 
 export const mathUnit3: Unit = {
   id: "m3",
-  number: 3,
-  title: "الْوَحْدَة الثَّالِثَة",
+  number: 5,
+  title: "الْوَحْدَةُ الْخَامِسَةُ",
   theme: "الأَشْكَال الْهَنْدَسِيَّة",
   emoji: "🔺",
   color,

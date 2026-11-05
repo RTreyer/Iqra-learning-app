@@ -7,7 +7,7 @@ import { unit5 } from "./arabic/unit5.ts";
 import { unit6 } from "./arabic/unit6.ts";
 import { unit7 } from "./arabic/unit7.ts";
 import { unit8 } from "./arabic/unit8.ts";
-import { mathUnit1 } from "./math/unit1.ts";
+import { mathBookUnit2 } from "./math/bookUnit2.ts";
 import { mathUnit2 } from "./math/unit2.ts";
 import { mathUnit3 } from "./math/unit3.ts";
 import { scienceUnit1 } from "./science/unit1.ts";
@@ -54,7 +54,7 @@ const grade1Books: Book[] = [
     emoji: "🔢",
     color: SUBJECT_COLORS.math,
     available: true,
-    units: [mathUnit1, mathUnit2, mathUnit3],
+    units: [mathBookUnit2, mathUnit2, mathUnit3],
   },
   {
     id: "math-2",

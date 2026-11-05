@@ -22,13 +22,14 @@ export const QUIZ_ROUNDS = {
     { right: "تَا", wrong: "بَا" },
     { right: "مَا", wrong: "لَا" },
   ],
-  // content/math/unit1.ts, counting (choices shown as Eastern Arabic digits)
-  "m1-1": [
+  // content/math/bookUnit2.ts, first counting lesson (choices shown as Eastern Arabic digits)
+  "math-u2-1": [
     { right: "٢", wrong: "١" },
-    { right: "٣", wrong: "٤" },
-    { right: "١", wrong: "٣" },
+    { right: "٣", wrong: "١" },
+    { right: "١", wrong: "٢" },
     { right: "٣", wrong: "٢" },
-    { right: "٢", wrong: "١" },
+    { right: "١", wrong: "٣" },
+    { right: "٢", wrong: "٣" },
   ],
 };
 

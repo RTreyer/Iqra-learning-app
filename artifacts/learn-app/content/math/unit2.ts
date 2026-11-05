@@ -5,8 +5,8 @@ const color = SUBJECT_COLORS.math;
 
 export const mathUnit2: Unit = {
   id: "m2",
-  number: 2,
-  title: "الْوَحْدَة الثَّانِيَة",
+  number: 3,
+  title: "الْوَحْدَةُ الثَّالِثَةُ",
   theme: "الْجَمْع وَالطَّرْح ضِمْنَ ١٠",
   emoji: "➕",
   color,
