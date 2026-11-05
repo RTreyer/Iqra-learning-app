@@ -57,11 +57,18 @@ export function validateNumberFill(round: NumberFillRound): string[] {
     problems.push("row and vertical need a op b = c");
     return problems;
   }
+  if (round.layout === "sequence" && round.cells.some((c) => c !== "?" && typeof c !== "number"))
+    problems.push("sequence cells must be numbers");
   const answer = numberFillAnswer(round.cells);
   if (answer === null || answer < 0) problems.push("no answer or negative answer");
-  const numbers = round.cells.filter((c): c is number => typeof c === "number");
-  if (numbers.some((n) => n < 0)) problems.push("negative number");
-  if (!round.options.includes(answer as number)) problems.push(`answer ${answer} not in options`);
+  const whole = (n: number) => Number.isInteger(n) && n >= 0;
+  if (round.options.length < 2 || round.options.length > MAX_CHOICES)
+    problems.push("needs 2 to 4 options");
+  if (!round.options.every(whole)) problems.push("options must be whole numbers 0 or more");
+  if (!round.cells.every((c) => typeof c !== "number" || whole(c)))
+    problems.push("cells must be whole numbers 0 or more");
+  if (answer !== null && !round.options.includes(answer))
+    problems.push(`answer ${answer} not in options`);
   if (new Set(round.options).size !== round.options.length) problems.push("options not unique");
   return problems;
 }

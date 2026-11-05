@@ -79,9 +79,60 @@ test("number fill needs a solvable sentence whose answer is an option", () => {
       prompt: "x",
       cells: [5, "-", 7, "=", "?"],
       layout: "vertical",
-      options: [2],
+      options: [2, 3],
     }),
   ).toEqual(["no answer or negative answer", "answer -2 not in options"]);
+  expect(
+    validateNumberFill({
+      prompt: "x",
+      cells: [3, "+", "?", "=", "?"],
+      layout: "row",
+      options: [1, 2],
+    }),
+  ).toEqual(["no answer or negative answer"]);
+  expect(
+    validateNumberFill({ prompt: "x", cells: [3, "+", "?", "=", 5], layout: "row", options: [2] }),
+  ).toEqual(["needs 2 to 4 options"]);
+  expect(
+    validateNumberFill({
+      prompt: "x",
+      cells: [3, "+", "?", "=", 5],
+      layout: "row",
+      options: [1, 2, 3, 4, 5],
+    }),
+  ).toEqual(["needs 2 to 4 options"]);
+  expect(
+    validateNumberFill({
+      prompt: "x",
+      cells: [3, "+", "?", "=", 5],
+      layout: "row",
+      options: [2, 1.5],
+    }),
+  ).toEqual(["options must be whole numbers 0 or more"]);
+  expect(
+    validateNumberFill({
+      prompt: "x",
+      cells: [3, "+", "?", "=", 5],
+      layout: "row",
+      options: [2, -1],
+    }),
+  ).toEqual(["options must be whole numbers 0 or more"]);
+  expect(
+    validateNumberFill({
+      prompt: "x",
+      cells: [3.5, "+", "?", "=", 5],
+      layout: "row",
+      options: [2, 1],
+    }).includes("cells must be whole numbers 0 or more"),
+  ).toBe(true);
+  expect(
+    validateNumberFill({
+      prompt: "x",
+      cells: [1, "+", "?", 4],
+      layout: "sequence",
+      options: [2, 3],
+    }),
+  ).toEqual(["sequence cells must be numbers", "no answer or negative answer"]);
   expect(
     validateNumberFill({
       prompt: "x",

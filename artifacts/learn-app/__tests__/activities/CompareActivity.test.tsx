@@ -58,3 +58,31 @@ test("a wrong first tap is not undone by pressing the right button", () => {
   act(() => jest.advanceTimersByTime(900));
   expect(onComplete).toHaveBeenCalledWith({ correct: 0, total: 1 });
 });
+
+test("a number against a group uses the group words", () => {
+  const mixed: Extract<Lesson, { type: "compare" }> = {
+    ...lesson,
+    rounds: [
+      {
+        prompt: "أُقَارِنُ",
+        first: { number: 3 },
+        second: { pics: [fish] },
+        mode: "words",
+      },
+    ],
+  };
+  renderActivity(
+    <CompareActivity lesson={mixed} color="#7C3AED" attemptKey="x:1" onComplete={jest.fn()} />,
+  );
+  expect(screen.getByText("أَكْثَرُ")).toBeTruthy();
+  expect(screen.queryByText("أَكْبَرُ")).toBeNull();
+});
+
+test("the locked result symbol is announced by its words", () => {
+  const sym: Extract<Lesson, { type: "compare" }> = { ...lesson, rounds: [lesson.rounds[1]] };
+  renderActivity(
+    <CompareActivity lesson={sym} color="#7C3AED" attemptKey="x:1" onComplete={jest.fn()} />,
+  );
+  fireEvent.press(screen.getByRole("button", { name: "يُسَاوِي" }));
+  expect(screen.getAllByLabelText("يُسَاوِي").length).toBeGreaterThan(1);
+});

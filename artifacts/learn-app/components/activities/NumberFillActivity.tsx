@@ -10,14 +10,12 @@ import { useInstruction } from "./math/useInstruction";
 import { ChoiceCard } from "./shared/ChoiceCard";
 import { ListenButton } from "./shared/ListenButton";
 import { ProgressDots } from "./shared/ProgressDots";
-import { PRAISE } from "./shared/strings";
+import { EMPTY_BOX, PRAISE } from "./shared/strings";
 import { act } from "./shared/styles";
 import { ADVANCE_MS, choiceState, useBounce, useQuiz } from "./shared/useQuiz";
 import { useShuffled } from "./shared/useShuffled";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import type { ActivityProps } from "./types";
-
-const EMPTY_LABEL = "مربع فارغ";
 
 /** One cell: a number, a sign, or the empty box (filled with the answer once the round locks). */
 function Cell({ cell, filled }: { cell: FillCell; filled: number | null }) {
@@ -26,7 +24,7 @@ function Cell({ cell, filled }: { cell: FillCell; filled: number | null }) {
       <View
         testID="number-fill-box"
         accessible
-        accessibilityLabel={filled === null ? EMPTY_LABEL : toArabicDigits(filled)}
+        accessibilityLabel={filled === null ? EMPTY_BOX : toArabicDigits(filled)}
         style={styles.box}
       >
         <Text style={styles.cell}>{filled === null ? "" : toArabicDigits(filled)}</Text>
@@ -114,9 +112,9 @@ export const NumberFillActivity = withAttemptReset(NumberFill, "NumberFillActivi
 const styles = StyleSheet.create({
   row: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 12 },
   rtl: { flexDirection: "row-reverse" },
-  vertical: { alignItems: "flex-start", gap: 4 },
+  vertical: { alignItems: "flex-end", gap: 4 },
   rule: { height: 4, alignSelf: "stretch", backgroundColor: colors.text, borderRadius: 2 },
-  cell: { fontSize: 44, fontWeight: "900", color: colors.text, minWidth: 36, textAlign: "center" },
+  cell: { fontSize: 44, fontWeight: "900", color: colors.text, minWidth: 64, textAlign: "center" },
   box: {
     minWidth: 64,
     minHeight: 64,

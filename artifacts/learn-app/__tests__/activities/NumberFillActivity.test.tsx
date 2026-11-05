@@ -1,5 +1,6 @@
 import { act, fireEvent, screen } from "@testing-library/react-native";
 import React from "react";
+import { EMPTY_BOX } from "@/components/activities/shared/strings";
 import { NumberFillActivity } from "@/components/activities/NumberFillActivity";
 import { groupLabel } from "@/content/math/picLabel";
 import type { Lesson } from "@/content/types";
@@ -43,7 +44,7 @@ test("shows each layout with an empty box, never reads the sum aloud", () => {
   expect(speech.speak.mock.calls.map((c) => c[0])).toEqual(["أُكْمِلُ"]);
   expect(screen.getByTestId("number-fill-sentence")).toBeTruthy();
   expect(screen.getByTestId("number-fill-box")).toBeTruthy();
-  expect(screen.getByLabelText("مربع فارغ")).toBeTruthy();
+  expect(screen.getByLabelText(EMPTY_BOX)).toBeTruthy();
   expect(screen.getByLabelText(groupLabel(lesson.rounds[0].pics ?? []))).toBeTruthy();
   fireEvent.press(screen.getByRole("button", { name: "٣" }));
   act(() => jest.advanceTimersByTime(900));
@@ -66,4 +67,17 @@ test("a wrong first tap is not undone by pressing the right option", () => {
   fireEvent.press(screen.getByRole("button", { name: "٤" }));
   act(() => jest.advanceTimersByTime(900));
   expect(onComplete).toHaveBeenCalledWith({ correct: 0, total: 1 });
+});
+
+test("a vertical sum right aligns its rows on the units column", () => {
+  const vertical = { ...lesson, rounds: [lesson.rounds[1]] };
+  renderActivity(
+    <NumberFillActivity
+      lesson={vertical}
+      color="#7C3AED"
+      attemptKey="x:1"
+      onComplete={jest.fn()}
+    />,
+  );
+  expect(screen.getByTestId("number-fill-sentence")).toHaveStyle({ alignItems: "flex-end" });
 });

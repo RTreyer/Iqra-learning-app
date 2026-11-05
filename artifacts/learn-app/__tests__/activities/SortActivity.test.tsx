@@ -2,6 +2,7 @@ import { act, fireEvent, screen } from "@testing-library/react-native";
 import React from "react";
 import { SortActivity } from "@/components/activities/SortActivity";
 import type { Lesson } from "@/content/types";
+import { colors } from "@/theme/tokens";
 import { renderActivity } from "@/test-utils/activities";
 
 const lesson: Extract<Lesson, { type: "sort" }> = {
@@ -70,4 +71,16 @@ test("a perfect run completes exactly once, even after a re-render", () => {
   act(() => jest.advanceTimersByTime(2000));
   expect(onComplete).toHaveBeenCalledTimes(1);
   expect(onComplete).toHaveBeenCalledWith({ correct: 2, total: 2 });
+});
+
+test("a wrong box shows a danger border for a moment and keeps the item selected", () => {
+  renderActivity(
+    <SortActivity lesson={lesson} color="#7C3AED" attemptKey="x:1" onComplete={jest.fn()} />,
+  );
+  fireEvent.press(screen.getByTestId("sort-item-0"));
+  fireEvent.press(screen.getByTestId("sort-box-1"));
+  expect(screen.getByTestId("sort-box-1")).toHaveStyle({ borderColor: colors.danger });
+  expect(screen.getByTestId("sort-item-0")).toBeSelected();
+  act(() => jest.advanceTimersByTime(700));
+  expect(screen.getByTestId("sort-box-1")).not.toHaveStyle({ borderColor: colors.danger });
 });

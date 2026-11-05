@@ -50,8 +50,8 @@ function Compare({ lesson, color, onComplete, onRoundResult }: ActivityProps<"co
   const round = lesson.rounds[quiz.roundIndex];
   const answer = compareAnswer(round.first, round.second);
   const correctIndex = ANSWERS.indexOf(answer);
-  const words =
-    round.mode === "symbols" ? SYMBOL_WORDS : "number" in round.first ? NUMBER_WORDS : GROUP_WORDS;
+  const bothNumbers = "number" in round.first && "number" in round.second;
+  const words = round.mode === "symbols" ? SYMBOL_WORDS : bothNumbers ? NUMBER_WORDS : GROUP_WORDS;
   useInstruction(round.prompt);
 
   const handlePick = useCallback(
@@ -73,7 +73,9 @@ function Compare({ lesson, color, onComplete, onRoundResult }: ActivityProps<"co
         </View>
         <View style={styles.gap}>
           {quiz.locked && round.mode === "symbols" ? (
-            <CompareSymbol answer={answer} color={colors.successText} />
+            <View accessible accessibilityLabel={SYMBOL_WORDS[answer]}>
+              <CompareSymbol answer={answer} color={colors.successText} />
+            </View>
           ) : null}
         </View>
         <View style={styles.side} testID="compare-second">

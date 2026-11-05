@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
 import { picLabel } from "@/content/math/picLabel";
 import * as haptics from "@/lib/haptics";
 import { speak } from "@/lib/speech";
@@ -22,6 +22,9 @@ function Sort({ lesson, color, onComplete }: ActivityProps<"sort">) {
   const [selected, setSelected] = useState<number | null>(null);
   const [placed, setPlaced] = useState<boolean[]>(() => lesson.items.map(() => false));
   const missed = useRef<Set<number>>(new Set());
+  const [wrongBox, setWrongBox] = useState<number | null>(null);
+  const shakes = useRef<Animated.Value[]>([new Animated.Value(0), new Animated.Value(0)]).current;
+  const wrongTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const callbacks = useLatest({ onComplete });
   useInstruction(lesson.prompt);
 
@@ -37,19 +40,43 @@ function Sort({ lesson, color, onComplete }: ActivityProps<"sort">) {
     return () => clearTimeout(t);
   }, [done, lesson.items.length, callbacks]);
 
+  useEffect(
+    () => () => {
+      if (wrongTimer.current) clearTimeout(wrongTimer.current);
+    },
+    [],
+  );
+
+  const flagWrong = useCallback(
+    (box: number) => {
+      setWrongBox(box);
+      if (wrongTimer.current) clearTimeout(wrongTimer.current);
+      wrongTimer.current = setTimeout(() => setWrongBox(null), WRONG_MS);
+      const x = shakes[box];
+      Animated.sequence([
+        Animated.timing(x, { toValue: 8, duration: 50, useNativeDriver: true }),
+        Animated.timing(x, { toValue: -8, duration: 100, useNativeDriver: true }),
+        Animated.timing(x, { toValue: 8, duration: 100, useNativeDriver: true }),
+        Animated.timing(x, { toValue: 0, duration: 50, useNativeDriver: true }),
+      ]).start();
+    },
+    [shakes],
+  );
+
   const handleBox = useCallback(
     (box: 0 | 1) => {
       if (selected === null) return;
       if (lesson.items[selected].box !== box) {
         missed.current.add(selected);
         haptics.error();
+        flagWrong(box);
         return;
       }
       haptics.success();
       setPlaced((p) => p.map((v, i) => v || i === selected));
       setSelected(null);
     },
-    [selected, lesson.items],
+    [selected, lesson.items, flagWrong],
   );
 
   return (
@@ -57,24 +84,32 @@ function Sort({ lesson, color, onComplete }: ActivityProps<"sort">) {
       <ListenButton text={lesson.prompt} color={color} showText />
       <View style={styles.boxes}>
         {lesson.boxes.map((box, b) => (
-          <Pressable
+          <Animated.View
             key={b}
-            testID={`sort-box-${b}`}
-            accessibilityRole="button"
-            accessibilityLabel={box.label}
-            onPress={() => handleBox(b as 0 | 1)}
-            style={[styles.box, selected !== null && { borderColor: color }]}
+            style={[styles.boxWrap, { transform: [{ translateX: shakes[b] }] }]}
           >
-            {box.pic ? <MathPic pic={box.pic} decorative /> : null}
-            <Text style={styles.boxLabel}>{box.label}</Text>
-            <View style={styles.inBox}>
-              {lesson.items.map((item, i) =>
-                placed[i] && item.box === b ? (
-                  <MathPic key={i} pic={{ ...item.pic, size: "small" }} decorative />
-                ) : null,
-              )}
-            </View>
-          </Pressable>
+            <Pressable
+              testID={`sort-box-${b}`}
+              accessibilityRole="button"
+              accessibilityLabel={box.label}
+              onPress={() => handleBox(b as 0 | 1)}
+              style={[
+                styles.box,
+                selected !== null && { borderColor: color },
+                wrongBox === b && { borderColor: colors.danger },
+              ]}
+            >
+              {box.pic ? <MathPic pic={box.pic} decorative /> : null}
+              <Text style={styles.boxLabel}>{box.label}</Text>
+              <View style={styles.inBox}>
+                {lesson.items.map((item, i) =>
+                  placed[i] && item.box === b ? (
+                    <MathPic key={i} pic={{ ...item.pic, size: "small" }} decorative />
+                  ) : null,
+                )}
+              </View>
+            </Pressable>
+          </Animated.View>
         ))}
       </View>
       <View style={styles.items}>
@@ -106,7 +141,10 @@ function Sort({ lesson, color, onComplete }: ActivityProps<"sort">) {
 
 export const SortActivity = withAttemptReset(Sort, "SortActivity");
 
+const WRONG_MS = 600;
+
 const styles = StyleSheet.create({
+  boxWrap: { flex: 1 },
   boxes: { flexDirection: "row-reverse", gap: 12, width: "100%" },
   box: {
     flex: 1,
