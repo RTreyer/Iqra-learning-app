@@ -110,14 +110,15 @@ function NumberFill({
 export const NumberFillActivity = withAttemptReset(NumberFill, "NumberFillActivity");
 
 const styles = StyleSheet.create({
-  row: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 12 },
+  // Five cells (a op b = c) fit a 360 px phone: 5 × 52 + 4 × 6 = 284 px inside the 20 px padding.
+  row: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 6 },
   rtl: { flexDirection: "row-reverse" },
   vertical: { alignItems: "flex-end", gap: 4 },
   rule: { height: 4, alignSelf: "stretch", backgroundColor: colors.text, borderRadius: 2 },
-  cell: { fontSize: 44, fontWeight: "900", color: colors.text, minWidth: 64, textAlign: "center" },
+  cell: { fontSize: 40, fontWeight: "900", color: colors.text, minWidth: 52, textAlign: "center" },
   box: {
-    minWidth: 64,
-    minHeight: 64,
+    minWidth: 52,
+    minHeight: 56,
     borderWidth: 3,
     borderStyle: "dashed",
     borderColor: colors.mutedStrong,
