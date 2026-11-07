@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from "react";
+import { Gloss } from "@/components/Gloss";
 import { Picture } from "@/components/pictures/Picture";
 import { Animated, StyleSheet, Text, View } from "react-native";
 import { Pressable } from "@/components/demo/DemoPressable";
@@ -45,6 +46,7 @@ function Story({ lesson, color, onComplete }: ActivityProps<"story">) {
         </View>
       ) : null}
       <Text style={styles.title}>{lesson.storyTitle}</Text>
+      <Gloss text={lesson.storyTitle} />
       {/* Each sentence heard fills a wagon; Hudhud says what to do. */}
       <StoryProgress count={lines.length} current={heard.size} color={color} />
       <View style={act.fullWidth}>
@@ -72,9 +74,12 @@ function Story({ lesson, color, onComplete }: ActivityProps<"story">) {
                 ) : (
                   <Picture emoji={line.emoji} size={36} />
                 )}
-                <Text style={[styles.text, done && { color: readableFill(color) }]}>
-                  {line.text}
-                </Text>
+                <View style={styles.textCol}>
+                  <Text style={[styles.text, done && { color: readableFill(color) }]}>
+                    {line.text}
+                  </Text>
+                  <Gloss text={line.text} style={styles.gloss} />
+                </View>
                 {done ? <Text style={styles.check}>✓</Text> : null}
               </Pressable>
             </Animated.View>
@@ -132,6 +137,8 @@ const styles = StyleSheet.create({
     gap: 10,
     minHeight: touchTarget,
   },
-  text: { flex: 1, fontSize: 18, fontWeight: "700", color: colors.text, textAlign: "right" },
+  textCol: { flex: 1 },
+  gloss: { textAlign: "right" },
+  text: { fontSize: 18, fontWeight: "700", color: colors.text, textAlign: "right" },
   check: { fontSize: 16, color: colors.successText },
 });

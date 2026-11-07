@@ -1,6 +1,8 @@
 import * as Speech from "expo-speech";
 import { Platform } from "react-native";
 
+import { explainLine, isExplainMode, lineParts } from "@/lib/explain";
+
 export const ARABIC_RATE = 0.8;
 
 export type SpeakOptions = {
@@ -21,21 +23,41 @@ export function isSpeechMuted(): boolean {
   return muted;
 }
 
-/** Speaks Arabic text, stopping any current speech first. A number is read as the rate. */
+/** Rate of the English voice in the explanation mode (lib/explain.ts). */
+export const ENGLISH_RATE = 0.95;
+
+/** Each speak() call gets a number; parts of an older call stop once a newer one starts. */
+let generation = 0;
+
+/**
+ * Speaks a line, stopping any current speech first. A number is read as the rate. In the
+ * English explanation mode (lib/explain.ts) a line is spoken in English, part by part around
+ * the Arabic learning in it, which keeps the Arabic voice.
+ */
 export function speak(text: string, options: number | SpeakOptions = {}): void {
   const { rate = ARABIC_RATE, onDone } = typeof options === "number" ? { rate: options } : options;
   if (muted) {
     onDone?.();
     return;
   }
+  const parts = lineParts(text);
+  const mine = ++generation;
   try {
     Speech.stop();
-    if (onDone) {
-      const done = () => onDone();
-      Speech.speak(text, { language: "ar", rate, onDone: done, onError: done, onStopped: done });
-    } else {
-      Speech.speak(text, { language: "ar", rate });
-    }
+    const say = (i: number) => {
+      const part = parts[i];
+      const last = i === parts.length - 1;
+      const next = () => {
+        if (generation !== mine) return onDone?.();
+        if (last) onDone?.();
+        else say(i + 1);
+      };
+      const voice =
+        part.lang === "en" ? { language: "en-US", rate: ENGLISH_RATE } : { language: "ar", rate };
+      if (!onDone && last) Speech.speak(part.text, voice);
+      else Speech.speak(part.text, { ...voice, onDone: next, onError: next, onStopped: next });
+    };
+    say(0);
   } catch {
     onDone?.();
   }
@@ -52,7 +74,9 @@ const MAX_SPEECH_MS = 8000;
  * engine never reports back. Too long only delays the next step on a silent device.
  */
 export function estimateSpeechMs(text: string, rate: number = ARABIC_RATE): number {
-  const chars = text.replace(HARAKAT, "").length;
+  // English words are longer in letters than the vocalised Arabic, and spoken a little faster.
+  const english = isExplainMode();
+  const chars = english ? explainLine(text).length * 0.75 : text.replace(HARAKAT, "").length;
   const ms = (chars * MS_PER_CHAR) / rate;
   return Math.round(Math.min(MAX_SPEECH_MS, Math.max(MIN_SPEECH_MS, ms)));
 }

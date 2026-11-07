@@ -1,4 +1,5 @@
 import React, { useCallback } from "react";
+import { Gloss } from "@/components/Gloss";
 import { StyleSheet, Text, View } from "react-native";
 import { Pressable } from "@/components/demo/DemoPressable";
 import { compareAnswer, type CompareAnswer } from "@/content/math/answers";
@@ -101,7 +102,10 @@ function Compare({ lesson, color, onComplete, onRoundResult }: ActivityProps<"co
               {round.mode === "symbols" ? (
                 <CompareSymbol answer={a} color={colors.text} />
               ) : (
-                <Text style={styles.word}>{words[a]}</Text>
+                <>
+                  <Text style={styles.word}>{words[a]}</Text>
+                  <Gloss text={words[a]} />
+                </>
               )}
             </Pressable>
           );

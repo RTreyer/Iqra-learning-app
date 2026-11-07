@@ -3,6 +3,7 @@
  */
 
 import { useLocalSearchParams } from "expo-router";
+import { useLanguage } from "@/context/LanguageContext";
 import React, { useEffect, useMemo, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
@@ -47,10 +48,12 @@ function useLessonIntro(
   lessonId: string,
   title: string | undefined,
   instruction: string | undefined,
+  /** The menu language is known, so the title is spoken in the right language. */
+  languageLoaded = true,
 ): boolean {
   const [readyFor, setReadyFor] = useState<string | null>(null);
   useEffect(() => {
-    if (!title) return;
+    if (!title || !languageLoaded) return;
     const steps: [string, number][] = [[title, INTRO_FALLBACK_MS]];
     if (instruction) steps.push([instruction, estimateSpeechMs(instruction)]);
     let settled = false;
@@ -80,7 +83,7 @@ function useLessonIntro(
       clearTimeout(timer);
       stopSpeaking();
     };
-  }, [lessonId, title, instruction]);
+  }, [lessonId, title, instruction, languageLoaded]);
   return readyFor === lessonId;
 }
 
@@ -100,7 +103,8 @@ export default function LessonScreen() {
   const instruction = found ? instructionFor(found.lesson) : undefined;
   // Hudhud tells the task above the activity and reacts to the child's answers.
   const guide = useGuideState();
-  const ready = useLessonIntro(lessonId, found?.lesson.title, instruction);
+  const { loaded: languageLoaded } = useLanguage();
+  const ready = useLessonIntro(lessonId, found?.lesson.title, instruction, languageLoaded);
 
   // Worked example: shown on the first lesson of each activity type, and again on request.
   const { seen, markSeen } = useDemoSeen();

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useLine } from "@/components/Gloss";
 import { Animated, StyleSheet, Text, View } from "react-native";
 import { Pressable } from "@/components/demo/DemoPressable";
 import { picLabel } from "@/content/math/picLabel";
@@ -21,6 +22,7 @@ import { useGuide } from "@/components/world/LessonGuide";
  * item's first placement counts. The lesson ends when every item is in its box.
  */
 function Sort({ lesson, color, onComplete }: ActivityProps<"sort">) {
+  const line = useLine();
   const guide = useGuide();
   const [selected, setSelected] = useState<number | null>(null);
   const [placed, setPlaced] = useState<boolean[]>(() => lesson.items.map(() => false));
@@ -96,7 +98,7 @@ function Sort({ lesson, color, onComplete }: ActivityProps<"sort">) {
             <Pressable
               testID={`sort-box-${b}`}
               accessibilityRole="button"
-              accessibilityLabel={box.label}
+              accessibilityLabel={line(box.label)}
               onPress={() => handleBox(b as 0 | 1)}
               style={[
                 styles.box,
@@ -105,7 +107,7 @@ function Sort({ lesson, color, onComplete }: ActivityProps<"sort">) {
               ]}
             >
               {box.pic ? <MathPic pic={box.pic} decorative /> : null}
-              <Text style={styles.boxLabel}>{box.label}</Text>
+              <Text style={styles.boxLabel}>{line(box.label)}</Text>
               <View style={styles.inBox}>
                 {lesson.items.map((item, i) =>
                   placed[i] && item.box === b ? (

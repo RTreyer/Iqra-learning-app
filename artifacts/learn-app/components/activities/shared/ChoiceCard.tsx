@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Gloss } from "@/components/Gloss";
 import { Picture } from "@/components/pictures/Picture";
 import { Animated, StyleSheet, Text } from "react-native";
 import { Pressable } from "@/components/demo/DemoPressable";
@@ -63,6 +64,7 @@ export function ChoiceCard({
         >
           {word}
         </Text>
+        {variant === "number" ? null : <Gloss text={word} />}
         {icon ? <Text style={iconStyles[variant]}>{icon}</Text> : null}
       </Pressable>
     </Animated.View>

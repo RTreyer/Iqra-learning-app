@@ -7,6 +7,7 @@
  */
 
 import React, { useEffect, useState } from "react";
+import { useLine } from "@/components/Gloss";
 import {
   Animated,
   Easing,
@@ -357,6 +358,7 @@ function PathGuide({
   /** He flies in from this offset (another stop) before he lands and speaks. */
   from?: { dx: number; dy: number };
 }) {
+  const line = useLine();
   const [flight] = useState(() => new Animated.Value(from ? 0 : 1));
   const [flying, setFlying] = useState(from !== undefined);
   const [start] = useState(from);
@@ -409,7 +411,7 @@ function PathGuide({
     <Pressable
       testID="guide"
       accessibilityRole="button"
-      accessibilityLabel={text}
+      accessibilityLabel={line(text)}
       onPress={() => {
         haptics.tap();
         speak(text);
@@ -434,7 +436,7 @@ function PathGuide({
         <View style={{ flexShrink: 0 }}>
           <Icon name="speaker" size={18} color={yemen.clay} />
         </View>
-        <Text style={styles.bubbleText}>{text}</Text>
+        <Text style={styles.bubbleText}>{line(text)}</Text>
         <View style={[styles.tail, side === "left" ? styles.tailLeft : styles.tailRight]} />
       </Animated.View>
       {/* He looks at the stop: to the right when he stands on its left. */}

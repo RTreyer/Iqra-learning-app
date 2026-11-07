@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from "react";
+import { Gloss } from "@/components/Gloss";
 import { Picture } from "@/components/pictures/Picture";
 import { StyleSheet, Text, View } from "react-native";
 import { Pressable } from "@/components/demo/DemoPressable";
@@ -103,6 +104,7 @@ function Matching({ lesson, color, attemptKey, onComplete }: ActivityProps<"matc
               <Text style={[styles.word, !pair.left.emoji && styles.wordOnly]}>
                 {pair.left.word}
               </Text>
+              <Gloss text={pair.left.word} />
             </Pressable>
           ))}
         </View>
@@ -141,6 +143,7 @@ function Matching({ lesson, color, attemptKey, onComplete }: ActivityProps<"matc
               <Text style={[styles.word, !pairs[pairIdx].right.emoji && styles.wordOnly]}>
                 {pairs[pairIdx].right.word}
               </Text>
+              <Gloss text={pairs[pairIdx].right.word} />
             </Pressable>
           ))}
         </View>

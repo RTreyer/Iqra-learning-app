@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Gloss } from "@/components/Gloss";
 import { Picture } from "@/components/pictures/Picture";
 import { StarIcon } from "@/components/world/Icon";
 import { Animated, Easing, StyleSheet, Text, View } from "react-native";
@@ -241,6 +242,7 @@ function LetterRound({ round, color, seed, onDone }: RoundProps) {
           <Text style={[styles.word, sentence && styles.sentence, { color: readableFill(color) }]}>
             {word}
           </Text>
+          <Gloss text={word} />
           <StarIcon size={44} dim={missed} />
         </View>
       ) : (

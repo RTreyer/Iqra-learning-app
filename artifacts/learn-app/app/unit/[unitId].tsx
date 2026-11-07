@@ -7,6 +7,7 @@
  */
 
 import { router, useLocalSearchParams } from "expo-router";
+import { useLine } from "@/components/Gloss";
 import React, { useCallback, useMemo, useRef, type ComponentRef } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
@@ -41,6 +42,7 @@ export default function UnitScreen() {
     [],
   );
   const { language, digits } = useLanguage();
+  const line = useLine();
 
   const unit = getUnit(unitId ?? "");
   const summary = useMemo(
@@ -88,7 +90,7 @@ export default function UnitScreen() {
               style={[styles.sectionText, { color: readableFill(unit.color) }]}
               accessibilityRole="header"
             >
-              {lesson.section}
+              {line(lesson.section!)}
             </Text>
           </View>
         ) : undefined,

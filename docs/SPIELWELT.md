@@ -100,6 +100,16 @@ Der Sturm im Intro bläst deshalb «die Buchstaben und ihre Vokalzeichen» aus d
 
 **Play danach**: öffnet die nächste noch nicht gemachte Lektion im gewählten Fach; ein kleines Abzeichen (أ / ١) zeigt, welches. **Wechseln**: Antippen einer Insel öffnet dieses Buch und macht es zum Fach für Play (goldener Rand). Ein Buch-Knopf oben spielt die Geschichte nochmals ab.
 
+## Englischer Erklär-Modus
+
+Für Erwachsene, die kein Arabisch lesen (Eltern im Ausland, Lehrkräfte, Spender, Prüfer): Wer in der Elternecke die Menüsprache auf English stellt, sieht und hört, was in der App passiert (`lib/explain.ts`, `components/Gloss.tsx`).
+
+- **Englisch, mit englischer Stimme**: alles, was Hudhud und die App sagen und zeigen: das Intro, Hudhuds Sätze auf Pfaden und am Ziel, Anweisungen, Lob und «Try again», Mathe-Fragen, Lektions- und Abschnittstitel (`content/translations/lines.ts`).
+- **Arabisch mit Übersetzung darunter**: der Lernstoff bleibt, was das Kind sieht und hört. Wörter und Lesesätze zeigen klein ihre englische Bedeutung (`content/translations/gloss.ts`), Buchstaben und Silben eine Lateinlesung («م» → «the letter mīm», «مَا» → «mā», `lib/transliterate.ts`). Gesprochen werden sie weiter mit der arabischen Stimme.
+- **Gemischte Sätze** wie «حَاوِلْ مَرَّةً أُخْرَى، مَ» werden Teil für Teil gesprochen: «Try again,» englisch, der Buchstabe arabisch.
+- Die Sprache wird vor dem ersten gesprochenen Satz geladen, damit nichts in der falschen Sprache beginnt.
+- `test-utils/explainStrings.ts` sammelt alle Texte; ein Test meldet jeden ohne Übersetzung. Die Übersetzungen sind maschinell und sollten gegengelesen werden. Hudhuds «رِسَالَة» heisst durchgehend «message», ein Buchstabe «letter».
+
 ## Aufbau
 
 | Bildschirm | Was das Kind sieht | Code |

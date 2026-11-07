@@ -49,7 +49,7 @@ function subjectGlyph(book: Book, digits: (v: string) => string): string {
 }
 
 export default function HomeScreen() {
-  const { t, digits, language } = useLanguage();
+  const { t, digits, language, loaded: languageLoaded } = useLanguage();
   const { progress, getDueItemIds, getUnitProgress } = useProgress();
   const { settings, loaded, update } = useSettings();
   const pad = useScreenPadding();
@@ -122,7 +122,7 @@ export default function HomeScreen() {
           }
           layout="stack"
           birdSize={112}
-          speakOnMount={loaded}
+          speakOnMount={loaded && languageLoaded}
         />
 
         {story || next ? (

@@ -5,6 +5,7 @@
  */
 
 import { router } from "expo-router";
+import { useLine } from "@/components/Gloss";
 import React, { useEffect, useState } from "react";
 import { Animated, Easing, Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -166,7 +167,8 @@ function ChoicePicture({ book }: { book: Book }) {
 }
 
 export default function IntroScreen() {
-  const { t, language } = useLanguage();
+  const { t, language, loaded: languageLoaded } = useLanguage();
+  const line = useLine();
   const { update } = useSettings();
   const pad = useScreenPadding();
   const [index, setIndex] = useState(0);
@@ -176,6 +178,8 @@ export default function IntroScreen() {
 
   // Tell the scene; move on when the voice is done (or after a fallback), except on the choice.
   useEffect(() => {
+    // Wait for the menu language, so the first line is told in the chosen language.
+    if (!languageLoaded) return;
     let moved = false;
     let linger: ReturnType<typeof setTimeout> | undefined;
     const shownAt = Date.now();
@@ -193,7 +197,7 @@ export default function IntroScreen() {
       clearTimeout(fallback);
       clearTimeout(linger);
     };
-  }, [scene.line, scene.minMs, choosing]);
+  }, [scene.line, scene.minMs, choosing, languageLoaded]);
 
   useEffect(() => () => stopSpeaking(), []);
 
@@ -247,7 +251,7 @@ export default function IntroScreen() {
       <Pressable
         testID="intro-next"
         accessibilityRole="button"
-        accessibilityLabel={scene.line}
+        accessibilityLabel={line(scene.line)}
         disabled={choosing}
         onPress={next}
         style={styles.stage}
@@ -258,7 +262,7 @@ export default function IntroScreen() {
           <View style={styles.speaker}>
             <Icon name="speaker" size={22} color={yemen.clay} />
           </View>
-          <Text style={styles.line}>{scene.line}</Text>
+          <Text style={styles.line}>{line(scene.line)}</Text>
         </Appear>
       </Pressable>
 

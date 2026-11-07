@@ -14,6 +14,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { useLine } from "@/components/Gloss";
 import { Animated, Easing, Pressable, StyleSheet, Text, View } from "react-native";
 
 import * as haptics from "@/lib/haptics";
@@ -68,6 +69,7 @@ export function GuideProvider({ api, children }: { api: GuideApi; children: Reac
 
 /** Hudhud with the task in a bubble; tapping him says it again. */
 export function LessonGuide({ text, mood = "idle" }: { text: string; mood?: GuideMood }) {
+  const line = useLine();
   const [move] = useState(() => new Animated.Value(0));
   useEffect(() => {
     if (mood === "idle") return;
@@ -105,7 +107,7 @@ export function LessonGuide({ text, mood = "idle" }: { text: string; mood?: Guid
     <Pressable
       testID="lesson-guide"
       accessibilityRole="button"
-      accessibilityLabel={text}
+      accessibilityLabel={line(text)}
       onPress={() => {
         haptics.tap();
         speak(text);
@@ -119,7 +121,7 @@ export function LessonGuide({ text, mood = "idle" }: { text: string; mood?: Guid
         <View style={styles.speaker}>
           <Icon name="speaker" size={18} color={yemen.clay} />
         </View>
-        <Text style={styles.text}>{text}</Text>
+        <Text style={styles.text}>{line(text)}</Text>
         <View style={styles.tail} />
       </View>
     </Pressable>

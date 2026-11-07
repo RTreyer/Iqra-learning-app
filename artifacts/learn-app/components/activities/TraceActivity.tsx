@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState, type ComponentRef } from "react";
+import { useLine } from "@/components/Gloss";
 import { Picture } from "@/components/pictures/Picture";
 import { Animated, Platform, StyleSheet, Text, View, type LayoutChangeEvent } from "react-native";
 import { Pressable } from "@/components/demo/DemoPressable";
@@ -38,6 +39,7 @@ export function guideScale(guide: string): number {
 const PLATFORM_PAD = Platform.OS === "web" ? webPad : null;
 
 function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
+  const line = useLine();
   const guide = useGuide();
   const { targets } = lesson;
   const { t } = useLanguage();
@@ -251,7 +253,7 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
       ) : null}
       <View style={trace.header}>
         {target.emoji ? <Picture emoji={target.emoji} size={44} /> : null}
-        <Text style={[trace.label, { color: readableFill(color) }]}>{target.label}</Text>
+        <Text style={[trace.label, { color: readableFill(color) }]}>{line(target.label)}</Text>
       </View>
       {error ? (
         <Animated.View
@@ -270,7 +272,7 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
             testID="trace-pad"
             accessible
             accessibilityRole="image"
-            accessibilityLabel={target.label}
+            accessibilityLabel={line(target.label)}
             accessibilityHint={t("ارسم بإصبعك")}
             collapsable={false}
             style={[

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useLine } from "@/components/Gloss";
 import { Icon } from "@/components/world/Icon";
 import { Picture } from "@/components/pictures/Picture";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -86,6 +87,7 @@ function roundOf(item: ReviewItem): RoundSpec {
 }
 
 function Prompt({ item, color, spoken }: { item: ReviewItem; color: string; spoken: string }) {
+  const line = useLine();
   switch (item.kind) {
     case "letter":
       return <TargetCard text={item.targetLetter} color={color} testID="review-target" />;
@@ -108,12 +110,12 @@ function Prompt({ item, color, spoken }: { item: ReviewItem; color: string; spok
           ) : null}
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={`🔊 ${shown}`}
+            accessibilityLabel={`🔊 ${line(shown)}`}
             style={styles.question}
             onPress={() => speak(spoken)}
           >
             <Icon name="speaker" size={24} color="#065F46" />
-            <Text style={styles.questionText}>{shown}</Text>
+            <Text style={styles.questionText}>{line(shown)}</Text>
           </Pressable>
         </View>
       );

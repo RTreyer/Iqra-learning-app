@@ -5,6 +5,7 @@
  */
 
 import { type Href } from "expo-router";
+import { useLine } from "@/components/Gloss";
 import React from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
@@ -32,6 +33,7 @@ type Props = {
 
 export function WorldHeader({ up, picture, name, detail, color, stars, end }: Props) {
   const { t, language } = useLanguage();
+  const line = useLine();
   return (
     <View style={[styles.row, { flexDirection: language === "en" ? "row" : "row-reverse" }]}>
       <Pressable
@@ -49,7 +51,9 @@ export function WorldHeader({ up, picture, name, detail, color, stars, end }: Pr
       <Pressable
         testID="header-picture"
         accessibilityRole="button"
-        accessibilityLabel={detail ? `${name}، ${detail}` : name}
+        accessibilityLabel={
+          detail ? `${line(name)}${language === "en" ? ", " : "، "}${line(detail)}` : line(name)
+        }
         onPress={() => {
           haptics.tap();
           speak(name);

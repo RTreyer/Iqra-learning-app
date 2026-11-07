@@ -129,7 +129,9 @@ test.describe("navigation", () => {
     // The voice tells each scene and the story moves on by itself (speech ends at once here).
     await expect(page.getByTestId("intro-scene-choose")).toBeVisible({ timeout: 15000 });
     const told = await page.evaluate(() => window.__spoken);
-    expect(told).toContain("هَبَّتْ عَاصِفَةٌ قَوِيَّةٌ، فَطَارَتِ الْحُرُوفُ وَحَرَكَاتُهَا مِنْ رَسَائِلِي!");
+    expect(told).toContain(
+      "هَبَّتْ عَاصِفَةٌ قَوِيَّةٌ، فَطَارَتِ الْحُرُوفُ وَحَرَكَاتُهَا مِنْ رَسَائِلِي!",
+    );
     await page.getByTestId("choose-math-1").click();
     await expect(page).toHaveURL(/\/book\/math-1$/);
 
@@ -362,7 +364,7 @@ test.describe("worked example", () => {
 });
 
 test.describe("language", () => {
-  test("English menus, set in the parents' corner, while lesson text stays Arabic", async ({
+  test("English explains the app: Hudhud and titles in English, the reading stays Arabic with its meaning", async ({
     page,
   }) => {
     await openParents(page);
@@ -379,8 +381,9 @@ test.describe("language", () => {
     ).toBeVisible();
     await expect(page.getByTestId("header-picture").filter({ visible: true })).toHaveAttribute(
       "aria-label",
-      /أَقْرَأُ الْقِصَّة/,
+      /I read the story/,
     );
+    await expect(page.getByText("Mama takes me to school")).toBeVisible();
 
     await openParents(page);
     await page.getByTestId("language-ar").click();

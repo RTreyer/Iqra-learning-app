@@ -1,4 +1,5 @@
 import React from "react";
+import { Gloss } from "@/components/Gloss";
 import { StyleSheet, Text, View } from "react-native";
 
 import { Pressable } from "@/components/demo/DemoPressable";
@@ -27,6 +28,7 @@ export function TargetCard({ text, color, testID = "letter-target" }: Props) {
       style={({ pressed }) => [styles.card, { borderColor: fill }, pressed && styles.pressed]}
     >
       <Text style={[styles.letter, { color: fill }]}>{text}</Text>
+      <Gloss text={text} />
       <View style={[styles.speaker, { backgroundColor: fill }]}>
         <Icon name="speaker" size={26} color="#FFFFFF" />
       </View>

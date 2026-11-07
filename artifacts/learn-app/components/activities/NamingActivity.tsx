@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from "react";
+import { Gloss } from "@/components/Gloss";
 import { Picture } from "@/components/pictures/Picture";
 import { Animated, StyleSheet, Text, View } from "react-native";
 import { Pressable } from "@/components/demo/DemoPressable";
@@ -59,6 +60,7 @@ function Naming({ lesson, color, onComplete }: ActivityProps<"naming">) {
                 <Text style={[styles.word, done && { color: readableFill(color) }]}>
                   {item.word}
                 </Text>
+                <Gloss text={item.word} />
               </Pressable>
             </Animated.View>
           );

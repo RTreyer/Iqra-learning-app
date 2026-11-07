@@ -4,6 +4,7 @@
  */
 
 import React, { useEffect, useState } from "react";
+import { useLine } from "@/components/Gloss";
 import {
   Animated,
   Easing,
@@ -44,6 +45,7 @@ export function Guide({
   testID = "guide",
   style,
 }: Props) {
+  const line = useLine();
   useEffect(() => {
     if (!speakOnMount) return;
     const timer = setTimeout(() => speak(text), 300);
@@ -60,7 +62,7 @@ export function Guide({
       <View style={{ flexShrink: 0 }}>
         <Icon name="speaker" size={22} color={yemen.clay} />
       </View>
-      <Text style={styles.text}>{text}</Text>
+      <Text style={styles.text}>{line(text)}</Text>
     </View>
   );
 
@@ -68,7 +70,7 @@ export function Guide({
     <Pressable
       testID={testID}
       accessibilityRole="button"
-      accessibilityLabel={text}
+      accessibilityLabel={line(text)}
       onPress={say}
       style={({ pressed }) => [
         layout === "row" ? styles.row : styles.stack,

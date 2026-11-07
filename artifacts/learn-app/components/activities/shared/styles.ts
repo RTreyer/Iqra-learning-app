@@ -17,6 +17,7 @@ export const act = StyleSheet.create({
     minHeight: touchTarget,
   },
   listenBtnText: { fontSize: 24, fontWeight: "900", color: colors.white, textAlign: "center" },
+  listenGloss: { color: "#FFFFFF", opacity: 0.9 },
   listenHint: { fontSize: 13, color: colors.white, fontWeight: "600" },
 
   choicesRow: {

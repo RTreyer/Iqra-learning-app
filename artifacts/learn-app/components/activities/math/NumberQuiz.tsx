@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, type ReactNode } from "react";
+import { useLine } from "@/components/Gloss";
 import { Icon } from "@/components/world/Icon";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import type { Lesson } from "@/content/types";
@@ -43,6 +44,7 @@ export function NumberQuiz({
   promptOf,
   renderVisual,
 }: Props) {
+  const line = useLine();
   const { t } = useLanguage();
   const total = lesson.rounds.length;
   const quiz = useQuiz({ lesson, total, onComplete, onRoundResult, autoAdvanceMs: ADVANCE_MS });
@@ -84,12 +86,12 @@ export function NumberQuiz({
       <View style={styles.visual}>{renderVisual(quiz.roundIndex)}</View>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={`${t("اضغط للاستماع")}: ${shown}`}
+        accessibilityLabel={`${t("اضغط للاستماع")}: ${line(shown)}`}
         style={styles.question}
         onPress={() => speak(spoken)}
       >
         <Icon name="speaker" size={24} color="#065F46" />
-        <Text style={styles.questionText}>{shown}</Text>
+        <Text style={styles.questionText}>{line(shown)}</Text>
       </Pressable>
       <View style={styles.options}>
         {labels.map((label, idx) => (

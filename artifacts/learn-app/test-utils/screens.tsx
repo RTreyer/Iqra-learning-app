@@ -13,7 +13,7 @@ const metrics = {
 export function renderScreen(ui: React.ReactElement) {
   return render(
     <SafeAreaProvider initialMetrics={metrics}>
-      <LanguageProvider>
+      <LanguageProvider initial="ar">
         <GestureHandlerRootView>{ui}</GestureHandlerRootView>
       </LanguageProvider>
     </SafeAreaProvider>,

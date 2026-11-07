@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from "react";
+import { Gloss, useLine } from "@/components/Gloss";
 import { Icon } from "@/components/world/Icon";
 import { Animated, Pressable, Text } from "react-native";
 import { UiText } from "@/components/UiText";
@@ -13,6 +14,7 @@ type Props = { text: string; color: string; showText?: boolean };
 /** Big speaker button that replays the round prompt. */
 export function ListenButton({ text, color, showText }: Props) {
   const { t } = useLanguage();
+  const line = useLine();
   const [scale] = useState(() => new Animated.Value(1));
   const handlePress = useCallback(() => {
     speak(text);
@@ -33,7 +35,9 @@ export function ListenButton({ text, color, showText }: Props) {
         onPress={handlePress}
       >
         <Icon name="speaker" size={40} color="#FFFFFF" />
-        {showText ? <Text style={act.listenBtnText}>{text}</Text> : null}
+        {showText ? <Text style={act.listenBtnText}>{line(text)}</Text> : null}
+        {/* A question is shown in English already; a word keeps its meaning below it. */}
+        {line(text) === text ? <Gloss text={text} style={act.listenGloss} /> : null}
         <UiText style={act.listenHint}>اضغط للاستماع</UiText>
       </Pressable>
     </Animated.View>

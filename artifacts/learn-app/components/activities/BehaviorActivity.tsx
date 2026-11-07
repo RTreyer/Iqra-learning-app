@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from "react";
+import { Gloss } from "@/components/Gloss";
 import { Picture } from "@/components/pictures/Picture";
 import { StyleSheet, Text, View } from "react-native";
 import { Pressable } from "@/components/demo/DemoPressable";
@@ -71,7 +72,10 @@ function Behavior({ lesson, color, onComplete }: ActivityProps<"behavior">) {
             ]}
           >
             <Picture emoji={item.emoji} size={42} />
-            <Text style={styles.text}>{item.description}</Text>
+            <View style={styles.textCol}>
+              <Text style={styles.text}>{item.description}</Text>
+              <Gloss text={item.description} style={styles.gloss} />
+            </View>
             {result !== undefined ? (
               <Text style={[styles.resultIcon, { color: result ? colors.success : colors.danger }]}>
                 {result ? "✓" : "✗"}
@@ -131,8 +135,9 @@ const styles = StyleSheet.create({
   },
   cardRight: { borderColor: colors.success, borderWidth: 2, backgroundColor: colors.successSoft },
   cardWrong: { borderColor: colors.danger, borderWidth: 2, backgroundColor: colors.dangerSoft },
+  textCol: { flex: 1 },
+  gloss: { textAlign: "right" },
   text: {
-    flex: 1,
     fontSize: 14,
     fontWeight: "600",
     color: colors.text,
