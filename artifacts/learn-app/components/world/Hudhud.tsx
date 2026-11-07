@@ -1,6 +1,6 @@
 /**
  * Hudhud, the hoopoe who guides the child. In Surat an-Naml the hoopoe brings the news from
- * Saba, from Yemen. Flat inline SVG, two poses, a gentle hop that can be switched off. In his
+ * Saba, from Yemen. Flat inline SVG, three poses (standing, cheering, sad), a gentle hop that can be switched off. In his
  * story he is the postman of Yemen and wears a leather mail bag across his chest, letters
  * peeking out of it.
  */
@@ -16,8 +16,13 @@ const INK = "#2B1D14";
 const STRIPE = "#FFF6E8";
 const LEGS = "#3A2A20";
 const CHEEK = "#F2A98A";
+const TEAR = "#7FB8E8";
 
 const CREST = [-50, -25, 0, 25, 50];
+/** Laid back along the neck: how a hoopoe carries its crest when it is low. */
+const CREST_DOWN = [58, 68, 78, 88, 98];
+/** The bowed head turns about the neck. */
+const BOW = "rotate(-20 62 66)";
 const LEATHER = "#9A5B2C";
 const LEATHER_DARK = "#74401C";
 const LEATHER_EDGE = "#4E2A12";
@@ -28,7 +33,8 @@ const SEAL = "#C8402F";
 /** Wing beats per second while flying. */
 const FLAP_MS = 180;
 
-export type HudhudPose = "stand" | "cheer";
+/** "sad": crest laid back, head bowed, eyes half shut, a tear (the night he waits in vain). */
+export type HudhudPose = "stand" | "cheer" | "sad";
 
 type Props = {
   size?: number;
@@ -187,13 +193,15 @@ export function Hudhud({
       >
         <Path d="M96 82 L130 68 L132 84 L100 95 Z" fill={INK} />
         <Path d="M112 76 L115 90" stroke={STRIPE} strokeWidth={4} />
-        {CREST.map((angle) => (
-          <G key={angle} transform={`rotate(${angle} 52 46)`}>
-            <Ellipse cx={52} cy={30} rx={5.5} ry={14} fill={HEAD} />
-            <Ellipse cx={52} cy={23} rx={5.5} ry={2} fill={STRIPE} />
-            <Ellipse cx={52} cy={19} rx={4.5} ry={4} fill={INK} />
-          </G>
-        ))}
+        <G transform={pose === "sad" ? BOW : undefined}>
+          {(pose === "sad" ? CREST_DOWN : CREST).map((angle) => (
+            <G key={angle} transform={`rotate(${angle} 52 46)`}>
+              <Ellipse cx={52} cy={30} rx={5.5} ry={14} fill={HEAD} />
+              <Ellipse cx={52} cy={23} rx={5.5} ry={2} fill={STRIPE} />
+              <Ellipse cx={52} cy={19} rx={4.5} ry={4} fill={INK} />
+            </G>
+          ))}
+        </G>
         <Ellipse cx={74} cy={84} rx={32} ry={24} fill={BODY} />
         <Ellipse cx={58} cy={70} rx={14} ry={13} fill={HEAD} />
         {bag !== undefined ? <BagStrapBack /> : null}
@@ -227,29 +235,43 @@ export function Hudhud({
           />
         ) : null}
         {bag !== undefined ? <Bag letters={bag} /> : null}
-        <Circle cx={50} cy={56} r={17} fill={HEAD} />
-        <Path
-          d="M35 58 Q21 62 8 73"
-          stroke={LEGS}
-          strokeWidth={4}
-          strokeLinecap="round"
-          fill="none"
-        />
-        {pose === "cheer" ? (
+        <G transform={pose === "sad" ? BOW : undefined}>
+          <Circle cx={50} cy={56} r={17} fill={HEAD} />
           <Path
-            d="M40 52 Q44 48 48 52"
-            stroke={INK}
-            strokeWidth={3}
+            d="M35 58 Q21 62 8 73"
+            stroke={LEGS}
+            strokeWidth={4}
             strokeLinecap="round"
             fill="none"
           />
-        ) : (
-          <G>
-            <Circle cx={44} cy={53} r={3.8} fill={INK} />
-            <Circle cx={45.3} cy={51.8} r={1.3} fill="#FFFFFF" />
-          </G>
-        )}
-        <Circle cx={50} cy={62} r={3.5} fill={CHEEK} opacity={0.75} />
+          {pose === "sad" ? (
+            <G>
+              <Path
+                d="M39 54 Q44 57.5 49 54"
+                stroke={INK}
+                strokeWidth={3}
+                strokeLinecap="round"
+                fill="none"
+              />
+              <Path d="M38 47 L47 49.5" stroke={INK} strokeWidth={2} strokeLinecap="round" />
+              <Path d="M43 59 Q40.5 64 43 66 Q45.5 64 43 59 Z" fill={TEAR} />
+            </G>
+          ) : pose === "cheer" ? (
+            <Path
+              d="M40 52 Q44 48 48 52"
+              stroke={INK}
+              strokeWidth={3}
+              strokeLinecap="round"
+              fill="none"
+            />
+          ) : (
+            <G>
+              <Circle cx={44} cy={53} r={3.8} fill={INK} />
+              <Circle cx={45.3} cy={51.8} r={1.3} fill="#FFFFFF" />
+            </G>
+          )}
+          <Circle cx={50} cy={62} r={3.5} fill={CHEEK} opacity={0.75} />
+        </G>
         {bag !== undefined ? null : (
           <Path
             d="M66 106 L64 121 M80 106 L82 121 M58 121 L68 121 M78 121 L88 121"

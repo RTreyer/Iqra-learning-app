@@ -19,7 +19,9 @@ import {
   HillsArt,
   JugArt,
   NightSkyArt,
+  RASHA_SHOULDER,
   Rasha,
+  RashaArm,
   SunArt,
   TruckArt,
   WiltedPlantArt,
@@ -71,6 +73,10 @@ function useSwing(duration: number, delay = 0) {
   }, [v, duration, delay]);
   return v;
 }
+
+/** Rasha's size on the back of the pick-up, and where her waving arm turns. */
+const RASHA_ON_TRUCK = 96;
+const ARM_BOX = (72 * RASHA_ON_TRUCK) / 130;
 
 const lerp = (v: Animated.Value, from: number, to: number) =>
   v.interpolate({ inputRange: [0, 1], outputRange: [from, to] });
@@ -492,7 +498,7 @@ function Days() {
  */
 function Leave() {
   const drive = useOnce(5400, 1300, Easing.in(Easing.quad));
-  const wave = useSwing(320, 300);
+  const wave = useSwing(520, 300);
   const rattle = useSwing(160);
   const follow = useOnce(1600, 2600, Easing.inOut(Easing.quad));
   const dust = useLoop(700, 1300);
@@ -509,18 +515,21 @@ function Leave() {
       <View style={styles.street} />
       <Animated.View style={[styles.truckBox, away]}>
         <Animated.View style={{ transform: [{ translateY: lerp(rattle, 0, -2) }] }}>
-          <TruckArt width={210} />
-          {/* Rasha sits at the back among the bundles and waves. */}
+          <TruckArt width={210} layer="load" />
+          {/* Rasha stands at the back between the bundles, looks back, sad, and waves. */}
           <View style={styles.truckRasha}>
-            <Art art="girl" size={52} />
+            <Rasha size={RASHA_ON_TRUCK} pose="wave" sad ownArm />
             <Animated.View
               style={[
-                styles.waveHand,
-                { transform: [{ rotate: at(wave, [0, 1], ["-20deg", "20deg"]) }] },
+                styles.rashaArm,
+                { transform: [{ rotate: at(wave, [0, 1], ["-30deg", "18deg"]) }] },
               ]}
             >
-              <Picture emoji="👋" size={26} />
+              <RashaArm size={RASHA_ON_TRUCK} />
             </Animated.View>
+          </View>
+          <View style={StyleSheet.absoluteFill}>
+            <TruckArt width={210} layer="body" />
           </View>
         </Animated.View>
         <Animated.View
@@ -544,7 +553,15 @@ function Leave() {
           },
         ]}
       >
-        <Hudhud size={70} flap hop={false} />
+        {/* He flies after her a little, then lands and hangs his head. */}
+        <Animated.View style={{ opacity: at(follow, [0, 0.9, 1], [1, 1, 0]) }}>
+          <Hudhud size={70} flap hop={false} />
+        </Animated.View>
+        <Animated.View
+          style={[StyleSheet.absoluteFill, { opacity: at(follow, [0, 0.9, 1], [0, 0, 1]) }]}
+        >
+          <Hudhud size={70} pose="sad" hop={false} />
+        </Animated.View>
       </Animated.View>
     </View>
   );
@@ -552,11 +569,13 @@ function Leave() {
 
 /**
  * The next morning the bowl stays empty. Hudhud waits and waits; the day goes by, a dry leaf
- * blows past, night falls, and she does not come.
+ * blows past, night falls, and she does not come. Hudhud lays back his crest and cries.
  */
 function Gone() {
   const dusk = useOnce(4400, 600, Easing.inOut(Easing.quad));
   const look = useSwing(1500, 600);
+  // Once night has fallen, a tear runs down, again and again.
+  const tear = useLoop(1800, 3400);
   const leaf = useOnce(4000, 900, Easing.inOut(Easing.sin));
   return (
     <View style={styles.scene}>
@@ -572,13 +591,30 @@ function Gone() {
           styles.drinker,
           {
             transform: [
-              { translateY: lerp(dusk, 0, 6) },
-              { rotate: at(look, [0, 1], ["-5deg", "5deg"]) },
+              { translateY: lerp(dusk, 0, 10) },
+              { rotate: at(look, [0, 1], ["-4deg", "4deg"]) },
             ],
           },
         ]}
       >
-        <Hudhud size={86} hop={false} />
+        {/* Waiting, looking about; as the night comes he gives up and hangs his head. */}
+        <Animated.View style={{ opacity: at(dusk, [0, 0.4, 0.6], [1, 1, 0]) }}>
+          <Hudhud size={86} hop={false} />
+        </Animated.View>
+        <Animated.View
+          style={[StyleSheet.absoluteFill, { opacity: at(dusk, [0, 0.4, 0.6], [0, 0, 1]) }]}
+        >
+          <Hudhud size={86} pose="sad" hop={false} />
+          <Animated.View
+            style={[
+              styles.tear,
+              {
+                opacity: at(tear, [0, 0.15, 0.7, 1], [0, 1, 1, 0]),
+                transform: [{ translateY: lerp(tear, 0, 30) }],
+              },
+            ]}
+          />
+        </Animated.View>
       </Animated.View>
       <Animated.View
         style={[
@@ -1256,8 +1292,22 @@ const styles = StyleSheet.create({
     backgroundColor: "#BFA98C",
   },
   truckBox: { position: "absolute", left: 110, bottom: 22 },
-  truckRasha: { position: "absolute", left: 150, top: -6, zIndex: 1 },
-  waveHand: { position: "absolute", left: 40, top: -6 },
+  // Cut off below the side of the bed: she stands inside it.
+  truckRasha: { position: "absolute", left: 146, top: 2, height: 62, overflow: "hidden" },
+  rashaArm: {
+    position: "absolute",
+    left: (RASHA_SHOULDER.x * RASHA_ON_TRUCK) / 130 - ARM_BOX / 2,
+    top: (RASHA_SHOULDER.y * RASHA_ON_TRUCK) / 130 - ARM_BOX / 2,
+  },
+  tear: {
+    position: "absolute",
+    left: 23,
+    top: 41,
+    width: 5,
+    height: 7,
+    borderRadius: 3,
+    backgroundColor: "#7FB8E8",
+  },
   dust: {
     position: "absolute",
     right: -24,

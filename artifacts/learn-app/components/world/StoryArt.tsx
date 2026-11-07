@@ -24,10 +24,14 @@ export function Rasha({
   size = 140,
   pose = "stand",
   sad = false,
+  ownArm = false,
 }: {
   size?: number;
   pose?: RashaPose;
+  /** Brows raised in the middle, the mouth turned down, a tear. */
   sad?: boolean;
+  /** "wave" without its raised arm: RashaArm draws it, so the arm can move. */
+  ownArm?: boolean;
 }) {
   const sleeve = { stroke: DRESS, strokeWidth: 7, strokeLinecap: "round" as const, fill: "none" };
   return (
@@ -50,10 +54,9 @@ export function Rasha({
           <Path d="M24 54 Q18 70 20 84" {...sleeve} />
           <Circle cx={20} cy={87} r={3.6} fill={SKIN} />
           {pose === "wave" ? (
-            <>
-              <Path d="M46 54 Q57 44 58 30" {...sleeve} />
-              <Circle cx={58} cy={26} r={4} fill={SKIN} />
-            </>
+            ownArm ? null : (
+              <WaveArm />
+            )
           ) : (
             <>
               <Path d="M46 54 Q52 70 50 84" {...sleeve} />
@@ -73,6 +76,12 @@ export function Rasha({
       <Circle cx={39} cy={29} r={1.5} fill="#2B1D16" />
       <Circle cx={28} cy={33} r={1.8} fill="#E58B7B" opacity={0.6} />
       <Circle cx={42} cy={33} r={1.8} fill="#E58B7B" opacity={0.6} />
+      {sad ? (
+        <>
+          <Path d="M28 26 L33 24.2 M42 26 L37 24.2" stroke="#2B1D16" strokeWidth={1.1} />
+          <Path d="M30.5 32 Q28.6 36 30.5 37.6 Q32.4 36 30.5 32 Z" fill="#7FB8E8" />
+        </>
+      ) : null}
       <Path
         d={sad ? "M31 36 Q35 33 39 36" : "M31 34 Q35 37.5 39 34"}
         stroke="#7A3418"
@@ -83,6 +92,39 @@ export function Rasha({
     </Svg>
   );
 }
+
+/** Rasha's raised arm, in her own coordinates. */
+function WaveArm() {
+  return (
+    <>
+      <Path
+        d="M46 54 Q57 44 58 30"
+        stroke={DRESS}
+        strokeWidth={7}
+        strokeLinecap="round"
+        fill="none"
+      />
+      <Circle cx={58} cy={26} r={4} fill={SKIN} />
+    </>
+  );
+}
+
+/**
+ * Rasha's waving arm on its own, for `<Rasha pose="wave" ownArm />` at the same size. Its box
+ * is centred on her shoulder, so turning it (an Animated.View) swings the arm from the shoulder:
+ * place its centre at RASHA_SHOULDER × size / 130 from her top left.
+ */
+export function RashaArm({ size = 140 }: { size?: number }) {
+  const box = (72 * size) / 130;
+  return (
+    <Svg width={box} height={box} viewBox="10 18 72 72">
+      <WaveArm />
+    </Svg>
+  );
+}
+
+/** Where her shoulder is in Rasha's drawing (x, y of 70 × 130). */
+export const RASHA_SHOULDER = { x: 46, y: 54 };
 
 /** A clay water jug with a spout on the right; tilted, it pours. */
 export function JugArt({ size = 48 }: { size?: number }) {
@@ -180,10 +222,8 @@ export function NightSkyArt() {
       {stars.map(([x, y, r]) => (
         <Circle key={x} cx={x} cy={y} r={r} fill="#FFF6D6" />
       ))}
-      <G transform="translate(290 70)">
-        <Circle cx={0} cy={0} r={16} fill="#FFF1C2" />
-        <Circle cx={7} cy={-5} r={14} fill="#2B3A63" />
-      </G>
+      {/* A crescent of its own, so it sits on any evening sky. */}
+      <Path d="M290 54 A16 16 0 0 0 290 86 A9 16 0 0 1 290 54 Z" fill="#FFF1C2" />
     </Svg>
   );
 }
@@ -192,9 +232,27 @@ export function NightSkyArt() {
  * The family's pick-up, facing left (it drives away to the left): rolled mattresses, a bundle
  * and a water can tied on the back.
  */
-export function TruckArt({ width = 200 }: { width?: number }) {
+export function TruckArt({
+  width = 200,
+  layer = "all",
+}: {
+  width?: number;
+  /** Draw only the load or only the truck, to put someone between them. */
+  layer?: "all" | "load" | "body";
+}) {
+  const load = layer !== "body";
+  const body = layer !== "load";
   return (
     <Svg width={width} height={(width * 90) / 170} viewBox="0 0 170 90">
+      {load ? <TruckLoad /> : null}
+      {body ? <TruckBody /> : null}
+    </Svg>
+  );
+}
+
+function TruckLoad() {
+  return (
+    <>
       <Rect x={68} y={26} width={36} height={18} rx={9} fill="#3E7CB1" />
       <Path d="M80 26 L80 44 M92 26 L92 44" stroke="#2C5E8A" strokeWidth={2} />
       <Rect x={98} y={18} width={34} height={26} rx={11} fill="#E9A81E" />
@@ -202,6 +260,13 @@ export function TruckArt({ width = 200 }: { width?: number }) {
       <Circle cx={146} cy={32} r={13} fill="#C8402F" />
       <Path d="M141 20 L146 14 L151 20" stroke="#8E2A1F" strokeWidth={3} fill="none" />
       <Path d="M64 34 L160 40" stroke="#6B4A2E" strokeWidth={1.5} />
+    </>
+  );
+}
+
+function TruckBody() {
+  return (
+    <>
       <Rect
         x={60}
         y={44}
@@ -226,6 +291,6 @@ export function TruckArt({ width = 200 }: { width?: number }) {
           <Circle cx={x} cy={70} r={5} fill="#C9C9C9" />
         </G>
       ))}
-    </Svg>
+    </>
   );
 }
