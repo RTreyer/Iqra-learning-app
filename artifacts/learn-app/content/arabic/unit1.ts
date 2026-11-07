@@ -11,6 +11,7 @@ export const unit1: Unit = {
   theme: "تَمْهِيدِيَّة",
   emoji: "🌱",
   emblem: "lawh",
+  goal: "writing",
   color: "#059669",
   badgeLabel: "تَمْهِيدِيَّة",
   lessons: [

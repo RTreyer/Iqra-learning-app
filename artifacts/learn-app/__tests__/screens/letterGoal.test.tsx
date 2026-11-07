@@ -3,9 +3,8 @@ import { fireEvent, screen } from "@testing-library/react-native";
 import React from "react";
 
 import UnitScreen from "@/app/unit/[unitId]";
-import { symbolsBack } from "@/lib/storyProgress";
 import { getUnit } from "@/content";
-import { LETTER_LINES } from "@/content/story";
+import { GOAL_LINES, goalLine } from "@/content/story";
 import { ProgressProvider } from "@/context/ProgressContext";
 import { renderScreen, setParams } from "@/test-utils/screens";
 
@@ -16,21 +15,19 @@ beforeEach(async () => {
   jest.clearAllMocks();
 });
 
-test("the letters come back into Hudhud's letter as the unit is done, all of them only at the end", () => {
-  expect([0, 0.2, 0.5, 0.99, 1].map((share) => symbolsBack(7, share))).toEqual([0, 1, 3, 6, 7]);
-});
-
 test("a unit path ends with Hudhud's letter, still missing letters while lessons are left", () => {
   setParams({ unitId: "a2" });
   renderScreen(<UnitScreen />);
   const letter = screen.getByTestId("unit-letter");
-  expect(letter.props.accessibilityLabel).toBe(LETTER_LINES.missing);
+  expect(letter.props.accessibilityLabel).toBe(GOAL_LINES.letters.missing);
   expect(letter.props.accessibilityState).toMatchObject({ checked: false });
   fireEvent.press(letter);
-  expect(Speech.speak).toHaveBeenLastCalledWith(LETTER_LINES.missing, expect.anything());
+  expect(Speech.speak).toHaveBeenLastCalledWith(GOAL_LINES.letters.missing, expect.anything());
+  // Whom the letter is for already shows, faint, below it.
+  expect(screen.getByTestId("goal-recipient")).toBeTruthy();
 });
 
-test("with every lesson done the letter is complete", async () => {
+test("with every lesson done the letter is sealed and delivered", async () => {
   const at = new Date().toISOString();
   const lessons = Object.fromEntries(
     getUnit("a3")!.lessons.map((l) => [l.id, { completed: true, stars: 3, completedAt: at }]),
@@ -45,7 +42,52 @@ test("with every lesson done the letter is complete", async () => {
       <UnitScreen />
     </ProgressProvider>,
   );
-  const letter = await screen.findByLabelText(LETTER_LINES.complete);
+  const letter = await screen.findByLabelText(goalLine(getUnit("a3")!, "letters", true));
   expect(letter.props.accessibilityState).toMatchObject({ checked: true });
   for (const l of getUnit("a3")!.letters!) expect(screen.getAllByText(l).length).toBeGreaterThan(1);
+});
+
+test("a vowels unit shows its letters bare, and a letter wears its mark once its lessons are done", async () => {
+  const unit = getUnit("a4")!;
+  const at = new Date().toISOString();
+  const first = unit.lessons.filter((l) => l.section === unit.lessons[0].section);
+  const lessons = Object.fromEntries(
+    first.map((l) => [l.id, { completed: true, stars: 3, completedAt: at }]),
+  );
+  await AsyncStorage.setItem(
+    "@kidlearn_progress_v1",
+    JSON.stringify({ version: 2, lessons, items: {}, activity: { days: [] }, totalStars: 0 }),
+  );
+  setParams({ unitId: "a4" });
+  renderScreen(
+    <ProgressProvider>
+      <UnitScreen />
+    </ProgressProvider>,
+  );
+  const letter = await screen.findByTestId("goal-letter-0");
+  const first0 = unit.letters![0];
+  expect(letter).toHaveTextContent(first0 + "\u064F");
+  expect(screen.queryByTestId("goal-letter-1")).toBeNull();
+  // The letter chip above the path agrees with the goal.
+  expect(screen.getByTestId(`letter-${first0}`).props.accessibilityState).toMatchObject({
+    checked: true,
+  });
+  expect(screen.getByTestId(`letter-${unit.letters![1]}`).props.accessibilityState).toMatchObject({
+    checked: false,
+  });
+  expect(screen.getByTestId("unit-letter").props.accessibilityLabel).toBe(
+    GOAL_LINES.vowels.missing,
+  );
+});
+
+test("a maths unit ends with its market station; only packing has the ship", () => {
+  setParams({ unitId: "math-u4" });
+  renderScreen(<UnitScreen />);
+  expect(screen.getByTestId("unit-letter").props.accessibilityLabel).toBe(GOAL_LINES.carry.missing);
+  expect(screen.getByTestId("ship-docked")).toBeTruthy();
+  setParams({ unitId: "math-u2" });
+  renderScreen(<UnitScreen />);
+  expect(screen.getAllByTestId("unit-letter").pop()!.props.accessibilityLabel).toBe(
+    GOAL_LINES.count.missing,
+  );
 });

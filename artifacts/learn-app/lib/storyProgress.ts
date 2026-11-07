@@ -1,9 +1,14 @@
 /**
- * Where a unit stands in Hudhud's story: which letters the child has collected back, and what a
- * finished lesson brought back (one more letter in his letter, one more sack counted).
+ * Where a unit stands in Hudhud's story. Every unit has one goal at the end of its path
+ * (GoalKind in content/types.ts). The goal, the letters above the path and the finish card all
+ * read the same state from here, so they never disagree:
+ * - letters and vowels: a letter is back (or has its vowel marks back) once every lesson of its
+ *   section is done; the exercises at the end seal the letter;
+ * - writing and the market stations: a share of the places fill as lessons are done, the last
+ *   one only with the whole unit.
  */
 
-import type { Lesson, Unit } from "@/content/types";
+import type { GoalKind, Lesson, Unit } from "@/content/types";
 
 /** The letter a section is about ("م: أُحِبُّ مَامَا" is about م), or null (exercises, tests). */
 export function sectionLetter(section: string | undefined): string | null {
@@ -22,34 +27,85 @@ export function collectedLetters(unit: Unit, done: (lesson: Lesson) => boolean):
   return collected;
 }
 
-/** How many of a goal's symbols are back at this share of the unit; all only when it is done. */
+/** How many of a goal's places are filled at this share of the unit; all only when it is done. */
 export function symbolsBack(count: number, share: number): number {
   if (share >= 1) return count;
   return Math.min(count - 1, Math.floor(share * count));
 }
 
-export type StoryStep = {
-  /** Share of the unit done after the lesson. */
-  share: number;
-  /** Index of the letter or sack the lesson brought back, if any. */
+type GoalUnit = Pick<Unit, "letters" | "goal">;
+
+/** The unit's goal: as set in the content, else from its subject and letters. Null: no story. */
+export function goalKind(unit: GoalUnit, subject: string): GoalKind | null {
+  if (unit.goal) return unit.goal;
+  if (subject === "math") return "count";
+  if (subject === "arabic" || subject === "lughati")
+    return unit.letters?.length ? "letters" : "writing";
+  return null;
+}
+
+/** Places of a goal that are not letters: lines on the page, baskets, sacks, parcels. */
+const PLACES: Record<Exclude<GoalKind, "letters" | "vowels">, number> = {
+  writing: 4,
+  sort: 3,
+  count: 5,
+  add: 5,
+  carry: 5,
+  pack: 4,
+};
+
+/** The letters a goal is about (letters, vowels), else none. */
+export function goalLetters(unit: GoalUnit, kind: GoalKind): string[] {
+  return kind === "letters" || kind === "vowels" ? (unit.letters ?? []) : [];
+}
+
+export function goalSize(unit: GoalUnit, kind: GoalKind): number {
+  return kind === "letters" || kind === "vowels" ? (unit.letters ?? []).length : PLACES[kind];
+}
+
+export type GoalState = {
+  /** One flag per place of the goal: filled (letter back, line written, sack counted …). */
+  back: boolean[];
+  /** Every lesson of the unit is done: the letter is sealed, the station finished. */
+  complete: boolean;
+};
+
+export function goalState(
+  unit: Unit,
+  kind: GoalKind,
+  done: (lesson: Lesson) => boolean,
+): GoalState {
+  const complete = unit.lessons.length > 0 && unit.lessons.every(done);
+  if (kind === "letters" || kind === "vowels") {
+    const collected = collectedLetters(unit, done);
+    return { back: goalLetters(unit, kind).map((l) => collected.has(l)), complete };
+  }
+  const total = unit.lessons.length;
+  const share = total ? unit.lessons.filter(done).length / total : 0;
+  const filled = symbolsBack(PLACES[kind], share);
+  return { back: Array.from({ length: PLACES[kind] }, (_, i) => i < filled), complete };
+}
+
+export type StoryStep = GoalState & {
+  /** Index of the place this lesson filled, if any. */
   fresh: number | null;
-  /** The lesson completed the unit: the letter is whole, the ship sails. */
+  /** This lesson finished the unit: the letter is sealed, the station done. */
   completed: boolean;
 };
 
 /** What finishing one lesson does to the unit's goal in the story. */
 export function storyStep(
-  symbols: number,
-  total: number,
-  doneBefore: number,
-  lessonWasDone: boolean,
+  unit: Unit,
+  kind: GoalKind,
+  doneBefore: (lesson: Lesson) => boolean,
+  lessonId: string,
 ): StoryStep {
-  const doneAfter = Math.min(total, doneBefore + (lessonWasDone ? 0 : 1));
-  const before = symbolsBack(symbols, total ? doneBefore / total : 0);
-  const after = symbolsBack(symbols, total ? doneAfter / total : 0);
+  const before = goalState(unit, kind, doneBefore);
+  const after = goalState(unit, kind, (l) => l.id === lessonId || doneBefore(l));
+  const fresh = after.back.findIndex((b, i) => b && !before.back[i]);
   return {
-    share: total ? doneAfter / total : 0,
-    fresh: after > before ? after - 1 : null,
-    completed: doneAfter === total && doneBefore < total,
+    ...after,
+    fresh: fresh < 0 ? null : fresh,
+    completed: after.complete && !before.complete,
   };
 }

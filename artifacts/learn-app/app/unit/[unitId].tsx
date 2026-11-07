@@ -18,7 +18,7 @@ import { PathMap, type Stop } from "@/components/world/PathMap";
 import { StoryGoal } from "@/components/world/StoryGoal";
 import { WorldHeader } from "@/components/world/WorldHeader";
 import { books, getUnit, unitLessonIds, type Lesson, type Unit } from "@/content";
-import { unitStoryLine } from "@/content/story";
+import { GOAL_LINES, SUBJECT_LINES } from "@/content/story";
 import { useLanguage } from "@/context/LanguageContext";
 import { useProgress, type LessonStatus } from "@/context/ProgressContext";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
@@ -26,7 +26,7 @@ import * as haptics from "@/lib/haptics";
 import { firstParam } from "@/lib/params";
 import { routes } from "@/lib/routes";
 import { speak } from "@/lib/speech";
-import { collectedLetters, sectionLetter } from "@/lib/storyProgress";
+import { goalKind, goalState, sectionLetter } from "@/lib/storyProgress";
 import { readableFill, touchTarget, yemen } from "@/theme/tokens";
 
 export default function UnitScreen() {
@@ -56,7 +56,10 @@ export default function UnitScreen() {
     unit.lessons.map((lesson) => [lesson.id, getLessonProgress(lesson.id)]),
   );
   const isDone = (lesson: Lesson) => statuses.get(lesson.id)?.completed === true;
-  const collected = collectedLetters(unit as Unit, isDone);
+  // One state for the letters above the path and the goal at its end, so they always agree.
+  const kind = goalKind(unit, subject);
+  const goal = kind ? goalState(unit as Unit, kind, isDone) : null;
+  const vowels = kind === "vowels";
   const current = unit.lessons.findIndex((lesson) => !isDone(lesson));
   const stops: Stop[] = unit.lessons.map((lesson, i) => {
     const status = statuses.get(lesson.id)!;
@@ -108,8 +111,8 @@ export default function UnitScreen() {
         <View
           style={[styles.lettersRow, { flexDirection: language === "en" ? "row" : "row-reverse" }]}
         >
-          {unit.letters.map((letter) => {
-            const back = collected.has(letter);
+          {unit.letters.map((letter, i) => {
+            const back = goal?.back[i] ?? false;
             return (
               <Pressable
                 key={letter}
@@ -132,7 +135,10 @@ export default function UnitScreen() {
                   pressed && styles.pressed,
                 ]}
               >
-                <Text style={[styles.letterChipText, back && styles.letterBackText]}>{letter}</Text>
+                <Text style={[styles.letterChipText, back && styles.letterBackText]}>
+                  {/* In a vowels unit a letter collected back wears its mark again. */}
+                  {back && vowels ? letter + "\u064F" : letter}
+                </Text>
               </Pressable>
             );
           })}
@@ -150,19 +156,20 @@ export default function UnitScreen() {
           color={unit.color}
           onPress={(lessonId) => router.push(routes.lesson(lessonId))}
           // Hudhud appears once the stored progress is known, so he flies to the right stop.
-          guide={progressReady ? unitStoryLine(unit, subject) : undefined}
+          guide={
+            progressReady
+              ? kind
+                ? GOAL_LINES[kind].path
+                : (SUBJECT_LINES[subject] ?? SUBJECT_LINES.arabic)
+              : undefined
+          }
           onGuideY={scrollToGuide}
           pathKey={unit.id}
-          goal={{
-            done: summary.done >= summary.total,
-            node: (
-              <StoryGoal
-                unit={unit}
-                subject={subject}
-                share={summary.total ? summary.done / summary.total : 0}
-              />
-            ),
-          }}
+          goal={
+            kind && goal
+              ? { done: goal.complete, node: <StoryGoal unit={unit} kind={kind} state={goal} /> }
+              : undefined
+          }
         />
       </ScrollView>
     </ScreenBackground>

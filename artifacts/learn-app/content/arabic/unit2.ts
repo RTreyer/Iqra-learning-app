@@ -425,6 +425,8 @@ export const unit2: Unit = {
   theme: "أُحِبُّ مَامَا وَبَابَا",
   emoji: "🏠",
   emblem: "house",
+  goal: "letters",
+  recipient: { to: "إِلَى مَامَا وَبَابَا", pictures: ["🧕", "👨"] },
   color: COLOR,
   badgeLabel: "م ب ل ن ر د ت",
   lessons: [...mim, ...ba, ...lam, ...nun, ...ra, ...dal, ...ta, ...exercises],

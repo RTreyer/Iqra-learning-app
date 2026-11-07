@@ -67,6 +67,37 @@ Beim ersten Tipp auf Play erzählt Hudhud seine Geschichte (`content/story.ts`, 
 
 Zwischen den Szenen blättert die Geschichte wie ein arabisches Buch um: Die alte Szene spielt weiter, während sie ausblendet und nach rechts gleitet, die neue gleitet von links herein; der gesprochene Satz und am Ende die Fachwahl erscheinen sanft. Die Szenen gehen weiter, sobald die Stimme fertig ist; Antippen geht sofort weiter, «تخطَّ» springt zur Wahl. Die Wahl legt das Fach fest (Briefe = Arabisch, Markt = Mathe) und öffnet dessen Lernpfad. Hudhud ist ein ausgedachter Bote; Figuren aus dem Koran werden nicht dargestellt. Die fünf Sätze sind einfaches Hocharabisch und die ersten Kandidaten für Aufnahmen.
 
+### Die Geschichte in den Lernpfaden
+
+Jede Einheit hat ein Ziel am Ende ihres Pfads (`GoalKind` in `content/types.ts`, Logik in `lib/storyProgress.ts`, Sätze in `GOAL_LINES` in `content/story.ts`). Die Buchstaben-Leiste oben, das Ziel am Pfadende und die Abschlusskarte lesen denselben Zustand und widersprechen sich nie.
+
+| Einheit | Ziel | Was sich füllt |
+|---|---|---|
+| A1 Vorbereitung | Hudhud lehrt das Schreiben: eine leere Briefseite | eine Zeile Schrift pro Viertel der Lektionen, die letzte mit der letzten Lektion; am Ende seine Schilfrohrfeder |
+| A2, A3, A6, A7, A8 | Hudhuds Brief | ein Buchstabe kehrt zurück, sobald alle Lektionen seines Abschnitts fertig sind; die Übungen am Ende versiegeln den Brief |
+| A4, A5 (Vokalzeichen) | derselbe Brief, die Buchstaben ohne «Kleider» | die Buchstaben (schon aus A2 bekannt) stehen blass da und bekommen ihr Vokalzeichen zurück, wenn ihr Abschnitt fertig ist; auch die Leiste zeigt dann «مُ» |
+| M1 Sortieren | Markttag, Station 1 | drei Körbe (Honig, Rosinen, Kaffee) werden gefüllt |
+| M2 Zahlen | Station 2 | die Säcke ١ bis ٥ werden gezählt |
+| M3 Addieren | Station 3 | das Kamel bringt Säcke, sie kommen dazu (+) |
+| M4 Subtrahieren | Station 4 | Säcke gehen vom Kai weg aufs wartende Schiff |
+| M5 Formen | Station 5 | die Waren werden verpackt (Quader, Zylinder, Würfel, Kugel); erst dann legt das Schiff ab, einmal, am Ende des Buchs |
+
+Der Sturm im Intro bläst deshalb «die Buchstaben und ihre Vokalzeichen» aus den Briefen.
+
+**Zustellung**: Jeder fertige Brief geht an eine Person aus den Geschichten der Einheit; ihr Bild steht unter dem Brief, blass auf dem Weg, mit Goldrand, wenn er zugestellt ist. Die Abschlusskarte der letzten Lektion sagt «اِكْتَمَلَتِ الرِّسَالَةُ! سَأُوصِلُهَا …», das Ziel danach «أَوْصَلْتُ رِسَالَتِي … شُكْرًا لَكَ!».
+
+| Einheit | Empfänger |
+|---|---|
+| A2 | إِلَى مَامَا وَبَابَا |
+| A3 | إِلَى الْمُعَلِّمَةِ بَيَانَ |
+| A4 | إِلَى أَصْدِقَائِي عَلَى الشَّاطِئِ |
+| A5 | إِلَى رَجُلِ الْمُرُورِ |
+| A6 | إِلَى صَابِرٍ وَبُلْبُلِهِ |
+| A7 | إِلَى وَسِيمٍ |
+| A8 | إِلَى جَدِّي |
+
+**Ende der Geschichte**: Hat das Kind alle Lektionen eines Fachs mit drei Sternen, sagt Hudhud auf der Startseite «وَصَلَتْ كُلُّ رَسَائِلِي! شُكْرًا لَكَ!» (Arabisch) bzw. «أَبْحَرَتِ السَّفِينَةُ، وَالتَّاجِرُ سَعِيدٌ! شُكْرًا لَكَ!» (Mathe). **Sticker** sind Dankesgeschenke: «هَدِيَّةُ شُكْرٍ لَكَ: …». Das Naturkunde-Buch (noch gesperrt) hat bewusst kein Ziel, bis es eine eigene Geschichte bekommt.
+
 **Play danach**: öffnet die nächste noch nicht gemachte Lektion im gewählten Fach; ein kleines Abzeichen (أ / ١) zeigt, welches. **Wechseln**: Antippen einer Insel öffnet dieses Buch und macht es zum Fach für Play (goldener Rand). Ein Buch-Knopf oben spielt die Geschichte nochmals ab.
 
 ## Aufbau

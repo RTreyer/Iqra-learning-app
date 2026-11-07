@@ -75,7 +75,11 @@ function ReviewSession({ initialIds }: { initialIds: string[] }) {
       ) : null}
       {current ? (
         <View style={styles.round}>
-          <StoryProgress count={total} current={Math.min(index, total - 1)} color={colors.success} />
+          <StoryProgress
+            count={total}
+            current={Math.min(index, total - 1)}
+            color={colors.success}
+          />
           <ReviewRound
             item={current}
             attemptKey={`review:${index}`}

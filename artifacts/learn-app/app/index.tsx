@@ -18,6 +18,7 @@ import { QamariyaGoal } from "@/components/world/QamariyaGoal";
 import { Skyline } from "@/components/world/Skyline";
 import { StickerArt } from "@/components/world/StickerArt";
 import { books, unitLessonIds, type Book } from "@/content";
+import { SUBJECT_DONE } from "@/content/story";
 import { useLanguage } from "@/context/LanguageContext";
 import { useProgress } from "@/context/ProgressContext";
 import { useSettings } from "@/context/SettingsContext";
@@ -34,7 +35,6 @@ import { readableFill, shadow, yemen } from "@/theme/tokens";
 const GREETING = "بِسْمِ اللهِ! هَيَّا نَتَعَلَّمُ";
 /** Before the story has been told: the play button starts it. */
 const STORY_INVITE = "اِضْغَطْ عَلَى الزِّرِّ، وَاسْمَعْ قِصَّتِي!";
-const ALL_DONE = "مَا شَاءَ اللهُ! أَتْمَمْتَ كُلَّ الدُّرُوسِ";
 const LESSONS_LEFT = ["", "دَرْسٌ وَاحِدٌ", "دَرْسَانِ", "ثَلَاثَةُ دُرُوسٍ"];
 
 /** What Hudhud says about today's window. */
@@ -112,7 +112,14 @@ export default function HomeScreen() {
         </View>
 
         <Guide
-          text={story ? STORY_INVITE : next ? GREETING : ALL_DONE}
+          text={
+            story
+              ? STORY_INVITE
+              : next
+                ? GREETING
+                : // The end of the story in the chosen subject: letters delivered, the ship gone.
+                  (SUBJECT_DONE[current?.subject ?? "arabic"] ?? SUBJECT_DONE.arabic)
+          }
           layout="stack"
           birdSize={112}
           speakOnMount={loaded}

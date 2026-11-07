@@ -31,8 +31,9 @@ import { starsForScore, type Score } from "@/lib/scoring";
 import { estimateSpeechMs, speak, stopSpeaking } from "@/lib/speech";
 import { newSticker, type Sticker } from "@/lib/stickers";
 import { StoryGoal } from "@/components/world/StoryGoal";
-import { LETTER_LINES, MARKET_LINES, STORY_BEATS, storySymbols } from "@/content/story";
-import { storyStep, type StoryStep } from "@/lib/storyProgress";
+import { GOAL_LINES, finishLine, giftLine } from "@/content/story";
+import { goalKind, storyStep, type StoryStep } from "@/lib/storyProgress";
+import type { GoalKind } from "@/content/types";
 
 /** The activity mounts when the title has been spoken, or after this at the latest. */
 const INTRO_FALLBACK_MS = 1500;
@@ -89,7 +90,7 @@ export default function LessonScreen() {
   const { progress, completeLesson, recordRoundResult, getLessonProgress } = useProgress();
   const today = useMemo(() => lessonsToday(progress), [progress]);
   const [sticker, setSticker] = useState<Sticker | null>(null);
-  const [story, setStory] = useState<StoryStep | null>(null);
+  const [story, setStory] = useState<{ kind: GoalKind; step: StoryStep } | null>(null);
   const pad = useScreenPadding();
 
   const found = getLesson(lessonId);
@@ -125,27 +126,35 @@ export default function LessonScreen() {
     const gained = Math.max(0, earned - getLessonProgress(lesson.id).stars);
     const won = newSticker(before, before + gained);
     setSticker(won);
-    // What the lesson brings back in Hudhud's story: a letter in his letter, a sack counted.
-    const ids = unitLessonIds(unit);
-    const step = storyStep(
-      storySymbols(unit, book.subject).length,
-      ids.length,
-      ids.filter((id) => getLessonProgress(id).completed).length,
-      getLessonProgress(lesson.id).completed,
-    );
-    setStory(step);
+    // What the lesson brings to the unit's goal in Hudhud's story (lib/storyProgress.ts): a
+    // letter back, a line written, a sack counted; the last lesson seals and delivers the letter
+    // or finishes the market station.
+    const kind = goalKind(unit, book.subject);
+    const step = kind
+      ? storyStep(unit, kind, (l) => getLessonProgress(l.id).completed, lesson.id)
+      : null;
+    setStory(kind && step ? { kind, step } : null);
     completeLesson(lesson.id, earned);
     haptics.success();
-    const math = book.subject === "math";
-    const beat = step.completed
-      ? (math ? MARKET_LINES : LETTER_LINES).complete
-      : step.fresh !== null
-        ? math
-          ? STORY_BEATS.sackCounted
-          : STORY_BEATS.letterBack
+    const beat =
+      kind && step
+        ? step.completed
+          ? finishLine(unit, kind)
+          : step.fresh !== null
+            ? GOAL_LINES[kind].beat
+            : ""
         : "";
-    const praise = won ? `أَحْسَنْت! مُلْصَقٌ جَدِيدٌ: ${won.name}` : "أحسنت! لقد أتممت الدرس";
-    speak(beat && !step.completed ? `${praise} ${beat}` : step.completed ? beat : praise);
+    // A sticker is a thank-you gift from the people Hudhud and the child help.
+    const praise = won ? `أَحْسَنْت! ${giftLine(won.name)}` : "أحسنت! لقد أتممت الدرس";
+    speak(
+      step?.completed
+        ? won
+          ? `${beat} ${giftLine(won.name)}`
+          : beat
+        : beat
+          ? `${praise} ${beat}`
+          : praise,
+    );
     completeAttempt(earned);
   };
 
@@ -193,9 +202,9 @@ export default function LessonScreen() {
                   story ? (
                     <StoryGoal
                       unit={unit}
-                      subject={book.subject}
-                      share={story.share}
-                      fresh={story.completed ? null : story.fresh}
+                      kind={story.kind}
+                      state={story.step}
+                      fresh={story.step.completed ? null : story.step.fresh}
                       compact
                       testID="lesson-story"
                     />

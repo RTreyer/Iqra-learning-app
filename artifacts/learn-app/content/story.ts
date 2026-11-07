@@ -7,6 +7,8 @@
  * for recorded audio.
  */
 
+import type { GoalKind, Recipient } from "./types";
+
 export type StorySceneId = "postman" | "wind" | "market" | "waiting" | "choose";
 
 export type StoryScene = {
@@ -24,7 +26,7 @@ export const INTRO_STORY: readonly StoryScene[] = [
   // The storm tears out the three letters one by one: let it finish (components/world/StoryScenes).
   {
     id: "wind",
-    line: "هَبَّتْ عَاصِفَةٌ قَوِيَّةٌ، فَطَارَتِ الْحُرُوفُ مِنْ رَسَائِلِي!",
+    line: "هَبَّتْ عَاصِفَةٌ قَوِيَّةٌ، فَطَارَتِ الْحُرُوفُ وَحَرَكَاتُهَا مِنْ رَسَائِلِي!",
     minMs: 5600,
   },
   {
@@ -45,41 +47,95 @@ export const INTRO_STORY: readonly StoryScene[] = [
 export const SUBJECT_LINES: Record<string, string> = {
   arabic: "هَيَّا نَجْمَعُ الْحُرُوفَ!",
   lughati: "هَيَّا نَجْمَعُ الْحُرُوفَ!",
-  math: "هَيَّا إِلَى السُّوقِ نَعُدُّ!",
+  math: "هَيَّا نُسَاعِدُ التَّاجِرَ فِي السُّوقِ!",
   science: "هَيَّا نَتَعَلَّمُ!",
 };
 
-/**
- * Hudhud's letter at the end of every unit's path: the storm blew its letters away, each
- * lesson done brings some back, and with the whole unit done the letter is complete.
- */
-export const LETTER_LINES = {
-  missing: "فِي آخِرِ الطَّرِيقِ رِسَالَتِي، نُكْمِلُهَا مَعًا!",
-  complete: "اِكْتَمَلَتِ الرِّسَالَةُ! أَحْسَنْت!",
+/** Hudhud's lines about a unit's goal (GoalKind, lib/storyProgress.ts). */
+type GoalLines = {
+  /** On the unit's path, beside Hudhud. */
+  path: string;
+  /** Tapping the goal while it is not finished. */
+  missing: string;
+  /** On the finish card, when the lesson filled a place of the goal. */
+  beat: string;
+  /** When the unit is finished (letters: before the delivery). */
+  complete: string;
 };
 
-/** At the end of a maths unit: the trader's coffee sacks, counted, and the ship that can sail. */
-export const MARKET_LINES = {
-  missing: "التَّاجِرُ يَنْتَظِرُ، نَعُدُّ أَكْيَاسَهُ مَعًا!",
-  complete: "عَدَدْنَا كُلَّ الْأَكْيَاسِ، وَأَبْحَرَتِ السَّفِينَةُ! أَحْسَنْت!",
+export const GOAL_LINES: Record<GoalKind, GoalLines> = {
+  writing: {
+    path: "هَيَّا نَتَعَلَّمُ كِتَابَةَ الرَّسَائِلِ!",
+    missing: "نَكْتُبُ سَطْرًا بَعْدَ سَطْرٍ!",
+    beat: "كَتَبْنَا سَطْرًا جَدِيدًا!",
+    complete: "تَعَلَّمْنَا الْكِتَابَةَ! هَيَّا نَجْمَعُ الْحُرُوفَ!",
+  },
+  letters: {
+    path: "هَيَّا نَجْمَعُ حُرُوفَ رِسَالَتِي!",
+    missing: "فِي آخِرِ الطَّرِيقِ رِسَالَتِي، نُكْمِلُهَا مَعًا!",
+    beat: "رَجَعَ حَرْفٌ إِلَى رِسَالَتِي!",
+    complete: "اِكْتَمَلَتِ الرِّسَالَةُ!",
+  },
+  vowels: {
+    path: "هَيَّا نُعِيدُ إِلَى الْحُرُوفِ حَرَكَاتِهَا!",
+    missing: "حُرُوفُ رِسَالَتِي بِلَا حَرَكَاتٍ، نُعِيدُهَا مَعًا!",
+    beat: "رَجَعَتْ حَرَكَاتُ حَرْفٍ!",
+    complete: "اِكْتَمَلَتِ الرِّسَالَةُ بِحَرَكَاتِهَا!",
+  },
+  sort: {
+    path: "هَيَّا نُرَتِّبُ بَضَائِعَ التَّاجِرِ!",
+    missing: "التَّاجِرُ يَنْتَظِرُ، نُرَتِّبُ بَضَائِعَهُ مَعًا!",
+    beat: "رَتَّبْنَا سَلَّةً أُخْرَى!",
+    complete: "رَتَّبْنَا كُلَّ الْبَضَائِعِ! أَحْسَنْت!",
+  },
+  count: {
+    path: "هَيَّا نَعُدُّ أَكْيَاسَ الْبُنِّ لِلتَّاجِرِ!",
+    missing: "التَّاجِرُ يَنْتَظِرُ، نَعُدُّ أَكْيَاسَهُ مَعًا!",
+    beat: "عَدَدْنَا كِيسًا آخَرَ!",
+    complete: "عَدَدْنَا كُلَّ الْأَكْيَاسِ! أَحْسَنْت!",
+  },
+  add: {
+    path: "وَصَلَتْ أَكْيَاسٌ جَدِيدَةٌ، هَيَّا نَجْمَعُهَا!",
+    missing: "الْجَمَلُ يَحْمِلُ أَكْيَاسًا جَدِيدَةً، نَجْمَعُهَا مَعًا!",
+    beat: "وَصَلَ كِيسٌ جَدِيدٌ!",
+    complete: "جَمَعْنَا كُلَّ الْأَكْيَاسِ الْجَدِيدَةِ! أَحْسَنْت!",
+  },
+  carry: {
+    path: "هَيَّا نَحْمِلُ الْأَكْيَاسَ إِلَى السَّفِينَةِ!",
+    missing: "الْأَكْيَاسُ تَنْتَظِرُ، نَحْمِلُهَا إِلَى السَّفِينَةِ!",
+    beat: "حَمَلْنَا كِيسًا إِلَى السَّفِينَةِ!",
+    complete: "حَمَلْنَا كُلَّ الْأَكْيَاسِ إِلَى السَّفِينَةِ! أَحْسَنْت!",
+  },
+  pack: {
+    path: "هَيَّا نُغَلِّفُ الْبَضَائِعَ لِلسَّفَرِ!",
+    missing: "نُغَلِّفُ الْبَضَائِعَ، ثُمَّ تُبْحِرُ السَّفِينَةُ!",
+    beat: "غَلَّفْنَا طَرْدًا آخَرَ!",
+    complete: "غَلَّفْنَا كُلَّ الْبَضَائِعِ، وَأَبْحَرَتِ السَّفِينَةُ! شُكْرًا لَكَ!",
+  },
 };
 
-/** What a lesson brings back to the story, said on its finish card. */
-export const STORY_BEATS = {
-  letterBack: "رَجَعَ حَرْفٌ إِلَى رِسَالَتِي!",
-  sackCounted: "عَدَدْنَا كِيسًا آخَرَ!",
-};
+type StoryUnit = { recipient?: Recipient };
 
-/** The letters (or numbers) a unit's goal holds: its own letters, else by subject. */
-export function storySymbols(unit: { letters?: string[] }, subject: string): string[] {
-  if (unit.letters?.length) return unit.letters;
-  return subject === "math" ? ["١", "٢", "٣", "٤", "٥"] : ["أ", "ب", "ت", "ث", "ج"];
+/** Said on the finish card of the lesson that finishes a unit: a letter is also delivered. */
+export function finishLine(unit: StoryUnit, kind: GoalKind): string {
+  const { complete } = GOAL_LINES[kind];
+  return unit.recipient ? `${complete} سَأُوصِلُهَا ${unit.recipient.to}.` : complete;
 }
 
-/** Hudhud's line on a unit's path, in the story: collecting letters, or counting in the market. */
-export function unitStoryLine(unit: { letters?: string[] }, subject: string): string {
-  if (subject === "math") return "هَيَّا نَعُدُّ أَكْيَاسَ الْبُنِّ لِلتَّاجِرِ!";
-  // The letters themselves stand above the path; the line stays short.
-  if (unit.letters?.length) return "هَيَّا نَجْمَعُ حُرُوفَ رِسَالَتِي!";
-  return "هَيَّا نَبْدَأُ رِحْلَتَنَا!";
+/** Said when the goal at the end of a path is tapped. */
+export function goalLine(unit: StoryUnit, kind: GoalKind, complete: boolean): string {
+  if (!complete) return GOAL_LINES[kind].missing;
+  if (unit.recipient) return `أَوْصَلْتُ رِسَالَتِي ${unit.recipient.to}. شُكْرًا لَكَ!`;
+  return GOAL_LINES[kind].complete;
 }
+
+/** A won sticker is a thank-you gift from the people Hudhud and the child help. */
+export const giftLine = (sticker: string) => `هَدِيَّةُ شُكْرٍ لَكَ: ${sticker}`;
+
+/** The end of the story in a subject: every lesson done with three stars. */
+export const SUBJECT_DONE: Record<string, string> = {
+  arabic: "وَصَلَتْ كُلُّ رَسَائِلِي! شُكْرًا لَكَ!",
+  lughati: "وَصَلَتْ كُلُّ رَسَائِلِي! شُكْرًا لَكَ!",
+  math: "أَبْحَرَتِ السَّفِينَةُ، وَالتَّاجِرُ سَعِيدٌ! شُكْرًا لَكَ!",
+  science: "مَا شَاءَ اللهُ! أَتْمَمْتَ كُلَّ الدُّرُوسِ",
+};
