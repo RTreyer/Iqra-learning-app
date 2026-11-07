@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+import { Pressable } from "@/components/demo/DemoPressable";
 import { UiText } from "@/components/UiText";
 import { useLanguage } from "@/context/LanguageContext";
 import * as haptics from "@/lib/haptics";
@@ -73,6 +74,7 @@ function Behavior({ lesson, color, onComplete }: ActivityProps<"behavior">) {
             ) : (
               <View style={styles.buttons}>
                 <Pressable
+                  testID={`behavior-right-${i}`}
                   accessibilityRole="button"
                   accessibilityLabel={`${t("سلوك صحيح")}: ${item.description}`}
                   style={[styles.round, styles.check]}
@@ -81,6 +83,7 @@ function Behavior({ lesson, color, onComplete }: ActivityProps<"behavior">) {
                   <Text style={styles.checkText}>✓</Text>
                 </Pressable>
                 <Pressable
+                  testID={`behavior-wrong-${i}`}
                   accessibilityRole="button"
                   accessibilityLabel={`${t("سلوك خطأ")}: ${item.description}`}
                   style={[styles.round, styles.cross]}

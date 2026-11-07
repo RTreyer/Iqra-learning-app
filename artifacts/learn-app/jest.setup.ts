@@ -5,6 +5,7 @@ jest.mock("expo-speech", () => ({
   speak: jest.fn(),
   stop: jest.fn(),
   getAvailableVoicesAsync: jest.fn(() => Promise.resolve([])),
+  isSpeakingAsync: jest.fn(() => Promise.resolve(false)),
 }));
 
 jest.mock("expo-haptics", () => ({

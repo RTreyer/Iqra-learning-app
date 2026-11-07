@@ -7,11 +7,14 @@ import { groupLabel } from "../content/math/picLabel.ts";
 import { mathBookUnit1 } from "../content/math/bookUnit1.ts";
 import { mathBookUnit2 } from "../content/math/bookUnit2.ts";
 import { TRACE_GRID, traceGuides } from "../content/generated/traceGuides.ts";
+import { DEMO_IDS } from "../content/demos.ts";
 
 export { expect };
 
 export const PROGRESS_KEY = "@kidlearn_progress_v1";
 export const VOICE_HINT_KEY = "@iqra_voice_hint_shown";
+/** hooks/useDemoSeen.ts: the activity types whose worked example the child has seen. */
+export const DEMO_SEEN_KEY = "@iqra_demo_seen_v1";
 
 /**
  * Answers per round, taken from content/. Options are shuffled per attempt, so rounds are
@@ -38,8 +41,11 @@ export const QUIZ_ROUNDS = {
   ],
 };
 
-/** Runs before any app code: silent speech that finishes at once, and no voice hint banner. */
-function prepareBrowser() {
+/**
+ * Runs before any app code: silent speech that finishes at once, no voice hint banner, and
+ * every worked example already seen unless a test stored its own list (seedStorage).
+ */
+function prepareBrowser({ demoKey, demoTypes }) {
   window.__spoken = [];
   const synth = window.speechSynthesis;
   if (synth) {
@@ -54,6 +60,8 @@ function prepareBrowser() {
   }
   try {
     localStorage.setItem("@iqra_voice_hint_shown", "1");
+    if (localStorage.getItem(demoKey) === null)
+      localStorage.setItem(demoKey, JSON.stringify(demoTypes));
   } catch {}
 }
 
@@ -65,7 +73,10 @@ export const test = base.extend({
       if (m.type() === "error") errors.push(m.text().slice(0, 300));
     });
     page.on("pageerror", (e) => errors.push(`pageerror: ${e.message.slice(0, 300)}`));
-    await page.addInitScript(prepareBrowser);
+    await page.addInitScript(prepareBrowser, {
+      demoKey: DEMO_SEEN_KEY,
+      demoTypes: DEMO_IDS,
+    });
     await provide(page);
     expect(errors, "console errors during the test").toEqual([]);
   },

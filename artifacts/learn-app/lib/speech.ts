@@ -41,6 +41,15 @@ export function estimateSpeechMs(text: string, rate: number = ARABIC_RATE): numb
   return Math.round(Math.min(MAX_SPEECH_MS, Math.max(MIN_SPEECH_MS, ms)));
 }
 
+/** True while the engine is speaking; false when it cannot tell. */
+export async function isSpeaking(): Promise<boolean> {
+  try {
+    return await Speech.isSpeakingAsync();
+  } catch {
+    return false;
+  }
+}
+
 export function stopSpeaking(): void {
   try {
     Speech.stop();

@@ -7,6 +7,7 @@ import { createRequire } from "node:module";
 import { mathBookUnit5 } from "../content/math/bookUnit5.ts";
 
 import {
+  DEMO_SEEN_KEY,
   QUIZ_ROUNDS,
   answerRound,
   completeMathLesson,
@@ -18,6 +19,7 @@ import {
   mathUnit1Lesson,
   pictureChoiceByName,
   readProgress,
+  seedStorage,
   tapAllAndFinish,
   compareAnswerButton,
   numberFillAnswerButton,
@@ -250,6 +252,49 @@ test.describe("activities", () => {
     await tapAllAndFinish(page, ["عَيْن", "أُذُن", "أَنْف", "فَم", "يَد", "قَدَم"]);
     expect(await earnedStars(page)).toBe(3);
     await expect.poll(async () => (await readProgress(page))?.totalStars).toBe(6);
+  });
+});
+
+test.describe("worked example", () => {
+  test("the first lesson of a type plays its example, which scores nothing; the lesson then counts", async ({
+    page,
+  }) => {
+    await seedStorage(page, { [DEMO_SEEN_KEY]: "[]" });
+    await page.goto("/lesson/u2-29");
+    const demo = page.getByTestId("demo");
+    await expect(demo).toBeVisible();
+    await expect(demo).toContainText("مثال");
+    // The hand answers the example: the voice praises it.
+    await expect
+      .poll(() => page.evaluate(() => window.__spoken), { timeout: 30_000 })
+      .toContain("اَلْآنَ دَوْرُكَ!");
+    await expect(demo).toBeHidden();
+    await expect
+      .poll(() => page.evaluate((k) => localStorage.getItem(k), DEMO_SEEN_KEY))
+      .toBe(JSON.stringify(["letter_pick"]));
+    // Nothing recorded: no stars, no review items from the example.
+    const progress = await readProgress(page);
+    expect(progress?.lessons ?? {}).toEqual({});
+    expect(progress?.items ?? {}).toEqual({});
+    // The real lesson: every round is still there and scores as usual.
+    expect(await completeQuizLesson(page, "u2-29", 6, { navigate: false })).toBe(3);
+    // Seen: the next letter_pick lesson starts at once.
+    await page.reload();
+    const firstRight = QUIZ_ROUNDS["u2-29"][0].right;
+    await expect(page.getByRole("button", { name: firstRight, exact: true })).toBeVisible();
+    await expect(page.getByTestId("demo")).toHaveCount(0);
+  });
+
+  test("Skip ends the example at once, and the help button plays it again", async ({ page }) => {
+    await seedStorage(page, { [DEMO_SEEN_KEY]: "[]" });
+    await page.goto("/lesson/u2-3");
+    await page.getByTestId("demo-skip").click();
+    await expect(page.getByTestId("demo")).toHaveCount(0);
+    await expect(page.getByTestId("listen-button")).toBeVisible();
+    await page.getByTestId("help-button").click();
+    await expect(page.getByTestId("demo")).toBeVisible();
+    await page.getByTestId("demo-skip").click();
+    await expect(page.getByTestId("demo")).toHaveCount(0);
   });
 });
 

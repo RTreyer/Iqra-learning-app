@@ -12,6 +12,7 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import * as hb from "harfbuzzjs";
+import { DEMOS } from "../content/demos.ts";
 import { books } from "../content/index.ts";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -193,6 +194,9 @@ for (const book of books)
       if (lesson.type === "trace")
         for (const target of lesson.targets)
           if (ARABIC.test(target.guide)) guides.add(target.guide);
+// The worked example traces a letter of its own (content/demos.ts).
+for (const target of DEMOS.trace.lesson.targets)
+  if (ARABIC.test(target.guide)) guides.add(target.guide);
 
 /**
  * Arabic-Indic digits (٠ to ٩). At letter size they would be about a third of the box, too

@@ -1,15 +1,9 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Animated,
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-  type LayoutChangeEvent,
-} from "react-native";
+import React, { useCallback, useEffect, useMemo, useRef, useState, type ComponentRef } from "react";
+import { Animated, Platform, StyleSheet, Text, View, type LayoutChangeEvent } from "react-native";
+import { Pressable } from "@/components/demo/DemoPressable";
 import { GestureDetector, usePanGesture } from "react-native-gesture-handler";
 import { Path, Svg } from "react-native-svg";
+import { measureNode, useDemoEntry, type DemoEntry } from "@/components/demo/DemoContext";
 import { UiText } from "@/components/UiText";
 import { useLanguage } from "@/context/LanguageContext";
 import * as haptics from "@/lib/haptics";
@@ -21,12 +15,15 @@ import { useLatest } from "./shared/useLatest";
 import { ADVANCE_MS } from "./shared/useQuiz";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import { PAD_FALLBACK, PAD_MAX, trace, webPad } from "./trace/styles";
+import { densify, guidePath } from "./trace/guidePath";
 import { addPoint, startStroke, type DrawnStroke } from "./trace/path";
 import { decodeMask, validateOnGuide, validateTracing } from "./trace/validate";
 import { TRACE_GRID, traceGuides } from "@/content/generated/traceGuides";
 import type { ActivityProps } from "./types";
 
 const ERROR_VISIBLE_MS = 3000;
+/** Distance between the points of a demo line, in pixels. */
+const DEMO_STEP = 6;
 
 /** Two letters or more (يد، بيت): a word, for the wording of hints. */
 const isWord = (guide: string) => guide.replace(/[ً-ْـ\s]/g, "").length > 1;
@@ -74,6 +71,34 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
   useEffect(() => {
     speak(target.tts);
   }, [target.tts, targetIndex]);
+
+  /** In a demo the hand follows the guide's centre line and the stroke appears under it. */
+  const padNode = useRef<ComponentRef<typeof View> | null>(null);
+  const demoEntry = useMemo<DemoEntry>(
+    () => ({
+      testID: "trace-pad",
+      measure: () => measureNode(padNode.current),
+      tracePath: (relative) =>
+        relative
+          ? densify(
+              relative.map((p) => ({ x: p.x * padSize, y: p.y * padSize })),
+              DEMO_STEP,
+            )
+          : shape
+            ? guidePath(decodeMask(shape.mask, TRACE_GRID), padSize)
+            : null,
+      draw: (points, final) => {
+        if (points.length === 0) return;
+        const stroke = startStroke(points[0]);
+        for (const p of points.slice(1)) addPoint(stroke, p);
+        if (!final) return setLivePath(stroke.d);
+        setLivePath("");
+        setStrokes([stroke]);
+      },
+    }),
+    [shape, padSize],
+  );
+  useDemoEntry(demoEntry);
 
   /** Draws the stroke in progress at most once per frame. */
   const scheduleFlush = () => {
@@ -235,6 +260,7 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
       <View testID="trace-measure" style={trace.measure} onLayout={handleLayout}>
         <GestureDetector gesture={gesture}>
           <View
+            ref={padNode}
             testID="trace-pad"
             accessible
             accessibilityRole="image"

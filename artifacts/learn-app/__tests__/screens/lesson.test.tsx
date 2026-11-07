@@ -1,9 +1,11 @@
 import { act, fireEvent, screen } from "@testing-library/react-native";
 import React from "react";
 import LessonScreen from "@/app/lesson/[lessonId]";
-import { getLesson } from "@/content";
+import { books, getLesson } from "@/content";
+import { DEMO_IDS } from "@/content/demos";
 import { instructionFor } from "@/content/instructions";
 import { routes } from "@/lib/routes";
+import { resetDemoSeenCache } from "@/hooks/useDemoSeen";
 import { estimateSpeechMs } from "@/lib/speech";
 import { mockCanGoBack, renderScreen, setParams } from "@/test-utils/screens";
 
@@ -52,6 +54,19 @@ jest.mock("@/components/activities", () => {
   return { ACTIVITY_COMPONENTS: Object.fromEntries(types.map((type) => [type, Stub])) };
 });
 
+/** The demo player is tested on its own; here it is a stub that ends on a press. */
+jest.mock("@/components/demo/DemoPlayer", () => {
+  const { Pressable, Text } = jest.requireActual("react-native");
+  type MockDemoProps = { id: string; preface?: string; onDone: () => void };
+  return {
+    DemoPlayer: ({ id, preface, onDone }: MockDemoProps) => (
+      <Pressable testID="demo-stub" onPress={onDone}>
+        <Text>{`demo:${id}:${preface ?? ""}`}</Text>
+      </Pressable>
+    ),
+  };
+});
+
 type SpeakOptions = { onDone?: () => void };
 const speech = jest.requireMock("expo-speech") as { speak: jest.Mock; stop: jest.Mock };
 const { router } = jest.requireMock("expo-router") as {
@@ -59,6 +74,9 @@ const { router } = jest.requireMock("expo-router") as {
 };
 const lesson = getLesson("u2-2")!.lesson;
 const instruction = instructionFor(lesson)!;
+const letterTrace = books
+  .flatMap((b) => b.units.flatMap((u) => u.lessons))
+  .find((l) => l.type === "trace" && l.id !== "u1-5")!;
 
 /** expo-speech finishes every utterance at once. */
 const speechFinishes = () =>
@@ -70,6 +88,8 @@ beforeEach(() => {
   jest.useFakeTimers();
   mockCanGoBack(true);
   setParams({ lessonId: "u2-2" });
+  // Every demo seen, unless a test says otherwise.
+  resetDemoSeenCache(DEMO_IDS);
 });
 afterEach(() => jest.useRealTimers());
 
@@ -124,20 +144,90 @@ test("a late report from the stopped title does not skip the instruction", () =>
   expect(screen.getByText("stub:letter_pick")).toBeTruthy();
 });
 
-test("the header button speaks the instruction again", () => {
-  speechFinishes();
-  renderScreen(<LessonScreen />);
-  speech.speak.mockClear();
-  fireEvent.press(screen.getByTestId("instruction-button"));
-  expect(speech.speak).toHaveBeenCalledWith(instruction, expect.anything());
-});
-
 test("maths lessons speak only the title: their rounds speak the task", () => {
   speechFinishes();
   setParams({ lessonId: "math-u3-1" });
   renderScreen(<LessonScreen />);
   expect(speech.speak).toHaveBeenCalledTimes(1);
-  expect(screen.queryByTestId("instruction-button")).toBeNull();
+});
+
+describe("worked example", () => {
+  test("plays after the intro the first time a type comes up, then the activity starts", () => {
+    resetDemoSeenCache([]);
+    speechFinishes();
+    renderScreen(<LessonScreen />);
+    expect(screen.getByText("demo:letter_pick:")).toBeTruthy();
+    expect(screen.queryByText("stub:letter_pick")).toBeNull();
+    fireEvent.press(screen.getByTestId("demo-stub"));
+    expect(screen.queryByTestId("demo-stub")).toBeNull();
+    expect(screen.getByText("stub:letter_pick")).toBeTruthy();
+  });
+
+  test("waits for the intro before it starts", () => {
+    resetDemoSeenCache([]);
+    renderScreen(<LessonScreen />);
+    expect(screen.queryByTestId("demo-stub")).toBeNull();
+  });
+
+  test("is not shown again for a type the child has seen", () => {
+    resetDemoSeenCache([]);
+    speechFinishes();
+    const first = renderScreen(<LessonScreen />);
+    fireEvent.press(screen.getByTestId("demo-stub"));
+    first.unmount();
+    renderScreen(<LessonScreen />);
+    expect(screen.queryByTestId("demo-stub")).toBeNull();
+    expect(screen.getByText("stub:letter_pick")).toBeTruthy();
+  });
+
+  test("other types still get their own demo", () => {
+    resetDemoSeenCache(["letter_pick"]);
+    speechFinishes();
+    setParams({ lessonId: "u2-3" });
+    renderScreen(<LessonScreen />);
+    expect(screen.getByText("demo:word_read:")).toBeTruthy();
+  });
+
+  test("the help button replays it with the instruction, keeping the activity's place", () => {
+    speechFinishes();
+    renderScreen(<LessonScreen />);
+    const activity = screen.getByText("stub:letter_pick");
+    fireEvent.press(screen.getByTestId("help-button"));
+    expect(screen.getByText(`demo:letter_pick:${instruction}`)).toBeTruthy();
+    // Hidden, not unmounted.
+    expect(screen.queryByText("stub:letter_pick")).toBeNull();
+    expect(screen.getByText("stub:letter_pick", { includeHiddenElements: true })).toBe(activity);
+    expect(screen.getByTestId("help-button").props.accessibilityState.disabled).toBe(true);
+    fireEvent.press(screen.getByTestId("demo-stub"));
+    expect(screen.queryByTestId("demo-stub")).toBeNull();
+    expect(screen.getByText("stub:letter_pick")).toBe(activity);
+  });
+
+  test("the help button waits for the intro", () => {
+    renderScreen(<LessonScreen />);
+    expect(screen.getByTestId("help-button").props.accessibilityState.disabled).toBe(true);
+  });
+
+  test("Unit 1 traces lines: it gets the line demo, and letter tracing keeps its own", () => {
+    resetDemoSeenCache([]);
+    speechFinishes();
+    setParams({ lessonId: "u1-5" });
+    const first = renderScreen(<LessonScreen />);
+    expect(screen.getByText("demo:trace_lines:")).toBeTruthy();
+    fireEvent.press(screen.getByTestId("demo-stub"));
+    first.unmount();
+    setParams({ lessonId: letterTrace.id });
+    renderScreen(<LessonScreen />);
+    expect(screen.getByText("demo:trace:")).toBeTruthy();
+  });
+
+  test("maths types get a demo too, without an instruction before it", () => {
+    speechFinishes();
+    setParams({ lessonId: "math-u3-1" });
+    renderScreen(<LessonScreen />);
+    fireEvent.press(screen.getByTestId("help-button"));
+    expect(screen.getByText(/^demo:[a-z_]+:$/)).toBeTruthy();
+  });
 });
 
 test("stops speaking on unmount", () => {

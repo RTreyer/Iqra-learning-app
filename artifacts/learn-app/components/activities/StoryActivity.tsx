@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from "react";
-import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
+import { Animated, StyleSheet, Text, View } from "react-native";
+import { Pressable } from "@/components/demo/DemoPressable";
 import { Art } from "@/components/art/Art";
 import { Scene } from "@/components/art/scenes/Scene";
 import { UiText } from "@/components/UiText";
@@ -50,6 +51,7 @@ function Story({ lesson, color, onComplete }: ActivityProps<"story">) {
           return (
             <Animated.View key={i} style={{ transform: [{ scale: values[i] }] }}>
               <Pressable
+                testID={`story-line-${i}`}
                 accessibilityRole="button"
                 accessibilityLabel={line.text}
                 accessibilityState={{ selected: done }}

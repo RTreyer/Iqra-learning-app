@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
+import { Animated, StyleSheet, Text, View } from "react-native";
+import { Pressable } from "@/components/demo/DemoPressable";
 import { picLabel } from "@/content/math/picLabel";
 import * as haptics from "@/lib/haptics";
 import { speak } from "@/lib/speech";

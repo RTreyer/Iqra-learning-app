@@ -48,7 +48,7 @@ Unit 1 uses `naming`, `listen_pick`, `behavior`, `matching` and `trace`. Math Un
 
 - Monorepo: pnpm workspaces with one package, Node 24, TypeScript 5.9.
 - App: Expo SDK 54, expo-router 6, React Native 0.81, React 19, New Architecture. Typed routes are off, a `lib/routes.ts` helper builds paths.
-- Storage: AsyncStorage only. Key `@kidlearn_progress_v1` (schema v2) for progress, `iqra_ui_language` for language.
+- Storage: AsyncStorage only. Key `@kidlearn_progress_v1` (schema v2) for progress, `iqra_ui_language` for language, `@iqra_demo_seen_v1` for the worked examples already shown.
 - Audio: expo-speech with Arabic locale. Haptics: expo-haptics.
 - Graphics and input: react-native-svg and react-native-gesture-handler (Pan) for letter tracing. No icon fonts, no `expo-font`, no custom fonts at runtime. Icons are inline SVG or emoji. Arabic trace guides are SVG outlines generated at build time from Noto Naskh Arabic (SIL OFL, `scripts/fonts/`) with HarfBuzz (`harfbuzzjs`, dev dependency): `npm run guides` writes `content/generated/traceGuides.ts`, and `test:data` fails when it is out of date.
 - Tests: jest-expo with Testing Library for unit and component tests, Node test runner for content and translation data, Playwright for web end to end.
@@ -99,7 +99,7 @@ artifacts/learn-app/                the Expo app
 - Home guidance: a continue card for the next lesson below 3 stars, a review card with the due count, a streak badge from 2 days.
 - Voice hint banner appears when the device has no Arabic TTS voice.
 - Tracing: gesture handler Pan draws strokes on an SVG pad. A heuristic first checks stroke count, path length (50 percent of the shorter pad side), bounding box (20 percent of width or 15 percent of height) and centroid (within 35 percent of centre). For Arabic guides the drawing is then checked against the letter itself (`validateOnGuide`): at least 90 percent of the drawn points must lie on the letter (tolerance 2 cells of a 50 × 50 grid, about 4 percent of the pad) and at least 50 percent of the letter must be traced. All guides share one letter size, in book proportions. Letters that differ only by dots (ح ج، س ص) cannot be told apart by shape. The Unit 1 line drawings keep the heuristic only.
-- Opening a lesson speaks the title, then the spoken instruction of its activity type (`content/instructions.ts`), then the activity mounts. The 🗣️ button in the lesson header repeats the instruction. Maths types have no extra instruction: every round speaks its own task. See `docs/VOICE.md`.
+- Opening a lesson speaks the title, then the spoken instruction of its activity type (`content/instructions.ts`), then the activity mounts. Maths types have no extra instruction: every round speaks its own task. The first time a child meets an activity type, a worked example plays before the lesson (`content/demos.ts`, `components/demo/`): a hand plays the real activity on content of its own while the voice explains, nothing is scored, and the 👆 button in the lesson header plays it again. See `docs/VOICE.md`.
 - Language switch persists and affects only strings wrapped in `UiText` or passed through `translateUi`.
 - Progress is stored with a corrupt blob backup. Storage read errors never overwrite saved stars.
 - No network requests at runtime. Desktop browser shows a centered 480 px phone frame.

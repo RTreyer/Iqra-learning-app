@@ -3,25 +3,26 @@ import { Pressable, StyleSheet, Text } from "react-native";
 
 import { useLanguage } from "@/context/LanguageContext";
 import * as haptics from "@/lib/haptics";
-import { speak } from "@/lib/speech";
 import { shadow, touchTarget } from "@/theme/tokens";
 
-/** Header button that speaks the lesson instruction again, for a child who cannot read it. */
-export function InstructionButton({ instruction }: { instruction: string }) {
+/** Header button: hear the task again and watch the worked example. */
+export function HelpButton({ onPress, disabled }: { onPress: () => void; disabled?: boolean }) {
   const { t } = useLanguage();
   return (
     <Pressable
-      testID="instruction-button"
-      style={({ pressed }) => [styles.btn, pressed && styles.pressed]}
+      testID="help-button"
+      style={({ pressed }) => [styles.btn, disabled && styles.disabled, pressed && styles.pressed]}
       onPress={() => {
         haptics.tap();
-        speak(instruction);
+        onPress();
       }}
+      disabled={disabled}
       hitSlop={8}
       accessibilityRole="button"
-      accessibilityLabel={`${t("اسمع المطلوب")}: ${instruction}`}
+      accessibilityLabel={t("شاهد مثالاً")}
+      accessibilityState={{ disabled: !!disabled }}
     >
-      <Text style={styles.icon}>🗣️</Text>
+      <Text style={styles.icon}>👆</Text>
     </Pressable>
   );
 }
@@ -36,6 +37,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     ...shadow.card,
   },
+  disabled: { opacity: 0.45 },
   pressed: { opacity: 0.7, transform: [{ scale: 0.95 }] },
   icon: { fontSize: 22 },
 });

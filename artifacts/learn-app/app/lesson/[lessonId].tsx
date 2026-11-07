@@ -11,11 +11,14 @@ import { BackButton } from "@/components/BackButton";
 import { LessonCompleteCard } from "@/components/LessonCompleteCard";
 import { NotFoundCard } from "@/components/NotFoundCard";
 import { ScreenBackground } from "@/components/ScreenBackground";
-import { InstructionButton } from "@/components/InstructionButton";
+import { DemoPlayer } from "@/components/demo/DemoPlayer";
+import { HelpButton } from "@/components/HelpButton";
 import { getLesson } from "@/content";
+import { demoIdFor } from "@/content/demos";
 import { instructionFor } from "@/content/instructions";
 import { useLanguage } from "@/context/LanguageContext";
 import { useProgress } from "@/context/ProgressContext";
+import { useDemoSeen } from "@/hooks/useDemoSeen";
 import { useLessonAttempt } from "@/hooks/useLessonAttempt";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
 import * as haptics from "@/lib/haptics";
@@ -88,6 +91,20 @@ export default function LessonScreen() {
   const instruction = found ? instructionFor(found.lesson) : undefined;
   const ready = useLessonIntro(lessonId, found?.lesson.title, instruction);
 
+  // Worked example: shown on the first lesson of each activity type, and again on request.
+  const { seen, markSeen } = useDemoSeen();
+  const [replay, setReplay] = useState<{ lessonId: string; run: number } | null>(null);
+  const demoId = found ? demoIdFor(found.lesson) : undefined;
+  const replaying = replay?.lessonId === lessonId;
+  const decided = ready && seen !== null && demoId !== undefined;
+  const showDemo = decided && (replaying || !seen.has(demoId));
+  // During a replay the activity stays mounted, hidden, so the child keeps its place.
+  const showActivity = decided && (!showDemo || replaying);
+  const finishDemo = () => {
+    if (demoId) markSeen(demoId);
+    setReplay(null);
+  };
+
   if (!found) return <NotFoundCard message="الدرس غير موجود" />;
   const { book, unit, lesson, next } = found;
 
@@ -117,10 +134,13 @@ export default function LessonScreen() {
             </Text>
           </View>
         </View>
-        {instruction ? (
-          <InstructionButton instruction={instruction} />
-        ) : (
+        {completed ? (
           <View style={styles.headerSpacer} />
+        ) : (
+          <HelpButton
+            disabled={!decided || showDemo}
+            onPress={() => setReplay({ lessonId, run: (replay?.run ?? 0) + 1 })}
+          />
         )}
       </View>
       <ScrollView
@@ -138,15 +158,30 @@ export default function LessonScreen() {
             backTo={routes.unit(unit.id)}
             color={unit.color}
           />
-        ) : ready ? (
-          <ActivityHost
-            lesson={lesson}
-            color={unit.color}
-            attemptKey={activityKey}
-            onComplete={onComplete}
-            onRoundResult={recordRoundResult}
-          />
-        ) : null}
+        ) : (
+          <>
+            {showDemo ? (
+              <DemoPlayer
+                key={`${lessonId}-${replay?.run ?? 0}`}
+                id={demoIdFor(lesson)}
+                color={unit.color}
+                preface={replaying ? instruction : undefined}
+                onDone={finishDemo}
+              />
+            ) : null}
+            {showActivity ? (
+              <View style={showDemo ? styles.hidden : styles.activity}>
+                <ActivityHost
+                  lesson={lesson}
+                  color={unit.color}
+                  attemptKey={activityKey}
+                  onComplete={onComplete}
+                  onRoundResult={recordRoundResult}
+                />
+              </View>
+            ) : null}
+          </>
+        )}
       </ScrollView>
     </ScreenBackground>
   );
@@ -173,4 +208,6 @@ const styles = StyleSheet.create({
   lessonTitle: { fontSize: 17, fontWeight: "800", color: colors.text, flexShrink: 1 },
   lessonSubtitle: { fontSize: 12, fontWeight: "500", color: colors.mutedStrong, flexShrink: 1 },
   scrollContent: { flexGrow: 1, paddingBottom: 24 },
+  activity: { flexGrow: 1 },
+  hidden: { display: "none" },
 });

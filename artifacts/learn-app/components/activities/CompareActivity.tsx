@@ -1,5 +1,6 @@
 import React, { useCallback } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+import { Pressable } from "@/components/demo/DemoPressable";
 import { compareAnswer, type CompareAnswer } from "@/content/math/answers";
 import type { CompareSide } from "@/content/types";
 import { toArabicDigits } from "@/lib/arabicNumbers";

@@ -1,5 +1,6 @@
 import React from "react";
-import { Animated, Pressable, StyleSheet, Text } from "react-native";
+import { Animated, StyleSheet, Text } from "react-native";
+import { Pressable } from "@/components/demo/DemoPressable";
 import { groupLabel } from "@/content/math/picLabel";
 import type { MathPic } from "@/content/types";
 import { colors, touchTarget } from "@/theme/tokens";
