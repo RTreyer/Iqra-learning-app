@@ -6,7 +6,7 @@
 
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Animated, Easing, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { goBackOr } from "@/components/BackButton";
 import { ScreenBackground } from "@/components/ScreenBackground";
@@ -26,6 +26,125 @@ import { readableFill, touchTarget, yemen } from "@/theme/tokens";
 /** Pause after a line before the next scene, so a child can look at the picture. */
 const LINGER_MS = 900;
 const LAST = INTRO_STORY.length - 1;
+/** How long one scene takes to give way to the next, like turning a page. */
+const TURN_MS = 700;
+/** How far a scene glides while it comes in or goes (px). */
+const GLIDE = 40;
+
+/**
+ * The scene pictures with page-turn transitions: the old scene stays alive (its animation
+ * keeps playing) while it fades and glides out to the right, and the new one fades and glides
+ * in from the left, the way pages of an Arabic book turn.
+ */
+function SceneStage({ index }: { index: number }) {
+  const [current, setCurrent] = useState(index);
+  const [leaving, setLeaving] = useState<number | null>(null);
+  const [turn] = useState(() => new Animated.Value(1));
+  // A new scene: the one on show starts leaving (adjusting state while rendering, as React
+  // recommends for state derived from a changed prop).
+  if (index !== current) {
+    setLeaving(current);
+    setCurrent(index);
+  }
+  useEffect(() => {
+    turn.setValue(0);
+    const anim = Animated.timing(turn, {
+      toValue: 1,
+      duration: TURN_MS,
+      easing: Easing.inOut(Easing.cubic),
+      useNativeDriver: true,
+    });
+    anim.start(({ finished }) => {
+      if (finished) setLeaving(null);
+    });
+    return () => anim.stop();
+  }, [current, turn]);
+
+  const turning = leaving !== null;
+  return (
+    <View style={styles.picture}>
+      {turning ? (
+        <Animated.View
+          key={INTRO_STORY[leaving].id}
+          pointerEvents="none"
+          style={[
+            styles.layer,
+            {
+              opacity: turn.interpolate({ inputRange: [0, 1], outputRange: [1, 0] }),
+              transform: [
+                { translateX: turn.interpolate({ inputRange: [0, 1], outputRange: [0, GLIDE] }) },
+                { scale: turn.interpolate({ inputRange: [0, 1], outputRange: [1, 0.96] }) },
+              ],
+            },
+          ]}
+        >
+          <StoryPicture id={INTRO_STORY[leaving].id} />
+        </Animated.View>
+      ) : null}
+      <Animated.View
+        key={INTRO_STORY[current].id}
+        testID={`intro-scene-${INTRO_STORY[current].id}`}
+        style={[
+          styles.layer,
+          turning
+            ? {
+                opacity: turn.interpolate({ inputRange: [0, 0.25, 1], outputRange: [0, 0.2, 1] }),
+                transform: [
+                  {
+                    translateX: turn.interpolate({ inputRange: [0, 1], outputRange: [-GLIDE, 0] }),
+                  },
+                  { scale: turn.interpolate({ inputRange: [0, 1], outputRange: [1.04, 1] }) },
+                ],
+              }
+            : null,
+        ]}
+      >
+        <StoryPicture id={INTRO_STORY[current].id} />
+      </Animated.View>
+    </View>
+  );
+}
+
+/** Fades and lifts its content in when it appears (the spoken line, the choices). */
+function Appear({
+  children,
+  delay = 0,
+  rise = 10,
+  style,
+}: {
+  children: React.ReactNode;
+  delay?: number;
+  rise?: number;
+  style?: React.ComponentProps<typeof View>["style"];
+}) {
+  const [v] = useState(() => new Animated.Value(0));
+  useEffect(() => {
+    const anim = Animated.timing(v, {
+      toValue: 1,
+      duration: 420,
+      delay,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    });
+    anim.start();
+    return () => anim.stop();
+  }, [v, delay]);
+  return (
+    <Animated.View
+      style={[
+        style,
+        {
+          opacity: v,
+          transform: [
+            { translateY: v.interpolate({ inputRange: [0, 1], outputRange: [rise, 0] }) },
+          ],
+        },
+      ]}
+    >
+      {children}
+    </Animated.View>
+  );
+}
 
 /** The picture on a choice card: a message with letters, or a sack with numbers. */
 function ChoicePicture({ book }: { book: Book }) {
@@ -133,17 +252,18 @@ export default function IntroScreen() {
         onPress={next}
         style={styles.stage}
       >
-        <View testID={`intro-scene-${scene.id}`} style={styles.picture}>
-          <StoryPicture id={scene.id} />
-        </View>
-        <View style={styles.bubble}>
+        <SceneStage index={index} />
+        {/* A new line appears as the new scene comes in. */}
+        <Appear key={scene.id} delay={TURN_MS / 3} style={styles.bubble}>
           <Icon name="speaker" size={22} color={yemen.clay} />
           <Text style={styles.line}>{scene.line}</Text>
-        </View>
+        </Appear>
       </Pressable>
 
       {choosing ? (
-        <View
+        <Appear
+          delay={TURN_MS}
+          rise={40}
           style={[
             styles.choices,
             {
@@ -171,7 +291,7 @@ export default function IntroScreen() {
               </UiText>
             </Pressable>
           ))}
-        </View>
+        </Appear>
       ) : null}
     </ScreenBackground>
   );
@@ -209,7 +329,8 @@ const styles = StyleSheet.create({
   },
   skipText: { fontSize: 15, fontWeight: "700", color: yemen.inkSoft },
   stage: { flex: 1, minHeight: touchTarget, paddingHorizontal: 16, gap: 14 },
-  picture: { width: "100%" },
+  picture: { width: "100%", height: 300 },
+  layer: { position: "absolute", top: 0, right: 0, bottom: 0, left: 0 },
   bubble: {
     backgroundColor: "#FFFFFF",
     borderRadius: 22,

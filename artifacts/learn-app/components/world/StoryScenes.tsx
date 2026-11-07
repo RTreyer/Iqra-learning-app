@@ -641,5 +641,5 @@ const styles = StyleSheet.create({
   waitPeople: { position: "absolute", left: 120, bottom: 6, flexDirection: "row" },
   waitBird: { position: "absolute", right: 14, top: 30 },
   waitShip: { position: "absolute", right: 10, bottom: 4 },
-  chooseScene: { height: 170, backgroundColor: "transparent" },
+  chooseScene: { backgroundColor: "transparent" },
 });
