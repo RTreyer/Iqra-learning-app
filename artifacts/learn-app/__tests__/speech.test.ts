@@ -2,7 +2,7 @@ import * as Speech from "expo-speech";
 
 import { Platform } from "react-native";
 
-import { hasArabicVoice, speak, stopSpeaking } from "@/lib/speech";
+import { estimateSpeechMs, hasArabicVoice, speak, stopSpeaking } from "@/lib/speech";
 
 const mockSpeech = jest.requireMock("expo-speech") as {
   speak: jest.Mock;
@@ -143,5 +143,21 @@ describe("hasArabicVoice on web", () => {
       configurable: true,
     });
     await expect(hasArabicVoice()).resolves.toBe(true);
+  });
+});
+
+describe("estimateSpeechMs", () => {
+  it("ignores harakat, so a vocalised text takes as long as its bare letters", () => {
+    expect(estimateSpeechMs("اِسْمَعِ الْكَلِمَةَ، وَاخْتَرِ الصَّوَابَ.")).toBe(
+      estimateSpeechMs("اسمع الكلمة، واختر الصواب."),
+    );
+  });
+
+  it("grows with length, slows with a lower rate, and stays within bounds", () => {
+    const sentence = "اضغط على شيء في اليمين ثم ما يناسبه في اليسار";
+    expect(estimateSpeechMs("ب")).toBe(1500);
+    expect(estimateSpeechMs(sentence)).toBeGreaterThan(1500);
+    expect(estimateSpeechMs(sentence, 0.5)).toBeGreaterThan(estimateSpeechMs(sentence));
+    expect(estimateSpeechMs(sentence.repeat(20))).toBe(8000);
   });
 });

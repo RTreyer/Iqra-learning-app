@@ -66,7 +66,7 @@ Nach Raso bewirkt nicht die Visualisierung selbst Lernen, sondern ihre aktive Ve
 ## 6. Kommunikation: Die Stimme der App ist die Lehrperson
 
 - **Fragend-gelenktes Verfahren:** Für Lernende mit wenig Vorwissen empfiehlt Huwendiek kleinschrittige Führung mit grossen Hilfen. Das passt zur ersten Klasse.
-- **Alle Anweisungen vorlesen:** Kinder, die noch nicht lesen können, verstehen geschriebene Aufgabenstellungen nicht. In der App prüfen.
+- **Alle Anweisungen vorlesen:** Kinder, die noch nicht lesen können, verstehen geschriebene Aufgabenstellungen nicht. Umgesetzt mit gesprochenen Anweisungen pro Übungstyp, siehe `docs/VOICE.md`.
 - **Gute Fragen nach Dubs:** kurz, eindeutig, eine Frage pro Runde, keine Fragebatterien.
 
 ## 7. Feedback und Leistungsbeurteilung

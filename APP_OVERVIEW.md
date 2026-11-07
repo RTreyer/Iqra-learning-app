@@ -99,7 +99,7 @@ artifacts/learn-app/                the Expo app
 - Home guidance: a continue card for the next lesson below 3 stars, a review card with the due count, a streak badge from 2 days.
 - Voice hint banner appears when the device has no Arabic TTS voice.
 - Tracing: gesture handler Pan draws strokes on an SVG pad. A heuristic first checks stroke count, path length (50 percent of the shorter pad side), bounding box (20 percent of width or 15 percent of height) and centroid (within 35 percent of centre). For Arabic guides the drawing is then checked against the letter itself (`validateOnGuide`): at least 90 percent of the drawn points must lie on the letter (tolerance 2 cells of a 50 × 50 grid, about 4 percent of the pad) and at least 50 percent of the letter must be traced. All guides share one letter size, in book proportions. Letters that differ only by dots (ح ج، س ص) cannot be told apart by shape. The Unit 1 line drawings keep the heuristic only.
-- Opening a lesson speaks the title first, then the activity mounts.
+- Opening a lesson speaks the title, then the spoken instruction of its activity type (`content/instructions.ts`), then the activity mounts. The 🗣️ button in the lesson header repeats the instruction. Maths types have no extra instruction: every round speaks its own task. See `docs/VOICE.md`.
 - Language switch persists and affects only strings wrapped in `UiText` or passed through `translateUi`.
 - Progress is stored with a corrupt blob backup. Storage read errors never overwrite saved stars.
 - No network requests at runtime. Desktop browser shows a centered 480 px phone frame.

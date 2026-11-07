@@ -11,7 +11,9 @@ import { BackButton } from "@/components/BackButton";
 import { LessonCompleteCard } from "@/components/LessonCompleteCard";
 import { NotFoundCard } from "@/components/NotFoundCard";
 import { ScreenBackground } from "@/components/ScreenBackground";
+import { InstructionButton } from "@/components/InstructionButton";
 import { getLesson } from "@/content";
+import { instructionFor } from "@/content/instructions";
 import { useLanguage } from "@/context/LanguageContext";
 import { useProgress } from "@/context/ProgressContext";
 import { useLessonAttempt } from "@/hooks/useLessonAttempt";
@@ -20,35 +22,55 @@ import * as haptics from "@/lib/haptics";
 import { firstParam } from "@/lib/params";
 import { routes } from "@/lib/routes";
 import { starsForScore, type Score } from "@/lib/scoring";
-import { speak, stopSpeaking } from "@/lib/speech";
+import { estimateSpeechMs, speak, stopSpeaking } from "@/lib/speech";
 import { colors, touchTarget } from "@/theme/tokens";
 
 /** The activity mounts when the title has been spoken, or after this at the latest. */
 const INTRO_FALLBACK_MS = 1500;
 
 /**
- * Speaks the title, then reports the lesson as ready. Activities speak their own first prompt,
- * and speak() stops current speech, so they must not mount before the title has finished.
+ * Speaks the title, then the instruction, then reports the lesson as ready. Activities speak
+ * their own first prompt, and speak() stops current speech, so they must not mount before the
+ * intro has finished. Each step moves on when speech reports back, or after a fallback timer.
  */
-function useLessonIntro(lessonId: string, title: string | undefined): boolean {
+function useLessonIntro(
+  lessonId: string,
+  title: string | undefined,
+  instruction: string | undefined,
+): boolean {
   const [readyFor, setReadyFor] = useState<string | null>(null);
   useEffect(() => {
     if (!title) return;
+    const steps: [string, number][] = [[title, INTRO_FALLBACK_MS]];
+    if (instruction) steps.push([instruction, estimateSpeechMs(instruction)]);
     let settled = false;
-    const finish = () => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const next = (step: number) => {
       if (settled) return;
-      settled = true;
       clearTimeout(timer);
-      setReadyFor(lessonId);
+      if (step >= steps.length) {
+        settled = true;
+        setReadyFor(lessonId);
+        return;
+      }
+      // speak() stops the previous utterance, which may report back late: only move on once.
+      let moved = false;
+      const done = () => {
+        if (moved) return;
+        moved = true;
+        next(step + 1);
+      };
+      const [text, fallbackMs] = steps[step];
+      timer = setTimeout(done, fallbackMs);
+      speak(text, { onDone: done });
     };
-    const timer = setTimeout(finish, INTRO_FALLBACK_MS);
-    speak(title, { onDone: finish });
+    next(0);
     return () => {
       settled = true;
       clearTimeout(timer);
       stopSpeaking();
     };
-  }, [lessonId, title]);
+  }, [lessonId, title, instruction]);
   return readyFor === lessonId;
 }
 
@@ -63,7 +85,8 @@ export default function LessonScreen() {
   const { completed, stars, completeAttempt, restartAttempt, activityKey } = useLessonAttempt(
     found ? found.lesson.id : "",
   );
-  const ready = useLessonIntro(lessonId, found?.lesson.title);
+  const instruction = found ? instructionFor(found.lesson) : undefined;
+  const ready = useLessonIntro(lessonId, found?.lesson.title, instruction);
 
   if (!found) return <NotFoundCard message="الدرس غير موجود" />;
   const { book, unit, lesson, next } = found;
@@ -94,7 +117,11 @@ export default function LessonScreen() {
             </Text>
           </View>
         </View>
-        <View style={styles.headerSpacer} />
+        {instruction ? (
+          <InstructionButton instruction={instruction} />
+        ) : (
+          <View style={styles.headerSpacer} />
+        )}
       </View>
       <ScrollView
         key={activityKey}
