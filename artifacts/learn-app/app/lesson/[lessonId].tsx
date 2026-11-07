@@ -14,6 +14,7 @@ import { DemoPlayer } from "@/components/demo/DemoPlayer";
 import { HelpButton } from "@/components/HelpButton";
 import { lessonPicture } from "@/components/world/lessonPicture";
 import { WorldHeader } from "@/components/world/WorldHeader";
+import { StorySymbolContext } from "@/components/activities/shared/StoryProgress";
 import { GuideProvider, LessonGuide, useGuideState } from "@/components/world/LessonGuide";
 import { getLesson, unitLessonIds } from "@/content";
 import { demoIdFor } from "@/content/demos";
@@ -172,59 +173,61 @@ export default function LessonScreen() {
         <LessonGuide text={guide.line ?? instruction ?? lesson.subtitle} mood={guide.mood} />
       )}
       <GuideProvider api={guide.api}>
-        <ScrollView
-          key={activityKey}
-          scrollEnabled={lesson.type !== "trace"}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
-          {completed ? (
-            <LessonCompleteCard
-              stars={stars}
-              onRepeat={restartAttempt}
-              next={next}
-              backTo={routes.unit(unit.id)}
-              today={today}
-              sticker={sticker}
-              story={
-                story ? (
-                  <StoryGoal
-                    unit={unit}
-                    subject={book.subject}
-                    share={story.share}
-                    fresh={story.completed ? null : story.fresh}
-                    compact
-                    testID="lesson-story"
-                  />
-                ) : null
-              }
-            />
-          ) : (
-            <>
-              {showDemo ? (
-                <DemoPlayer
-                  key={`${lessonId}-${replay?.run ?? 0}`}
-                  id={demoIdFor(lesson)}
-                  color={unit.color}
-                  preface={replaying ? instruction : undefined}
-                  onDone={finishDemo}
-                />
-              ) : null}
-              {showActivity ? (
-                <View style={showDemo ? styles.hidden : styles.activity}>
-                  <ActivityHost
-                    lesson={lesson}
+        <StorySymbolContext.Provider value={book.subject === "math" ? "sack" : "letter"}>
+          <ScrollView
+            key={activityKey}
+            scrollEnabled={lesson.type !== "trace"}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
+            {completed ? (
+              <LessonCompleteCard
+                stars={stars}
+                onRepeat={restartAttempt}
+                next={next}
+                backTo={routes.unit(unit.id)}
+                today={today}
+                sticker={sticker}
+                story={
+                  story ? (
+                    <StoryGoal
+                      unit={unit}
+                      subject={book.subject}
+                      share={story.share}
+                      fresh={story.completed ? null : story.fresh}
+                      compact
+                      testID="lesson-story"
+                    />
+                  ) : null
+                }
+              />
+            ) : (
+              <>
+                {showDemo ? (
+                  <DemoPlayer
+                    key={`${lessonId}-${replay?.run ?? 0}`}
+                    id={demoIdFor(lesson)}
                     color={unit.color}
-                    attemptKey={activityKey}
-                    onComplete={onComplete}
-                    onRoundResult={recordRoundResult}
+                    preface={replaying ? instruction : undefined}
+                    onDone={finishDemo}
                   />
-                </View>
-              ) : null}
-            </>
-          )}
-        </ScrollView>
+                ) : null}
+                {showActivity ? (
+                  <View style={showDemo ? styles.hidden : styles.activity}>
+                    <ActivityHost
+                      lesson={lesson}
+                      color={unit.color}
+                      attemptKey={activityKey}
+                      onComplete={onComplete}
+                      onRoundResult={recordRoundResult}
+                    />
+                  </View>
+                ) : null}
+              </>
+            )}
+          </ScrollView>
+        </StorySymbolContext.Provider>
       </GuideProvider>
     </ScreenBackground>
   );

@@ -77,9 +77,9 @@ export function letterLessons(l: LetterLesson): LessonDraft[] {
     {
       section,
       type: "build_word",
-      title: "قِطَارُ الْمَقَاطِع",
-      subtitle: "اسمع الكلمة وحمّل القطار",
-      emoji: "🚂",
+      title: "مَقَاطِعُ الرِّسَالَة",
+      subtitle: "اسمع الكلمة واكتبها في الرسالة",
+      emoji: "✉️",
       color: "#EA580C",
       rounds: l.train,
     },
@@ -200,9 +200,9 @@ export function sentenceLessons(
     {
       section: EXERCISES,
       type: "build_word",
-      title: "قِطَارُ الْجُمْلَة",
+      title: "جُمْلَةُ الرِّسَالَة",
       subtitle: sentence,
-      emoji: "🚂",
+      emoji: "✉️",
       color: "#EA580C",
       rounds: [
         train(

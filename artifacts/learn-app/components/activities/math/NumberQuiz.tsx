@@ -7,7 +7,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { speak } from "@/lib/speech";
 import { colors, touchTarget } from "@/theme/tokens";
 import { ChoiceCard } from "../shared/ChoiceCard";
-import { ProgressDots } from "../shared/ProgressDots";
+import { StoryProgress } from "../shared/StoryProgress";
 import { PRAISE } from "../shared/strings";
 import { act } from "../shared/styles";
 import {
@@ -80,7 +80,7 @@ export function NumberQuiz({
 
   return (
     <View style={act.container}>
-      <ProgressDots count={total} current={quiz.roundIndex} color={color} />
+      <StoryProgress count={total} current={quiz.roundIndex} color={color} />
       <View style={styles.visual}>{renderVisual(quiz.roundIndex)}</View>
       <Pressable
         accessibilityRole="button"

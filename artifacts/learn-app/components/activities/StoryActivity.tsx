@@ -12,7 +12,7 @@ import { useOnce } from "./shared/useOnce";
 import { useBounce } from "./shared/useQuiz";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import type { ActivityProps } from "./types";
-import { ProgressDots } from "./shared/ProgressDots";
+import { StoryProgress } from "./shared/StoryProgress";
 
 function Story({ lesson, color, onComplete }: ActivityProps<"story">) {
   const { lines } = lesson;
@@ -45,7 +45,7 @@ function Story({ lesson, color, onComplete }: ActivityProps<"story">) {
       ) : null}
       <Text style={styles.title}>{lesson.storyTitle}</Text>
       {/* Each sentence heard fills a wagon; Hudhud says what to do. */}
-      <ProgressDots count={lines.length} current={heard.size} color={color} />
+      <StoryProgress count={lines.length} current={heard.size} color={color} />
       <View style={act.fullWidth}>
         {lines.map((line, i) => {
           const done = heard.has(i);

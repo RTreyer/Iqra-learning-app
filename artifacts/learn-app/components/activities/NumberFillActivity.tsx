@@ -9,7 +9,7 @@ import { PicGroup } from "./math/MathPic";
 import { useInstruction } from "./math/useInstruction";
 import { ChoiceCard } from "./shared/ChoiceCard";
 import { ListenButton } from "./shared/ListenButton";
-import { ProgressDots } from "./shared/ProgressDots";
+import { StoryProgress } from "./shared/StoryProgress";
 import { EMPTY_BOX, PRAISE } from "./shared/strings";
 import { act } from "./shared/styles";
 import { ADVANCE_MS, TRY_AGAIN, choiceState, useBounce, useQuiz } from "./shared/useQuiz";
@@ -70,7 +70,7 @@ function NumberFill({
   const [a, op, b, , c] = round.cells;
   return (
     <View style={act.container}>
-      <ProgressDots count={total} current={quiz.roundIndex} color={color} />
+      <StoryProgress count={total} current={quiz.roundIndex} color={color} />
       <ListenButton text={round.prompt} color={color} showText />
       {round.pics ? <PicGroup pics={round.pics} /> : null}
       {round.layout === "vertical" ? (

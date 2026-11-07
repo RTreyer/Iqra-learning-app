@@ -7,7 +7,7 @@ import React, { useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { ReviewRound } from "@/components/activities/ReviewRound";
-import { ProgressDots } from "@/components/activities/shared/ProgressDots";
+import { StoryProgress } from "@/components/activities/shared/StoryProgress";
 import { BackButton } from "@/components/BackButton";
 import { ReviewCompleteCard } from "@/components/ReviewCompleteCard";
 import { ScreenBackground } from "@/components/ScreenBackground";
@@ -75,7 +75,7 @@ function ReviewSession({ initialIds }: { initialIds: string[] }) {
       ) : null}
       {current ? (
         <View style={styles.round}>
-          <ProgressDots count={total} current={Math.min(index, total - 1)} color={colors.success} />
+          <StoryProgress count={total} current={Math.min(index, total - 1)} color={colors.success} />
           <ReviewRound
             item={current}
             attemptKey={`review:${index}`}

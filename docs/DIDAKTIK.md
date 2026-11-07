@@ -38,7 +38,7 @@ Von Roths sechs Stufen fehlen in der App heute die Schwierigkeit (Stufe 2) und d
 | --- | --- | --- |
 | 1 Motivation | Geschichte | – |
 | 2 Schwierigkeit | fehlt | Kein echtes Problem zu Beginn |
-| 3 Lösung | Laute hören, Silbenzug | Kaum Vormachen |
+| 3 Lösung | Laute hören, Silben in Hudhuds Brief | Kaum Vormachen |
 | 4 Tun | Wörter lesen | – |
 | 5 Einüben | Leitner-Wiederholung | – |
 | 6 Übertragung | fehlt weitgehend | Nur bekannte Wörter |
@@ -80,7 +80,7 @@ Hier liegt der grösste Hebel: Heute wird eine falsche Antwort nur markiert, nic
 
 ## 8. Aktivität vertiefen (ICAP-Modell)
 
-Chi & Wylie unterscheiden passiv, aktiv, konstruktiv und interaktiv. Die meisten Übungen sind heute aktiv (antippen); der Silbenzug ist bereits konstruktiv.
+Chi & Wylie unterscheiden passiv, aktiv, konstruktiv und interaktiv. Die meisten Übungen sind heute aktiv (antippen); die Silben-Übung (Silben in Hudhuds Brief schreiben) ist bereits konstruktiv.
 
 - **«Ich spreche nach»:** Das Kind nimmt sich auf und hört sich im Vergleich zum Modell. Funktioniert offline, ohne Spracherkennung.
 - **Soziale Dimension (Illeris):** Aufgaben wie «Lies dieses Wort deiner Schwester vor» holen die Familie als Lernpartner ins Boot.

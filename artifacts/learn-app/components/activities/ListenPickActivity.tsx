@@ -5,7 +5,7 @@ import { PRAISE } from "./shared/strings";
 import { ChoiceCard } from "./shared/ChoiceCard";
 import { DoneButton } from "./shared/DoneButton";
 import { ListenButton } from "./shared/ListenButton";
-import { ProgressDots } from "./shared/ProgressDots";
+import { StoryProgress } from "./shared/StoryProgress";
 import { act } from "./shared/styles";
 import { PROMPT_DELAY_MS, TRY_AGAIN, choiceState, useBounce, useQuiz } from "./shared/useQuiz";
 import { useShuffled } from "./shared/useShuffled";
@@ -55,7 +55,7 @@ function ListenPick({
 
   return (
     <View style={act.container}>
-      <ProgressDots count={questions.length} current={quiz.roundIndex} color={color} />
+      <StoryProgress count={questions.length} current={quiz.roundIndex} color={color} />
       <ListenButton text={q.word} color={color} showText />
       <View style={act.choicesRow}>
         {options.items.map((choice, idx) => (

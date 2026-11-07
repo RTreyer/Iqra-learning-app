@@ -36,15 +36,15 @@ function render(onRoundResult = jest.fn(), onComplete = jest.fn()) {
 
 test("loads the syllables in reading order and says the word", () => {
   const { onRoundResult } = render();
-  // The train is not a review item: rounds count for the score only.
+  // Hudhud's letter is not a review item: rounds count for the score only.
   act(() => jest.advanceTimersByTime(400));
   expect(spoken()).toContain("بَيَانُ");
 
   tap("بَ");
   tap("يَا");
-  expect(screen.getByTestId("wagon-0")).toHaveProp("accessibilityLabel", "بَ");
-  expect(screen.getByTestId("wagon-2")).toHaveProp("accessibilityLabel", "؟");
-  expect(screen.getByTestId("wagon-1")).toHaveProp("accessibilityLabel", "يَا");
+  expect(screen.getByTestId("slot-0")).toHaveProp("accessibilityLabel", "بَ");
+  expect(screen.getByTestId("slot-2")).toHaveProp("accessibilityLabel", "؟");
+  expect(screen.getByTestId("slot-1")).toHaveProp("accessibilityLabel", "يَا");
   tap("نُ");
 
   expect(screen.getByText("بَيَانُ")).toBeTruthy();
@@ -57,13 +57,13 @@ test("a wrong tile shakes, says the needed syllable and costs the round", () => 
   const { onComplete } = render();
   tap("يُو"); // decoy: بَ was needed
   expect(spoken().at(-1)).toBe("بَ");
-  expect(screen.getByTestId("wagon-0")).toHaveProp("accessibilityLabel", "؟");
+  expect(screen.getByTestId("slot-0")).toHaveProp("accessibilityLabel", "؟");
   tap("بَ");
   tap("يَا");
   tap("نُ");
   depart();
 
-  expect(screen.getByTestId("progress-train")).toHaveProp("aria-valuenow", 2);
+  expect(screen.getByTestId("story-progress")).toHaveProp("aria-valuenow", 2);
   for (const s of ["يَ", "دُ"]) tap(s);
   depart();
   for (const s of ["يُو", "لَـ", "دُ"]) tap(s);
@@ -82,7 +82,7 @@ test("tatweel is dropped from spoken syllables", () => {
   expect(spokenSyllable("بَيْـ")).toBe("بَيْ");
 });
 
-test("complete the word: given wagons start full, only the gap is loaded", () => {
+test("complete the word: given syllables are already written, only the gap is loaded", () => {
   // u6-5 round 1: قِدْرُ = قِدْ / رُ with رُ given; decoys قَا and قُو.
   const gapLesson = lessonOf("u6-5", "build_word");
   const onComplete = jest.fn();
@@ -94,15 +94,15 @@ test("complete the word: given wagons start full, only the gap is loaded", () =>
       onComplete={onComplete}
     />,
   );
-  expect(screen.getByTestId("wagon-1")).toHaveProp("accessibilityLabel", "رُ");
-  expect(screen.getByTestId("wagon-0")).toHaveProp("accessibilityLabel", "؟");
+  expect(screen.getByTestId("slot-1")).toHaveProp("accessibilityLabel", "رُ");
+  expect(screen.getByTestId("slot-0")).toHaveProp("accessibilityLabel", "؟");
   expect(screen.queryByRole("button", { name: "رُ" })).toBeNull();
   tap("قِدْ");
-  expect(screen.getByTestId("wagon-0")).toHaveProp("accessibilityLabel", "قِدْ");
+  expect(screen.getByTestId("slot-0")).toHaveProp("accessibilityLabel", "قِدْ");
   expect(screen.getByText("قِدْرُ")).toBeTruthy();
 });
 
-test("sentence train: the words are loaded in reading order", () => {
+test("sentence letter: the words are placed in reading order", () => {
   // u7-29: ذَهَبَ جُبْرَانُ إِلَى الْمَسْجِدِ, decoy جَارُ.
   const sentenceLesson = lessonOf("u7-29", "build_word");
   const onComplete = jest.fn();

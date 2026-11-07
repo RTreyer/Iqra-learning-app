@@ -181,7 +181,7 @@ test.describe("scoring", () => {
         await expect(
           page.getByRole("button", { name: rounds[i].right, exact: true }),
         ).toBeEnabled();
-        await expect(page.getByTestId("progress-train")).toHaveAttribute(
+        await expect(page.getByTestId("story-progress")).toHaveAttribute(
           "aria-valuenow",
           String(i + 1),
         );
@@ -197,7 +197,7 @@ test.describe("scoring", () => {
   test("replaying a lesson with a worse score keeps the best stars", async ({ page }) => {
     expect(await completeQuizLesson(page, "u2-29", 6)).toBe(3);
     await page.getByTestId("repeat-lesson").click();
-    await expect(page.getByTestId("progress-train")).toHaveAttribute("aria-valuenow", "1");
+    await expect(page.getByTestId("story-progress")).toHaveAttribute("aria-valuenow", "1");
     expect(await completeQuizLesson(page, "u2-29", 0, { navigate: false })).toBe(1);
     await expect.poll(async () => (await readProgress(page))?.lessons["u2-29"]?.stars).toBe(3);
     await gotoAndWaitReady(page, "/");
@@ -209,7 +209,7 @@ test.describe("scoring", () => {
     await gotoAndWaitReady(page, "/lesson/u2-29");
     for (let attempt = 0; attempt < 3; attempt++) {
       if (attempt > 0) await page.getByTestId("repeat-lesson").click();
-      await expect(page.getByTestId("progress-train")).toHaveAttribute("aria-valuenow", "1");
+      await expect(page.getByTestId("story-progress")).toHaveAttribute("aria-valuenow", "1");
       firstRoundOrders.push(
         await page.getByRole("button", { name: /^(رَ|دَ|تَ)$/, disabled: false }).allInnerTexts(),
       );
@@ -310,8 +310,8 @@ test.describe("activities", () => {
 
     await page.getByTestId("next-lesson").click();
     await expect(page).toHaveURL(/\/lesson\/s1-2$/);
-    // Six words: six wagons on the train, none heard yet.
-    await expect(page.getByTestId("progress-train")).toHaveAttribute("aria-valuemax", "6");
+    // Six words: six letters for the mail bag, none heard yet.
+    await expect(page.getByTestId("story-progress")).toHaveAttribute("aria-valuemax", "6");
     await tapAllAndFinish(page, ["عَيْن", "أُذُن", "أَنْف", "فَم", "يَد", "قَدَم"]);
     expect(await earnedStars(page)).toBe(3);
     await expect.poll(async () => (await readProgress(page))?.totalStars).toBe(6);
@@ -405,7 +405,7 @@ test.describe("accessibility", () => {
     for (const path of ["/", "/book/arabic-1", "/unit/a2", "/lesson/u2-29", "/album", "/intro"]) {
       await gotoAndWaitReady(page, path);
       if (path.startsWith("/lesson/"))
-        await expect(page.getByTestId("progress-train")).toHaveAttribute("aria-valuenow", "1");
+        await expect(page.getByTestId("story-progress")).toHaveAttribute("aria-valuenow", "1");
       await page.addScriptTag({ content: axeSource });
       const violations = await page.evaluate(async () => {
         // axe's own matcher drops text it takes for an icon ligature, and its canvas check flags

@@ -9,7 +9,7 @@ import * as haptics from "@/lib/haptics";
 import { readableFill } from "@/theme/tokens";
 import { speak } from "@/lib/speech";
 import { PRAISE } from "./shared/strings";
-import { ProgressDots } from "./shared/ProgressDots";
+import { StoryProgress } from "./shared/StoryProgress";
 import { useLatest } from "./shared/useLatest";
 import { ADVANCE_MS } from "./shared/useQuiz";
 import { withAttemptReset } from "./shared/withAttemptReset";
@@ -228,7 +228,7 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
 
   return (
     <View style={trace.container}>
-      <ProgressDots count={targets.length} current={targetIndex} color={color} />
+      <StoryProgress count={targets.length} current={targetIndex} color={color} />
       {lesson.sentence ? (
         <Text testID="trace-sentence" style={trace.sentence} accessibilityLabel={lesson.sentence}>
           {lesson.sentence.split(" ").map((word, i, all) => (

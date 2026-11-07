@@ -7,7 +7,8 @@ const english: Record<string, string> = {
   "قصة هدهد": "Hudhud's story",
   "ألبوم الملصقات": "Sticker album",
   "قمرية اليوم": "Today's window",
-  "هذا الركن للأهل. اضغط على الزر مطوّلاً.": "This corner is for parents. Press and hold the button.",
+  "هذا الركن للأهل. اضغط على الزر مطوّلاً.":
+    "This corner is for parents. Press and hold the button.",
   "اضغط مطوّلاً": "Press and hold",
   الصف: "Grade",
   "الصفوف ٢ إلى ٦ قريباً.": "Grades 2 to 6 are coming soon.",
@@ -137,9 +138,6 @@ const english: Record<string, string> = {
   "اضغط على شيء في اليمين ثم ما يناسبه في اليسار":
     "Tap an item on the left, then its match on the right",
   "ابحث عن الحرف": "Find the letter",
-  "رتّب المقاطع في القطار 🚂": "Load the syllables into the train 🚂",
-  "رتّب الكلمات في القطار 🚂": "Load the words into the train 🚂",
-  "أكمل القطار بالمقطع الناقص 🚂": "Complete the train with the missing syllable 🚂",
   "اضغط للاستماع ثم اختر": "Tap to listen, then choose",
   "سلوك صحيح": "Good behavior",
   "سلوك خطأ": "Bad behavior",

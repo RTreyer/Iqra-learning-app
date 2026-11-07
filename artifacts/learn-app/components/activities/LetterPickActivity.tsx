@@ -3,7 +3,7 @@ import { View } from "react-native";
 import { speak } from "@/lib/speech";
 import { PRAISE } from "./shared/strings";
 import { ChoiceCard } from "./shared/ChoiceCard";
-import { ProgressDots } from "./shared/ProgressDots";
+import { StoryProgress } from "./shared/StoryProgress";
 import { act } from "./shared/styles";
 import {
   ADVANCE_MS,
@@ -60,7 +60,7 @@ function LetterPick({
 
   return (
     <View style={act.container}>
-      <ProgressDots count={rounds.length} current={quiz.roundIndex} color={color} />
+      <StoryProgress count={rounds.length} current={quiz.roundIndex} color={color} />
       <TargetCard text={round.targetLetter} color={color} testID="letter-target" />
       <View style={act.letterChoicesRow}>
         {options.items.map((letter, idx) => (

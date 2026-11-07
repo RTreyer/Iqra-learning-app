@@ -10,7 +10,7 @@ import { CompareSymbol } from "./math/CompareSymbol";
 import { PicGroup } from "./math/MathPic";
 import { useInstruction } from "./math/useInstruction";
 import { ListenButton } from "./shared/ListenButton";
-import { ProgressDots } from "./shared/ProgressDots";
+import { StoryProgress } from "./shared/StoryProgress";
 import { PRAISE } from "./shared/strings";
 import { act } from "./shared/styles";
 import { ADVANCE_MS, TRY_AGAIN, choiceState, useQuiz } from "./shared/useQuiz";
@@ -66,7 +66,7 @@ function Compare({ lesson, color, onComplete, onRoundResult }: ActivityProps<"co
 
   return (
     <View style={act.container}>
-      <ProgressDots count={total} current={quiz.roundIndex} color={color} />
+      <StoryProgress count={total} current={quiz.roundIndex} color={color} />
       <ListenButton text={round.prompt} color={color} showText />
       <View style={styles.sides}>
         <View style={styles.side} testID="compare-first">

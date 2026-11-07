@@ -30,11 +30,11 @@ test("first tap scoring: wrong then found, wrong then found, right, right", () =
       onRoundResult={onRoundResult}
     />,
   );
-  expect(screen.getByTestId("progress-train")).toHaveProp("aria-valuenow", 1);
+  expect(screen.getByTestId("story-progress")).toHaveProp("aria-valuenow", 1);
 
   tap("بَ"); // target مَ: wrong, the round stays open
   advance();
-  expect(screen.getByTestId("progress-train")).toHaveProp("aria-valuenow", 1);
+  expect(screen.getByTestId("story-progress")).toHaveProp("aria-valuenow", 1);
   tap("مَ"); // found on the second try: does not count
   advance();
   tap("مَ"); // target مَا: wrong
@@ -82,11 +82,11 @@ test("resets when attemptKey changes", () => {
   );
   tap("مَ");
   advance();
-  expect(screen.getByTestId("progress-train")).toHaveProp("aria-valuenow", 2);
+  expect(screen.getByTestId("story-progress")).toHaveProp("aria-valuenow", 2);
   rerenderActivity(
     <LetterPickActivity lesson={lesson} color="#7C3AED" attemptKey="a:2" onComplete={jest.fn()} />,
   );
-  expect(screen.getByTestId("progress-train")).toHaveProp("aria-valuenow", 1);
+  expect(screen.getByTestId("story-progress")).toHaveProp("aria-valuenow", 1);
   expect(choice("مَ")).not.toBeDisabled();
 });
 

@@ -10,7 +10,7 @@ import { useOnce } from "./shared/useOnce";
 import { useBounce } from "./shared/useQuiz";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import type { ActivityProps } from "./types";
-import { ProgressDots } from "./shared/ProgressDots";
+import { StoryProgress } from "./shared/StoryProgress";
 
 function Naming({ lesson, color, onComplete }: ActivityProps<"naming">) {
   const { items } = lesson;
@@ -33,7 +33,7 @@ function Naming({ lesson, color, onComplete }: ActivityProps<"naming">) {
   return (
     <View style={act.container}>
       {/* Each word heard fills a wagon; Hudhud says what to do. */}
-      <ProgressDots count={items.length} current={tapped.size} color={color} />
+      <StoryProgress count={items.length} current={tapped.size} color={color} />
       <View style={styles.grid}>
         {items.map((item, i) => {
           const done = tapped.has(i);
