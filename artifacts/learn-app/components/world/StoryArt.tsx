@@ -18,8 +18,11 @@ const GOLD = "#F4C14B";
 
 export type RashaPose = "stand" | "reach" | "wave";
 
-/** How a girl looks: smiling, happy (laughing eyes, an open smile), or sad (brows up, a tear). */
-export type RashaMood = "smile" | "happy" | "sad";
+/**
+ * How a girl looks: smiling, happy (laughing eyes, an open smile), astonished (round eyes,
+ * raised brows, a small round mouth), or sad (brows up, a tear).
+ */
+export type RashaMood = "smile" | "happy" | "wonder" | "sad";
 
 /** Where her parts turn, as a share of the 70 × 130 drawing. */
 const R_NECK = "50% 39%";
@@ -217,6 +220,21 @@ export function Rasha({
                   fill="none"
                 />
               </>
+            ) : face === "wonder" ? (
+              // Round eyes under raised brows: astonished.
+              <>
+                <Path
+                  d="M27.8 24.6 Q30.8 22.4 33.6 24.2 M36.4 24.2 Q39.2 22.4 42.2 24.6"
+                  stroke="#2B1D16"
+                  strokeWidth={1.1}
+                  strokeLinecap="round"
+                  fill="none"
+                />
+                <Circle cx={31} cy={29} r={2.7} fill="#FFFFFF" stroke="#2B1D16" strokeWidth={0.6} />
+                <Circle cx={39} cy={29} r={2.7} fill="#FFFFFF" stroke="#2B1D16" strokeWidth={0.6} />
+                <Circle cx={31} cy={29.3} r={1.5} fill="#2B1D16" />
+                <Circle cx={39} cy={29.3} r={1.5} fill="#2B1D16" />
+              </>
             ) : (
               <>
                 <Circle cx={31} cy={29} r={1.5} fill="#2B1D16" />
@@ -231,7 +249,10 @@ export function Rasha({
                 <Path d="M30.5 32 Q28.6 36 30.5 37.6 Q32.4 36 30.5 32 Z" fill="#7FB8E8" />
               </>
             ) : null}
-            {face === "happy" ? null : (
+            {face === "wonder" ? (
+              <Ellipse cx={35} cy={35.6} rx={1.9} ry={2.5} fill="#7A3418" />
+            ) : null}
+            {face === "happy" || face === "wonder" ? null : (
               <Path
                 d={face === "sad" ? "M31 36 Q35 33 39 36" : "M31 34 Q35 37.5 39 34"}
                 stroke="#7A3418"

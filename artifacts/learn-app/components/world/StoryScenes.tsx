@@ -117,11 +117,24 @@ const NEWGIRL_ACTS = [
 /** At a station he walks in, then stares at the thing there to read or count. */
 const STATION_ACTS = [[1500, "wonder"]] as const;
 
-/** Rasha is glad once the water is in the bowl. */
-const GIRL_MOOD = [[4300, "happy"]] as const;
+/** Rasha is glad once the water is in the bowl; a hoopoe walks up: astonished, then beaming. */
+const GIRL_MOOD = [
+  [4300, "happy"],
+  [4600, "wonder"],
+  [5800, "happy"],
+] as const;
+/** The birds fly in: she marvels, then beams. */
+const DRINK_MOOD = [
+  [1300, "wonder"],
+  [2900, "happy"],
+] as const;
 /** The little girl walks onto the roof, pours, and is glad. */
 const NEWGIRL_WALK = [[1000, false]] as const;
-const NEWGIRL_MOOD = [[3600, "happy"]] as const;
+/** A hoopoe walks up to her bowl: she marvels, then beams once it is full. */
+const NEWGIRL_MOOD = [
+  [1900, "wonder"],
+  [3600, "happy"],
+] as const;
 
 /** Hudhud's thought bubbles in the resolve scene: left, top and size, from his head upwards. */
 const THOUGHT_DOTS: [number, number, number][] = [
@@ -444,11 +457,12 @@ function Drink() {
   const dove = useOnce(1400, 2100, Easing.out(Easing.quad));
   const peck = useSwing(420, 2400);
   const act = useTimeline<Act>("stand", DRINK_ACTS);
+  const mood = useTimeline<RashaMood>("happy", DRINK_MOOD);
   return (
     <View style={styles.scene}>
       <Rooftop />
       <View style={styles.rasha}>
-        <Rasha size={140} mood="happy" />
+        <Rasha size={140} mood={mood} />
       </View>
       <Animated.View style={[styles.bowlOnWall, { opacity: lerp(shimmer, 0.92, 1) }]}>
         <BowlArt width={96} level={0.9} />
