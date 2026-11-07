@@ -36,8 +36,8 @@ type Props = {
   mirrored?: boolean;
   /** A slow hop; off for still pictures. */
   hop?: boolean;
-  /** The postman's mail bag: letters peek out ("closed"), or are pulled up by the wind ("open"). */
-  bag?: "closed" | "open";
+  /** The postman's mail bag, letters peeking out over its rim. */
+  bag?: boolean;
   /** Beats the wing, for flying. */
   flap?: boolean;
   style?: StyleProp<ViewStyle>;
@@ -78,15 +78,16 @@ function BagStrapBack() {
   );
 }
 
-/** The bag on the bird's side with letters peeking out, and the strap across the chest. */
-function Bag({ open }: { open: boolean }) {
-  // The letters stand up out of the bag; the wind pulls them higher and tilts them.
-  const lift = open ? -9 : 0;
+/**
+ * The bag on the bird's side, with the strap across the chest. The letters only peek over the
+ * rim (a third of each shows), so they never reach up into the bird.
+ */
+function Bag() {
   return (
     <G>
-      <Letter x={53} y={82 + lift} angle={open ? -32 : -16} />
-      <Letter x={74} y={80 + lift * 1.3} angle={open ? 28 : 14} cream />
-      <Letter x={63} y={78 + lift * 1.6} angle={open ? -6 : 2} />
+      <Letter x={55} y={87} angle={-9} />
+      <Letter x={73} y={87} angle={10} cream />
+      <Letter x={64} y={85} angle={1} />
       <Path
         d="M46 90 h34 v15 q0 7 -7 7 h-20 q-7 0 -7 -7 Z"
         fill={LEATHER}
@@ -214,7 +215,7 @@ export function Hudhud({
             strokeLinecap="round"
           />
         ) : null}
-        {bag ? <Bag open={bag === "open"} /> : null}
+        {bag ? <Bag /> : null}
         <Circle cx={50} cy={56} r={17} fill={HEAD} />
         <Path
           d="M35 58 Q21 62 8 73"

@@ -85,7 +85,7 @@ function Postman() {
           },
         ]}
       >
-        <Hudhud size={140} hop={false} flap bag="closed" />
+        <Hudhud size={140} hop={false} flap bag />
       </Animated.View>
       <View style={styles.ground}>
         <Skyline />
@@ -112,78 +112,152 @@ function Cloud({ left, top, small }: { left: number; top: number; small?: boolea
   );
 }
 
-const FLYING = ["أ", "ب", "ت", "م", "ر", "ن", "د", "ل"];
+/** Letters that fly out of each of the three letters (envelopes) the wind pulls from the bag. */
+const LETTER_GROUPS = [
+  ["أ", "ب", "ت"],
+  ["م", "ر", "ن"],
+  ["د", "ل", "س"],
+];
 const TILE_COLOURS = [yemen.red, yemen.blue, yemen.green, yemen.goldDeep];
-/** Hudhud's size in the wind scene, and where his bag sits in that picture (px from top left). */
+/** Hudhud's size in the wind scene, and the mouth of his bag in that picture (px from top left). */
 const WIND_BIRD = 140;
-const BAG_AT = { x: (63 / 140) * WIND_BIRD, y: (86 / 130) * ((WIND_BIRD * 130) / 140) };
+/** The front edge of the bag's mouth, where the wind catches each letter (viewBox units = px here). */
+const BAG_AT = { x: 44, y: 92 };
+/** One envelope's flight, and the pause between envelopes. */
+const ENVELOPE_MS = 2600;
+const STAGGER_MS = 1000;
+/** Share of the flight after which the envelope bursts open and its letters fly on. */
+const BURST = 0.42;
 
 /**
- * One letter pulled out of the bag by the wind: it rises from the bag, tumbles away with the
- * gust (to the right and up, each on its own path) and fades, again and again.
+ * One envelope pulled out of the bag by the wind. Hudhud looks left and the bag hangs at his
+ * front, so the envelope slides out of the front of the bag, passes low under his beak, and
+ * only rises once it is clear of him: it never crosses the bird. In the air it bursts open and
+ * its letters flutter on as paper cards.
  */
-function FlyingLetter({ letter, index }: { letter: string; index: number }) {
+function BlownLetter({ index }: { index: number }) {
   const [v] = useState(() => new Animated.Value(0));
   useEffect(() => {
     const loop = Animated.loop(
       Animated.sequence([
-        Animated.delay(index * 260),
+        Animated.delay(index * STAGGER_MS),
         Animated.timing(v, {
           toValue: 1,
-          duration: 2200,
-          easing: Easing.out(Easing.cubic),
+          duration: ENVELOPE_MS,
+          easing: Easing.linear,
           useNativeDriver: true,
         }),
         Animated.timing(v, { toValue: 0, duration: 0, useNativeDriver: true }),
-        Animated.delay((FLYING.length - index) * 260),
+        Animated.delay((LETTER_GROUPS.length - 1 - index) * STAGGER_MS),
       ]),
     );
     loop.start();
     return () => loop.stop();
   }, [v, index]);
-  const dx = 70 + (index % 4) * 34;
-  const dy = -40 - ((index * 37) % 90);
-  const wobble = index % 2 ? 18 : -18;
+
+  // Out under the beak first (low and forward), then up and away to where it bursts.
+  const clear = { x: -62, y: 6 };
+  const ex = -112 - index * 14;
+  const ey = -64 + index * 18;
+  const at = (via: number, end: number) =>
+    v.interpolate({
+      inputRange: [0, 0.16, BURST, 1],
+      outputRange: [0, via, end, end],
+      extrapolate: "clamp",
+    });
+
   return (
-    <Animated.View
-      style={[
-        styles.tile,
-        {
-          left: BAG_AT.x - 18,
-          top: BAG_AT.y - 30,
-          opacity: v.interpolate({ inputRange: [0, 0.06, 0.8, 1], outputRange: [0, 1, 1, 0] }),
-          transform: [
-            {
-              translateX: v.interpolate({
-                inputRange: [0, 0.5, 1],
-                outputRange: [0, dx * 0.45 + wobble, dx],
-              }),
-            },
-            {
-              translateY: v.interpolate({
-                inputRange: [0, 0.3, 1],
-                outputRange: [0, dy * 0.5, dy],
-              }),
-            },
-            {
-              rotate: v.interpolate({
-                inputRange: [0, 1],
-                outputRange: ["0deg", `${(index % 2 ? 1 : -1) * (25 + index * 5)}deg`],
-              }),
-            },
-            { scale: v.interpolate({ inputRange: [0, 0.2, 1], outputRange: [0.5, 1, 1] }) },
-          ],
-        },
-      ]}
-    >
-      <Text style={[styles.tileLetter, { color: TILE_COLOURS[index % TILE_COLOURS.length] }]}>
-        {letter}
-      </Text>
-    </Animated.View>
+    <>
+      <Animated.View
+        style={[
+          styles.blownEnvelope,
+          {
+            left: BAG_AT.x - 17,
+            top: BAG_AT.y - 12,
+            // Starts tucked into the bag and grows as the wind pulls it out.
+            opacity: v.interpolate({
+              inputRange: [0, 0.06, BURST - 0.04, BURST + 0.04, 1],
+              outputRange: [0, 1, 1, 0, 0],
+            }),
+            transform: [
+              { translateX: at(clear.x, ex) },
+              { translateY: at(clear.y, ey) },
+              {
+                rotate: v.interpolate({
+                  inputRange: [0, 0.16, BURST],
+                  outputRange: ["0deg", "-8deg", `${-30 + index * 18}deg`],
+                  extrapolate: "clamp",
+                }),
+              },
+              {
+                scale: v.interpolate({
+                  inputRange: [0, 0.16, BURST],
+                  outputRange: [0.5, 0.9, 1.1],
+                  extrapolate: "clamp",
+                }),
+              },
+            ],
+          },
+        ]}
+      >
+        <Envelope size={34} />
+      </Animated.View>
+      {LETTER_GROUPS[index].map((letter, j) => {
+        const dx = -30 - j * 22 + index * 8;
+        const dy = -34 + j * 30;
+        const turn = (j % 2 ? 1 : -1) * (18 + j * 8);
+        return (
+          <Animated.View
+            key={letter}
+            style={[
+              styles.tile,
+              {
+                left: BAG_AT.x - 18,
+                top: BAG_AT.y - 20,
+                opacity: v.interpolate({
+                  inputRange: [0, BURST - 0.02, BURST + 0.04, 0.85, 1],
+                  outputRange: [0, 0, 1, 1, 0],
+                }),
+                transform: [
+                  {
+                    translateX: v.interpolate({
+                      inputRange: [0, BURST, 1],
+                      outputRange: [ex, ex, ex + dx],
+                    }),
+                  },
+                  {
+                    translateY: v.interpolate({
+                      inputRange: [0, BURST, 0.7, 1],
+                      outputRange: [ey, ey, ey + dy * 0.75, ey + dy],
+                    }),
+                  },
+                  {
+                    rotate: v.interpolate({
+                      inputRange: [0, BURST, 1],
+                      outputRange: ["0deg", "0deg", `${turn}deg`],
+                    }),
+                  },
+                  {
+                    scale: v.interpolate({
+                      inputRange: [0, BURST, BURST + 0.1, 1],
+                      outputRange: [0.3, 0.3, 1, 1],
+                    }),
+                  },
+                ],
+              },
+            ]}
+          >
+            <Text style={[styles.tileLetter, { color: TILE_COLOURS[(index + j) % 4] }]}>
+              {letter}
+            </Text>
+          </Animated.View>
+        );
+      })}
+    </>
   );
 }
 
-/** Scene 2: a gust of wind pulls the letters out of Hudhud's bag. */
+/** Scene 2: a gust of wind pulls the letters out of Hudhud's bag and blows them away. */
 function Wind() {
   const sway = useSwing(420);
   const gust = useSwing(1200);
@@ -195,7 +269,7 @@ function Wind() {
           styles.wind,
           {
             transform: [
-              { translateX: gust.interpolate({ inputRange: [0, 1], outputRange: [-20, 20] }) },
+              { translateX: gust.interpolate({ inputRange: [0, 1], outputRange: [24, -24] }) },
             ],
           },
         ]}
@@ -228,15 +302,15 @@ function Wind() {
         <Animated.View
           style={{
             transform: [
-              { rotate: sway.interpolate({ inputRange: [0, 1], outputRange: ["-6deg", "7deg"] }) },
-              { translateX: sway.interpolate({ inputRange: [0, 1], outputRange: [-3, 4] }) },
+              { rotate: sway.interpolate({ inputRange: [0, 1], outputRange: ["-4deg", "5deg"] }) },
+              { translateX: sway.interpolate({ inputRange: [0, 1], outputRange: [-2, 3] }) },
             ],
           }}
         >
-          <Hudhud size={WIND_BIRD} hop={false} flap bag="open" />
+          <Hudhud size={WIND_BIRD} hop={false} flap bag />
         </Animated.View>
-        {FLYING.map((letter, i) => (
-          <FlyingLetter key={letter} letter={letter} index={i} />
+        {LETTER_GROUPS.map((_, i) => (
+          <BlownLetter key={i} index={i} />
         ))}
       </View>
     </View>
@@ -303,7 +377,7 @@ function Market() {
         </Animated.Text>
       ))}
       <View style={styles.marketBird}>
-        <Hudhud size={96} bag="closed" />
+        <Hudhud size={96} bag />
       </View>
     </View>
   );
@@ -325,7 +399,7 @@ function Waiting() {
         <StickerArt id="dhow" size={84} />
       </View>
       <View style={styles.waitBird}>
-        <Hudhud size={110} pose="cheer" bag="closed" />
+        <Hudhud size={110} pose="cheer" bag />
       </View>
     </View>
   );
@@ -335,7 +409,7 @@ function Waiting() {
 function Choose() {
   return (
     <View style={[styles.scene, styles.chooseScene]}>
-      <Hudhud size={140} bag="closed" />
+      <Hudhud size={140} bag />
     </View>
   );
 }
@@ -377,7 +451,9 @@ const styles = StyleSheet.create({
     color: yemen.ink,
   },
   wind: { position: "absolute", top: 20 },
-  windBird: { width: WIND_BIRD, height: (WIND_BIRD * 130) / 140, marginLeft: -60, marginTop: 40 },
+  // Hudhud on the right, so the letters have room to fly forward (left) away from him.
+  windBird: { width: WIND_BIRD, height: (WIND_BIRD * 130) / 140, marginLeft: 120, marginTop: 70 },
+  blownEnvelope: { position: "absolute" },
   tile: {
     position: "absolute",
     width: 36,

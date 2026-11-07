@@ -7,7 +7,7 @@ Ziel: Ein Kind der 1. Klasse findet sich allein zurecht, ohne zu lesen, und komm
 Beim ersten Tipp auf Play erzählt Hudhud seine Geschichte (`content/story.ts`, `app/intro.tsx`), fünf Szenen mit Stimme, jede mit einem bewegten Bild:
 
 1. Hudhud ist der Briefbote des Jemen und bringt die Briefe zu allen Häusern. Er fliegt mit Flügelschlag über Sanaa, eine lederne Brieftasche umgeschnallt, aus der die Briefe hervorschauen.
-2. Ein starker Wind zieht die Briefe hoch, und die Buchstaben flattern als kleine Papierkärtchen aus der Tasche davon.
+2. Ein starker Wind zieht die Briefe einzeln vorne aus der Tasche, unter dem Schnabel hindurch und vor Hudhud hoch (nie über ihn hinweg); in der Luft platzt jeder Brief auf, und seine Buchstaben flattern als kleine Papierkärtchen davon.
 3. Auf dem Markt von Mokka weiss der Händler nicht, wie viele Säcke Kaffee er hat.
 4. Die Menschen warten, das Schiff wartet: «Ich brauche deine Hilfe!»
 5. «Hilfst du mir? Wir sammeln Buchstaben oder zählen auf dem Markt. Wähle!»
