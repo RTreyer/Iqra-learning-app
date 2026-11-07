@@ -106,11 +106,12 @@ test("unit: back button and lesson rows, including a completed one", async () =>
   expectAccessiblePressables(6);
 });
 
-test("lesson u2-2: back button and the activity controls", async () => {
+test("lesson u2-2: back button, instruction button and the activity controls", async () => {
   setParams({ lessonId: "u2-2" });
   withProgress(<LessonScreen />);
+  // Past the fallbacks of the spoken title and instruction.
   await act(async () => {
-    jest.advanceTimersByTime(2000);
+    jest.advanceTimersByTime(10000);
   });
-  expectAccessiblePressables(4);
+  expectAccessiblePressables(5);
 });

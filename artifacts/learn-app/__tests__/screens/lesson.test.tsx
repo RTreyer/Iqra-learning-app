@@ -2,7 +2,9 @@ import { act, fireEvent, screen } from "@testing-library/react-native";
 import React from "react";
 import LessonScreen from "@/app/lesson/[lessonId]";
 import { getLesson } from "@/content";
+import { instructionFor } from "@/content/instructions";
 import { routes } from "@/lib/routes";
+import { estimateSpeechMs } from "@/lib/speech";
 import { mockCanGoBack, renderScreen, setParams } from "@/test-utils/screens";
 
 const mockCompleteLesson = jest.fn();
@@ -41,6 +43,11 @@ jest.mock("@/components/activities", () => {
     "trace",
     "counting",
     "arithmetic",
+    "build_word",
+    "picture_choice",
+    "compare",
+    "number_fill",
+    "sort",
   ];
   return { ACTIVITY_COMPONENTS: Object.fromEntries(types.map((type) => [type, Stub])) };
 });
@@ -51,6 +58,7 @@ const { router } = jest.requireMock("expo-router") as {
   router: { back: jest.Mock; replace: jest.Mock };
 };
 const lesson = getLesson("u2-2")!.lesson;
+const instruction = instructionFor(lesson)!;
 
 /** expo-speech finishes every utterance at once. */
 const speechFinishes = () =>
@@ -65,27 +73,71 @@ beforeEach(() => {
 });
 afterEach(() => jest.useRealTimers());
 
-test("speaks the title first and mounts the activity once it has been spoken", () => {
+test("speaks the title, then the instruction, and mounts the activity once both are spoken", () => {
   const order: string[] = [];
   speech.speak.mockImplementation((text: string, options?: SpeakOptions) => {
     order.push(`speak:${text}`);
     options?.onDone?.();
   });
   renderScreen(<LessonScreen />);
-  expect(order[0]).toBe(`speak:${lesson.title}`);
+  expect(order).toEqual([`speak:${lesson.title}`, `speak:${instruction}`]);
   expect(screen.getByText(lesson.title)).toBeTruthy();
   expect(screen.getByText(lesson.subtitle)).toBeTruthy();
   expect(screen.getByText("stub:letter_pick")).toBeTruthy();
 });
 
-test("mounts the activity after the fallback when speech never reports back", () => {
+test("waits for the instruction before mounting the activity", () => {
+  let finishInstruction: (() => void) | undefined;
+  speech.speak.mockImplementation((text: string, options?: SpeakOptions) => {
+    if (text === instruction) finishInstruction = options?.onDone;
+    else options?.onDone?.();
+  });
+  renderScreen(<LessonScreen />);
+  expect(screen.queryByText("stub:letter_pick")).toBeNull();
+  act(() => finishInstruction?.());
+  expect(screen.getByText("stub:letter_pick")).toBeTruthy();
+});
+
+test("mounts the activity after the fallbacks when speech never reports back", () => {
   renderScreen(<LessonScreen />);
   expect(speech.speak).toHaveBeenCalledWith(lesson.title, expect.anything());
   expect(screen.queryByText("stub:letter_pick")).toBeNull();
   act(() => jest.advanceTimersByTime(1499));
-  expect(screen.queryByText("stub:letter_pick")).toBeNull();
+  expect(speech.speak).not.toHaveBeenCalledWith(instruction, expect.anything());
   act(() => jest.advanceTimersByTime(1));
+  expect(speech.speak).toHaveBeenCalledWith(instruction, expect.anything());
+  expect(screen.queryByText("stub:letter_pick")).toBeNull();
+  act(() => jest.advanceTimersByTime(estimateSpeechMs(instruction)));
   expect(screen.getByText("stub:letter_pick")).toBeTruthy();
+});
+
+test("a late report from the stopped title does not skip the instruction", () => {
+  const callbacks: (() => void)[] = [];
+  speech.speak.mockImplementation((_: string, options?: SpeakOptions) => {
+    if (options?.onDone) callbacks.push(options.onDone);
+  });
+  renderScreen(<LessonScreen />);
+  act(() => callbacks[0]());
+  act(() => callbacks[0]());
+  expect(screen.queryByText("stub:letter_pick")).toBeNull();
+  act(() => callbacks[1]());
+  expect(screen.getByText("stub:letter_pick")).toBeTruthy();
+});
+
+test("the header button speaks the instruction again", () => {
+  speechFinishes();
+  renderScreen(<LessonScreen />);
+  speech.speak.mockClear();
+  fireEvent.press(screen.getByTestId("instruction-button"));
+  expect(speech.speak).toHaveBeenCalledWith(instruction, expect.anything());
+});
+
+test("maths lessons speak only the title: their rounds speak the task", () => {
+  speechFinishes();
+  setParams({ lessonId: "math-u3-1" });
+  renderScreen(<LessonScreen />);
+  expect(speech.speak).toHaveBeenCalledTimes(1);
+  expect(screen.queryByTestId("instruction-button")).toBeNull();
 });
 
 test("stops speaking on unmount", () => {

@@ -25,6 +25,22 @@ export function speak(text: string, options: number | SpeakOptions = {}): void {
   }
 }
 
+/** Short vowels, shadda, sukun and dagger alif: written, but not spoken as sounds of their own. */
+const HARAKAT = /[ً-ٰٟ]/g;
+const MS_PER_CHAR = 110;
+const MIN_SPEECH_MS = 1500;
+const MAX_SPEECH_MS = 8000;
+
+/**
+ * Generous guess of how long `text` takes to speak, for a fallback timer when the
+ * engine never reports back. Too long only delays the next step on a silent device.
+ */
+export function estimateSpeechMs(text: string, rate: number = ARABIC_RATE): number {
+  const chars = text.replace(HARAKAT, "").length;
+  const ms = (chars * MS_PER_CHAR) / rate;
+  return Math.round(Math.min(MAX_SPEECH_MS, Math.max(MIN_SPEECH_MS, ms)));
+}
+
 export function stopSpeaking(): void {
   try {
     Speech.stop();
