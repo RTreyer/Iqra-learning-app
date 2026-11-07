@@ -15,13 +15,15 @@ import { useLatest } from "./shared/useLatest";
 import { ADVANCE_MS } from "./shared/useQuiz";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import { PAD_FALLBACK, PAD_MAX, trace, webPad } from "./trace/styles";
-import { guidePath } from "./trace/guidePath";
+import { densify, guidePath } from "./trace/guidePath";
 import { addPoint, startStroke, type DrawnStroke } from "./trace/path";
 import { decodeMask, validateOnGuide, validateTracing } from "./trace/validate";
 import { TRACE_GRID, traceGuides } from "@/content/generated/traceGuides";
 import type { ActivityProps } from "./types";
 
 const ERROR_VISIBLE_MS = 3000;
+/** Distance between the points of a demo line, in pixels. */
+const DEMO_STEP = 6;
 
 /** Two letters or more (يد، بيت): a word, for the wording of hints. */
 const isWord = (guide: string) => guide.replace(/[ً-ْـ\s]/g, "").length > 1;
@@ -76,7 +78,15 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
     () => ({
       testID: "trace-pad",
       measure: () => measureNode(padNode.current),
-      tracePath: () => (shape ? guidePath(decodeMask(shape.mask, TRACE_GRID), padSize) : null),
+      tracePath: (relative) =>
+        relative
+          ? densify(
+              relative.map((p) => ({ x: p.x * padSize, y: p.y * padSize })),
+              DEMO_STEP,
+            )
+          : shape
+            ? guidePath(decodeMask(shape.mask, TRACE_GRID), padSize)
+            : null,
       draw: (points, final) => {
         if (points.length === 0) return;
         const stroke = startStroke(points[0]);

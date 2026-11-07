@@ -43,3 +43,17 @@ export function guidePath(guide: GuideMask, pad: number): Point[] {
   const scale = pad / grid;
   return order.map((i) => ({ x: (col(i) + 0.5) * scale, y: (row(i) + 0.5) * scale }));
 }
+
+/** `points` with extra points every `step` along each segment, as a finger would report them. */
+export function densify(points: Point[], step: number): Point[] {
+  if (points.length === 0) return [];
+  const out = [points[0]];
+  for (let i = 1; i < points.length; i++) {
+    const a = points[i - 1];
+    const b = points[i];
+    const n = Math.max(1, Math.ceil(Math.hypot(b.x - a.x, b.y - a.y) / step));
+    for (let k = 1; k <= n; k++)
+      out.push({ x: a.x + ((b.x - a.x) * k) / n, y: a.y + ((b.y - a.y) * k) / n });
+  }
+  return out;
+}

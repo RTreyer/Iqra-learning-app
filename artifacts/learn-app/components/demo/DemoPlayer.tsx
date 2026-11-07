@@ -4,8 +4,7 @@ import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
 import { ActivityHost } from "@/components/ActivityHost";
 import { UiText } from "@/components/UiText";
 import { useLanguage } from "@/context/LanguageContext";
-import { DEMO_END, DEMO_START, demoFor, type DemoStep } from "@/content/demos";
-import type { LessonType } from "@/content/types";
+import { DEMO_END, DEMO_START, demoFor, type DemoId, type DemoStep } from "@/content/demos";
 import { estimateSpeechMs, isSpeaking, speak, stopSpeaking } from "@/lib/speech";
 import { colors, radius, touchTarget } from "@/theme/tokens";
 import { useLatest } from "@/components/activities/shared/useLatest";
@@ -30,7 +29,8 @@ const CANCELLED = Symbol("cancelled");
 const noop = () => {};
 
 type Props = {
-  type: LessonType;
+  /** Which demo: an activity type, or `trace_lines` (demoIdFor). */
+  id: DemoId;
   color: string;
   /** Spoken before the demo starts, e.g. the instruction when the child asks again. */
   preface?: string;
@@ -42,9 +42,9 @@ type Props = {
  * content, driven by a hand that taps and traces while the voice explains. Touches are
  * blocked until it ends; Skip ends it at once. Nothing is scored.
  */
-export function DemoPlayer({ type, color, preface, onDone }: Props) {
+export function DemoPlayer({ id, color, preface, onDone }: Props) {
   const { t } = useLanguage();
-  const demo = demoFor(type);
+  const demo = demoFor(id);
   const [registry] = useState(createRegistry);
   const [mounted, setMounted] = useState(false);
   const [handShown, setHandShown] = useState(false);
@@ -128,8 +128,8 @@ export function DemoPlayer({ type, color, preface, onDone }: Props) {
         ]),
         2 * PRESS_MS,
       );
-    const trace = async (entry: DemoEntry) => {
-      const points = entry.tracePath?.() ?? null;
+    const trace = async (entry: DemoEntry, relative?: { x: number; y: number }[]) => {
+      const points = entry.tracePath?.(relative) ?? null;
       if (!points || points.length === 0 || !entry.draw) return;
       const [rootBox, pad] = [await origin(), await live(entry.measure())];
       await placeHand(rootBox);
@@ -157,11 +157,11 @@ export function DemoPlayer({ type, color, preface, onDone }: Props) {
       const target = "tap" in step ? step.tap : step.trace;
       const entry = await find(target);
       if (!entry) {
-        if (__DEV__) console.warn(`Demo ${type}: nothing to show for`, target);
+        if (__DEV__) console.warn(`Demo ${id}: nothing to show for`, target);
         return;
       }
       if ("trace" in step) {
-        await trace(entry);
+        await trace(entry, step.path);
       } else {
         await moveTo(entry);
         await press();
@@ -189,7 +189,7 @@ export function DemoPlayer({ type, color, preface, onDone }: Props) {
       alive = false;
       stopSpeaking();
     };
-  }, [type, registry, hand, handScale, done, steps, intro]);
+  }, [id, registry, hand, handScale, done, steps, intro]);
 
   const skip = () => {
     stopSpeaking();

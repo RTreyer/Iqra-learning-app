@@ -14,7 +14,11 @@ import type { Lesson, LessonType, MathPic } from "./types.ts";
  */
 
 export type DemoTarget = { testID: string } | { label: string };
-export type DemoStep = { say: string } | { tap: DemoTarget } | { trace: DemoTarget };
+/** A point on the tracing pad as a share of its side, 0 to 1. */
+export type PadPoint = { x: number; y: number };
+/** `path` traces a drawn line; without it the hand follows the letter's guide. */
+export type DemoStep =
+  { say: string } | { tap: DemoTarget } | { trace: DemoTarget; path?: PadPoint[] };
 export type Demo<T extends LessonType = LessonType> = {
   lesson: Extract<Lesson, { type: T }>;
   steps: DemoStep[];
@@ -27,7 +31,7 @@ export const DEMO_END = "اَلْآنَ دَوْرُكَ!";
 /** Before a Continue or Next button: its label is chrome and may be English. */
 const THEN_HERE = "ثُمَّ أَضْغَطُ هُنَا.";
 
-const base = (type: LessonType) => ({
+const base = (type: string) => ({
   id: `demo-${type}`,
   number: 0,
   title: "مِثَالٌ",
@@ -44,7 +48,11 @@ const tapPics = (pics: MathPic[]): DemoStep => tapLabel(groupLabel(pics));
 
 const oranges = (n: number): MathPic[] => Array.from({ length: n }, () => ({ emoji: "🍊" }));
 
-export const DEMOS: { [K in LessonType]: Demo<K> } = {
+/**
+ * One demo per activity type, plus a second tracing demo: the Unit 1 lessons trace lines,
+ * not letters, and get a line of their own.
+ */
+export const DEMOS: { [K in LessonType]: Demo<K> } & { trace_lines: Demo<"trace"> } = {
   story: {
     lesson: {
       ...base("story"),
@@ -176,6 +184,28 @@ export const DEMOS: { [K in LessonType]: Demo<K> } = {
       tap("trace-done"),
     ],
   },
+  trace_lines: {
+    lesson: {
+      ...base("trace_lines"),
+      type: "trace",
+      // An em dash: a line no lesson traces.
+      targets: [
+        { guide: "—", label: "خَطٌّ", tts: "أَرْسُمُ خَطًّا مِنَ الْيَمِينِ إِلَى الْيَسَارِ." },
+      ],
+    },
+    steps: [
+      say("أَمْشِي بِإِصْبَعِي عَلَى الْخَطِّ، مِنَ الْيَمِينِ إِلَى الْيَسَارِ."),
+      {
+        trace: { testID: "trace-pad" },
+        path: [
+          { x: 0.78, y: 0.535 },
+          { x: 0.22, y: 0.535 },
+        ],
+      },
+      say("ثُمَّ أَضْغَطُ تَمَّ."),
+      tap("trace-done"),
+    ],
+  },
   build_word: {
     lesson: {
       ...base("build_word"),
@@ -270,6 +300,22 @@ export const DEMOS: { [K in LessonType]: Demo<K> } = {
   },
 };
 
-export function demoFor(type: LessonType): Demo {
-  return DEMOS[type] as Demo;
+export type DemoId = keyof typeof DEMOS;
+export const DEMO_IDS = Object.keys(DEMOS) as DemoId[];
+
+/** Any letter, not counting the tatweel that the Unit 1 horizontal line is drawn with. */
+const LETTER = /[\u0621-\u063F\u0641-\u064A]/;
+
+/** The demo a lesson gets: the one of its type, or the line demo for tracing lines. */
+export function demoIdFor(lesson: Lesson): DemoId {
+  if (
+    lesson.type === "trace" &&
+    !lesson.targets.some((t) => LETTER.test(t.guide) || /[\u0660-\u0669]/.test(t.guide))
+  )
+    return "trace_lines";
+  return lesson.type;
+}
+
+export function demoFor(id: DemoId): Demo {
+  return DEMOS[id] as Demo;
 }

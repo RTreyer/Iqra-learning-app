@@ -8,7 +8,7 @@ import BookScreen from "@/app/book/[bookId]";
 import GradeScreen from "@/app/grade/[gradeId]";
 import LessonScreen from "@/app/lesson/[lessonId]";
 import UnitScreen from "@/app/unit/[unitId]";
-import { DEMOS } from "@/content/demos";
+import { DEMO_IDS } from "@/content/demos";
 import { resetDemoSeenCache } from "@/hooks/useDemoSeen";
 import { ProgressProvider } from "@/context/ProgressContext";
 import { allItems } from "@/lib/reviewItems";
@@ -109,7 +109,7 @@ test("unit: back button and lesson rows, including a completed one", async () =>
 });
 
 test("lesson u2-2: back button, help button and the activity controls", async () => {
-  resetDemoSeenCache(Object.keys(DEMOS));
+  resetDemoSeenCache(DEMO_IDS);
   setParams({ lessonId: "u2-2" });
   withProgress(<LessonScreen />);
   // Past the fallbacks of the spoken title and instruction.

@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCallback, useEffect, useState } from "react";
 
-import type { LessonType } from "@/content/types";
+import type { DemoId } from "@/content/demos";
 
 export const DEMO_SEEN_KEY = "@iqra_demo_seen_v1";
 
@@ -29,12 +29,12 @@ export function resetDemoSeenCache(seen?: Iterable<string>): void {
 }
 
 /**
- * Activity types whose demo the child has seen, persisted across launches.
+ * Demos the child has seen (activity types, and `trace_lines`), persisted across launches.
  * `seen` is null while loading.
  */
 export function useDemoSeen(): {
   seen: ReadonlySet<string> | null;
-  markSeen: (type: LessonType) => void;
+  markSeen: (id: DemoId) => void;
 } {
   const [seen, setSeen] = useState<ReadonlySet<string> | null>(cache);
 
@@ -49,10 +49,10 @@ export function useDemoSeen(): {
     };
   }, []);
 
-  const markSeen = useCallback((type: LessonType) => {
+  const markSeen = useCallback((id: DemoId) => {
     const next = new Set(cache ?? []);
-    if (next.has(type)) return;
-    next.add(type);
+    if (next.has(id)) return;
+    next.add(id);
     cache = next;
     setSeen(next);
     AsyncStorage.setItem(DEMO_SEEN_KEY, JSON.stringify([...next])).catch(() => {});

@@ -1,8 +1,8 @@
 import { act, fireEvent, screen } from "@testing-library/react-native";
 import React from "react";
 import LessonScreen from "@/app/lesson/[lessonId]";
-import { getLesson } from "@/content";
-import { DEMOS } from "@/content/demos";
+import { books, getLesson } from "@/content";
+import { DEMO_IDS } from "@/content/demos";
 import { instructionFor } from "@/content/instructions";
 import { routes } from "@/lib/routes";
 import { resetDemoSeenCache } from "@/hooks/useDemoSeen";
@@ -57,11 +57,11 @@ jest.mock("@/components/activities", () => {
 /** The demo player is tested on its own; here it is a stub that ends on a press. */
 jest.mock("@/components/demo/DemoPlayer", () => {
   const { Pressable, Text } = jest.requireActual("react-native");
-  type MockDemoProps = { type: string; preface?: string; onDone: () => void };
+  type MockDemoProps = { id: string; preface?: string; onDone: () => void };
   return {
-    DemoPlayer: ({ type, preface, onDone }: MockDemoProps) => (
+    DemoPlayer: ({ id, preface, onDone }: MockDemoProps) => (
       <Pressable testID="demo-stub" onPress={onDone}>
-        <Text>{`demo:${type}:${preface ?? ""}`}</Text>
+        <Text>{`demo:${id}:${preface ?? ""}`}</Text>
       </Pressable>
     ),
   };
@@ -74,6 +74,9 @@ const { router } = jest.requireMock("expo-router") as {
 };
 const lesson = getLesson("u2-2")!.lesson;
 const instruction = instructionFor(lesson)!;
+const letterTrace = books
+  .flatMap((b) => b.units.flatMap((u) => u.lessons))
+  .find((l) => l.type === "trace" && l.id !== "u1-5")!;
 
 /** expo-speech finishes every utterance at once. */
 const speechFinishes = () =>
@@ -86,7 +89,7 @@ beforeEach(() => {
   mockCanGoBack(true);
   setParams({ lessonId: "u2-2" });
   // Every demo seen, unless a test says otherwise.
-  resetDemoSeenCache(Object.keys(DEMOS));
+  resetDemoSeenCache(DEMO_IDS);
 });
 afterEach(() => jest.useRealTimers());
 
@@ -203,6 +206,19 @@ describe("worked example", () => {
   test("the help button waits for the intro", () => {
     renderScreen(<LessonScreen />);
     expect(screen.getByTestId("help-button").props.accessibilityState.disabled).toBe(true);
+  });
+
+  test("Unit 1 traces lines: it gets the line demo, and letter tracing keeps its own", () => {
+    resetDemoSeenCache([]);
+    speechFinishes();
+    setParams({ lessonId: "u1-5" });
+    const first = renderScreen(<LessonScreen />);
+    expect(screen.getByText("demo:trace_lines:")).toBeTruthy();
+    fireEvent.press(screen.getByTestId("demo-stub"));
+    first.unmount();
+    setParams({ lessonId: letterTrace.id });
+    renderScreen(<LessonScreen />);
+    expect(screen.getByText("demo:trace:")).toBeTruthy();
   });
 
   test("maths types get a demo too, without an instruction before it", () => {

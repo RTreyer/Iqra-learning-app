@@ -1,5 +1,5 @@
 import { books } from "@/content";
-import { DEMOS, DEMO_END, DEMO_START } from "@/content/demos";
+import { DEMOS, DEMO_END, DEMO_IDS, DEMO_START, demoIdFor } from "@/content/demos";
 import {
   validateCompare,
   validateNumberFill,
@@ -9,7 +9,7 @@ import {
 import type { Lesson, LessonType } from "@/content/types";
 
 const lessons = books.flatMap((b) => b.units.flatMap((u) => u.lessons));
-const types = Object.keys(DEMOS) as LessonType[];
+const types = Object.keys(DEMOS).filter((id) => id !== "trace_lines") as LessonType[];
 
 /** The rounds or items a child answers in a lesson, as comparable strings. */
 function tasks(lesson: Lesson): string[] {
@@ -24,11 +24,21 @@ test("every activity type has a demo of its own type", () => {
 });
 
 test("no demo shows a task the child will be asked in a lesson", () => {
-  for (const type of types) {
-    const asked = new Set(lessons.filter((l) => l.type === type).flatMap(tasks));
-    const shown = tasks(DEMOS[type].lesson).filter((task) => asked.has(task));
-    expect({ type, shown }).toEqual({ type, shown: [] });
+  for (const id of DEMO_IDS) {
+    const { lesson } = DEMOS[id];
+    const asked = new Set(lessons.filter((l) => l.type === lesson.type).flatMap(tasks));
+    const shown = tasks(lesson).filter((task) => asked.has(task));
+    expect({ id, shown }).toEqual({ id, shown: [] });
   }
+});
+
+test("lessons that trace lines get the line demo; letters and digits get the letter demo", () => {
+  const traces = lessons.filter((l) => l.type === "trace");
+  expect(demoIdFor(traces.find((l) => l.id === "u1-5")!)).toBe("trace_lines");
+  const others = traces.filter((l) => l.id !== "u1-5").map(demoIdFor);
+  expect(new Set(others)).toEqual(new Set(["trace"]));
+  for (const lesson of lessons.filter((l) => l.type !== "trace"))
+    expect(demoIdFor(lesson)).toBe(lesson.type);
 });
 
 test("maths demos are valid rounds", () => {
@@ -40,7 +50,7 @@ test("maths demos are valid rounds", () => {
 });
 
 test("everything the demos say is vocalised Arabic the voice can read", () => {
-  const said = [DEMO_START, DEMO_END, ...types.flatMap((t) => DEMOS[t].steps)].flatMap((s) =>
+  const said = [DEMO_START, DEMO_END, ...DEMO_IDS.flatMap((id) => DEMOS[id].steps)].flatMap((s) =>
     typeof s === "string" ? [s] : "say" in s ? [s.say] : [],
   );
   for (const text of said) {
@@ -50,7 +60,7 @@ test("everything the demos say is vocalised Arabic the voice can read", () => {
 });
 
 test("every demo does something: at least one tap or trace", () => {
-  for (const type of types) {
-    expect(DEMOS[type].steps.some((s) => "tap" in s || "trace" in s)).toBe(true);
+  for (const id of DEMO_IDS) {
+    expect(DEMOS[id].steps.some((s) => "tap" in s || "trace" in s)).toBe(true);
   }
 });

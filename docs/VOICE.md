@@ -35,10 +35,10 @@ Auf einem echten Android-Gerät prüfen, am besten auf einem günstigen Modell, 
 
 Beim ersten Mal, wenn das Kind einen Übungstyp sieht, macht die App ihn vor: Nach Titel und Anweisung sagt die Stimme «اُنْظُرْ، سَأُرِيكَ مِثَالًا.», eine Hand 👆 bedient die echte Übung an einem eigenen Beispiel und die Stimme erklärt jeden Schritt. Am Ende kommt «اَلْآنَ دَوْرُكَ!», dann startet die Lektion.
 
-- **Inhalt:** `content/demos.ts`, ein Beispiel für jeden der 15 Übungstypen. Kein Beispiel ist eine Aufgabe aus einer Lektion (Test). Für das Nachfahren gibt es den Buchstaben «ه», der in keiner Lektion nachgefahren wird; seine Vorlage wird mit den anderen erzeugt (`npm run guides`).
+- **Inhalt:** `content/demos.ts`, ein Beispiel für jeden der 15 Übungstypen, dazu ein zweites Nachfahr-Beispiel mit einer Linie für Unit 1, die Linien statt Buchstaben nachfährt (`trace_lines`, gewählt von `demoIdFor`). Kein Beispiel ist eine Aufgabe aus einer Lektion (Test). Für das Nachfahren gibt es den Buchstaben «ه», der in keiner Lektion nachgefahren wird; seine Vorlage wird mit den anderen erzeugt (`npm run guides`).
 - **Ablauf:** `components/demo/DemoPlayer.tsx` spielt die echte Übung mit dem Beispielinhalt. Die Hand findet Knöpfe über ihre `testID` oder Beschriftung (`components/demo/DemoPressable.tsx`), beim Nachfahren folgt sie der Mittellinie des Buchstabens (`trace/guidePath.ts`), so dass die echte Prüfung besteht. Während des Beispiels sind Berührungen gesperrt; «تخطَّ» (Überspringen) beendet es sofort.
 - **Zählt nicht:** keine Sterne, keine Wiederholungs-Einträge.
-- **Einmal pro Typ:** gespeichert unter `@iqra_demo_seen_v1`. Der Knopf 👆 im Lektionskopf zeigt das Beispiel jederzeit wieder, zusammen mit der Anweisung; die angefangene Übung bleibt dabei erhalten.
+- **Einmal pro Typ:** gespeichert unter `@iqra_demo_seen_v1` (Linien und Buchstaben nachfahren zählen getrennt). Wer die Beispiele noch einmal von vorne sehen will, löscht diesen Eintrag oder die Website-Daten im Browser, oder öffnet ein privates Fenster. Der Knopf 👆 im Lektionskopf zeigt das Beispiel jederzeit wieder, zusammen mit der Anweisung; die angefangene Übung bleibt dabei erhalten.
 - **Tests:** `__tests__/demo/` spielt jedes Beispiel ganz durch und prüft, dass jedes Element gefunden und jede Aufgabe richtig gelöst wird; zwei Playwright-Tests prüfen den Ablauf im Browser.
 
 Auf dem Handy zusätzlich prüfen: Ist die Hand gut sichtbar und das Tempo für Kinder angenehm? Verstehen Kinder ohne Hilfe, dass sie danach selbst dran sind?

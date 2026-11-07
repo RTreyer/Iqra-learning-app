@@ -12,8 +12,11 @@ export type DemoEntry = {
   /** Position in the window, or null when it cannot be measured. */
   measure: () => Promise<Box | null>;
   press?: () => void;
-  /** Tracing pad only: a path over the guide in pad coordinates, and a way to draw it. */
-  tracePath?: () => Point[] | null;
+  /**
+   * Tracing pad only: a path in pad coordinates, from `relative` (shares of the pad side)
+   * or else along the guide's letter; and a way to draw it.
+   */
+  tracePath?: (relative?: Point[]) => Point[] | null;
   draw?: (points: Point[], final: boolean) => void;
 };
 

@@ -14,6 +14,7 @@ import { ScreenBackground } from "@/components/ScreenBackground";
 import { DemoPlayer } from "@/components/demo/DemoPlayer";
 import { HelpButton } from "@/components/HelpButton";
 import { getLesson } from "@/content";
+import { demoIdFor } from "@/content/demos";
 import { instructionFor } from "@/content/instructions";
 import { useLanguage } from "@/context/LanguageContext";
 import { useProgress } from "@/context/ProgressContext";
@@ -93,14 +94,14 @@ export default function LessonScreen() {
   // Worked example: shown on the first lesson of each activity type, and again on request.
   const { seen, markSeen } = useDemoSeen();
   const [replay, setReplay] = useState<{ lessonId: string; run: number } | null>(null);
-  const type = found?.lesson.type;
+  const demoId = found ? demoIdFor(found.lesson) : undefined;
   const replaying = replay?.lessonId === lessonId;
-  const decided = ready && seen !== null && type !== undefined;
-  const showDemo = decided && (replaying || !seen.has(type));
+  const decided = ready && seen !== null && demoId !== undefined;
+  const showDemo = decided && (replaying || !seen.has(demoId));
   // During a replay the activity stays mounted, hidden, so the child keeps its place.
   const showActivity = decided && (!showDemo || replaying);
   const finishDemo = () => {
-    if (type) markSeen(type);
+    if (demoId) markSeen(demoId);
     setReplay(null);
   };
 
@@ -162,7 +163,7 @@ export default function LessonScreen() {
             {showDemo ? (
               <DemoPlayer
                 key={`${lessonId}-${replay?.run ?? 0}`}
-                type={lesson.type}
+                id={demoIdFor(lesson)}
                 color={unit.color}
                 preface={replaying ? instruction : undefined}
                 onDone={finishDemo}

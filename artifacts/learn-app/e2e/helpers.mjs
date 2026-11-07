@@ -7,7 +7,7 @@ import { groupLabel } from "../content/math/picLabel.ts";
 import { mathBookUnit1 } from "../content/math/bookUnit1.ts";
 import { mathBookUnit2 } from "../content/math/bookUnit2.ts";
 import { TRACE_GRID, traceGuides } from "../content/generated/traceGuides.ts";
-import { DEMOS } from "../content/demos.ts";
+import { DEMO_IDS } from "../content/demos.ts";
 
 export { expect };
 
@@ -75,7 +75,7 @@ export const test = base.extend({
     page.on("pageerror", (e) => errors.push(`pageerror: ${e.message.slice(0, 300)}`));
     await page.addInitScript(prepareBrowser, {
       demoKey: DEMO_SEEN_KEY,
-      demoTypes: Object.keys(DEMOS),
+      demoTypes: DEMO_IDS,
     });
     await provide(page);
     expect(errors, "console errors during the test").toEqual([]);
