@@ -261,6 +261,7 @@ export const unit4: Unit = {
   letters: unit4Letters,
   theme: "بَيْتٌ مِنْ رَمْلٍ، ابْنَةٌ أَمِينَةٌ، الْبَقَرَةُ",
   emoji: "🏖️",
+  emblem: "sand_house",
   color: COLOR,
   badgeLabel: "م ب ل",
   lessons: numberLessons("u4", [...mim, ...ba, ...lam, ...exercises]),

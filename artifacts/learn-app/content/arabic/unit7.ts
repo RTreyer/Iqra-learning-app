@@ -342,6 +342,7 @@ export const unit7: Unit = {
   letters: unit7Letters,
   theme: "النَّظَافَةُ، أَسْنَانُ وَسِيمٍ، جَارُ الْمَسْجِدِ",
   emoji: "🧼",
+  emblem: "ibriq",
   color: COLOR,
   badgeLabel: "ح س ج",
   lessons: numberLessons("u7", [...ha, ...sin, ...jim, ...exercises, ...sentence]),

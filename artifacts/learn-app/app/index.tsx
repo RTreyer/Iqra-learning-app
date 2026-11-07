@@ -11,6 +11,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { ScreenBackground } from "@/components/ScreenBackground";
 import { StarBadge } from "@/components/StarBadge";
 import { UiText } from "@/components/UiText";
+import { EmblemDisc } from "@/components/world/Emblem";
 import { Guide, Pulse } from "@/components/world/Guide";
 import { Icon } from "@/components/world/Icon";
 import { QamariyaGoal } from "@/components/world/QamariyaGoal";
@@ -42,11 +43,9 @@ export function windowLine(done: number): string {
   return `${LESSONS_LEFT[DAILY_GOAL - done]}، وَتُضِيءُ الْقَمَرِيَّةُ!`;
 }
 
-/** Picture on a subject island: the first letters or numbers the child meets there. */
-function islandGlyph(book: Book, digits: (v: string) => string): string {
-  if (book.subject === "math") return digits("1 2 3");
-  if (book.subject === "arabic" || book.subject === "lughati") return "أ ب ت";
-  return book.emoji;
+/** The subject on the play button: the first letter or number the child meets there. */
+function subjectGlyph(book: Book, digits: (v: string) => string): string {
+  return book.subject === "math" ? digits("1") : "أ";
 }
 
 export default function HomeScreen() {
@@ -145,9 +144,7 @@ export default function HomeScreen() {
                 testID="play-subject"
                 style={[styles.playSubject, { backgroundColor: readableFill(current.color) }]}
               >
-                <Text style={styles.playSubjectText}>
-                  {islandGlyph(current, digits).split(" ")[0]}
-                </Text>
+                <Text style={styles.playSubjectText}>{subjectGlyph(current, digits)}</Text>
               </View>
             ) : null}
           </Pulse>
@@ -175,7 +172,7 @@ export default function HomeScreen() {
                 pressed && styles.pressed,
               ]}
             >
-              <Text style={styles.islandGlyph}>{islandGlyph(book, digits)}</Text>
+              <EmblemDisc id={book.emblem} size={68} />
               <View style={styles.islandTrack}>
                 <View style={[styles.islandFill, { width: `${Math.round(share * 100)}%` }]} />
               </View>
@@ -295,7 +292,6 @@ const styles = StyleSheet.create({
     ...shadow.card,
   },
   islandOn: { borderWidth: 5, borderColor: yemen.gold },
-  islandGlyph: { fontSize: 40, fontWeight: "800", color: "#FFFFFF", lineHeight: 56 },
   islandTrack: {
     width: "70%",
     height: 10,

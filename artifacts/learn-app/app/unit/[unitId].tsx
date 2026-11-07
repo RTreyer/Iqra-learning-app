@@ -12,6 +12,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { NotFoundCard } from "@/components/NotFoundCard";
 import { ScreenBackground } from "@/components/ScreenBackground";
+import { EmblemDisc } from "@/components/world/Emblem";
 import { lessonPicture } from "@/components/world/lessonPicture";
 import { PathMap, type Stop } from "@/components/world/PathMap";
 import { StoryGoal } from "@/components/world/StoryGoal";
@@ -96,7 +97,7 @@ export default function UnitScreen() {
     <ScreenBackground subject={subject} style={[styles.container, { paddingTop: pad.top }]}>
       <WorldHeader
         up={{ fallback: book ? routes.book(book.id) : routes.home(), icon: "map" }}
-        picture={<Text style={styles.headerEmoji}>{unit.emoji}</Text>}
+        picture={<EmblemDisc id={unit.emblem} size={50} />}
         name={unit.theme}
         detail={digits(`${unit.title}، ${summary.done} / ${summary.total}`)}
         color={unit.color}
@@ -170,8 +171,6 @@ export default function UnitScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  // White, so the picture reads as light on the coloured tile (and passes contrast checks).
-  headerEmoji: { fontSize: 34, color: "#FFFFFF" },
   lettersRow: {
     flexWrap: "wrap",
     justifyContent: "center",

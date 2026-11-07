@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { StarIcon } from "@/components/world/Icon";
 import { Animated, Easing, StyleSheet, Text, View } from "react-native";
 import { Pressable } from "@/components/demo/DemoPressable";
 import { Circle, Path, Rect, Svg } from "react-native-svg";
@@ -225,7 +226,7 @@ function TrainRound({ round, color, seed, onDone }: RoundProps) {
           <Text style={[styles.word, sentence && styles.sentence, { color: readableFill(color) }]}>
             {word}
           </Text>
-          <Text style={styles.cheer}>{missed ? "👏" : "🎉"}</Text>
+          <StarIcon size={44} dim={missed} />
         </View>
       ) : (
         <View style={styles.tiles}>
@@ -345,5 +346,4 @@ const styles = StyleSheet.create({
   result: { flexDirection: "row", alignItems: "center", gap: 12 },
   word: { fontSize: 48, fontWeight: "900", lineHeight: 72 },
   sentence: { fontSize: 28, lineHeight: 44, flexShrink: 1, textAlign: "center" },
-  cheer: { fontSize: 40 },
 });

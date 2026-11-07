@@ -166,12 +166,40 @@ export type LessonType = LessonBody["type"];
 
 export type Lesson = LessonBase & LessonBody;
 
+/**
+ * Drawn pictures of the books and units (components/world/Emblem), from the child's Yemen and
+ * from Hudhud's story, in place of emoji.
+ */
+export type EmblemId =
+  | "book_arabic"
+  | "book_lughati"
+  | "book_math"
+  | "book_science"
+  | "lawh"
+  | "house"
+  | "caring_hands"
+  | "sand_house"
+  | "school"
+  | "bulbul"
+  | "ibriq"
+  | "terraces"
+  | "basket"
+  | "coffee_sacks"
+  | "dates_tray"
+  | "pomegranates"
+  | "shapes_window"
+  | "hand"
+  | "camel"
+  | "seedling";
+
 export type Unit = {
   id: string;
   number: number;
   title: string;
   theme: string;
+  /** Fallback text picture; the app shows `emblem`. */
   emoji: string;
+  emblem: EmblemId;
   color: string;
   badgeLabel: string;
   /** Letters introduced by the unit (Arabic units 2 to 8). */
@@ -184,7 +212,9 @@ export type Book = {
   subject: Subject;
   title: string;
   subtitle: string;
+  /** Fallback text picture; the app shows `emblem`. */
   emoji: string;
+  emblem: EmblemId;
   color: string;
   available: boolean;
   units: Unit[];

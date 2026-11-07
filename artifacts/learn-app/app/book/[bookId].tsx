@@ -10,6 +10,7 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { NotFoundCard } from "@/components/NotFoundCard";
 import { UiText } from "@/components/UiText";
 import { ScreenBackground } from "@/components/ScreenBackground";
+import { EmblemDisc } from "@/components/world/Emblem";
 import { PathMap, type Stop } from "@/components/world/PathMap";
 import { WorldHeader } from "@/components/world/WorldHeader";
 import { getBook, unitLessonIds } from "@/content";
@@ -49,7 +50,8 @@ export default function BookScreen() {
     state: p.total > 0 && p.done >= p.total ? "done" : i === currentIndex ? "current" : "open",
     ring: p.total ? p.done / p.total : 0,
     caption: digits(`${p.done} / ${p.total}`),
-    picture: (_color, size) => <Text style={{ fontSize: size }}>{unit.emoji}</Text>,
+    // The unit's own drawing on a paper disc, so it reads on gold, the subject colour or sand.
+    picture: (_color, size) => <EmblemDisc id={unit.emblem} size={Math.round(size * 1.7)} />,
     aside: unit.letters ? (
       <View style={styles.letters}>
         {unit.letters.map((letter) => (
@@ -72,7 +74,7 @@ export default function BookScreen() {
     >
       <WorldHeader
         up={{ fallback: routes.home(), icon: "home" }}
-        picture={<Text style={styles.bookEmoji}>{book.emoji}</Text>}
+        picture={<EmblemDisc id={book.emblem} size={50} />}
         name={t(book.title)}
         detail={t(book.subtitle)}
         color={book.color}
@@ -100,7 +102,6 @@ export default function BookScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  bookEmoji: { fontSize: 34, color: "#FFFFFF" },
   scroll: { flex: 1, width: "100%" },
   letters: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 4, justifyContent: "center" },
   letter: {

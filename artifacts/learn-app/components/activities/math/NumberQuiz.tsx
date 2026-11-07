@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, type ReactNode } from "react";
+import { Icon } from "@/components/world/Icon";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import type { Lesson } from "@/content/types";
 import { toArabicDigits } from "@/lib/arabicNumbers";
@@ -87,7 +88,7 @@ export function NumberQuiz({
         style={styles.question}
         onPress={() => speak(spoken)}
       >
-        <Text style={styles.speaker}>🔊</Text>
+        <Icon name="speaker" size={24} color="#065F46" />
         <Text style={styles.questionText}>{shown}</Text>
       </Pressable>
       <View style={styles.options}>
@@ -142,7 +143,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     minHeight: touchTarget,
   },
-  speaker: { fontSize: 22 },
   questionText: { fontSize: 20, fontWeight: "600", color: "#065F46", textAlign: "center" },
   options: { flexDirection: "row", justifyContent: "center", gap: 16, flexWrap: "wrap" },
 });

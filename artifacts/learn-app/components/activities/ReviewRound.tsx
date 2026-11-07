@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Icon } from "@/components/world/Icon";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import * as haptics from "@/lib/haptics";
 import { toArabicDigits } from "@/lib/arabicNumbers";
@@ -112,7 +113,7 @@ function Prompt({ item, color, spoken }: { item: ReviewItem; color: string; spok
             style={styles.question}
             onPress={() => speak(spoken)}
           >
-            <Text style={styles.speaker}>🔊</Text>
+            <Icon name="speaker" size={24} color="#065F46" />
             <Text style={styles.questionText}>{shown}</Text>
           </Pressable>
         </View>
@@ -220,6 +221,5 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     minHeight: touchTarget,
   },
-  speaker: { fontSize: 22 },
   questionText: { fontSize: 20, fontWeight: "600", color: "#065F46", textAlign: "center" },
 });

@@ -166,7 +166,7 @@ export function LessonCompleteCard({
 
       {next ? null : (
         <UiText testID="unit-finished" style={styles.celebration}>
-          🎉 أتممت الوحدة!
+          أتممت الوحدة!
         </UiText>
       )}
 

@@ -86,7 +86,7 @@ const english: Record<string, string> = {
   "لقد أتممت هذا النشاط بنجاح": "You finished this activity",
   "أَحْسَنْت!": "Well done!",
   "النشاط التالي:": "Next activity:",
-  "🎉 أتممت الوحدة!": "🎉 Unit complete!",
+  "أتممت الوحدة!": "Unit complete!",
   "الْوَحْدَة الأُولَى": "Unit 1",
   "الْوَحْدَة الثَّانِيَة": "Unit 2",
   "الْوَحْدَة الثَّالِثَة": "Unit 3",

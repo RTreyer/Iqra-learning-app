@@ -249,6 +249,7 @@ export const unit3: Unit = {
   letters: unit3Letters,
   theme: "الْمُعَلِّمَةُ بَيَانُ، أَخِي مَرِيضٌ، دَارُ الأَيْتَامِ",
   emoji: "🤝",
+  emblem: "caring_hands",
   color: COLOR,
   badgeLabel: "ي و أ",
   lessons: numberLessons("u3", [...ya, ...waw, ...alif, ...exercises]),

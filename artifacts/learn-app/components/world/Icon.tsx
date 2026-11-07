@@ -21,7 +21,15 @@ export type IconName =
   | "hand"
   | "check"
   | "mail"
-  | "album";
+  | "album"
+  | "beads"
+  | "ops"
+  | "scale"
+  | "gap"
+  | "baskets"
+  | "link"
+  | "heart"
+  | "picture";
 
 type Props = { name: IconName; size?: number; color?: string; strokeWidth?: number };
 
@@ -134,6 +142,82 @@ export function Icon({ name, size = 24, color = "#2B1D14", strokeWidth = 2.2 }: 
           <Rect x={3} y={4} width={18} height={16} rx={2} {...stroke} />
           <Path d="M12 4v16" {...stroke} />
           <Path d="M6 9h3v3H6zM15 13h3v3h-3z" {...stroke} />
+        </>
+      ) : null}
+      {name === "beads" ? (
+        <>
+          <Rect x={2.5} y={3.5} width={19} height={17} rx={2.5} {...stroke} />
+          <Path d="M3.5 9h17M3.5 15h17" {...stroke} strokeWidth={strokeWidth * 0.6} />
+          <Circle cx={8} cy={9} r={2.3} fill={color} />
+          <Circle cx={12.8} cy={9} r={2.3} fill={color} />
+          <Circle cx={8} cy={15} r={2.3} fill={color} />
+          <Circle cx={12.8} cy={15} r={2.3} fill={color} />
+          <Circle cx={17.6} cy={15} r={2.3} fill={color} />
+        </>
+      ) : null}
+      {name === "ops" ? (
+        <>
+          <Path d="M3 7.5h7M6.5 4v7" {...stroke} />
+          <Path d="M14 16.5h7" {...stroke} />
+          <Path d="M19 4L5 20" {...stroke} strokeWidth={strokeWidth * 0.7} />
+        </>
+      ) : null}
+      {name === "scale" ? (
+        <>
+          <Path d="M12 4v16M8 20h8M4 9l16-3" {...stroke} />
+          <Path d="M4 9l-2.2 6M4 9l2.2 6M1.5 15a2.5 2.5 0 0 0 5 0z" {...stroke} />
+          <Path d="M20 6l-2.2 6M20 6l2.2 6M17.5 12a2.5 2.5 0 0 0 5 0z" {...stroke} />
+        </>
+      ) : null}
+      {name === "gap" ? (
+        <>
+          <Rect x={0.8} y={6} width={6.4} height={12} rx={1.5} fill={color} />
+          <Rect
+            x={8.8}
+            y={6}
+            width={6.4}
+            height={12}
+            rx={1.5}
+            {...stroke}
+            strokeDasharray="2.4 2"
+          />
+          <Rect x={16.8} y={6} width={6.4} height={12} rx={1.5} fill={color} />
+          <Path
+            d="M10.4 10.4a1.6 1.6 0 1 1 2.3 1.4c-.5.3-.7.6-.7 1.2"
+            {...stroke}
+            strokeWidth={strokeWidth * 0.7}
+          />
+          <Circle cx={12} cy={15.2} r={0.9} fill={color} />
+        </>
+      ) : null}
+      {name === "baskets" ? (
+        <>
+          <Circle cx={6.5} cy={6.5} r={2.8} fill={color} />
+          <Path d="M17.5 3.5l3.2 5.5h-6.4z" fill={color} />
+          <Path d="M1.5 12h10l-1.6 8.5H3.1zM12.5 12h10l-1.6 8.5h-6.8z" {...stroke} />
+          <Path d="M3 16h7M14 16h7" {...stroke} strokeWidth={strokeWidth * 0.6} />
+        </>
+      ) : null}
+      {name === "link" ? (
+        <>
+          <Circle cx={4.5} cy={6} r={2.3} fill={color} />
+          <Circle cx={4.5} cy={18} r={2.3} fill={color} />
+          <Circle cx={19.5} cy={6} r={2.3} fill={color} />
+          <Circle cx={19.5} cy={18} r={2.3} fill={color} />
+          <Path d="M7.5 6.8l9 10.4M7.5 17.2l9-10.4" {...stroke} />
+        </>
+      ) : null}
+      {name === "heart" ? (
+        <Path
+          d="M12 20s-8-4.8-8-10.5A4.3 4.3 0 0 1 12 7a4.3 4.3 0 0 1 8 2.5C20 15.2 12 20 12 20z"
+          {...stroke}
+        />
+      ) : null}
+      {name === "picture" ? (
+        <>
+          <Rect x={2.5} y={4} width={19} height={16} rx={2.5} {...stroke} />
+          <Circle cx={16.5} cy={9} r={1.8} fill={color} />
+          <Path d="M3 18l6-6.5 4 4 2.5-2.5 5.5 5" {...stroke} />
         </>
       ) : null}
     </Svg>

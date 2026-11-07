@@ -11,6 +11,7 @@ export const unit8: Unit = {
   letters: unit8Letters,
   theme: "فِي الْقَرْيَة",
   emoji: "🏡",
+  emblem: "terraces",
   color: "#9333EA",
   badgeLabel: "ع غ ف ق",
   lessons: [

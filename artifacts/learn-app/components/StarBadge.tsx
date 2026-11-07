@@ -1,6 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
+import { StarIcon } from "@/components/world/Icon";
 import { useLanguage } from "@/context/LanguageContext";
 import type { UiLanguage } from "@/content/ui-translations";
 import { colors, withAlpha } from "@/theme/tokens";
@@ -24,7 +25,7 @@ export function StarBadge({ stars }: { stars: number }) {
       accessible
       accessibilityLabel={digits(starsLabel(stars, language))}
     >
-      <Text style={styles.emoji}>⭐</Text>
+      <StarIcon size={24} />
       <Text style={styles.count}>{digits(stars)}</Text>
     </View>
   );
@@ -40,6 +41,5 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     gap: 6,
   },
-  emoji: { fontSize: 20 },
   count: { fontSize: 22, fontWeight: "700", color: colors.starText },
 });

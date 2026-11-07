@@ -36,7 +36,7 @@ test("celebrates the finished unit when there is no next lesson", () => {
   renderScreen(<LessonCompleteCard stars={3} onRepeat={jest.fn()} next={null} backTo={backTo} />);
   expect(screen.getAllByTestId("star-earned")).toHaveLength(3);
   expect(screen.queryByTestId("next-lesson")).toBeNull();
-  expect(screen.getByText("🎉 أتممت الوحدة!")).toBeTruthy();
+  expect(screen.getByText("أتممت الوحدة!")).toBeTruthy();
   expect(screen.getAllByRole("button")).toHaveLength(2);
   fireEvent.press(screen.getByTestId("back-to-list"));
   expect(router.back).toHaveBeenCalledTimes(1);

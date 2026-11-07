@@ -315,6 +315,7 @@ export const unit6: Unit = {
   letters: unit6Letters,
   theme: "مُنِيرٌ وَالْقِرَاءَةُ، صَابِرٌ وَالْبُلْبُلُ، مِصْيَدَةُ مُفِيدٍ",
   emoji: "📚",
+  emblem: "bulbul",
   color: COLOR,
   badgeLabel: "ق ص ف",
   lessons: numberLessons("u6", [...qaf, ...sad, ...fa, ...exercises]),

@@ -26,6 +26,30 @@ Pro Bildschirm gibt es nur einen Hudhud. Die Elternecke hat keinen; sie ist für
 - **Buchstaben der Einheit**: gesammelt (alle Lektionen des Buchstabens fertig) gefüllt, sonst gestrichelt. Wo die Lektionen eines Buchstabens beginnen, trägt der Stopp ein Fähnchen mit dem Buchstaben.
 - **Weg**: gold bis zum aktuellen Stopp, danach gestrichelt bis zum Ziel. Palmen am Rand.
 - **Hintergrund**: warmer Sand mit einem Hauch Fachfarbe, keine Deko-Emojis.
+- **Gezeichnete Bilder statt Emojis** (`components/world/Emblem.tsx`, Feld `emblem` an Buch und Einheit): Emojis sehen auf jedem Handy anders aus und gehören nicht in die Welt des Kindes. Jedes Bild sagt, worum es in der Einheit geht, aus dem Jemen oder aus Hudhuds Geschichte, auf einer Papierscheibe:
+
+  | Wo | Bild | Warum |
+  |---|---|---|
+  | Buch Arabisch | offenes Buch mit أ und ب | die ersten Buchstaben |
+  | Buch «لغتي العربية» | Tintenfass und Schilfrohr-Feder (قلم) | Schreiben |
+  | Buch Mathe | hölzerner Rechenrahmen | Zählen |
+  | Buch Naturkunde | Blatt unter der Lupe | Entdecken |
+  | A1 Vorbereitung | Holztafel (لوح) mit Wellenlinie zum Nachspuren | erste Linien |
+  | A2 أُحِبُّ مَامَا وَبَابَا | Turmhaus aus Sanaa | Familie, Zuhause |
+  | A3 Lehrerin, kranker Bruder, Waisenhaus | Herz in zwei Händen | Fürsorge |
+  | A4 بَيْتٌ مِنْ رَمْلٍ | Sand-Turmhaus am Meer, Eimer | Titelgeschichte |
+  | A5 Klasse, Verkehr | Schule mit jemenitischer Fahne | Schule |
+  | A6 صَابِرٌ وَالْبُلْبُلُ | Bülbül auf einem Zweig | Titelgeschichte |
+  | A7 Sauberkeit, Zähne | Messing-Ibriq, Seifenblasen | Waschen |
+  | A8 فِي الْقَرْيَةِ | Terrassenfelder, Turmhaus auf dem Berg | Dorf im Hochland |
+  | M1 Sortieren, Muster | geflochtener Korb mit Zickzack, Perlen rot-gelb-rot | Muster |
+  | M2 Zahlen | Kaffeesäcke ١ ٢ ٣ des Händlers | Hudhuds Geschichte |
+  | M3 Addieren | Messingtablett mit Datteln, eine kommt dazu, «+» | dazu |
+  | M4 Subtrahieren | Granatäpfel, einer rollt weg, «−» | weg |
+  | M5 Formen, Brüche | Sanaa-Fenster: Qamariya in zwei Hälften, Dreieck | Formen und Hälften |
+  | N1–N3 (noch nicht frei) | Hand, Kamel, Kaffeesetzling mit Tropfen | Körper, Tiere, Pflanzen |
+
+  Die Übungsarten haben feste, einfarbige Bilder (`lessonPicture.tsx`): Rechenrahmen fürs Zählen, Waage fürs Vergleichen, Lücke mit Fragezeichen fürs Ergänzen, zwei Körbe fürs Sortieren, Verbindungslinien fürs Zuordnen, Herz fürs richtige Verhalten, Bilderrahmen für Bildauswahl, «+ −» fürs Rechnen. Sterne und Lautsprecher sind überall gezeichnet statt ⭐ und 🔊.
 - **Übungen ohne Lesen**: Hudhud sagt die Aufgabe; die früheren Texthinweise («ابحث عن الحرف», «اضغط على كل جملة…», «٤ جملة متبقية», «رتّب…») sind entfernt. Geschichte und Benennen zeigen den Fortschritt als Zug. Der gesuchte Buchstabe steht gross auf einer Karte mit Lautsprecher zum Nochmal-Hören; die Antwortkarten sind grösser. Weiter ist ein grosser runder Play-Knopf, Nachzeichnen hat Bild-Knöpfe (neu anfangen, fertig).
 
 ## Hudhuds Geschichte

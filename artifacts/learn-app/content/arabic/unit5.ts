@@ -358,6 +358,7 @@ export const unit5: Unit = {
   letters: unit5Letters,
   theme: "تَرْتِيبُ الصَّفِّ، رَجُلُ الْمُرُورِ، بَدْرٌ وَاللُّعْبَةُ، مَنَالُ وَالْمَزْرَعَةُ",
   emoji: "🏫",
+  emblem: "school",
   color: COLOR,
   badgeLabel: "ن ر د ت",
   lessons: numberLessons("u5", [...nun, ...ra, ...dal, ...ta, ...exercises]),

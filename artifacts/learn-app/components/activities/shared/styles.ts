@@ -16,7 +16,6 @@ export const act = StyleSheet.create({
     minWidth: 200,
     minHeight: touchTarget,
   },
-  listenEmoji: { fontSize: 36 },
   listenBtnText: { fontSize: 24, fontWeight: "900", color: colors.white, textAlign: "center" },
   listenHint: { fontSize: 13, color: colors.white, fontWeight: "600" },
 

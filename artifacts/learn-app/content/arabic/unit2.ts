@@ -424,6 +424,7 @@ export const unit2: Unit = {
   letters: unit2Letters,
   theme: "أُحِبُّ مَامَا وَبَابَا",
   emoji: "🏠",
+  emblem: "house",
   color: COLOR,
   badgeLabel: "م ب ل ن ر د ت",
   lessons: [...mim, ...ba, ...lam, ...nun, ...ra, ...dal, ...ta, ...exercises],

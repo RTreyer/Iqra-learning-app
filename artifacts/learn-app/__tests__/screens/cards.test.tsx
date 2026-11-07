@@ -28,13 +28,13 @@ describe("digits follow the interface language", () => {
 
   test("Arabic shows Eastern Arabic digits", () => {
     renderScreen(<StarBadge stars={12} />);
-    expect(screen.getByTestId("star-badge")).toHaveTextContent("⭐١٢");
+    expect(screen.getByTestId("star-badge")).toHaveTextContent("١٢");
   });
 
   test("English keeps Western digits", async () => {
     await AsyncStorage.setItem("iqra_ui_language", "en");
     renderScreen(<StarBadge stars={12} />);
     expect(await screen.findByLabelText("12 stars")).toBeTruthy();
-    expect(screen.getByTestId("star-badge")).toHaveTextContent("⭐12");
+    expect(screen.getByTestId("star-badge")).toHaveTextContent("12");
   });
 });
