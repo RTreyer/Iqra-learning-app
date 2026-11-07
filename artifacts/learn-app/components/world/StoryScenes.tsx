@@ -75,6 +75,12 @@ function useSwing(duration: number, delay = 0) {
   return v;
 }
 
+/** Hudhud's thought bubbles in the resolve scene: left, top and size, from his head upwards. */
+const THOUGHT_DOTS: [number, number, number][] = [
+  [212, 150, 10],
+  [188, 124, 16],
+];
+
 /** Eastern Arabic numerals, for counting in the pictures. */
 const NUMBERS = ["١", "٢", "٣", "٤", "٥"];
 
@@ -705,40 +711,20 @@ function Inscription() {
 }
 
 /**
- * Hudhud's resolve: Rasha gave the birds water when they were thirsty; now it is his turn, and
- * he sets out to find her. The sun rises behind him; her note and her empty bowl glow.
+ * Hudhud's resolve: on his roof, Rasha's note before him, he thinks of her: thought bubbles rise
+ * from his head, and in the cloud Rasha appears and waves. He will go and look for her.
  */
 function Turn() {
-  const rise = useOnce(2200, 200, Easing.out(Easing.cubic));
-  const spin = useLoop(14000);
+  const think = useOnce(2000, 500, Easing.out(Easing.quad));
   const glow = useSwing(900, 800);
+  const wave = useSwing(700, 2200);
   return (
     <View style={styles.scene}>
-      <View style={[styles.fill, { backgroundColor: "#FBE3B5" }]} />
-      <Animated.View
-        style={[
-          styles.bigRays,
-          {
-            opacity: lerp(rise, 0, 0.55),
-            transform: [
-              { rotate: at(spin, [0, 1], ["0deg", "360deg"]) },
-              { scale: lerp(rise, 0.6, 1) },
-            ],
-          },
-        ]}
-      >
-        <SunArt size={340} />
-      </Animated.View>
-      <View style={styles.hills}>
-        <HillsArt />
-      </View>
-      <View style={styles.city}>
-        <Skyline />
-      </View>
+      <Rooftop />
       <Animated.View
         style={[
           styles.turnNote,
-          { transform: [{ translateY: lerp(glow, 0, -8) }, { rotate: "-8deg" }] },
+          { transform: [{ translateY: lerp(glow, 0, -4) }, { rotate: "-8deg" }] },
         ]}
       >
         <Animated.View style={[styles.halo, { opacity: lerp(glow, 0.3, 0.8) }]} />
@@ -746,12 +732,36 @@ function Turn() {
           <NoteLetters readable={() => false} size={11} />
         </Note>
       </Animated.View>
-      <Animated.View style={[styles.turnBowl, { transform: [{ translateY: lerp(glow, -6, 0) }] }]}>
-        <Animated.View style={[styles.halo, styles.bowlHalo, { opacity: lerp(glow, 0.8, 0.3) }]} />
-        <BowlArt width={84} level={0} />
-      </Animated.View>
-      <Animated.View style={[styles.turnBird, { transform: [{ translateY: lerp(rise, 40, 0) }] }]}>
-        <Hudhud size={130} pose="cheer" />
+      <View style={styles.turnBird}>
+        <Hudhud size={118} hop={false} />
+      </View>
+      {/* His thought: two small bubbles rise, then the cloud with Rasha in it. */}
+      {THOUGHT_DOTS.map(([left, top, size], i) => (
+        <Animated.View
+          key={i}
+          style={[
+            styles.thoughtDot,
+            { left, top, width: size, height: size, borderRadius: size / 2 },
+            {
+              opacity: at(think, [i * 0.2, i * 0.2 + 0.15], [0, 1]),
+              transform: [{ scale: at(think, [i * 0.2, i * 0.2 + 0.15], [0.3, 1]) }],
+            },
+          ]}
+        />
+      ))}
+      <Animated.View
+        style={[
+          styles.thought,
+          {
+            opacity: at(think, [0.4, 0.7], [0, 1]),
+            transform: [
+              { scale: at(think, [0.4, 1], [0.6, 1]) },
+              { translateY: lerp(wave, 0, -3) },
+            ],
+          },
+        ]}
+      >
+        <Rasha size={84} pose="wave" />
       </Animated.View>
     </View>
   );
@@ -1494,8 +1504,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#E8D5B8",
   },
   follower: { position: "absolute", right: 16, top: 70 },
-  bigRays: { position: "absolute", top: -30, left: "50%", marginLeft: -170 },
-  turnNote: { position: "absolute", left: 22, top: 112 },
+  turnNote: { position: "absolute", left: 22, bottom: 58 },
   halo: {
     position: "absolute",
     left: -12,
@@ -1505,7 +1514,27 @@ const styles = StyleSheet.create({
     borderRadius: 60,
     backgroundColor: "#FFF1C2",
   },
-  turnBird: { position: "absolute", left: 0, right: 0, bottom: 34, alignItems: "center" },
+  turnBird: { position: "absolute", right: 56, bottom: 40 },
+  thoughtDot: {
+    position: "absolute",
+    backgroundColor: "#FFFFFF",
+    borderWidth: 2,
+    borderColor: "#E2CFA4",
+  },
+  thought: {
+    position: "absolute",
+    left: 60,
+    top: 10,
+    width: 150,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 2,
+    borderColor: "#E2CFA4",
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+  },
   sun: { position: "absolute", top: 26, left: 40 },
   roofBird: { position: "absolute", right: 46, bottom: 92 },
   bowlOnWall: { position: "absolute", left: 140, bottom: 62 },
@@ -1573,8 +1602,6 @@ const styles = StyleSheet.create({
   homeBowl: { position: "absolute", right: 34, bottom: 34 },
   homeSparrow: { position: "absolute", left: -6, top: -22 },
   homeDove: { position: "absolute", right: -10, top: -30 },
-  bowlHalo: { left: -18, top: -24, width: 120, height: 100, borderRadius: 50 },
-  turnBowl: { position: "absolute", right: 26, top: 150 },
   trader: { position: "absolute", left: 18, bottom: 40 },
   sackPile: { position: "absolute", left: 120, bottom: 34, alignItems: "center" },
   sackRow: { flexDirection: "row", gap: -6 },
