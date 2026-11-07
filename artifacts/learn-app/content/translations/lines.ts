@@ -334,7 +334,7 @@ export const EN_LINES: Record<string, string> = {
   "اثْنَا عَشَر": "Twelve",
   اثْنَان: "Two",
   "اخْتِبَارُ الْوَحْدَةِ": "Unit test",
-  "ارسم خطاً مائلاً": "Draw a slanting line",
+  "ارسم خطاً مائلاً من الأعلى إلى الأسفل": "Draw a slanting line from top to bottom",
   "ارسم خطاً من الأعلى إلى الأسفل": "Draw a line from top to bottom",
   "ارسم خطاً من اليمين إلى اليسار": "Draw a line from right to left",
   "ارسم خطاً منكسراً مثل الموجة": "Draw a zigzag line like a wave",

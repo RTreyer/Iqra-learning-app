@@ -23,3 +23,13 @@ test("the stroke starts at the letter's top end", () => {
   const cell = PAD / TRACE_GRID;
   expect(path[0].y - Math.min(...path.map((p) => p.y))).toBeLessThanOrEqual(2 * cell);
 });
+
+test.each(["ه", "مـ", "ح", "ل", "ن"])(
+  "the demo writes %s from the right, as Arabic is written",
+  (guide) => {
+    const path = guidePath(decodeMask(traceGuides[guide].mask, TRACE_GRID), PAD);
+    const xs = path.map((p) => p.x);
+    // The stroke begins in the right half of the letter.
+    expect(path[0].x).toBeGreaterThan((Math.min(...xs) + Math.max(...xs)) / 2);
+  },
+);

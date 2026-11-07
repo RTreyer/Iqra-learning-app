@@ -13,6 +13,7 @@ import { StarBadge } from "@/components/StarBadge";
 import { UiText } from "@/components/UiText";
 import { EmblemDisc } from "@/components/world/Emblem";
 import { Guide, Pulse } from "@/components/world/Guide";
+import { AlbumArt } from "@/components/world/AlbumArt";
 import { Icon } from "@/components/world/Icon";
 import { QamariyaGoal } from "@/components/world/QamariyaGoal";
 import { Skyline } from "@/components/world/Skyline";
@@ -210,7 +211,7 @@ export default function HomeScreen() {
             {earned > 0 ? (
               <StickerArt id={STICKERS[earned - 1].id} size={62} />
             ) : (
-              <Icon name="album" size={44} color={yemen.green} />
+              <AlbumArt size={58} />
             )}
             <View style={styles.badge}>
               <Text style={styles.badgeText}>{digits(earned)}</Text>

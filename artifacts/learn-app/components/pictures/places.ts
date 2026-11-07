@@ -7,6 +7,8 @@ export const PICTURES_PLACES: Record<string, string> = {
   "📄": `<path d="M20 8 L62 8 L82 28 L82 92 L20 92 Z" fill="#FFF8EC" stroke="#D9C7A8" stroke-width="3" stroke-linejoin="round"/><path d="M62 8 L62 28 L82 28 Z" fill="#D9C7A8" stroke="#D9C7A8" stroke-width="3" stroke-linejoin="round"/><rect x="30" y="38" width="42" height="5" rx="2.5" fill="#9C8B7A"/><rect x="30" y="50" width="42" height="5" rx="2.5" fill="#9C8B7A"/><rect x="30" y="62" width="42" height="5" rx="2.5" fill="#9C8B7A"/><rect x="30" y="74" width="26" height="5" rx="2.5" fill="#9C8B7A"/><rect x="30" y="22" width="24" height="5" rx="2.5" fill="#4F8FD6"/>`,
   "➡": `<polygon points="8,41 54,41 54,18 92,50 54,82 54,59 8,59" fill="#1F5FA8"/>`,
   "⬇": `<g transform="rotate(90 50 50)"><polygon points="8,41 54,41 54,18 92,50 54,82 54,59 8,59" fill="#1F5FA8"/></g>`,
+  "⬅": `<g transform="rotate(180 50 50)"><polygon points="8,41 54,41 54,18 92,50 54,82 54,59 8,59" fill="#1F5FA8"/></g>`,
+  "↙": `<g transform="translate(50 50) rotate(135) scale(1.1) translate(-50 -50)"><polygon points="8,41 54,41 54,18 92,50 54,82 54,59 8,59" fill="#1F5FA8"/></g>`,
   "↗": `<g transform="translate(50 50) rotate(-45) scale(1.1) translate(-50 -50)"><polygon points="8,41 54,41 54,18 92,50 54,82 54,59 8,59" fill="#1F5FA8"/></g>`,
   "⭕": `<circle cx="50" cy="50" r="36" fill="none" stroke="#C8402F" stroke-width="13"/>`,
   "〰": `<path d="M10 50 C18 30 26 30 30 50 S42 70 50 50 S62 30 70 50 S82 70 90 50" fill="none" stroke="#1F5FA8" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>`,

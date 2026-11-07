@@ -21,7 +21,6 @@ export type IconName =
   | "hand"
   | "check"
   | "mail"
-  | "album"
   | "beads"
   | "ops"
   | "scale"
@@ -135,13 +134,6 @@ export function Icon({ name, size = 24, color = "#2B1D14", strokeWidth = 2.2 }: 
         <>
           <Rect x={3} y={5} width={18} height={14} rx={2} {...stroke} />
           <Path d="M3 7l9 6 9-6" {...stroke} />
-        </>
-      ) : null}
-      {name === "album" ? (
-        <>
-          <Rect x={3} y={4} width={18} height={16} rx={2} {...stroke} />
-          <Path d="M12 4v16" {...stroke} />
-          <Path d="M6 9h3v3H6zM15 13h3v3h-3z" {...stroke} />
         </>
       ) : null}
       {name === "beads" ? (

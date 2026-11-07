@@ -2,8 +2,9 @@ import type { GuideMask, Point } from "./validate";
 
 /**
  * The guide's centre line as one stroke in pad coordinates, for the demo hand: it starts at
- * the top end (rightmost on a tie, as Arabic is written) and always moves to the nearest cell
- * not yet passed. Fits letters drawn in one stroke without branches, such as د.
+ * the right top, as Arabic is written from right to left (at an end of the line there when it
+ * has one), and always moves to the nearest cell not yet passed. Fits letters drawn in one
+ * stroke without branches, such as د.
  */
 export function guidePath(guide: GuideMask, pad: number): Point[] {
   const { grid, spine } = guide;
@@ -19,8 +20,14 @@ export function guidePath(guide: GuideMask, pad: number): Point[] {
     return n;
   };
   const ends = spine.filter((i) => neighbours(i) === 1);
-  const start = (ends.length > 0 ? ends : spine).reduce((best, i) =>
-    row(i) < row(best) || (row(i) === row(best) && col(i) > col(best)) ? i : best,
+  // Arabic is written from right to left: start at the end nearest the top right corner.
+  const corner = (i: number) => col(i) - row(i);
+  // A loop letter (مـ, ه) may have its only end on the left, where the pen arrives: an end
+  // counts only near the right top; otherwise the stroke starts at the right top of the spine.
+  const top = spine.reduce((best, i) => (corner(i) > corner(best) ? i : best));
+  const startEnds = ends.filter((i) => corner(i) >= corner(top) - grid / 10);
+  const start = (startEnds.length > 0 ? startEnds : [top]).reduce((best, i) =>
+    corner(i) > corner(best) || (corner(i) === corner(best) && row(i) < row(best)) ? i : best,
   );
   const left = new Set(spine);
   left.delete(start);

@@ -9,6 +9,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { BackButton } from "@/components/BackButton";
 import { ScreenBackground } from "@/components/ScreenBackground";
 import { StarBadge } from "@/components/StarBadge";
+import { AlbumArt } from "@/components/world/AlbumArt";
 import { Guide } from "@/components/world/Guide";
 import { Icon, StarIcon } from "@/components/world/Icon";
 import { StickerArt } from "@/components/world/StickerArt";
@@ -48,7 +49,7 @@ export default function AlbumScreen() {
           accessible
           accessibilityLabel={digits(`${earned} / ${STICKERS.length}`)}
         >
-          <Icon name="album" size={28} color={yemen.green} />
+          <AlbumArt size={30} />
           <Text style={styles.countText}>{digits(`${earned} / ${STICKERS.length}`)}</Text>
         </View>
         <StarBadge stars={progress.totalStars} />
