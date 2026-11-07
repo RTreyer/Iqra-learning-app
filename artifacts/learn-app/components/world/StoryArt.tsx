@@ -6,9 +6,11 @@
  */
 
 import React from "react";
+import { Animated } from "react-native";
 import { Circle, Ellipse, G, Path, Rect, Svg } from "react-native-svg";
 
 import { CLAY, CLAY_DARK } from "./Bowl";
+import { key, useCycle } from "./motion";
 
 const SKIN = "#C68B5E";
 const DRESS = "#E7558A";
@@ -26,6 +28,7 @@ export function Rasha({
   sad = false,
   ownArm = false,
   dress = DRESS,
+  walking = false,
 }: {
   size?: number;
   pose?: RashaPose;
@@ -35,64 +38,107 @@ export function Rasha({
   sad?: boolean;
   /** "wave" without its raised arm: RashaArm draws it, so the arm can move. */
   ownArm?: boolean;
+  /** Walks: bobs and sways with every step. */
+  walking?: boolean;
 }) {
+  // Like a cartoon: she breathes, blinks now and then, and bobs as she walks.
+  const breath = useCycle(!walking, 2600);
+  const step = useCycle(walking, 520);
+  const blink = useCycle(true, 3900, 1500);
+  const lid = key(blink, [0, 0.9, 0.93, 0.97, 1], [0, 0, 1, 0, 0]);
+  const width = (size * 70) / 130;
+  const eyelid = (x: number) => (
+    <Animated.View
+      style={{
+        position: "absolute",
+        left: ((x - 2.2) * size) / 130,
+        top: (26.6 * size) / 130,
+        width: (4.4 * size) / 130,
+        height: (4.6 * size) / 130,
+        borderRadius: size,
+        backgroundColor: SKIN,
+        transformOrigin: "50% 0%",
+        transform: [{ scaleY: lid }],
+      }}
+    />
+  );
   const sleeve = { stroke: dress, strokeWidth: 7, strokeLinecap: "round" as const, fill: "none" };
   return (
-    <Svg width={(size * 70) / 130} height={size} viewBox="0 0 70 130">
-      <Ellipse cx={27} cy={125} rx={6} ry={3} fill="#4A2C20" />
-      <Ellipse cx={43} cy={125} rx={6} ry={3} fill="#4A2C20" />
-      <Path d="M24 50 Q35 45 46 50 L56 122 Q35 128 14 122 Z" fill={dress} />
-      <Path d="M15 117 Q35 123 55 117" stroke={GOLD} strokeWidth={3} fill="none" />
-      <Path d="M30 60 L35 66 L40 60" stroke={GOLD} strokeWidth={2} fill="none" />
-      {/* Arms: the far one first, so the near one is in front. */}
-      {pose === "reach" ? (
+    <Animated.View
+      style={{
+        width,
+        height: size,
+        transformOrigin: "50% 100%",
+        transform: walking
+          ? [
+              { translateY: key(step, [0, 0.25, 0.5, 0.75, 1], [0, -3, 0, -3, 0]) },
+              { rotate: key(step, [0, 0.5, 1], ["-3deg", "3deg", "-3deg"]) },
+            ]
+          : [{ scaleY: key(breath, [0, 0.5, 1], [1, 1.015, 1]) }],
+      }}
+    >
+      <Svg width={width} height={size} viewBox="0 0 70 130">
+        <Ellipse cx={27} cy={125} rx={6} ry={3} fill="#4A2C20" />
+        <Ellipse cx={43} cy={125} rx={6} ry={3} fill="#4A2C20" />
+        <Path d="M24 50 Q35 45 46 50 L56 122 Q35 128 14 122 Z" fill={dress} />
+        <Path d="M15 117 Q35 123 55 117" stroke={GOLD} strokeWidth={3} fill="none" />
+        <Path d="M30 60 L35 66 L40 60" stroke={GOLD} strokeWidth={2} fill="none" />
+        {/* Arms: the far one first, so the near one is in front. */}
+        {pose === "reach" ? (
+          <>
+            <Path d="M24 56 Q40 72 60 70" {...sleeve} />
+            <Circle cx={62} cy={70} r={3.6} fill={SKIN} />
+            <Path d="M46 54 Q56 60 63 62" {...sleeve} />
+            <Circle cx={65} cy={62} r={3.6} fill={SKIN} />
+          </>
+        ) : (
+          <>
+            <Path d="M24 54 Q18 70 20 84" {...sleeve} />
+            <Circle cx={20} cy={87} r={3.6} fill={SKIN} />
+            {pose === "wave" ? (
+              ownArm ? null : (
+                <WaveArm />
+              )
+            ) : (
+              <>
+                <Path d="M46 54 Q52 70 50 84" {...sleeve} />
+                <Circle cx={50} cy={87} r={3.6} fill={SKIN} />
+              </>
+            )}
+          </>
+        )}
+        <Path
+          d="M20 34 Q19 12 35 10 Q51 12 50 34 Q50 50 46 54 Q35 58 24 54 Q20 50 20 34 Z"
+          fill="#FFFFFF"
+          stroke="#E2DCD3"
+          strokeWidth={1}
+        />
+        <Circle cx={35} cy={30} r={11} fill={SKIN} />
+        <Circle cx={31} cy={29} r={1.5} fill="#2B1D16" />
+        <Circle cx={39} cy={29} r={1.5} fill="#2B1D16" />
+        <Circle cx={28} cy={33} r={1.8} fill="#E58B7B" opacity={0.6} />
+        <Circle cx={42} cy={33} r={1.8} fill="#E58B7B" opacity={0.6} />
+        {sad ? (
+          <>
+            <Path d="M28 26 L33 24.2 M42 26 L37 24.2" stroke="#2B1D16" strokeWidth={1.1} />
+            <Path d="M30.5 32 Q28.6 36 30.5 37.6 Q32.4 36 30.5 32 Z" fill="#7FB8E8" />
+          </>
+        ) : null}
+        <Path
+          d={sad ? "M31 36 Q35 33 39 36" : "M31 34 Q35 37.5 39 34"}
+          stroke="#7A3418"
+          strokeWidth={1.4}
+          fill="none"
+          strokeLinecap="round"
+        />
+      </Svg>
+      {sad ? null : (
         <>
-          <Path d="M24 56 Q40 72 60 70" {...sleeve} />
-          <Circle cx={62} cy={70} r={3.6} fill={SKIN} />
-          <Path d="M46 54 Q56 60 63 62" {...sleeve} />
-          <Circle cx={65} cy={62} r={3.6} fill={SKIN} />
-        </>
-      ) : (
-        <>
-          <Path d="M24 54 Q18 70 20 84" {...sleeve} />
-          <Circle cx={20} cy={87} r={3.6} fill={SKIN} />
-          {pose === "wave" ? (
-            ownArm ? null : (
-              <WaveArm />
-            )
-          ) : (
-            <>
-              <Path d="M46 54 Q52 70 50 84" {...sleeve} />
-              <Circle cx={50} cy={87} r={3.6} fill={SKIN} />
-            </>
-          )}
+          {eyelid(31)}
+          {eyelid(39)}
         </>
       )}
-      <Path
-        d="M20 34 Q19 12 35 10 Q51 12 50 34 Q50 50 46 54 Q35 58 24 54 Q20 50 20 34 Z"
-        fill="#FFFFFF"
-        stroke="#E2DCD3"
-        strokeWidth={1}
-      />
-      <Circle cx={35} cy={30} r={11} fill={SKIN} />
-      <Circle cx={31} cy={29} r={1.5} fill="#2B1D16" />
-      <Circle cx={39} cy={29} r={1.5} fill="#2B1D16" />
-      <Circle cx={28} cy={33} r={1.8} fill="#E58B7B" opacity={0.6} />
-      <Circle cx={42} cy={33} r={1.8} fill="#E58B7B" opacity={0.6} />
-      {sad ? (
-        <>
-          <Path d="M28 26 L33 24.2 M42 26 L37 24.2" stroke="#2B1D16" strokeWidth={1.1} />
-          <Path d="M30.5 32 Q28.6 36 30.5 37.6 Q32.4 36 30.5 32 Z" fill="#7FB8E8" />
-        </>
-      ) : null}
-      <Path
-        d={sad ? "M31 36 Q35 33 39 36" : "M31 34 Q35 37.5 39 34"}
-        stroke="#7A3418"
-        strokeWidth={1.4}
-        fill="none"
-        strokeLinecap="round"
-      />
-    </Svg>
+    </Animated.View>
   );
 }
 

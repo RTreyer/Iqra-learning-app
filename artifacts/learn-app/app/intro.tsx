@@ -17,6 +17,7 @@ import { UiText } from "@/components/UiText";
 import { Icon } from "@/components/world/Icon";
 import { StoryPicture } from "@/components/world/StoryScenes";
 import { YemenMap } from "@/components/world/YemenMap";
+import { HudhudTalking } from "@/components/world/Hudhud";
 import { books, type Book } from "@/content";
 import {
   CHAPTERS,
@@ -197,6 +198,9 @@ function Story({ chapter }: { chapter: string | null }) {
   const LAST = scenes.length - 1;
   const [index, setIndex] = useState(0);
   const scene = scenes[index];
+  // While the voice tells the line, Hudhud's beak moves in the picture: until it is told.
+  const [toldLine, setToldLine] = useState<string | null>(null);
+  const talking = languageLoaded && toldLine !== scene.line;
   const choosing = !chapter && index === LAST;
   const choices = books.filter((book) => book.available);
 
@@ -219,6 +223,7 @@ function Story({ chapter }: { chapter: string | null }) {
     let linger: ReturnType<typeof setTimeout> | undefined;
     const shownAt = clock();
     const done = () => {
+      setToldLine(scene.line);
       if (moved || choosing) return;
       moved = true;
       // Stay at least as long as the scene's picture needs (the storm), then a short pause.
@@ -298,7 +303,9 @@ function Story({ chapter }: { chapter: string | null }) {
           onPress={next}
           style={styles.stage}
         >
-          <SceneStage scenes={scenes} index={index} />
+          <HudhudTalking.Provider value={talking}>
+            <SceneStage scenes={scenes} index={index} />
+          </HudhudTalking.Provider>
           {/* A new line appears as the new scene comes in. */}
           <Appear key={scene.id} delay={TURN_MS / 3} style={styles.bubble}>
             <View style={styles.speaker}>

@@ -143,16 +143,18 @@ function Rooftop({
   color?: string;
   sky?: React.ReactNode;
 }) {
+  // Depth, as in a cartoon: the far mountains drift slower than the houses nearer by.
+  const drift = useOnce(9000, 0, Easing.inOut(Easing.sin));
   return (
     <>
       <View style={[styles.fill, { backgroundColor: color ?? (dusk ? "#E7B98C" : "#F9E3BF") }]} />
       {sky}
-      <View style={styles.hills}>
+      <Animated.View style={[styles.hills, { transform: [{ translateX: lerp(drift, 0, -5) }] }]}>
         <HillsArt color={dusk ? "#D9A57C" : "#EBD3AE"} />
-      </View>
-      <View style={styles.city}>
+      </Animated.View>
+      <Animated.View style={[styles.city, { transform: [{ translateX: lerp(drift, 0, -14) }] }]}>
         <Skyline />
-      </View>
+      </Animated.View>
       <View style={styles.wall} />
       <View style={styles.wallTrim} />
     </>
@@ -296,6 +298,12 @@ function Girl() {
   const pour = useOnce(2000, 2300, Easing.linear);
   const flow = useSwing(180, 2300);
   const peek = useOnce(900, 3400, Easing.out(Easing.back(1.6)));
+  // She walks in (bobbing with her steps), then stands to pour.
+  const [arrived, setArrived] = useState(false);
+  useEffect(() => {
+    const stop = setTimeout(() => setArrived(true), 1700);
+    return () => clearTimeout(stop);
+  }, []);
   return (
     <View style={styles.scene}>
       <Rooftop />
@@ -318,7 +326,7 @@ function Girl() {
       <Animated.View
         style={[styles.rashaPour, { transform: [{ translateX: lerp(walk, -150, 0) }] }]}
       >
-        <Rasha size={140} pose="reach" />
+        <Rasha size={140} pose="reach" walking={!arrived} />
       </Animated.View>
       <Animated.View
         style={[
@@ -1417,12 +1425,39 @@ const SCENES: Record<StoryScene["id"], (props: { unit?: string }) => React.React
   station: Station,
 };
 
+/**
+ * The camera, as in a cartoon: it pushes in slowly while a scene plays. The map is left still,
+ * since its places are buttons laid over it (app/intro.tsx).
+ */
+function Camera({ children }: { children: React.ReactNode }) {
+  const push = useOnce(9000, 0, Easing.inOut(Easing.sin));
+  return (
+    <View style={styles.frame}>
+      <Animated.View
+        style={[
+          styles.lens,
+          { transform: [{ scale: lerp(push, 1, 1.07) }, { translateY: lerp(push, 0, -4) }] },
+        ]}
+      >
+        {children}
+      </Animated.View>
+    </View>
+  );
+}
+
 export function StoryPicture({ scene }: { scene: StoryScene }) {
   const Scene = SCENES[scene.id];
-  return <Scene unit={scene.unit} />;
+  if (scene.id === "map") return <Scene unit={scene.unit} />;
+  return (
+    <Camera>
+      <Scene unit={scene.unit} />
+    </Camera>
+  );
 }
 
 const styles = StyleSheet.create({
+  frame: { width: "100%", height: 300, borderRadius: 28, overflow: "hidden" },
+  lens: { width: "100%", height: 300 },
   scene: { width: "100%", height: 300, borderRadius: 28, overflow: "hidden" },
   fill: { position: "absolute", top: 0, right: 0, bottom: 0, left: 0 },
   city: { position: "absolute", bottom: 0, left: 0, right: 0, alignItems: "center" },

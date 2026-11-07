@@ -1,14 +1,15 @@
 /**
  * Hudhud, the hoopoe who guides the child. In Surat an-Naml the hoopoe brings the news from
- * Saba, from Yemen. Flat inline SVG, three poses (standing, cheering, sad), a gentle hop that can be switched off. In his
+ * Saba, from Yemen. Flat inline SVG in moving parts, three poses (standing, cheering, sad), a
+ * gentle hop that can be switched off. In his
  * story he is the postman of Yemen and wears a leather mail bag across his chest, letters
  * peeking out of it.
  */
 
 import React, { useEffect, useState } from "react";
-import { Animated, Easing, type StyleProp, type ViewStyle } from "react-native";
+import { Animated, View, type StyleProp, type ViewStyle } from "react-native";
 import { Circle, Ellipse, G, Path, Svg } from "react-native-svg";
-import { LOOP_NATIVE } from "./motion";
+import { key, useCycle } from "./motion";
 
 const BODY = "#DD8C44";
 const HEAD = "#E8A05A";
@@ -138,6 +139,24 @@ function Bag({ letters }: { letters: number }) {
   );
 }
 
+/**
+ * Whether Hudhud is telling something right now (the story's voice is speaking): his beak moves.
+ * The story (app/intro.tsx) provides it; elsewhere he is quiet.
+ */
+export const HudhudTalking = React.createContext(false);
+
+/** Where the parts turn, as a share of the 140 × 130 drawing: the neck, the beak's root. */
+const NECK = "41% 52%";
+const BEAK_ROOT = "25% 45%";
+
+/**
+ * Hudhud is drawn in parts, like a cartoon character: body and tail, the wing, the bag, the
+ * head with crest, eye and beak, the legs. The parts move on their own:
+ * - he hops with squash and stretch (crouch, stretch up, land and squash, settle);
+ * - his head nods and tilts now and then, his eye blinks;
+ * - while the story's voice speaks, his beak opens and closes;
+ * - flying, the wing beats.
+ */
 export function Hudhud({
   size = 120,
   pose = "stand",
@@ -147,7 +166,7 @@ export function Hudhud({
   flap = false,
   style,
 }: Props) {
-  const [lift] = useState(() => new Animated.Value(0));
+  const talking = React.useContext(HudhudTalking);
   const [wingUp, setWingUp] = useState(false);
   useEffect(() => {
     if (!flap) return;
@@ -155,132 +174,192 @@ export function Hudhud({
     return () => clearInterval(beat);
   }, [flap]);
   const raised = flap ? wingUp : pose === "cheer";
-  useEffect(() => {
-    if (!hop) return;
-    const height = pose === "cheer" ? -12 : -6;
-    const half = pose === "cheer" ? 280 : 800;
-    const loop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(lift, {
-          toValue: height,
-          duration: half,
-          easing: Easing.inOut(Easing.quad),
-          useNativeDriver: LOOP_NATIVE,
-        }),
-        Animated.timing(lift, {
-          toValue: 0,
-          duration: half,
-          easing: Easing.inOut(Easing.quad),
-          useNativeDriver: LOOP_NATIVE,
-        }),
-      ]),
-    );
-    loop.start();
-    return () => loop.stop();
-  }, [hop, pose, lift]);
-
+  const cheer = pose === "cheer";
+  // One hop: crouch, take off stretched, land squashed, settle, rest.
+  const hopCycle = useCycle(hop, cheer ? 760 : 2200);
   const height = Math.round((size * 130) / 140);
+  const lift = cheer ? -14 : -6;
+  const bounce = {
+    transformOrigin: "50% 100%",
+    transform: [
+      { translateY: key(hopCycle, [0, 0.12, 0.3, 0.48, 0.56, 0.66, 1], [0, 0, lift, 0, 0, 0, 0]) },
+      {
+        scaleX: key(hopCycle, [0, 0.1, 0.18, 0.48, 0.54, 0.64, 1], [1, 1.07, 0.95, 1, 1.08, 1, 1]),
+      },
+      { scaleY: key(hopCycle, [0, 0.1, 0.18, 0.48, 0.54, 0.64, 1], [1, 0.92, 1.07, 1, 0.9, 1, 1]) },
+    ],
+  };
+  // The head: now a little nod (as if pecking at a thought), then a curious tilt.
+  const still = pose === "sad";
+  const look = useCycle(!still, 5200, 600);
+  const head = {
+    transformOrigin: NECK,
+    transform: [
+      {
+        rotate: key(
+          look,
+          [0, 0.18, 0.24, 0.3, 0.36, 0.6, 0.68, 0.84, 0.92, 1],
+          ["0deg", "0deg", "-7deg", "0deg", "-4deg", "0deg", "6deg", "6deg", "0deg", "0deg"],
+        ),
+      },
+    ],
+  };
+  // The eye blinks (an eyelid closes over it for a moment), only while it is open.
+  const blink = useCycle(pose === "stand", 3400, 900);
+  const lid = key(blink, [0, 0.9, 0.93, 0.97, 1], [0, 0, 1, 0, 0]);
+  // The lower beak opens and closes while he talks.
+  const chatter = useCycle(talking, 260);
+  const jaw = {
+    transformOrigin: BEAK_ROOT,
+    transform: [{ rotate: key(chatter, [0, 0.5, 1], ["0deg", "-11deg", "0deg"]) }],
+  };
+  const layer = { position: "absolute" as const, top: 0, left: 0, width: size, height };
+  const svg = (children: React.ReactNode) => (
+    <Svg width={size} height={height} viewBox="0 0 140 130">
+      {children}
+    </Svg>
+  );
+  const legs = (
+    <Path
+      d="M66 106 L64 121 M80 106 L82 121 M58 121 L68 121 M78 121 L88 121"
+      stroke={LEGS}
+      strokeWidth={3.5}
+      strokeLinecap="round"
+    />
+  );
+
   return (
-    <Animated.View
-      pointerEvents="none"
-      style={[{ width: size, height, transform: [{ translateY: lift }] }, style]}
-    >
-      <Svg
-        width={size}
-        height={height}
-        viewBox="0 0 140 130"
-        style={mirrored ? { transform: [{ scaleX: -1 }] } : undefined}
-      >
-        <Path d="M96 82 L130 68 L132 84 L100 95 Z" fill={INK} />
-        <Path d="M112 76 L115 90" stroke={STRIPE} strokeWidth={4} />
-        <G transform={pose === "sad" ? BOW : undefined}>
-          {(pose === "sad" ? CREST_DOWN : CREST).map((angle) => (
-            <G key={angle} transform={`rotate(${angle} 52 46)`}>
-              <Ellipse cx={52} cy={30} rx={5.5} ry={14} fill={HEAD} />
-              <Ellipse cx={52} cy={23} rx={5.5} ry={2} fill={STRIPE} />
-              <Ellipse cx={52} cy={19} rx={4.5} ry={4} fill={INK} />
-            </G>
-          ))}
-        </G>
-        <Ellipse cx={74} cy={84} rx={32} ry={24} fill={BODY} />
-        <Ellipse cx={58} cy={70} rx={14} ry={13} fill={HEAD} />
-        {bag !== undefined ? <BagStrapBack /> : null}
-        {raised ? (
-          <G>
-            <Path d="M64 76 Q80 40 104 46 Q100 70 70 90 Z" fill={INK} />
-            <Path
-              d="M74 70 L86 52 M82 76 L96 58 M90 80 L100 68"
-              stroke={STRIPE}
-              strokeWidth={3.5}
-              strokeLinecap="round"
-            />
-          </G>
-        ) : (
-          <G>
-            <Path d="M62 78 Q86 64 108 80 Q92 101 64 97 Z" fill={INK} />
-            <Path
-              d="M72 82 L77 96 M82 78 L87 96 M92 77 L96 93"
-              stroke={STRIPE}
-              strokeWidth={3.5}
-              strokeLinecap="round"
-            />
-          </G>
-        )}
+    <Animated.View pointerEvents="none" style={[{ width: size, height }, bounce, style]}>
+      <Animated.View style={[layer, mirrored ? { transform: [{ scaleX: -1 }] } : null]}>
+        {/* Tail, body, neck and the strap's back: they move with the whole bird. */}
+        <View style={layer}>
+          {svg(
+            <>
+              <Path d="M96 82 L130 68 L132 84 L100 95 Z" fill={INK} />
+              <Path d="M112 76 L115 90" stroke={STRIPE} strokeWidth={4} />
+              <Ellipse cx={74} cy={84} rx={32} ry={24} fill={BODY} />
+              <Ellipse cx={58} cy={70} rx={14} ry={13} fill={HEAD} />
+              {bag !== undefined ? <BagStrapBack /> : null}
+            </>,
+          )}
+        </View>
+        {/* The wing: folded, or raised (cheering, and every other beat when flying). */}
+        <View style={layer}>
+          {svg(
+            raised ? (
+              <G>
+                <Path d="M64 76 Q80 40 104 46 Q100 70 70 90 Z" fill={INK} />
+                <Path
+                  d="M74 70 L86 52 M82 76 L96 58 M90 80 L100 68"
+                  stroke={STRIPE}
+                  strokeWidth={3.5}
+                  strokeLinecap="round"
+                />
+              </G>
+            ) : (
+              <G>
+                <Path d="M62 78 Q86 64 108 80 Q92 101 64 97 Z" fill={INK} />
+                <Path
+                  d="M72 82 L77 96 M82 78 L87 96 M92 77 L96 93"
+                  stroke={STRIPE}
+                  strokeWidth={3.5}
+                  strokeLinecap="round"
+                />
+              </G>
+            ),
+          )}
+        </View>
         {bag !== undefined ? (
-          <Path
-            d="M66 106 L64 121 M80 106 L82 121 M58 121 L68 121 M78 121 L88 121"
-            stroke={LEGS}
-            strokeWidth={3.5}
-            strokeLinecap="round"
-          />
+          <View style={layer}>
+            {svg(
+              <>
+                {legs}
+                <Bag letters={bag} />
+              </>,
+            )}
+          </View>
         ) : null}
-        {bag !== undefined ? <Bag letters={bag} /> : null}
-        <G transform={pose === "sad" ? BOW : undefined}>
-          <Circle cx={50} cy={56} r={17} fill={HEAD} />
-          <Path
-            d="M35 58 Q21 62 8 73"
-            stroke={LEGS}
-            strokeWidth={4}
-            strokeLinecap="round"
-            fill="none"
-          />
-          {pose === "sad" ? (
-            <G>
+        {/* The head with its crest, eye and beak turns about the neck. */}
+        <Animated.View style={[layer, head]}>
+          {svg(
+            <G transform={pose === "sad" ? BOW : undefined}>
+              {(pose === "sad" ? CREST_DOWN : CREST).map((angle) => (
+                <G key={angle} transform={`rotate(${angle} 52 46)`}>
+                  <Ellipse cx={52} cy={30} rx={5.5} ry={14} fill={HEAD} />
+                  <Ellipse cx={52} cy={23} rx={5.5} ry={2} fill={STRIPE} />
+                  <Ellipse cx={52} cy={19} rx={4.5} ry={4} fill={INK} />
+                </G>
+              ))}
+              <Circle cx={50} cy={56} r={17} fill={HEAD} />
+              {/* The upper beak; the lower one is its own part, to open while talking. */}
               <Path
-                d="M39 54 Q44 57.5 49 54"
-                stroke={INK}
+                d="M35 57.5 Q21 61 8 72"
+                stroke={LEGS}
                 strokeWidth={3}
                 strokeLinecap="round"
                 fill="none"
               />
-              <Path d="M38 47 L47 49.5" stroke={INK} strokeWidth={2} strokeLinecap="round" />
-              <Path d="M43 59 Q40.5 64 43 66 Q45.5 64 43 59 Z" fill={TEAR} />
-            </G>
-          ) : pose === "cheer" ? (
-            <Path
-              d="M40 52 Q44 48 48 52"
-              stroke={INK}
-              strokeWidth={3}
-              strokeLinecap="round"
-              fill="none"
-            />
-          ) : (
-            <G>
-              <Circle cx={44} cy={53} r={3.8} fill={INK} />
-              <Circle cx={45.3} cy={51.8} r={1.3} fill="#FFFFFF" />
-            </G>
+              {pose === "sad" ? (
+                <G>
+                  <Path
+                    d="M39 54 Q44 57.5 49 54"
+                    stroke={INK}
+                    strokeWidth={3}
+                    strokeLinecap="round"
+                    fill="none"
+                  />
+                  <Path d="M38 47 L47 49.5" stroke={INK} strokeWidth={2} strokeLinecap="round" />
+                  <Path d="M43 59 Q40.5 64 43 66 Q45.5 64 43 59 Z" fill={TEAR} />
+                </G>
+              ) : cheer ? (
+                <Path
+                  d="M40 52 Q44 48 48 52"
+                  stroke={INK}
+                  strokeWidth={3}
+                  strokeLinecap="round"
+                  fill="none"
+                />
+              ) : (
+                <G>
+                  <Circle cx={44} cy={53} r={3.8} fill={INK} />
+                  <Circle cx={45.3} cy={51.8} r={1.3} fill="#FFFFFF" />
+                </G>
+              )}
+              <Circle cx={50} cy={62} r={3.5} fill={CHEEK} opacity={0.75} />
+            </G>,
           )}
-          <Circle cx={50} cy={62} r={3.5} fill={CHEEK} opacity={0.75} />
-        </G>
-        {bag !== undefined ? null : (
-          <Path
-            d="M66 106 L64 121 M80 106 L82 121 M58 121 L68 121 M78 121 L88 121"
-            stroke={LEGS}
-            strokeWidth={3.5}
-            strokeLinecap="round"
-          />
-        )}
-      </Svg>
+          {pose === "stand" ? (
+            // The eyelid, in the head's colour, closes over the eye for a blink.
+            <Animated.View
+              style={{
+                position: "absolute",
+                left: (39.5 * size) / 140,
+                top: (48.6 * height) / 130,
+                width: (9 * size) / 140,
+                height: (9 * height) / 130,
+                borderRadius: size,
+                backgroundColor: HEAD,
+                transformOrigin: "50% 0%",
+                transform: [{ scaleY: lid }],
+              }}
+            />
+          ) : null}
+          <Animated.View style={[layer, jaw]}>
+            {svg(
+              <G transform={pose === "sad" ? BOW : undefined}>
+                <Path
+                  d="M35 60 Q22 64 9 74"
+                  stroke={LEGS}
+                  strokeWidth={2.6}
+                  strokeLinecap="round"
+                  fill="none"
+                />
+              </G>,
+            )}
+          </Animated.View>
+        </Animated.View>
+        {bag !== undefined ? null : <View style={layer}>{svg(legs)}</View>}
+      </Animated.View>
     </Animated.View>
   );
 }
