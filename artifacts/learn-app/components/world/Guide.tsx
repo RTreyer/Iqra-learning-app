@@ -20,6 +20,7 @@ import * as haptics from "@/lib/haptics";
 import { touchTarget, yemen } from "@/theme/tokens";
 import { Hudhud, type HudhudPose } from "./Hudhud";
 import { Icon } from "./Icon";
+import { LOOP_NATIVE } from "./motion";
 
 type Props = {
   /** Spoken line, fully vocalised. */
@@ -100,7 +101,7 @@ export function Pulse({
         toValue: 1,
         duration: 1600,
         easing: Easing.out(Easing.quad),
-        useNativeDriver: true,
+        useNativeDriver: LOOP_NATIVE,
       }),
     );
     loop.start();

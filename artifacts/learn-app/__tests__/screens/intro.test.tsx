@@ -38,10 +38,16 @@ test("tells the story scene by scene with the voice, then waits on the choice", 
   const finish = () => {
     const options = Speech.speak.mock.calls.at(-1)![1] as { onDone: () => void };
     act(() => options.onDone());
+    // A short pause after each line; the storm scene plays at least its own length.
     act(() => jest.advanceTimersByTime(1000));
   };
   for (let i = 1; i < INTRO_STORY.length; i++) {
-    finish();
+    if (INTRO_STORY[i - 1].minMs) {
+      // Not yet: the storm is still blowing.
+      finish();
+      expect(screen.getByTestId(`intro-scene-${INTRO_STORY[i - 1].id}`)).toBeTruthy();
+      act(() => jest.advanceTimersByTime(INTRO_STORY[i - 1].minMs!));
+    } else finish();
     expect(screen.getByTestId(`intro-scene-${INTRO_STORY[i].id}`)).toBeTruthy();
   }
   expect(spoken()).toEqual(INTRO_STORY.map((s) => s.line));

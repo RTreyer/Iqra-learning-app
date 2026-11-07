@@ -8,6 +8,7 @@
 import React, { useEffect, useState } from "react";
 import { Animated, Easing, type StyleProp, type ViewStyle } from "react-native";
 import { Circle, Ellipse, G, Path, Svg } from "react-native-svg";
+import { LOOP_NATIVE } from "./motion";
 
 const BODY = "#DD8C44";
 const HEAD = "#E8A05A";
@@ -36,8 +37,11 @@ type Props = {
   mirrored?: boolean;
   /** A slow hop; off for still pictures. */
   hop?: boolean;
-  /** The postman's mail bag, letters peeking out over its rim. */
-  bag?: boolean;
+  /**
+   * The postman's mail bag, with this many letters (0 to 3) peeking out over its rim. Leave it
+   * out for no bag. After the storm in his story the bag is empty (0).
+   */
+  bag?: number;
   /** Beats the wing, for flying. */
   flap?: boolean;
   style?: StyleProp<ViewStyle>;
@@ -78,16 +82,23 @@ function BagStrapBack() {
   );
 }
 
+/** Where the letters stand in the bag; the last one listed is taken first by the wind. */
+const IN_BAG = [
+  { x: 64, y: 85, angle: 1, cream: false },
+  { x: 73, y: 87, angle: 10, cream: true },
+  { x: 55, y: 87, angle: -9, cream: false },
+];
+
 /**
  * The bag on the bird's side, with the strap across the chest. The letters only peek over the
  * rim (a third of each shows), so they never reach up into the bird.
  */
-function Bag() {
+function Bag({ letters }: { letters: number }) {
   return (
     <G>
-      <Letter x={55} y={87} angle={-9} />
-      <Letter x={73} y={87} angle={10} cream />
-      <Letter x={64} y={85} angle={1} />
+      {IN_BAG.slice(0, Math.max(0, Math.min(IN_BAG.length, letters))).map((l) => (
+        <Letter key={l.x} x={l.x} y={l.y} angle={l.angle} cream={l.cream} />
+      ))}
       <Path
         d="M46 90 h34 v15 q0 7 -7 7 h-20 q-7 0 -7 -7 Z"
         fill={LEATHER}
@@ -148,13 +159,13 @@ export function Hudhud({
           toValue: height,
           duration: half,
           easing: Easing.inOut(Easing.quad),
-          useNativeDriver: true,
+          useNativeDriver: LOOP_NATIVE,
         }),
         Animated.timing(lift, {
           toValue: 0,
           duration: half,
           easing: Easing.inOut(Easing.quad),
-          useNativeDriver: true,
+          useNativeDriver: LOOP_NATIVE,
         }),
       ]),
     );
@@ -185,7 +196,7 @@ export function Hudhud({
         ))}
         <Ellipse cx={74} cy={84} rx={32} ry={24} fill={BODY} />
         <Ellipse cx={58} cy={70} rx={14} ry={13} fill={HEAD} />
-        {bag ? <BagStrapBack /> : null}
+        {bag !== undefined ? <BagStrapBack /> : null}
         {raised ? (
           <G>
             <Path d="M64 76 Q80 40 104 46 Q100 70 70 90 Z" fill={INK} />
@@ -207,7 +218,7 @@ export function Hudhud({
             />
           </G>
         )}
-        {bag ? (
+        {bag !== undefined ? (
           <Path
             d="M66 106 L64 121 M80 106 L82 121 M58 121 L68 121 M78 121 L88 121"
             stroke={LEGS}
@@ -215,7 +226,7 @@ export function Hudhud({
             strokeLinecap="round"
           />
         ) : null}
-        {bag ? <Bag /> : null}
+        {bag !== undefined ? <Bag letters={bag} /> : null}
         <Circle cx={50} cy={56} r={17} fill={HEAD} />
         <Path
           d="M35 58 Q21 62 8 73"
@@ -239,7 +250,7 @@ export function Hudhud({
           </G>
         )}
         <Circle cx={50} cy={62} r={3.5} fill={CHEEK} opacity={0.75} />
-        {bag ? null : (
+        {bag !== undefined ? null : (
           <Path
             d="M66 106 L64 121 M80 106 L82 121 M58 121 L68 121 M78 121 L88 121"
             stroke={LEGS}

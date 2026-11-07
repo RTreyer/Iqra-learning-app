@@ -59,10 +59,13 @@ export default function IntroScreen() {
   useEffect(() => {
     let moved = false;
     let linger: ReturnType<typeof setTimeout> | undefined;
+    const shownAt = Date.now();
     const done = () => {
       if (moved || choosing) return;
       moved = true;
-      linger = setTimeout(() => setIndex((i) => Math.min(LAST, i + 1)), LINGER_MS);
+      // Stay at least as long as the scene's picture needs (the storm), then a short pause.
+      const wait = Math.max(LINGER_MS, (scene.minMs ?? 0) - (Date.now() - shownAt));
+      linger = setTimeout(() => setIndex((i) => Math.min(LAST, i + 1)), wait);
     };
     const fallback = setTimeout(done, estimateSpeechMs(scene.line));
     speak(scene.line, { onDone: done });
@@ -71,7 +74,7 @@ export default function IntroScreen() {
       clearTimeout(fallback);
       clearTimeout(linger);
     };
-  }, [scene.line, choosing]);
+  }, [scene.line, scene.minMs, choosing]);
 
   useEffect(() => () => stopSpeaking(), []);
 

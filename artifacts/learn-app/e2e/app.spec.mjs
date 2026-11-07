@@ -127,7 +127,7 @@ test.describe("navigation", () => {
     // The voice tells each scene and the story moves on by itself (speech ends at once here).
     await expect(page.getByTestId("intro-scene-choose")).toBeVisible({ timeout: 15000 });
     const told = await page.evaluate(() => window.__spoken);
-    expect(told).toContain("هَبَّتْ رِيحٌ قَوِيَّةٌ، فَطَارَتِ الْحُرُوفُ مِنْ رَسَائِلِي!");
+    expect(told).toContain("هَبَّتْ عَاصِفَةٌ قَوِيَّةٌ، فَطَارَتِ الْحُرُوفُ مِنْ رَسَائِلِي!");
     await page.getByTestId("choose-math-1").click();
     await expect(page).toHaveURL(/\/book\/math-1$/);
 

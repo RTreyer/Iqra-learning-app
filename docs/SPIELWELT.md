@@ -7,7 +7,7 @@ Ziel: Ein Kind der 1. Klasse findet sich allein zurecht, ohne zu lesen, und komm
 Beim ersten Tipp auf Play erzählt Hudhud seine Geschichte (`content/story.ts`, `app/intro.tsx`), fünf Szenen mit Stimme, jede mit einem bewegten Bild:
 
 1. Hudhud ist der Briefbote des Jemen und bringt die Briefe zu allen Häusern. Er fliegt mit Flügelschlag über Sanaa, eine lederne Brieftasche umgeschnallt, aus der die Briefe hervorschauen.
-2. Ein starker Wind zieht die Briefe einzeln vorne aus der Tasche, unter dem Schnabel hindurch und vor Hudhud hoch (nie über ihn hinweg); in der Luft platzt jeder Brief auf, und seine Buchstaben flattern als kleine Papierkärtchen davon.
+2. Ein Sandsturm zieht auf: dunkle Wolken, Sandschleier und Sandkörner jagen durchs Bild, Hudhud kämpft mit schlagenden Flügeln gegen die Böen. Der Sturm reisst die drei Briefe nacheinander vorne aus der Tasche, unter dem Schnabel hindurch und vor Hudhud hoch (nie über ihn hinweg); in der Luft platzt jeder Brief auf, und seine Buchstaben wirbeln als Papierkärtchen davon. Danach ist die Tasche leer und bleibt es in den folgenden Szenen. Die Szene dauert mindestens 5,6 Sekunden, damit der Sturm fertig spielt.
 3. Auf dem Markt von Mokka weiss der Händler nicht, wie viele Säcke Kaffee er hat.
 4. Die Menschen warten, das Schiff wartet: «Ich brauche deine Hilfe!»
 5. «Hilfst du mir? Wir sammeln Buchstaben oder zählen auf dem Markt. Wähle!»
@@ -47,7 +47,7 @@ Eine falsche Karte wackelt kurz, wird grau und lässt sich nicht nochmals antipp
 - **Sticker-Motive**: Qamariya, Haus aus Sanaa, Mokka-Kaffee, Sanbuq (Dau), Sidr-Honig, Drachenblutbaum (Sokotra), Dattelpalme, Datteln, Bint al-Sahn. Keine Waffen (auch keine Jambiya), keine Kriegsbilder.
 - **Kein Glücksspiel-Mechanismus**: keine Glücksräder, Lootboxen oder Zufallsbelohnungen.
 - **Kein Druck**: kein Streak, nichts verfällt. Stromausfälle, Freitage, Ramadan oder eine Flucht werden nicht bestraft.
-- **Ruhig**: kurze Animationen, die einmal ablaufen; der Lichtring um den nächsten Schritt atmet langsam. Keine lauten Töne, keine Musik.
+- **Ruhig im Alltag, spannend in der Geschichte**: In der App kurze Animationen und ein langsam atmender Lichtring. Der Sandsturm in der Geschichte ist bewegt, aber ohne Blitze, Donner oder Flackern (erinnert nicht an Explosionen, schont lichtempfindliche Kinder). Keine lauten Töne, keine Musik.
 - **Alltagssprache**: «بسم الله» zum Start, «أَحْسَنْت» als Lob (in der Pausalform für Jungen und Mädchen gleich).
 
 ## Offen

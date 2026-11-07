@@ -14,6 +14,7 @@ import { yemen } from "@/theme/tokens";
 import { Hudhud } from "./Hudhud";
 import { Skyline } from "./Skyline";
 import { StickerArt } from "./StickerArt";
+import { LOOP_NATIVE } from "./motion";
 
 /** A value that swings 0 → 1 → 0 forever while mounted. */
 function useSwing(duration = 1400): Animated.Value {
@@ -25,13 +26,13 @@ function useSwing(duration = 1400): Animated.Value {
           toValue: 1,
           duration,
           easing: Easing.inOut(Easing.quad),
-          useNativeDriver: true,
+          useNativeDriver: LOOP_NATIVE,
         }),
         Animated.timing(v, {
           toValue: 0,
           duration,
           easing: Easing.inOut(Easing.quad),
-          useNativeDriver: true,
+          useNativeDriver: LOOP_NATIVE,
         }),
       ]),
     );
@@ -85,7 +86,7 @@ function Postman() {
           },
         ]}
       >
-        <Hudhud size={140} hop={false} flap bag />
+        <Hudhud size={140} hop={false} flap bag={3} />
       </Animated.View>
       <View style={styles.ground}>
         <Skyline />
@@ -112,56 +113,78 @@ function Cloud({ left, top, small }: { left: number; top: number; small?: boolea
   );
 }
 
-/** Letters that fly out of each of the three letters (envelopes) the wind pulls from the bag. */
+/** Letters that fly out of each of the three letters (envelopes) the storm tears from the bag. */
 const LETTER_GROUPS = [
   ["أ", "ب", "ت"],
   ["م", "ر", "ن"],
   ["د", "ل", "س"],
 ];
 const TILE_COLOURS = [yemen.red, yemen.blue, yemen.green, yemen.goldDeep];
-/** Hudhud's size in the wind scene, and the mouth of his bag in that picture (px from top left). */
-const WIND_BIRD = 140;
-/** The front edge of the bag's mouth, where the wind catches each letter (viewBox units = px here). */
+/** Hudhud's size in the storm scene. */
+const STORM_BIRD = 140;
+/** The front edge of the bag's mouth, where the storm catches each letter (px in the bird box). */
 const BAG_AT = { x: 44, y: 92 };
-/** One envelope's flight, and the pause between envelopes. */
-const ENVELOPE_MS = 2600;
-const STAGGER_MS = 1000;
+/** When the storm tears out each letter, after the scene opens; then the bag stays empty. */
+const TEAR_AT_MS = [900, 1800, 2700];
+/** One envelope's flight. */
+const ENVELOPE_MS = 2300;
 /** Share of the flight after which the envelope bursts open and its letters fly on. */
-const BURST = 0.42;
+const BURST = 0.4;
 
-/**
- * One envelope pulled out of the bag by the wind. Hudhud looks left and the bag hangs at his
- * front, so the envelope slides out of the front of the bag, passes low under his beak, and
- * only rises once it is clear of him: it never crosses the bird. In the air it bursts open and
- * its letters flutter on as paper cards.
- */
-function BlownLetter({ index }: { index: number }) {
+/** A value that runs 0 → 1 over and over (no way back), after an initial delay. */
+function useRun(duration: number, delay = 0): Animated.Value {
   const [v] = useState(() => new Animated.Value(0));
   useEffect(() => {
-    const loop = Animated.loop(
-      Animated.sequence([
-        Animated.delay(index * STAGGER_MS),
+    // The loop starts after the delay; a loop nested in a sequence would not repeat.
+    let loop: Animated.CompositeAnimation | undefined;
+    const start = setTimeout(() => {
+      loop = Animated.loop(
         Animated.timing(v, {
           toValue: 1,
-          duration: ENVELOPE_MS,
+          duration,
           easing: Easing.linear,
-          useNativeDriver: true,
+          useNativeDriver: LOOP_NATIVE,
         }),
-        Animated.timing(v, { toValue: 0, duration: 0, useNativeDriver: true }),
-        Animated.delay((LETTER_GROUPS.length - 1 - index) * STAGGER_MS),
-      ]),
-    );
-    loop.start();
-    return () => loop.stop();
+      );
+      loop.start();
+    }, delay);
+    return () => {
+      clearTimeout(start);
+      loop?.stop();
+    };
+  }, [v, duration, delay]);
+  return v;
+}
+
+/**
+ * One envelope torn out of the bag by the storm, once. Hudhud looks left and the bag hangs at
+ * his front, so the envelope slides out of the front of the bag, passes low under his beak, and
+ * only then is flung up, spinning, away from him: it never crosses the bird. In the air it
+ * bursts open and its letters whirl away as paper cards.
+ */
+function TornLetter({ index }: { index: number }) {
+  const [v] = useState(() => new Animated.Value(0));
+  useEffect(() => {
+    const anim = Animated.sequence([
+      Animated.delay(TEAR_AT_MS[index]),
+      Animated.timing(v, {
+        toValue: 1,
+        duration: ENVELOPE_MS,
+        easing: Easing.linear,
+        useNativeDriver: LOOP_NATIVE,
+      }),
+    ]);
+    anim.start();
+    return () => anim.stop();
   }, [v, index]);
 
-  // Out under the beak first (low and forward), then up and away to where it bursts.
-  const clear = { x: -62, y: 6 };
-  const ex = -112 - index * 14;
-  const ey = -64 + index * 18;
+  // Out under the beak first (low and forward), then flung up and away to where it bursts.
+  const clear = { x: -58, y: 8 };
+  const ex = -118 - index * 12;
+  const ey = -70 + index * 20;
   const at = (via: number, end: number) =>
     v.interpolate({
-      inputRange: [0, 0.16, BURST, 1],
+      inputRange: [0, 0.14, BURST, 1],
       outputRange: [0, via, end, end],
       extrapolate: "clamp",
     });
@@ -174,9 +197,8 @@ function BlownLetter({ index }: { index: number }) {
           {
             left: BAG_AT.x - 17,
             top: BAG_AT.y - 12,
-            // Starts tucked into the bag and grows as the wind pulls it out.
             opacity: v.interpolate({
-              inputRange: [0, 0.06, BURST - 0.04, BURST + 0.04, 1],
+              inputRange: [0, 0.05, BURST - 0.04, BURST + 0.04, 1],
               outputRange: [0, 1, 1, 0, 0],
             }),
             transform: [
@@ -184,15 +206,15 @@ function BlownLetter({ index }: { index: number }) {
               { translateY: at(clear.y, ey) },
               {
                 rotate: v.interpolate({
-                  inputRange: [0, 0.16, BURST],
-                  outputRange: ["0deg", "-8deg", `${-30 + index * 18}deg`],
+                  inputRange: [0, 0.14, BURST],
+                  outputRange: ["0deg", "-10deg", `${index % 2 ? 300 : -320}deg`],
                   extrapolate: "clamp",
                 }),
               },
               {
                 scale: v.interpolate({
-                  inputRange: [0, 0.16, BURST],
-                  outputRange: [0.5, 0.9, 1.1],
+                  inputRange: [0, 0.14, BURST],
+                  outputRange: [0.5, 0.9, 1.15],
                   extrapolate: "clamp",
                 }),
               },
@@ -203,9 +225,10 @@ function BlownLetter({ index }: { index: number }) {
         <Envelope size={34} />
       </Animated.View>
       {LETTER_GROUPS[index].map((letter, j) => {
-        const dx = -30 - j * 22 + index * 8;
-        const dy = -34 + j * 30;
-        const turn = (j % 2 ? 1 : -1) * (18 + j * 8);
+        // Each card whirls: out, a loop with the gust, and away.
+        const dx = -34 - j * 22 + index * 8;
+        const dy = -30 + j * 32;
+        const swirl = j % 2 ? 26 : -26;
         return (
           <Animated.View
             key={letter}
@@ -215,32 +238,32 @@ function BlownLetter({ index }: { index: number }) {
                 left: BAG_AT.x - 18,
                 top: BAG_AT.y - 20,
                 opacity: v.interpolate({
-                  inputRange: [0, BURST - 0.02, BURST + 0.04, 0.85, 1],
+                  inputRange: [0, BURST - 0.02, BURST + 0.04, 0.88, 1],
                   outputRange: [0, 0, 1, 1, 0],
                 }),
                 transform: [
                   {
                     translateX: v.interpolate({
-                      inputRange: [0, BURST, 1],
-                      outputRange: [ex, ex, ex + dx],
+                      inputRange: [0, BURST, 0.6, 0.8, 1],
+                      outputRange: [ex, ex, ex + dx * 0.4, ex + dx * 0.7 + swirl, ex + dx],
                     }),
                   },
                   {
                     translateY: v.interpolate({
-                      inputRange: [0, BURST, 0.7, 1],
-                      outputRange: [ey, ey, ey + dy * 0.75, ey + dy],
+                      inputRange: [0, BURST, 0.6, 0.8, 1],
+                      outputRange: [ey, ey, ey + dy * 0.5 - 22, ey + dy * 0.6 + 14, ey + dy],
                     }),
                   },
                   {
                     rotate: v.interpolate({
                       inputRange: [0, BURST, 1],
-                      outputRange: ["0deg", "0deg", `${turn}deg`],
+                      outputRange: ["0deg", "0deg", `${(j % 2 ? 1 : -1) * (200 + j * 80)}deg`],
                     }),
                   },
                   {
                     scale: v.interpolate({
                       inputRange: [0, BURST, BURST + 0.1, 1],
-                      outputRange: [0.3, 0.3, 1, 1],
+                      outputRange: [0.3, 0.3, 1, 0.9],
                     }),
                   },
                 ],
@@ -257,62 +280,170 @@ function BlownLetter({ index }: { index: number }) {
   );
 }
 
-/** Scene 2: a gust of wind pulls the letters out of Hudhud's bag and blows them away. */
-function Wind() {
-  const sway = useSwing(420);
-  const gust = useSwing(1200);
+/** A streak of blown sand racing across the picture, again and again. */
+function SandStreak({ top, width, ms, delay, opacity }: StreakProps) {
+  const run = useRun(ms, delay);
   return (
-    <View style={styles.scene}>
-      <View style={styles.sky} />
+    <Animated.View
+      style={[
+        styles.streak,
+        {
+          top,
+          width,
+          opacity,
+          transform: [
+            {
+              translateX: run.interpolate({ inputRange: [0, 1], outputRange: [420, -width - 40] }),
+            },
+          ],
+        },
+      ]}
+    />
+  );
+}
+type StreakProps = { top: number; width: number; ms: number; delay: number; opacity: number };
+
+/** A grain of sand tumbling across with the gusts. */
+function Grain({ top, size, ms, delay, wobble }: GrainProps) {
+  const run = useRun(ms, delay);
+  return (
+    <Animated.View
+      style={[
+        styles.grain,
+        {
+          top,
+          width: size,
+          height: size,
+          borderRadius: size / 2,
+          transform: [
+            { translateX: run.interpolate({ inputRange: [0, 1], outputRange: [400, -30] }) },
+            {
+              translateY: run.interpolate({
+                inputRange: [0, 0.25, 0.5, 0.75, 1],
+                outputRange: [0, -wobble, 0, wobble, 0],
+              }),
+            },
+          ],
+        },
+      ]}
+    />
+  );
+}
+type GrainProps = { top: number; size: number; ms: number; delay: number; wobble: number };
+
+/** A dark cloud rolling across the sky. */
+function StormCloud({
+  top,
+  width,
+  ms,
+  delay,
+}: {
+  top: number;
+  width: number;
+  ms: number;
+  delay: number;
+}) {
+  const run = useRun(ms, delay);
+  return (
+    <Animated.View
+      style={[
+        styles.stormCloud,
+        {
+          top,
+          transform: [
+            {
+              translateX: run.interpolate({ inputRange: [0, 1], outputRange: [400, -width - 20] }),
+            },
+          ],
+        },
+      ]}
+    >
+      <Svg width={width} height={width * 0.45} viewBox="0 0 84 38">
+        <Path
+          d="M14 34 Q2 34 4 24 Q6 14 18 16 Q22 4 36 6 Q48 0 56 12 Q72 8 76 22 Q84 34 70 34 Z"
+          fill="#6F6A73"
+          opacity={0.85}
+        />
+      </Svg>
+    </Animated.View>
+  );
+}
+
+// Fixed, varied paths so the storm looks wild but plays the same every time.
+const STREAKS: StreakProps[] = Array.from({ length: 11 }, (_, i) => ({
+  top: 30 + ((i * 53) % 230),
+  width: 60 + ((i * 37) % 90),
+  ms: 700 + ((i * 131) % 600),
+  delay: (i * 97) % 700,
+  opacity: 0.35 + ((i * 17) % 40) / 100,
+}));
+const GRAINS: GrainProps[] = Array.from({ length: 22 }, (_, i) => ({
+  top: 20 + ((i * 71) % 250),
+  size: 3 + (i % 4),
+  ms: 900 + ((i * 113) % 700),
+  delay: (i * 61) % 900,
+  wobble: 6 + ((i * 7) % 14),
+}));
+
+/**
+ * Scene 2: a sandstorm. Dark clouds roll in, sand races across, Hudhud fights the gusts with
+ * beating wings, and the storm tears his three letters from the bag one by one, until the bag
+ * is empty. No lightning and no thunder: exciting, not frightening.
+ */
+function Storm() {
+  const [left, setLeft] = useState(3);
+  useEffect(() => {
+    const timers = TEAR_AT_MS.map((ms, i) => setTimeout(() => setLeft(2 - i), ms));
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
+  // Hudhud is shaken by the gusts and pushed back, then fights his way forward again.
+  const shake = useRun(520);
+  const push = useSwing(900);
+  const haze = useSwing(1100);
+  return (
+    <View style={[styles.scene, styles.stormSky]}>
       <Animated.View
         style={[
-          styles.wind,
-          {
-            transform: [
-              { translateX: gust.interpolate({ inputRange: [0, 1], outputRange: [24, -24] }) },
-            ],
-          },
+          styles.haze,
+          { opacity: haze.interpolate({ inputRange: [0, 1], outputRange: [0.15, 0.45] }) },
         ]}
-      >
-        <Svg width={300} height={160} viewBox="0 0 300 160">
-          <Path
-            d="M10 50 Q90 10 160 50 T290 40"
-            stroke="#C9D8EA"
-            strokeWidth={8}
-            fill="none"
-            strokeLinecap="round"
-          />
-          <Path
-            d="M20 100 Q110 70 180 105 T290 95"
-            stroke="#D8E4F1"
-            strokeWidth={6}
-            fill="none"
-            strokeLinecap="round"
-          />
-          <Path
-            d="M40 140 Q120 120 200 140"
-            stroke="#C9D8EA"
-            strokeWidth={5}
-            fill="none"
-            strokeLinecap="round"
-          />
-        </Svg>
-      </Animated.View>
-      <View style={styles.windBird}>
+      />
+      <StormCloud top={-6} width={150} ms={5200} delay={0} />
+      <StormCloud top={22} width={110} ms={3900} delay={1300} />
+      <StormCloud top={-14} width={130} ms={4600} delay={2600} />
+      {STREAKS.map((p, i) => (
+        <SandStreak key={`s${i}`} {...p} />
+      ))}
+      <View style={styles.stormBird}>
         <Animated.View
           style={{
             transform: [
-              { rotate: sway.interpolate({ inputRange: [0, 1], outputRange: ["-4deg", "5deg"] }) },
-              { translateX: sway.interpolate({ inputRange: [0, 1], outputRange: [-2, 3] }) },
+              { translateX: push.interpolate({ inputRange: [0, 1], outputRange: [-4, 18] }) },
+              {
+                rotate: shake.interpolate({
+                  inputRange: [0, 0.2, 0.4, 0.6, 0.8, 1],
+                  outputRange: ["-10deg", "7deg", "-6deg", "10deg", "-4deg", "-10deg"],
+                }),
+              },
+              {
+                translateY: shake.interpolate({
+                  inputRange: [0, 0.25, 0.5, 0.75, 1],
+                  outputRange: [0, -6, 2, -4, 0],
+                }),
+              },
             ],
           }}
         >
-          <Hudhud size={WIND_BIRD} hop={false} flap bag />
+          <Hudhud size={STORM_BIRD} hop={false} flap bag={left} />
         </Animated.View>
         {LETTER_GROUPS.map((_, i) => (
-          <BlownLetter key={i} index={i} />
+          <TornLetter key={i} index={i} />
         ))}
       </View>
+      {GRAINS.map((p, i) => (
+        <Grain key={`g${i}`} {...p} />
+      ))}
     </View>
   );
 }
@@ -377,7 +508,7 @@ function Market() {
         </Animated.Text>
       ))}
       <View style={styles.marketBird}>
-        <Hudhud size={96} bag />
+        <Hudhud size={96} bag={0} />
       </View>
     </View>
   );
@@ -399,7 +530,7 @@ function Waiting() {
         <StickerArt id="dhow" size={84} />
       </View>
       <View style={styles.waitBird}>
-        <Hudhud size={110} pose="cheer" bag />
+        <Hudhud size={110} pose="cheer" bag={0} />
       </View>
     </View>
   );
@@ -409,14 +540,14 @@ function Waiting() {
 function Choose() {
   return (
     <View style={[styles.scene, styles.chooseScene]}>
-      <Hudhud size={140} bag />
+      <Hudhud size={140} bag={0} />
     </View>
   );
 }
 
 const SCENES: Record<StorySceneId, () => React.ReactElement> = {
   postman: Postman,
-  wind: Wind,
+  wind: Storm,
   market: Market,
   waiting: Waiting,
   choose: Choose,
@@ -450,9 +581,31 @@ const styles = StyleSheet.create({
     fontWeight: "900",
     color: yemen.ink,
   },
-  wind: { position: "absolute", top: 20 },
   // Hudhud on the right, so the letters have room to fly forward (left) away from him.
-  windBird: { width: WIND_BIRD, height: (WIND_BIRD * 130) / 140, marginLeft: 120, marginTop: 70 },
+  stormBird: {
+    width: STORM_BIRD,
+    height: (STORM_BIRD * 130) / 140,
+    marginLeft: 120,
+    marginTop: 70,
+  },
+  stormSky: { backgroundColor: "#D6BF94" },
+  haze: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    backgroundColor: "#7E6A50",
+  },
+  stormCloud: { position: "absolute", left: 0 },
+  streak: {
+    position: "absolute",
+    left: 0,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: "#FFF4DD",
+  },
+  grain: { position: "absolute", left: 0, backgroundColor: "#8A6A3E" },
   blownEnvelope: { position: "absolute" },
   tile: {
     position: "absolute",

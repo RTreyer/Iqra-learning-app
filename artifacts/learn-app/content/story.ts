@@ -9,14 +9,24 @@
 
 export type StorySceneId = "postman" | "wind" | "market" | "waiting" | "choose";
 
-export type StoryScene = { id: StorySceneId; line: string };
+export type StoryScene = {
+  id: StorySceneId;
+  line: string;
+  /** The picture plays this long at least before the story moves on by itself (ms). */
+  minMs?: number;
+};
 
 export const INTRO_STORY: readonly StoryScene[] = [
   {
     id: "postman",
     line: "أَنَا هُدْهُدٌ، سَاعِي الْبَرِيدِ فِي الْيَمَنِ. أَحْمِلُ الرَّسَائِلَ إِلَى كُلِّ الْبُيُوتِ.",
   },
-  { id: "wind", line: "هَبَّتْ رِيحٌ قَوِيَّةٌ، فَطَارَتِ الْحُرُوفُ مِنْ رَسَائِلِي!" },
+  // The storm tears out the three letters one by one: let it finish (components/world/StoryScenes).
+  {
+    id: "wind",
+    line: "هَبَّتْ عَاصِفَةٌ قَوِيَّةٌ، فَطَارَتِ الْحُرُوفُ مِنْ رَسَائِلِي!",
+    minMs: 5600,
+  },
   {
     id: "market",
     line: "وَفِي سُوقِ الْمُخَا، التَّاجِرُ لَا يَعْرِفُ كَمْ كِيسًا مِنَ الْبُنِّ عِنْدَهُ.",
