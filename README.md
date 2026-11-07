@@ -31,7 +31,7 @@ Windows: after `pnpm install`, double click `Start-Browser.cmd` (browser) or `St
 
 ## Storage
 
-Progress stays on the device. No server, no accounts. AsyncStorage key `@kidlearn_progress_v1` holds a schema v2 blob (`lessons`, `items`, `activity.days`, `totalStars`). The key keeps its legacy name so old progress survives. A corrupt blob is copied to a `@kidlearn_progress_corrupt_` backup key before anything is overwritten. The UI language is stored under `iqra_ui_language`, the parents' switches (voice, vibration) under `@iqra_settings_v1`.
+Progress stays on the device. No server, no accounts. AsyncStorage key `@kidlearn_progress_v1` holds a schema v2 blob (`lessons`, `items`, `activity.days`, `totalStars`). The key keeps its legacy name so old progress survives. A corrupt blob is copied to a `@kidlearn_progress_corrupt_` backup key before anything is overwritten. The UI language is stored under `iqra_ui_language`, the parents' switches (voice, vibration), whether Hudhud's story was told and the chosen subject under `@iqra_settings_v1`.
 
 ## Content
 
@@ -56,7 +56,7 @@ Home lists grades 1 to 6 (`grades` in `content/catalog.ts`). Grade 1 shows its b
 | Interleaving | A review session mixes item kinds (letter, word, count, calc, question) | `pickDue` in `lib/srs.ts` |
 | Error driven repetition | Wrong items repeat at the end of the same session | `app/review.tsx` |
 | Short sessions | Lessons have 3 to 6 rounds, review is capped at 10 items | `pickDue` limit in `lib/srs.ts`, content files |
-| Guided path, no locks | A play button opens the next lesson below 3 stars; books and units are paths with the next stop highlighted. All content stays open | `lib/nextLesson.ts`, `components/world/PathMap.tsx` |
+| Story, chosen subject, guided path, no locks | Hudhud's story leads to a choice of subject; the play button opens the next lesson not yet done in that subject, an island switches it; books and units are paths with the next stop highlighted. All content stays open | `app/intro.tsx`, `content/story.ts`, `lib/nextLesson.ts`, `components/world/PathMap.tsx` |
 | Daily window, stickers | Today's qamariya fills one pane per lesson (goal 3, never punishes a missed day); a sticker of Yemen every 12 stars, never by chance | `lib/daily.ts`, `lib/stickers.ts`, `docs/SPIELWELT.md` |
 | Voice support | A banner appears when no Arabic TTS voice is installed | `hooks/useVoiceHint.ts`, `components/VoiceHintBanner.tsx` |
 

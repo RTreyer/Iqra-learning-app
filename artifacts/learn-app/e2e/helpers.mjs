@@ -15,6 +15,8 @@ export const PROGRESS_KEY = "@kidlearn_progress_v1";
 export const VOICE_HINT_KEY = "@iqra_voice_hint_shown";
 /** hooks/useDemoSeen.ts: the activity types whose worked example the child has seen. */
 export const DEMO_SEEN_KEY = "@iqra_demo_seen_v1";
+/** context/SettingsContext.tsx: parents' switches, whether Hudhud's story was told, chosen subject. */
+export const SETTINGS_KEY = "@iqra_settings_v1";
 
 /**
  * Answers per round, taken from content/. Options are shuffled per attempt, so rounds are
@@ -42,10 +44,10 @@ export const QUIZ_ROUNDS = {
 };
 
 /**
- * Runs before any app code: silent speech that finishes at once, no voice hint banner, and
- * every worked example already seen unless a test stored its own list (seedStorage).
+ * Runs before any app code: silent speech that finishes at once, no voice hint banner, every
+ * worked example already seen and Hudhud's story told, unless a test stored its own (seedStorage).
  */
-function prepareBrowser({ demoKey, demoTypes }) {
+function prepareBrowser({ demoKey, demoTypes, settingsKey }) {
   window.__spoken = [];
   const synth = window.speechSynthesis;
   if (synth) {
@@ -62,6 +64,9 @@ function prepareBrowser({ demoKey, demoTypes }) {
     localStorage.setItem("@iqra_voice_hint_shown", "1");
     if (localStorage.getItem(demoKey) === null)
       localStorage.setItem(demoKey, JSON.stringify(demoTypes));
+    // Hudhud's story already told, unless a test stored its own settings (seedStorage).
+    if (localStorage.getItem(settingsKey) === null)
+      localStorage.setItem(settingsKey, JSON.stringify({ introSeen: true }));
   } catch {}
 }
 
@@ -76,6 +81,7 @@ export const test = base.extend({
     await page.addInitScript(prepareBrowser, {
       demoKey: DEMO_SEEN_KEY,
       demoTypes: DEMO_IDS,
+      settingsKey: SETTINGS_KEY,
     });
     await provide(page);
     expect(errors, "console errors during the test").toEqual([]);

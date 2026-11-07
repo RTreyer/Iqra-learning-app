@@ -4,6 +4,7 @@ export type UiLanguage = "ar" | "en";
 // deliberately stay Arabic, even when the interface is English.
 const english: Record<string, string> = {
   "ركن الأهل": "Parents' corner",
+  "قصة هدهد": "Hudhud's story",
   "ألبوم الملصقات": "Sticker album",
   "قمرية اليوم": "Today's window",
   "هذا الركن للأهل. اضغط على الزر مطوّلاً.": "This corner is for parents. Press and hold the button.",

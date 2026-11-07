@@ -9,6 +9,7 @@ import { mathBookUnit5 } from "../content/math/bookUnit5.ts";
 import {
   DEMO_SEEN_KEY,
   PROGRESS_KEY,
+  SETTINGS_KEY,
   QUIZ_ROUNDS,
   answerRound,
   completeMathLesson,
@@ -113,6 +114,35 @@ test.describe("navigation", () => {
       "الْقَمَرِيَّةُ",
     );
     await expect(page.getByTestId("sticker-house")).toHaveAttribute("aria-label", /النُّجُومَ/);
+  });
+
+  test("first play tells Hudhud's story; the chosen subject is where play continues, and an island switches it", async ({
+    page,
+  }) => {
+    await seedStorage(page, { [SETTINGS_KEY]: JSON.stringify({ introSeen: false }) });
+    await gotoAndWaitReady(page, "/");
+    await expect(page.getByTestId("continue-card")).toHaveAttribute("aria-label", "قصة هدهد");
+    await page.getByTestId("continue-card").click();
+    await expect(page).toHaveURL(/\/intro$/);
+    // The voice tells each scene and the story moves on by itself (speech ends at once here).
+    await expect(page.getByTestId("intro-scene-choose")).toBeVisible({ timeout: 15000 });
+    const told = await page.evaluate(() => window.__spoken);
+    expect(told).toContain("هَبَّتْ رِيحٌ قَوِيَّةٌ، فَطَارَتِ الْحُرُوفُ مِنْ رَسَائِلِي!");
+    await page.getByTestId("choose-math-1").click();
+    await expect(page).toHaveURL(/\/book\/math-1$/);
+
+    await gotoAndWaitReady(page, "/");
+    await expect(page.getByTestId("play-subject")).toHaveText("١");
+    await page.getByTestId("continue-card").click();
+    await expect(page).toHaveURL(/\/lesson\/math-u1-1$/);
+
+    await gotoAndWaitReady(page, "/");
+    await page.getByTestId("book-arabic-1").click();
+    await expect(page).toHaveURL(/\/book\/arabic-1$/);
+    await gotoAndWaitReady(page, "/");
+    await expect(page.getByTestId("play-subject")).toHaveText("أ");
+    await page.getByTestId("continue-card").click();
+    await expect(page).toHaveURL(/\/lesson\/u1-1$/);
   });
 
   test("an unknown lesson id shows the not found card", async ({ page }) => {
@@ -361,13 +391,13 @@ test.describe("accessibility", () => {
     axePath = require.resolve("axe-core/axe.min.js");
   } catch {}
 
-  test("axe: no serious or critical color contrast violations on home, book, unit, lesson, album", async ({
+  test("axe: no serious or critical color contrast violations on home, book, unit, lesson, album, intro", async ({
     page,
   }) => {
     test.skip(!axePath, "axe-core not installed");
     const axeSource = fs.readFileSync(axePath, "utf8");
     const found = {};
-    for (const path of ["/", "/book/arabic-1", "/unit/a2", "/lesson/u2-29", "/album"]) {
+    for (const path of ["/", "/book/arabic-1", "/unit/a2", "/lesson/u2-29", "/album", "/intro"]) {
       await gotoAndWaitReady(page, path);
       if (path.startsWith("/lesson/"))
         await expect(page.getByTestId("progress-train")).toHaveAttribute("aria-valuenow", "1");

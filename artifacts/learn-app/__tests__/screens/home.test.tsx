@@ -5,6 +5,7 @@ import React from "react";
 import HomeScreen, { windowLine } from "@/app/index";
 import { getLesson } from "@/content";
 import { ProgressProvider } from "@/context/ProgressContext";
+import { SETTINGS_KEY, SettingsProvider } from "@/context/SettingsContext";
 import { routes } from "@/lib/routes";
 import { allItems } from "@/lib/reviewItems";
 import { renderScreen } from "@/test-utils/screens";
@@ -31,10 +32,17 @@ async function seed(
 
 function renderHome() {
   return renderScreen(
-    <ProgressProvider>
-      <HomeScreen />
-    </ProgressProvider>,
+    <SettingsProvider>
+      <ProgressProvider>
+        <HomeScreen />
+      </ProgressProvider>
+    </SettingsProvider>,
   );
+}
+
+/** After the story: the child chose `bookId` (or nothing yet). */
+async function storyTold(bookId: string | null = null) {
+  await AsyncStorage.setItem(SETTINGS_KEY, JSON.stringify({ introSeen: true, bookId }));
 }
 
 beforeEach(async () => {
@@ -44,19 +52,60 @@ beforeEach(async () => {
 });
 afterEach(() => jest.useRealTimers());
 
-test("first launch: the play button opens u1-1, Hudhud greets, no review", async () => {
+test("first launch: Hudhud invites to his story, and play tells it", async () => {
   renderHome();
   const play = await screen.findByTestId("continue-card");
-  const { unit, lesson } = getLesson("u1-1")!;
+  expect(play.props.accessibilityLabel).toBe("قصة هدهد");
+  expect(screen.queryByTestId("review-card")).toBeNull();
+  expect(screen.queryByTestId("intro-button")).toBeNull();
+  // Hudhud speaks once the stored settings are read.
+  await act(async () => {});
+  await act(async () => {
+    jest.advanceTimersByTime(500);
+  });
+  expect(Speech.speak).toHaveBeenCalledWith(
+    "اِضْغَطْ عَلَى الزِّرِّ، وَاسْمَعْ قِصَّتِي!",
+    expect.anything(),
+  );
+  fireEvent.press(play);
+  expect(router.push).toHaveBeenCalledWith(routes.intro());
+});
+
+test("after the story, play opens the next lesson of the chosen subject", async () => {
+  await storyTold("math-1");
+  renderHome();
+  await screen.findByTestId("intro-button");
+  const play = screen.getByTestId("continue-card");
+  const { unit, lesson } = getLesson("math-u1-1")!;
   expect(play.props.accessibilityLabel).toContain(lesson.title);
   expect(play.props.accessibilityLabel).toContain(unit.title);
-  expect(screen.queryByTestId("review-card")).toBeNull();
+  expect(screen.getByTestId("play-subject")).toHaveTextContent("١");
+  expect(screen.getByTestId("book-math-1").props.accessibilityState).toMatchObject({
+    selected: true,
+  });
   await act(async () => {
     jest.advanceTimersByTime(500);
   });
   expect(Speech.speak).toHaveBeenCalledWith("بِسْمِ اللهِ! هَيَّا نَتَعَلَّمُ", expect.anything());
   fireEvent.press(play);
-  expect(router.push).toHaveBeenCalledWith(routes.lesson("u1-1"));
+  expect(router.push).toHaveBeenCalledWith(routes.lesson("math-u1-1"));
+  fireEvent.press(screen.getByTestId("intro-button"));
+  expect(router.push).toHaveBeenCalledWith(routes.intro());
+});
+
+test("an island switches the subject: play then continues there", async () => {
+  await storyTold("math-1");
+  renderHome();
+  await screen.findByTestId("intro-button");
+  await act(async () => {
+    fireEvent.press(screen.getByTestId("book-arabic-1"));
+  });
+  expect(router.push).toHaveBeenCalledWith(routes.book("arabic-1"));
+  expect(screen.getByTestId("play-subject")).toHaveTextContent("أ");
+  expect(screen.getByTestId("continue-card").props.accessibilityLabel).toContain(
+    getLesson("u1-1")!.lesson.title,
+  );
+  expect(JSON.parse((await AsyncStorage.getItem(SETTINGS_KEY))!).bookId).toBe("arabic-1");
 });
 
 test("two due items show the review tile, which opens the review", async () => {

@@ -15,14 +15,13 @@ import { UiText } from "@/components/UiText";
 import { Guide } from "@/components/world/Guide";
 import { PathMap, type Stop } from "@/components/world/PathMap";
 import { getBook, unitLessonIds } from "@/content";
+import { SUBJECT_LINES } from "@/content/story";
 import { useLanguage } from "@/context/LanguageContext";
 import { useProgress } from "@/context/ProgressContext";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
 import { firstParam } from "@/lib/params";
 import { routes } from "@/lib/routes";
 import { yemen } from "@/theme/tokens";
-
-const WHERE_TO = "أَيْنَ نَذْهَبُ الْيَوْمَ؟";
 
 export default function BookScreen() {
   const bookId = firstParam(useLocalSearchParams<{ bookId?: string | string[] }>().bookId);
@@ -76,7 +75,12 @@ export default function BookScreen() {
         </View>
         <StarBadge stars={progress.totalStars} />
       </View>
-      <Guide text={WHERE_TO} speakOnMount birdSize={64} style={styles.guide} />
+      <Guide
+        text={SUBJECT_LINES[book.subject] ?? SUBJECT_LINES.arabic}
+        speakOnMount
+        birdSize={64}
+        style={styles.guide}
+      />
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={{ paddingTop: 56, paddingBottom: pad.bottom + 32 }}

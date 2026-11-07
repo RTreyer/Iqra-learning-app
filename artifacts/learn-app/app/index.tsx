@@ -19,6 +19,7 @@ import { StickerArt } from "@/components/world/StickerArt";
 import { books, unitLessonIds, type Book } from "@/content";
 import { useLanguage } from "@/context/LanguageContext";
 import { useProgress } from "@/context/ProgressContext";
+import { useSettings } from "@/context/SettingsContext";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
 import { DAILY_GOAL, lessonsToday } from "@/lib/daily";
 import * as haptics from "@/lib/haptics";
@@ -30,6 +31,8 @@ import { STICKERS, stickersEarned } from "@/lib/stickers";
 import { readableFill, shadow, yemen } from "@/theme/tokens";
 
 const GREETING = "بِسْمِ اللهِ! هَيَّا نَتَعَلَّمُ";
+/** Before the story has been told: the play button starts it. */
+const STORY_INVITE = "اِضْغَطْ عَلَى الزِّرِّ، وَاسْمَعْ قِصَّتِي!";
 const ALL_DONE = "مَا شَاءَ اللهُ! أَتْمَمْتَ كُلَّ الدُّرُوسِ";
 const LESSONS_LEFT = ["", "دَرْسٌ وَاحِدٌ", "دَرْسَانِ", "ثَلَاثَةُ دُرُوسٍ"];
 
@@ -49,8 +52,14 @@ function islandGlyph(book: Book, digits: (v: string) => string): string {
 export default function HomeScreen() {
   const { t, digits, language } = useLanguage();
   const { progress, getDueItemIds, getUnitProgress } = useProgress();
+  const { settings, loaded, update } = useSettings();
   const pad = useScreenPadding();
-  const next = useMemo(() => nextLesson(progress), [progress]);
+  // The subject the child chose in the story or on an island; Arabic until then.
+  const current =
+    books.find((book) => book.available && book.id === settings.bookId) ??
+    books.find((book) => book.available);
+  const next = useMemo(() => nextLesson(progress, books, current?.id), [progress, current?.id]);
+  const story = !settings.introSeen;
   const today = useMemo(() => lessonsToday(progress), [progress]);
   const dueCount = getDueItemIds().length;
   const earned = stickersEarned(progress.totalStars);
@@ -77,7 +86,20 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.topBar}>
-          <StarBadge stars={progress.totalStars} />
+          <View style={styles.topStart}>
+            <StarBadge stars={progress.totalStars} />
+            {story ? null : (
+              <Pressable
+                testID="intro-button"
+                accessibilityRole="button"
+                accessibilityLabel={t("قصة هدهد")}
+                onPress={tap(() => router.push(routes.intro()))}
+                style={styles.storyButton}
+              >
+                <Icon name="book" size={24} color={yemen.clay} />
+              </Pressable>
+            )}
+          </View>
           <Pressable
             testID="parents-button"
             accessibilityRole="button"
@@ -90,21 +112,44 @@ export default function HomeScreen() {
           </Pressable>
         </View>
 
-        <Guide text={next ? GREETING : ALL_DONE} layout="stack" birdSize={112} speakOnMount />
+        <Guide
+          text={story ? STORY_INVITE : next ? GREETING : ALL_DONE}
+          layout="stack"
+          birdSize={112}
+          speakOnMount={loaded}
+        />
 
-        {next ? (
+        {story || next ? (
           <Pulse style={styles.playWrap}>
             <Pressable
               testID="continue-card"
               accessibilityRole="button"
-              accessibilityLabel={`${t("تَابِعْ:")} ${t(next.unit.title)}: ${next.lesson.title}`}
-              onPress={tap(() => router.push(routes.lesson(next.lesson.id)))}
+              accessibilityLabel={
+                story || !next
+                  ? t("قصة هدهد")
+                  : `${t("تَابِعْ:")} ${t(next.unit.title)}: ${next.lesson.title}`
+              }
+              onPress={tap(() => {
+                if (!loaded) return;
+                if (story || !next) router.push(routes.intro());
+                else router.push(routes.lesson(next.lesson.id));
+              })}
               style={({ pressed }) => [styles.play, pressed && styles.pressed]}
             >
               <View style={styles.playIcon}>
                 <Icon name="play" size={72} color="#FFFFFF" />
               </View>
             </Pressable>
+            {!story && current ? (
+              <View
+                testID="play-subject"
+                style={[styles.playSubject, { backgroundColor: readableFill(current.color) }]}
+              >
+                <Text style={styles.playSubjectText}>
+                  {islandGlyph(current, digits).split(" ")[0]}
+                </Text>
+              </View>
+            ) : null}
           </Pulse>
         ) : null}
 
@@ -117,10 +162,16 @@ export default function HomeScreen() {
               testID={`book-${book.id}`}
               accessibilityRole="button"
               accessibilityLabel={`${t(book.title)}، ${t(book.subtitle)}`}
-              onPress={tap(() => router.push(routes.book(book.id)))}
+              accessibilityState={{ selected: !story && book.id === current?.id }}
+              // Choosing an island makes it the subject the play button continues in.
+              onPress={tap(() => {
+                update({ bookId: book.id });
+                router.push(routes.book(book.id));
+              })}
               style={({ pressed }) => [
                 styles.island,
                 { backgroundColor: readableFill(book.color) },
+                !story && book.id === current?.id && styles.islandOn,
                 pressed && styles.pressed,
               ]}
             >
@@ -194,6 +245,15 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
+  topStart: { flexDirection: "row", alignItems: "center", gap: 8 },
+  storyButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: "#FFFFFF",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   gear: { width: 48, height: 48, alignItems: "center", justifyContent: "center" },
   playWrap: { marginTop: -6 },
   play: {
@@ -208,6 +268,19 @@ const styles = StyleSheet.create({
     boxShadow: `0 8px 0 ${yemen.clayDeep}`,
   },
   playIcon: { marginLeft: 10 },
+  playSubject: {
+    position: "absolute",
+    top: 0,
+    right: -4,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    borderWidth: 4,
+    borderColor: "#FFFFFF",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  playSubjectText: { color: "#FFFFFF", fontSize: 22, fontWeight: "900", lineHeight: 30 },
   pressed: { opacity: 0.88, transform: [{ scale: 0.96 }] },
   islands: { width: "100%", paddingHorizontal: 16, gap: 16, marginTop: 6 },
   island: {
@@ -221,6 +294,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     ...shadow.card,
   },
+  islandOn: { borderWidth: 5, borderColor: yemen.gold },
   islandGlyph: { fontSize: 40, fontWeight: "800", color: "#FFFFFF", lineHeight: 56 },
   islandTrack: {
     width: "70%",

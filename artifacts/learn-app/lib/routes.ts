@@ -8,4 +8,5 @@ export const routes = {
   review: (): Href => "/review",
   album: (): Href => "/album",
   parents: (): Href => "/parents",
+  intro: (): Href => "/intro",
 };

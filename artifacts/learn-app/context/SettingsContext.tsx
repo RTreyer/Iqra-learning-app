@@ -23,21 +23,34 @@ export type Settings = {
   /** The voice reads instructions and praise. Off silences every spoken line. */
   sound: boolean;
   haptics: boolean;
+  /** Hudhud's story has been told (app/intro.tsx); the play button then goes to lessons. */
+  introSeen: boolean;
+  /** The subject (book) the child chose to help with; the play button continues there. */
+  bookId: string | null;
 };
 
-export const DEFAULT_SETTINGS: Settings = { sound: true, haptics: true };
+export const DEFAULT_SETTINGS: Settings = {
+  sound: true,
+  haptics: true,
+  introSeen: false,
+  bookId: null,
+};
 
 type SettingsContextValue = {
   settings: Settings;
+  /** True once the stored settings have been read (or reading failed). */
+  loaded: boolean;
   update: (patch: Partial<Settings>) => void;
 };
 
+// Without a provider (tests, isolated screens) there is nothing to load: the defaults are final.
 const SettingsContext = createContext<SettingsContextValue>({
   settings: DEFAULT_SETTINGS,
+  loaded: true,
   update: () => {},
 });
 
-/** Keeps only known boolean switches from whatever was stored. */
+/** Keeps only known settings of the right type from whatever was stored. */
 export function parseSettings(raw: string | null): Settings {
   try {
     const parsed: unknown = raw ? JSON.parse(raw) : {};
@@ -46,6 +59,8 @@ export function parseSettings(raw: string | null): Settings {
     return {
       sound: typeof value.sound === "boolean" ? value.sound : DEFAULT_SETTINGS.sound,
       haptics: typeof value.haptics === "boolean" ? value.haptics : DEFAULT_SETTINGS.haptics,
+      introSeen: value.introSeen === true,
+      bookId: typeof value.bookId === "string" ? value.bookId : null,
     };
   } catch {
     return DEFAULT_SETTINGS;
@@ -54,6 +69,7 @@ export function parseSettings(raw: string | null): Settings {
 
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
+  const [loaded, setLoaded] = useState(false);
   const changed = useRef(false);
 
   useEffect(() => {
@@ -63,7 +79,10 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         // A switch flipped before storage answered wins over the stored value.
         if (alive && !changed.current) setSettings(parseSettings(raw));
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => {
+        if (alive) setLoaded(true);
+      });
     return () => {
       alive = false;
     };
@@ -83,7 +102,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  const value = useMemo(() => ({ settings, update }), [settings, update]);
+  const value = useMemo(() => ({ settings, loaded, update }), [settings, loaded, update]);
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;
 }
 

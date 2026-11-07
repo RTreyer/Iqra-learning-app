@@ -6,6 +6,7 @@ import { StyleSheet, type StyleProp, type ViewStyle } from "react-native";
 import HomeScreen from "@/app/index";
 import BookScreen from "@/app/book/[bookId]";
 import AlbumScreen from "@/app/album";
+import IntroScreen from "@/app/intro";
 import LessonScreen from "@/app/lesson/[lessonId]";
 import ParentsScreen from "@/app/parents";
 import UnitScreen from "@/app/unit/[unitId]";
@@ -149,4 +150,15 @@ test("lesson u2-2 with its worked example: the Skip button is accessible too", a
   });
   expect(screen.getByTestId("demo-skip").props.accessibilityLabel).toBe("تخطَّ");
   expect(screen.getByTestId("demo-skip").props.accessibilityRole).toBe("button");
+});
+
+test("intro: home, skip and the scene to tap on; then the two choices", async () => {
+  withProgress(<IntroScreen />);
+  // Home, skip and the scene.
+  expectAccessiblePressables(3);
+  await act(async () => {
+    fireEvent.press(screen.getByTestId("intro-skip"));
+  });
+  // Home, the scene (disabled while choosing, still labelled) and the two subjects.
+  expectAccessiblePressables(4);
 });

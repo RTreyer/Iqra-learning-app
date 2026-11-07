@@ -2,6 +2,20 @@
 
 Ziel: Ein Kind der 1. Klasse findet sich allein zurecht, ohne zu lesen, und kommt gern wieder. Die Bildsprache stammt aus dem Jemen.
 
+## Hudhuds Geschichte
+
+Beim ersten Tipp auf Play erzählt Hudhud seine Geschichte (`content/story.ts`, `app/intro.tsx`), fünf Szenen mit Stimme, jede mit einem bewegten Bild:
+
+1. Hudhud ist der Briefbote des Jemen und bringt die Briefe zu allen Häusern (über Sanaa).
+2. Ein starker Wind bläst die Buchstaben aus seinen Briefen.
+3. Auf dem Markt von Mokka weiss der Händler nicht, wie viele Säcke Kaffee er hat.
+4. Die Menschen warten, das Schiff wartet: «Ich brauche deine Hilfe!»
+5. «Hilfst du mir? Wir sammeln Buchstaben oder zählen auf dem Markt. Wähle!»
+
+Die Szenen gehen weiter, sobald die Stimme fertig ist; Antippen geht sofort weiter, «تخطَّ» springt zur Wahl. Die Wahl legt das Fach fest (Briefe = Arabisch, Markt = Mathe) und öffnet dessen Lernpfad. Hudhud ist ein ausgedachter Bote; Figuren aus dem Koran werden nicht dargestellt. Die fünf Sätze sind einfaches Hocharabisch und die ersten Kandidaten für Aufnahmen.
+
+**Play danach**: öffnet die nächste noch nicht gemachte Lektion im gewählten Fach; ein kleines Abzeichen (أ / ١) zeigt, welches. **Wechseln**: Antippen einer Insel öffnet dieses Buch und macht es zum Fach für Play (goldener Rand). Ein Buch-Knopf oben spielt die Geschichte nochmals ab.
+
 ## Aufbau
 
 | Bildschirm | Was das Kind sieht | Code |
@@ -41,5 +55,6 @@ Eine falsche Karte wackelt kurz, wird grau und lässt sich nicht nochmals antipp
 - **Aufgenommene Stimme**: Alle Sätze von Hudhud laufen über die Sprachausgabe des Geräts. Ohne arabische Stimme hört das Kind nichts (siehe `docs/VOICE.md`).
 - **Soundeffekte** (sanftes Glöckchen, Vogelruf, Klatschen): brauchen Audiodateien und ein Audio-Modul.
 - **Junge / Mädchen**: Arabische Anweisungen sind heute männlich formuliert (اِضْغَطْ). Eine Einstellung in der Elternecke braucht weibliche Formen aller gesprochenen Anweisungen, geprüft von einer Muttersprachlerin oder einem Muttersprachler.
-- **Sprachprüfung**: Hudhuds Sätze, Stickernamen und die Texte der Elternecke von einer jemenitischen Lehrkraft prüfen lassen.
+- **Sprachprüfung**: Hudhuds Geschichte, seine Sätze, Stickernamen und die Texte der Elternecke von einer jemenitischen Lehrkraft prüfen lassen.
+- **Geschichte weiterführen**: Jede fertige Einheit als zugestellter Brief an einen Ort im Jemen (Shibam, Aden, Sokotra …), mit einem Satz Geschichte.
 - **Klassenwahl**: Nur Klasse 1 hat Bücher; die Elternecke zeigt die anderen als «قريباً». Sobald weitere Klassen Inhalt haben, wird die Wahl dort aktiv.
