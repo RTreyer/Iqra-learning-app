@@ -121,13 +121,15 @@ test.describe("navigation", () => {
   test("first play tells Hudhud's story; the chosen subject is where play continues, and an island switches it", async ({
     page,
   }) => {
+    // Chapter 1 plays every picture through (about a minute).
+    test.setTimeout(240_000);
     await seedStorage(page, { [SETTINGS_KEY]: JSON.stringify({ introSeen: false }) });
     await gotoAndWaitReady(page, "/");
     await expect(page.getByTestId("continue-card")).toHaveAttribute("aria-label", "قصة هدهد");
     await page.getByTestId("continue-card").click();
     await expect(page).toHaveURL(/\/intro$/);
     // The voice tells each scene and the story moves on by itself (speech ends at once here).
-    await expect(page.getByTestId("intro-scene-choose")).toBeVisible({ timeout: 30000 });
+    await expect(page.getByTestId("intro-scene-choose")).toBeVisible({ timeout: 90000 });
     const told = await page.evaluate(() => window.__spoken);
     // Rasha's bowl: a message Hudhud cannot read yet.
     expect(told.some((line) => line.includes("لَا أَعْرِفُ الْقِرَاءَةَ"))).toBe(true);

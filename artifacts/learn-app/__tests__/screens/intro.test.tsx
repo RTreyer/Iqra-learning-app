@@ -86,16 +86,28 @@ test("skip jumps to the choice; choosing saves the subject and opens its path", 
   });
 });
 
-test("Hudhud's story: Rasha, her bowl and the message he cannot read, then two threads", () => {
+test("Hudhud's story: Rasha, her bowl and the note he cannot read, then two threads", () => {
   expect(INTRO_STORY.map((s) => s.id)).toEqual([
     "roof",
+    "thirst",
     "girl",
+    "drink",
     "why",
+    "days",
+    "leave",
     "gone",
     "inscription",
+    "turn",
     "choose",
   ]);
-  expect(INTRO_STORY[4].line).toContain("لَا أَعْرِفُ الْقِرَاءَةَ");
+  const line = (id: string) => INTRO_STORY.find((s) => s.id === id)!.line;
+  expect(line("inscription")).toContain("لَا أَعْرِفُ الْقِرَاءَةَ");
+  // Her name is told once she is known, and the turn: she gave water, now it is his turn.
+  expect(line("days")).toContain("رَشَا");
+  expect(line("turn")).toContain("دَوْرِي");
+  // Every picture with a slow animation plays long enough to be seen.
+  for (const id of ["thirst", "girl", "days", "leave", "gone"])
+    expect(INTRO_STORY.find((s) => s.id === id)!.minMs).toBeGreaterThanOrEqual(3800);
   expect(CHAPTERS.arabic.map((s) => s.id)).toEqual(["trail", "bowl"]);
   expect(CHAPTERS.math.map((s) => s.id)).toEqual(["seed", "share"]);
   expect(CHAPTERS.end.map((s) => s.id)).toEqual(["tree", "newgirl", "home"]);

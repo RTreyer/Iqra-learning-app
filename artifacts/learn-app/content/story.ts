@@ -1,10 +1,12 @@
 /**
  * Hudhud's story (app/intro.tsx), told by Hudhud himself, in the spirit of a quiet journey.
  *
- * Hudhud lives on a roof in Sana'a. Every morning a girl, Rasha, put out a clay bowl of water
- * for the birds, though she did not know them: "you are thirsty". One day the bowl was empty
- * and she was gone. Under the bowl she had tucked a note, and left a sidr seed. Hudhud
- * cannot read. Two threads, one per subject:
+ * Hudhud lives on a roof in Sana'a. One hot summer, when he found no water, a girl, Rasha,
+ * put out a clay bowl of water for the birds, though she did not know them: "you are thirsty".
+ * Every morning he waited for her, and she came. One sad day her family packed their things
+ * and moved far away; the bowl stayed empty. Under it she had tucked a note, and left a sidr
+ * seed. Hudhud cannot read. She gave them water when they were thirsty: now it is his turn.
+ * Two threads, one per subject:
  * - Arabic: he follows Rasha's trail through the stories of the textbook (one station per
  *   unit) and learns the letters; the note under the bowl, «اِسْقِ الطُّيُورَ» signed «رَشَا»,
  *   becomes readable letter by letter (its letters come in units 2, 3, 6, 7 and 8);
@@ -19,10 +21,15 @@ import type { GoalKind } from "./types";
 
 export type StorySceneId =
   | "roof"
+  | "thirst"
   | "girl"
+  | "drink"
   | "why"
+  | "days"
+  | "leave"
   | "gone"
   | "inscription"
+  | "turn"
   | "choose"
   | "trail"
   | "bowl"
@@ -42,19 +49,52 @@ export type StoryScene = {
   unit?: string;
 };
 
-/** Chapter 1: the girl, the bowl, the message Hudhud cannot read. Ends in the choice. */
+/**
+ * Chapter 1: the thirsty summer, the girl and her bowl, the day she left, the note Hudhud
+ * cannot read, and his resolve. Ends in the choice. Each picture plays at least `minMs`.
+ */
 export const INTRO_STORY: readonly StoryScene[] = [
   { id: "roof", line: "أَنَا هُدْهُدٌ. أَسْكُنُ عَلَى سَطْحٍ فِي صَنْعَاءَ.", minMs: 3600 },
   {
+    id: "thirst",
+    line: "فِي الصَّيْفِ، كَانَ الْجَوُّ حَارًّا، وَلَمْ أَجِدْ مَاءً. كُنْتُ عَطْشَانَ جِدًّا.",
+    minMs: 4200,
+  },
+  {
     id: "girl",
-    line: "كُلَّ صَبَاحٍ، كَانَتْ بِنْتٌ تَضَعُ مَاءً لِلطُّيُورِ فِي صَحْنٍ.",
-    minMs: 3200,
+    line: "فِي صَبَاحٍ، جَاءَتْ بِنْتٌ، وَصَبَّتْ مَاءً فِي صَحْنٍ.",
+    minMs: 4600,
+  },
+  {
+    id: "drink",
+    line: "شَرِبْتُ وَشَرِبْتُ! وَجَاءَتْ طُيُورٌ أُخْرَى تَشْرَبُ مَعِي.",
+    minMs: 3800,
   },
   { id: "why", line: "قُلْتُ لَهَا: أَنْتِ لَا تَعْرِفِينَنَا! قَالَتْ: لَكِنَّكُمْ عِطَاشٌ." },
-  { id: "gone", line: "وَفِي يَوْمٍ، كَانَ الصَّحْنُ فَارِغًا، وَالْبِنْتُ ذَهَبَتْ.", minMs: 3600 },
+  {
+    id: "days",
+    line: "اِسْمُهَا رَشَا. كُلَّ صَبَاحٍ، كُنْتُ أَنْتَظِرُهَا، وَكَانَتْ تَأْتِي.",
+    minMs: 6000,
+  },
+  {
+    id: "leave",
+    line: "ثُمَّ جَاءَ يَوْمٌ حَزِينٌ. حَمَلَ أَهْلُهَا أَغْرَاضَهُمْ، وَرَحَلُوا بَعِيدًا.",
+    minMs: 6400,
+  },
+  {
+    id: "gone",
+    line: "فِي الصَّبَاحِ، بَقِيَ الصَّحْنُ فَارِغًا. اِنْتَظَرْتُ وَانْتَظَرْتُ، وَلَمْ تَأْتِ رَشَا.",
+    minMs: 5000,
+  },
   {
     id: "inscription",
-    line: "تَحْتَ الصَّحْنِ وَرَقَةٌ مِنْهَا، وَبِذْرَةٌ. لَكِنِّي لَا أَعْرِفُ الْقِرَاءَةَ!",
+    line: "ثُمَّ رَأَيْتُ تَحْتَ الصَّحْنِ وَرَقَةً، وَبِذْرَةً. لَكِنِّي لَا أَعْرِفُ الْقِرَاءَةَ!",
+    minMs: 3600,
+  },
+  {
+    id: "turn",
+    line: "رَشَا سَقَتْنَا حِينَ كُنَّا عِطَاشًا. الْآنَ جَاءَ دَوْرِي!",
+    minMs: 3600,
   },
   {
     id: "choose",
@@ -76,10 +116,18 @@ export const CHAPTERS: Record<ChapterId, readonly StoryScene[]> = {
   ],
   math: [
     { id: "seed", line: "الْبِذْرَةُ تَحْتَاجُ مَاءً، وَالْمَاءُ قَلِيلٌ.", minMs: 3200 },
-    { id: "share", line: "مَنْ يَعُدُّ، يَعْرِفُ كَيْفَ يَقْسِمُ الْمَاءَ. هَيَّا نَعُدُّ!", minMs: 3600 },
+    {
+      id: "share",
+      line: "مَنْ يَعُدُّ، يَعْرِفُ كَيْفَ يَقْسِمُ الْمَاءَ. هَيَّا نَعُدُّ!",
+      minMs: 3600,
+    },
   ],
   end: [
-    { id: "tree", line: "كَبِرَتْ شَجَرَةُ السِّدْرِ، وَجَاءَتِ الطُّيُورُ إِلَيْهَا.", minMs: 3600 },
+    {
+      id: "tree",
+      line: "كَبِرَتْ شَجَرَةُ السِّدْرِ، وَجَاءَتِ الطُّيُورُ إِلَيْهَا.",
+      minMs: 3600,
+    },
     { id: "newgirl", line: "وَجَاءَتْ بِنْتٌ صَغِيرَةٌ، وَسَقَتِ الشَّجَرَةَ مَعِي.", minMs: 3600 },
     {
       id: "home",

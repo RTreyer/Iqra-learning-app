@@ -6,7 +6,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Animated, Easing, StyleSheet, Text, View } from "react-native";
-import { Circle, Ellipse, Path, Polygon, Rect, Svg } from "react-native-svg";
+import { Ellipse, Path, Polygon, Rect, Svg } from "react-native-svg";
 
 import { Art } from "@/components/art/Art";
 import { Picture } from "@/components/pictures/Picture";
@@ -14,6 +14,16 @@ import { MESSAGE, STATIONS, type StationPlace, type StoryScene } from "@/content
 import { yemen } from "@/theme/tokens";
 import { BowlArt, INK, Note, NoteLetters, messageLetters } from "./Bowl";
 import { Hudhud } from "./Hudhud";
+import {
+  DryGroundArt,
+  HillsArt,
+  JugArt,
+  NightSkyArt,
+  Rasha,
+  SunArt,
+  TruckArt,
+  WiltedPlantArt,
+} from "./StoryArt";
 import { SidrTreeArt } from "./SidrTree";
 import { Skyline } from "./Skyline";
 import { StickerArt } from "./StickerArt";
@@ -65,15 +75,70 @@ function useSwing(duration: number, delay = 0) {
 const lerp = (v: Animated.Value, from: number, to: number) =>
   v.interpolate({ inputRange: [0, 1], outputRange: [from, to] });
 
-/** The rooftop wall the bowl stands on, with the city behind. */
-function Rooftop({ dusk = false }: { dusk?: boolean }) {
+/** 0 → 1, then again from 0, forever (a day, a heat wave), after a delay. */
+function useLoop(duration: number, delay = 0) {
+  const [v] = useState(() => new Animated.Value(0));
+  useEffect(() => {
+    let loop: Animated.CompositeAnimation | undefined;
+    const start = setTimeout(() => {
+      loop = Animated.loop(
+        Animated.timing(v, {
+          toValue: 1,
+          duration,
+          easing: Easing.linear,
+          useNativeDriver: LOOP_NATIVE,
+        }),
+      );
+      loop.start();
+    }, delay);
+    return () => {
+      clearTimeout(start);
+      loop?.stop();
+    };
+  }, [v, duration, delay]);
+  return v;
+}
+
+/** Points of a clock (0 → 1) mapped to values: keyframes. */
+function at(
+  v: Animated.Value,
+  inputRange: number[],
+  outputRange: number[],
+): Animated.AnimatedInterpolation<number>;
+function at(
+  v: Animated.Value,
+  inputRange: number[],
+  outputRange: string[],
+): Animated.AnimatedInterpolation<string>;
+function at(v: Animated.Value, inputRange: number[], outputRange: number[] | string[]) {
+  return v.interpolate({ inputRange, outputRange: outputRange as number[], extrapolate: "clamp" });
+}
+
+/**
+ * The roof Rasha's bowl stands on: sky, the mountains around Sana'a, the tower houses, and the
+ * roof's wall with its white gypsum band. `sky` is drawn behind the mountains (sun, moon).
+ */
+function Rooftop({
+  dusk = false,
+  color,
+  sky,
+}: {
+  dusk?: boolean;
+  color?: string;
+  sky?: React.ReactNode;
+}) {
   return (
     <>
-      <View style={[styles.fill, { backgroundColor: dusk ? "#E7B98C" : "#F9E3BF" }]} />
+      <View style={[styles.fill, { backgroundColor: color ?? (dusk ? "#E7B98C" : "#F9E3BF") }]} />
+      {sky}
+      <View style={styles.hills}>
+        <HillsArt color={dusk ? "#D9A57C" : "#EBD3AE"} />
+      </View>
       <View style={styles.city}>
         <Skyline />
       </View>
       <View style={styles.wall} />
+      <View style={styles.wallTrim} />
     </>
   );
 }
@@ -96,24 +161,11 @@ function Roof() {
           { transform: [{ translateY: lerp(sun, 150, 0) }, { scale: lerp(rays, 1, 1.06) }] },
         ]}
       >
-        <Svg width={120} height={120} viewBox="0 0 130 130">
-          {Array.from({ length: 12 }, (_, i) => (
-            <Rect
-              key={i}
-              x={62}
-              y={4}
-              width={6}
-              height={20}
-              rx={3}
-              fill="#F4C14B"
-              opacity={0.7}
-              transform={`rotate(${i * 30} 65 65)`}
-            />
-          ))}
-          <Circle cx={65} cy={65} r={34} fill="#F6B73C" />
-          <Circle cx={65} cy={65} r={26} fill="#FBD46E" />
-        </Svg>
+        <SunArt size={120} />
       </Animated.View>
+      <View style={styles.hills}>
+        <HillsArt />
+      </View>
       <View style={styles.city}>
         <Skyline />
       </View>
@@ -129,33 +181,212 @@ function Roof() {
   );
 }
 
-/** Every morning Rasha puts water out for the birds; Hudhud comes and drinks. */
+/** A heat wave rising from the dry ground. */
+function HeatWave({ clock, left }: { clock: Animated.Value; left: `${number}%` }) {
+  return (
+    <Animated.View
+      style={[
+        styles.heatWave,
+        {
+          left,
+          opacity: at(clock, [0, 0.3, 1], [0, 0.8, 0]),
+          transform: [{ translateY: lerp(clock, 0, -70) }],
+        },
+      ]}
+    >
+      <Svg width={60} height={16} viewBox="0 0 60 16">
+        <Path
+          d="M2 8 Q9 1 16 8 T30 8 T44 8 T58 8"
+          stroke="#FFF6D6"
+          strokeWidth={3}
+          fill="none"
+          strokeLinecap="round"
+        />
+      </Svg>
+    </Animated.View>
+  );
+}
+
+/** The hot summer: the sun burns, the earth is cracked, the jar is empty, Hudhud is thirsty. */
+function Thirst() {
+  const burn = useSwing(1300);
+  const tired = useSwing(1500, 300);
+  const wave1 = useLoop(2400, 0);
+  const wave2 = useLoop(2400, 800);
+  const wave3 = useLoop(2400, 1600);
+  const leaf = useOnce(4600, 500, Easing.inOut(Easing.sin));
+  return (
+    <View style={styles.scene}>
+      <View style={[styles.fill, { backgroundColor: "#F7C873" }]} />
+      <Animated.View
+        style={[
+          styles.hotSun,
+          { opacity: lerp(burn, 0.85, 1), transform: [{ scale: lerp(burn, 1, 1.1) }] },
+        ]}
+      >
+        <SunArt size={140} hot />
+      </Animated.View>
+      <View style={styles.hills}>
+        <HillsArt color="#E8B877" />
+      </View>
+      <View style={styles.dryGround}>
+        <DryGroundArt />
+      </View>
+      <HeatWave clock={wave1} left="14%" />
+      <HeatWave clock={wave2} left="46%" />
+      <HeatWave clock={wave3} left="74%" />
+      <View style={styles.wilted}>
+        <WiltedPlantArt size={70} />
+      </View>
+      {/* The water jar lies empty on its side. */}
+      <View style={styles.emptyJar}>
+        <JugArt size={58} />
+      </View>
+      <Animated.View
+        style={[
+          styles.thirstyBird,
+          {
+            transform: [
+              { translateY: lerp(tired, 0, 5) },
+              { rotate: at(tired, [0, 1], ["2deg", "10deg"]) },
+            ],
+          },
+        ]}
+      >
+        <Hudhud size={96} hop={false} />
+      </Animated.View>
+      <Animated.View
+        style={[
+          styles.leaf,
+          {
+            transform: [
+              { translateX: lerp(leaf, -40, 380) },
+              { translateY: at(leaf, [0, 0.25, 0.5, 0.75, 1], [0, 18, 4, 24, 10]) },
+              { rotate: at(leaf, [0, 1], ["0deg", "540deg"]) },
+            ],
+          },
+        ]}
+      >
+        <Picture emoji="🍂" size={26} />
+      </Animated.View>
+    </View>
+  );
+}
+
+/** One morning a girl comes up to the roof, pours water into a bowl, and Hudhud peeks. */
 function Girl() {
-  const come = useOnce(1400, 900, Easing.out(Easing.quad));
-  const sip = useSwing(500, 2400);
-  const shimmer = useSwing(900);
+  const walk = useOnce(1500, 200, Easing.out(Easing.quad));
+  const tilt = useOnce(600, 1800);
+  const pour = useOnce(2000, 2300, Easing.linear);
+  const flow = useSwing(180, 2300);
+  const peek = useOnce(900, 3400, Easing.out(Easing.back(1.6)));
   return (
     <View style={styles.scene}>
       <Rooftop />
-      <View style={styles.girl}>
-        <Art art="girl" size={130} />
+      <View style={[styles.bowlOnWall, styles.bowlPour]}>
+        <BowlArt width={96} level={0} />
+        <Animated.View style={[StyleSheet.absoluteFill, { opacity: pour }]}>
+          <BowlArt width={96} level={1} />
+        </Animated.View>
+      </View>
+      {/* The water runs from the spout into the bowl while she pours. */}
+      <Animated.View
+        style={[
+          styles.stream,
+          {
+            opacity: at(pour, [0, 0.05, 0.9, 1], [0, 1, 1, 0]),
+            transform: [{ scaleX: lerp(flow, 0.8, 1.2) }],
+          },
+        ]}
+      />
+      <Animated.View
+        style={[styles.rashaPour, { transform: [{ translateX: lerp(walk, -150, 0) }] }]}
+      >
+        <Rasha size={140} pose="reach" />
+      </Animated.View>
+      <Animated.View
+        style={[
+          styles.jug,
+          {
+            transform: [
+              { translateX: lerp(walk, -150, 0) },
+              { rotate: at(tilt, [0, 1], ["0deg", "62deg"]) },
+            ],
+          },
+        ]}
+      >
+        <JugArt size={46} />
+      </Animated.View>
+      <Animated.View
+        style={[
+          styles.peeker,
+          {
+            opacity: at(peek, [0, 0.2, 1], [0, 1, 1]),
+            transform: [{ translateX: lerp(peek, 120, 0) }],
+          },
+        ]}
+      >
+        <Hudhud size={84} mirrored={false} hop={false} />
+      </Animated.View>
+    </View>
+  );
+}
+
+/** Hudhud drinks; a sparrow and a dove come to drink too. Rasha smiles. */
+function Drink() {
+  const sip = useSwing(500, 600);
+  const shimmer = useSwing(900);
+  const sparrow = useOnce(1300, 1100, Easing.out(Easing.quad));
+  const dove = useOnce(1400, 2100, Easing.out(Easing.quad));
+  const peck = useSwing(420, 2400);
+  return (
+    <View style={styles.scene}>
+      <Rooftop />
+      <View style={styles.rasha}>
+        <Rasha size={140} />
       </View>
       <Animated.View style={[styles.bowlOnWall, { opacity: lerp(shimmer, 0.92, 1) }]}>
-        <BowlArt width={96} level={1} />
+        <BowlArt width={96} level={0.9} />
       </Animated.View>
       <Animated.View
         style={[
           styles.drinker,
           {
             transform: [
-              { translateX: lerp(come, 140, 0) },
               { translateY: lerp(sip, 0, 8) },
-              { rotate: sip.interpolate({ inputRange: [0, 1], outputRange: ["0deg", "-10deg"] }) },
+              { rotate: at(sip, [0, 1], ["0deg", "-10deg"]) },
             ],
           },
         ]}
       >
         <Hudhud size={86} hop={false} />
+      </Animated.View>
+      <Animated.View
+        style={[
+          styles.sparrow,
+          {
+            transform: [
+              { translateX: lerp(sparrow, -60, 0) },
+              { translateY: at(sparrow, [0, 1], [-120, 0]) },
+              { rotate: at(peck, [0, 1], ["0deg", "18deg"]) },
+            ],
+          },
+        ]}
+      >
+        <Picture emoji="🐦" size={38} />
+      </Animated.View>
+      <Animated.View
+        style={[
+          styles.dove,
+          {
+            transform: [
+              { translateX: lerp(dove, 70, 0) },
+              { translateY: at(dove, [0, 1], [-140, 0]) },
+            ],
+          },
+        ]}
+      >
+        <Picture emoji="🕊" size={46} />
       </Animated.View>
     </View>
   );
@@ -167,8 +398,8 @@ function Why() {
   return (
     <View style={styles.scene}>
       <Rooftop />
-      <View style={styles.girl}>
-        <Art art="girl" size={130} />
+      <View style={styles.rasha}>
+        <Rasha size={140} />
       </View>
       <View style={styles.bowlOnWall}>
         <BowlArt width={96} level={0.8} />
@@ -191,10 +422,142 @@ function Why() {
   );
 }
 
-/** One morning the bowl is empty and she is gone: the door shut, Hudhud waits alone. */
+/**
+ * Day after day: the sun crosses the sky, night falls and lifts again. Every morning Rasha
+ * comes with water; Hudhud waits for her on the wall.
+ */
+function Days() {
+  const day = useLoop(2800, 300);
+  const visit = at(day, [0, 0.14, 0.22, 0.58, 0.66, 1], [0, 0, 1, 1, 0, 0]);
+  return (
+    <View style={styles.scene}>
+      <Rooftop
+        sky={
+          <Animated.View
+            style={[
+              styles.daySun,
+              {
+                transform: [
+                  { translateX: at(day, [0, 1], [-30, 330]) },
+                  { translateY: at(day, [0, 0.5, 1], [130, 0, 130]) },
+                ],
+              },
+            ]}
+          >
+            <SunArt size={70} />
+          </Animated.View>
+        }
+      />
+      <Animated.View style={[styles.rasha, { opacity: visit }]}>
+        <Rasha size={140} pose="wave" />
+      </Animated.View>
+      <View style={styles.bowlOnWall}>
+        <BowlArt width={96} level={0} />
+        <Animated.View
+          style={[
+            StyleSheet.absoluteFill,
+            { opacity: at(day, [0, 0.24, 0.3, 0.86, 1], [0, 0, 1, 1, 0]) },
+          ]}
+        >
+          <BowlArt width={96} level={1} />
+        </Animated.View>
+      </View>
+      <View style={styles.drinker}>
+        <Hudhud size={86} />
+      </View>
+      {/* Night: the sky darkens, the stars and the moon come out. */}
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          styles.fill,
+          {
+            backgroundColor: "#2B3A63",
+            opacity: at(day, [0, 0.1, 0.9, 1], [0.6, 0, 0, 0.6]),
+          },
+        ]}
+      />
+      <Animated.View
+        pointerEvents="none"
+        style={[styles.nightSky, { opacity: at(day, [0, 0.08, 0.92, 1], [1, 0, 0, 1]) }]}
+      >
+        <NightSkyArt />
+      </Animated.View>
+    </View>
+  );
+}
+
+/**
+ * The day she left: the family's pick-up, loaded with their things, drives away down the
+ * street. Rasha waves from the back; Hudhud flies after it a little, then stays.
+ */
+function Leave() {
+  const drive = useOnce(5400, 1300, Easing.in(Easing.quad));
+  const wave = useSwing(320, 300);
+  const rattle = useSwing(160);
+  const follow = useOnce(1600, 2600, Easing.inOut(Easing.quad));
+  const dust = useLoop(700, 1300);
+  const away = { transform: [{ translateX: lerp(drive, 0, -460) }] };
+  return (
+    <View style={styles.scene}>
+      <View style={[styles.fill, { backgroundColor: "#F2C48D" }]} />
+      <View style={styles.hills}>
+        <HillsArt color="#E3B07E" />
+      </View>
+      <View style={styles.city}>
+        <Skyline />
+      </View>
+      <View style={styles.street} />
+      <Animated.View style={[styles.truckBox, away]}>
+        <Animated.View style={{ transform: [{ translateY: lerp(rattle, 0, -2) }] }}>
+          <TruckArt width={210} />
+          {/* Rasha sits at the back among the bundles and waves. */}
+          <View style={styles.truckRasha}>
+            <Art art="girl" size={52} />
+            <Animated.View
+              style={[
+                styles.waveHand,
+                { transform: [{ rotate: at(wave, [0, 1], ["-20deg", "20deg"]) }] },
+              ]}
+            >
+              <Picture emoji="👋" size={26} />
+            </Animated.View>
+          </View>
+        </Animated.View>
+        <Animated.View
+          style={[
+            styles.dust,
+            {
+              opacity: at(dust, [0, 0.3, 1], [0, 0.7, 0]),
+              transform: [{ translateX: lerp(dust, 0, 30) }, { scale: lerp(dust, 0.6, 1.4) }],
+            },
+          ]}
+        />
+      </Animated.View>
+      <Animated.View
+        style={[
+          styles.follower,
+          {
+            transform: [
+              { translateX: at(follow, [0, 0.6, 1], [0, -70, -60]) },
+              { translateY: at(follow, [0, 0.4, 1], [0, -30, 0]) },
+            ],
+          },
+        ]}
+      >
+        <Hudhud size={70} flap hop={false} />
+      </Animated.View>
+    </View>
+  );
+}
+
+/**
+ * The next morning the bowl stays empty. Hudhud waits and waits; the day goes by, a dry leaf
+ * blows past, night falls, and she does not come.
+ */
 function Gone() {
-  const dim = useOnce(3600, 400);
-  const look = useSwing(1600, 800);
+  const dusk = useOnce(4400, 600, Easing.inOut(Easing.quad));
+  const look = useSwing(1500, 600);
+  const leaf = useOnce(4000, 900, Easing.inOut(Easing.sin));
   return (
     <View style={styles.scene}>
       <Rooftop dusk />
@@ -209,7 +572,8 @@ function Gone() {
           styles.drinker,
           {
             transform: [
-              { rotate: look.interpolate({ inputRange: [0, 1], outputRange: ["-4deg", "4deg"] }) },
+              { translateY: lerp(dusk, 0, 6) },
+              { rotate: at(look, [0, 1], ["-5deg", "5deg"]) },
             ],
           },
         ]}
@@ -217,8 +581,29 @@ function Gone() {
         <Hudhud size={86} hop={false} />
       </Animated.View>
       <Animated.View
-        style={[styles.fill, { backgroundColor: "#3B2A40", opacity: lerp(dim, 0, 0.35) }]}
+        style={[
+          styles.leaf,
+          {
+            transform: [
+              { translateX: lerp(leaf, 380, -40) },
+              { translateY: at(leaf, [0, 0.3, 0.6, 1], [0, 30, 14, 40]) },
+              { rotate: at(leaf, [0, 1], ["0deg", "-480deg"]) },
+            ],
+          },
+        ]}
+      >
+        <Picture emoji="🍂" size={24} />
+      </Animated.View>
+      <Animated.View
+        pointerEvents="none"
+        style={[styles.fill, { backgroundColor: "#2B2440", opacity: lerp(dusk, 0, 0.5) }]}
       />
+      <Animated.View
+        pointerEvents="none"
+        style={[styles.nightSky, { opacity: at(dusk, [0, 0.6, 1], [0, 0, 1]) }]}
+      >
+        <NightSkyArt />
+      </Animated.View>
     </View>
   );
 }
@@ -232,7 +617,9 @@ function Inscription() {
   const pull = useOnce(1500, 900);
   const puzzle = useSwing(700, 2400);
   const glint = useSwing(1100, 400);
-  const out = { transform: [{ translateY: lerp(pull, 0, 124) }, { translateX: lerp(pull, 0, 24) }] };
+  const out = {
+    transform: [{ translateY: lerp(pull, 0, 124) }, { translateX: lerp(pull, 0, 24) }],
+  };
   return (
     <View style={styles.scene}>
       <View style={[styles.fill, { backgroundColor: "#F3DCC7" }]} />
@@ -240,7 +627,14 @@ function Inscription() {
         <Animated.View
           style={[
             styles.pulledNote,
-            { transform: [...out.transform, { rotate: pull.interpolate({ inputRange: [0, 1], outputRange: ["-4deg", "5deg"] }) }] },
+            {
+              transform: [
+                ...out.transform,
+                {
+                  rotate: pull.interpolate({ inputRange: [0, 1], outputRange: ["-4deg", "5deg"] }),
+                },
+              ],
+            },
           ]}
         >
           <Note width={150}>
@@ -265,7 +659,11 @@ function Inscription() {
         <Animated.View style={[styles.puller, out]}>
           <Animated.View
             style={{
-              opacity: pull.interpolate({ inputRange: [0.85, 1], outputRange: [0, 1], extrapolate: "clamp" }),
+              opacity: pull.interpolate({
+                inputRange: [0.85, 1],
+                outputRange: [0, 1],
+                extrapolate: "clamp",
+              }),
               transform: [{ translateY: lerp(puzzle, 0, -6) }],
             }}
           >
@@ -274,6 +672,59 @@ function Inscription() {
           <Hudhud size={84} hop={false} />
         </Animated.View>
       </View>
+    </View>
+  );
+}
+
+/**
+ * Hudhud's resolve: Rasha gave the birds water when they were thirsty; now it is his turn. The
+ * sun rises behind him, the note and the seed glow.
+ */
+function Turn() {
+  const rise = useOnce(2200, 200, Easing.out(Easing.cubic));
+  const spin = useLoop(14000);
+  const glow = useSwing(900, 800);
+  return (
+    <View style={styles.scene}>
+      <View style={[styles.fill, { backgroundColor: "#FBE3B5" }]} />
+      <Animated.View
+        style={[
+          styles.bigRays,
+          {
+            opacity: lerp(rise, 0, 0.55),
+            transform: [
+              { rotate: at(spin, [0, 1], ["0deg", "360deg"]) },
+              { scale: lerp(rise, 0.6, 1) },
+            ],
+          },
+        ]}
+      >
+        <SunArt size={340} />
+      </Animated.View>
+      <View style={styles.hills}>
+        <HillsArt />
+      </View>
+      <View style={styles.city}>
+        <Skyline />
+      </View>
+      <Animated.View
+        style={[
+          styles.turnNote,
+          { transform: [{ translateY: lerp(glow, 0, -8) }, { rotate: "-8deg" }] },
+        ]}
+      >
+        <Animated.View style={[styles.halo, { opacity: lerp(glow, 0.3, 0.8) }]} />
+        <Note width={96}>
+          <NoteLetters readable={() => false} size={11} />
+        </Note>
+      </Animated.View>
+      <Animated.View style={[styles.turnSeed, { transform: [{ translateY: lerp(glow, -8, 0) }] }]}>
+        <Animated.View style={[styles.halo, styles.seedHalo, { opacity: lerp(glow, 0.8, 0.3) }]} />
+        <Picture emoji="🌱" size={46} />
+      </Animated.View>
+      <Animated.View style={[styles.turnBird, { transform: [{ translateY: lerp(rise, 40, 0) }] }]}>
+        <Hudhud size={130} pose="cheer" />
+      </Animated.View>
     </View>
   );
 }
@@ -724,10 +1175,15 @@ function Station({ unit }: { unit?: string }) {
 
 const SCENES: Record<StoryScene["id"], (props: { unit?: string }) => React.ReactElement> = {
   roof: Roof,
+  thirst: Thirst,
   girl: Girl,
+  drink: Drink,
   why: Why,
+  days: Days,
+  leave: Leave,
   gone: Gone,
   inscription: Inscription,
+  turn: Turn,
   choose: Choose,
   trail: Trail,
   bowl: BowlScene,
@@ -756,9 +1212,78 @@ const styles = StyleSheet.create({
     height: 70,
     backgroundColor: "#C98A5B",
   },
+  wallTrim: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 64,
+    height: 6,
+    backgroundColor: "#FFFFFF",
+    opacity: 0.85,
+  },
+  hills: { position: "absolute", left: 0, right: 0, bottom: 96, height: 120 },
+  nightSky: { position: "absolute", left: 0, right: 0, top: 0, height: 140 },
+  hotSun: { position: "absolute", top: 4, left: 18 },
+  dryGround: { position: "absolute", left: 0, right: 0, bottom: 0, height: 100 },
+  heatWave: { position: "absolute", bottom: 86 },
+  wilted: { position: "absolute", left: 26, bottom: 74 },
+  emptyJar: { position: "absolute", left: 100, bottom: 70, transform: [{ rotate: "100deg" }] },
+  thirstyBird: { position: "absolute", right: 28, bottom: 70 },
+  leaf: { position: "absolute", left: 0, top: 110 },
+  rasha: { position: "absolute", left: 20, bottom: 46 },
+  rashaPour: { position: "absolute", left: 44, bottom: 46 },
+  jug: { position: "absolute", left: 112, bottom: 112 },
+  bowlPour: { left: 146 },
+  stream: {
+    position: "absolute",
+    left: 158,
+    bottom: 88,
+    width: 5,
+    height: 36,
+    borderRadius: 3,
+    backgroundColor: "#4F8FD6",
+  },
+  peeker: { position: "absolute", right: 8, bottom: 70 },
+  sparrow: { position: "absolute", left: 124, bottom: 96 },
+  dove: { position: "absolute", left: 292, bottom: 64 },
+  daySun: { position: "absolute", top: 20, left: 0 },
+  street: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 64,
+    backgroundColor: "#BFA98C",
+  },
+  truckBox: { position: "absolute", left: 110, bottom: 22 },
+  truckRasha: { position: "absolute", left: 150, top: -6, zIndex: 1 },
+  waveHand: { position: "absolute", left: 40, top: -6 },
+  dust: {
+    position: "absolute",
+    right: -24,
+    bottom: 8,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: "#E8D5B8",
+  },
+  follower: { position: "absolute", right: 16, top: 70 },
+  bigRays: { position: "absolute", top: -30, left: "50%", marginLeft: -170 },
+  turnNote: { position: "absolute", left: 22, top: 112 },
+  halo: {
+    position: "absolute",
+    left: -12,
+    top: -18,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: "#FFF1C2",
+  },
+  seedHalo: { left: -17, top: -17, width: 80, height: 80, borderRadius: 40 },
+  turnSeed: { position: "absolute", right: 36, top: 150 },
+  turnBird: { position: "absolute", left: 0, right: 0, bottom: 34, alignItems: "center" },
   sun: { position: "absolute", top: 26, left: 40 },
   roofBird: { position: "absolute", right: 46, bottom: 92 },
-  girl: { position: "absolute", left: 20, bottom: 50 },
   bowlOnWall: { position: "absolute", left: 140, bottom: 62 },
   drinker: { position: "absolute", left: 210, bottom: 84 },
   facing: { left: 220 },
@@ -772,7 +1297,14 @@ const styles = StyleSheet.create({
     height: 64,
     backgroundColor: "#E5C3A4",
   },
-  noteStage: { position: "absolute", top: 16, left: 0, right: 0, height: 270, alignItems: "center" },
+  noteStage: {
+    position: "absolute",
+    top: 16,
+    left: 0,
+    right: 0,
+    height: 270,
+    alignItems: "center",
+  },
   // Under the bowl at first; only a corner shows below its foot.
   pulledNote: { position: "absolute", top: 34 },
   bowlOver: { position: "absolute", top: 0 },
@@ -782,7 +1314,13 @@ const styles = StyleSheet.create({
   bigNote: { position: "absolute", top: 26, left: 0, right: 0, alignItems: "center" },
   unfolded: { paddingVertical: 18, transform: [{ rotate: "-2deg" }] },
   noteRow: { flexDirection: "row-reverse", justifyContent: "center", gap: 6 },
-  noteLetter: { fontSize: 26, fontWeight: "900", lineHeight: 38, minWidth: 16, textAlign: "center" },
+  noteLetter: {
+    fontSize: 26,
+    fontWeight: "900",
+    lineHeight: 38,
+    minWidth: 16,
+    textAlign: "center",
+  },
   paleLetter: { color: "#D8CBAE" },
   glowLetter: {
     position: "absolute",

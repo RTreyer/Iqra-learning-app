@@ -445,6 +445,8 @@ export const EN_LINES: Record<string, string> = {
   "اِسْمَعْ جَيِّدًا، وَاخْتَرِ الصَّوَابَ.": "Listen carefully and choose the right one.",
   "اِسْمَعْ جَيِّدًا، وَاكْتُبِ الْكَلِمَةَ فِي رِسَالَتِي.":
     "Listen carefully and write the word in my message.",
+  "اِسْمُهَا رَشَا. كُلَّ صَبَاحٍ، كُنْتُ أَنْتَظِرُهَا، وَكَانَتْ تَأْتِي.":
+    "Her name is Rasha. Every morning I waited for her, and she came.",
   "اِضْغَطْ عَلَامَةَ الصَّحِّ لِلسُّلُوكِ الصَّحِيحِ، وَعَلَامَةَ الْخَطَأِ لِلسُّلُوكِ الْخَطَأِ.":
     "Tap the tick for the right behaviour, and the cross for the wrong behaviour.",
   "اِضْغَطْ عَلَى الزِّرِّ، وَاسْمَعْ قِصَّتِي!": "Press the button and listen to my story!",
@@ -479,6 +481,8 @@ export const EN_LINES: Record<string, string> = {
   تَاجٌ: "Crown",
   "تَتَبَّعِ الشَّكْلَ بِإِصْبَعِكَ، ثُمَّ اضْغَطْ تَمَّ.":
     "Trace the shape with your finger, then tap Done.",
+  "تَحْتَ الصَّحْنِ وَرَقَةٌ مِنْ رَشَا. كُلُّ حَرْفٍ نَتَعَلَّمُهُ يُضِيءُ!":
+    "Under the bowl is a note from Rasha. Every letter we learn lights up!",
   تَحْرُسُ: "She guards",
   تَدْرِيبَات: "Practice",
   تَدْرِيبَاتٌ: "Practice",
@@ -515,6 +519,10 @@ export const EN_LINES: Record<string, string> = {
   "ثَمَانِيَةَ عَشَر": "Eighteen",
   "ثُمَّ أَضْغَطُ تَمَّ.": "Then I tap Done.",
   "ثُمَّ أَضْغَطُ هُنَا.": "Then I tap here.",
+  "ثُمَّ جَاءَ يَوْمٌ حَزِينٌ. حَمَلَ أَهْلُهَا أَغْرَاضَهُمْ، وَرَحَلُوا بَعِيدًا.":
+    "Then came a sad day. Her family packed their things and moved far away.",
+  "ثُمَّ رَأَيْتُ تَحْتَ الصَّحْنِ وَرَقَةً، وَبِذْرَةً. لَكِنِّي لَا أَعْرِفُ الْقِرَاءَةَ!":
+    "Then I saw a note under the bowl, and a seed. But I cannot read!",
   "ثُمَّ عَلَى مَا يُنَاسِبُهُ.": "Then on the one that matches it.",
   "ج: جَارُ الْمَسْجِدِ": "ج: The mosque's neighbour",
   "جبران  ،  مسجد  ،  يحج  ،  تاج": "Jubran, mosque, he goes on Hajj, crown",
@@ -586,6 +594,8 @@ export const EN_LINES: Record<string, string> = {
   رَشَا: "Rasha",
   "رَشَا ذَهَبَتْ، لَكِنَّ لُطْفَهَا بَقِيَ. اِسْقِ الطُّيُورَ، يَا صَدِيقِي!":
     "Rasha has gone, but her kindness stayed. Give the birds water, my friend!",
+  "رَشَا سَقَتْنَا حِينَ كُنَّا عِطَاشًا. الْآنَ جَاءَ دَوْرِي!":
+    "Rasha gave us water when we were thirsty. Now it is my turn!",
   "رَشَا فِي بَيْتٍ جَدِيدٍ، وَهِيَ بِخَيْرٍ! الْآنَ أَرْجِعُ إِلَى الصَّحْنِ.":
     "Rasha is in a new home, and she is well! Now I am going back to the bowl.",
   "رَشِيدَةُ وَالْفَرَاشَاتُ": "Rashida and the butterflies",
@@ -617,6 +627,8 @@ export const EN_LINES: Record<string, string> = {
   "ش: رَشِيدَةُ وَالْفَرَاشَاتُ": "ش: Rashida and the butterflies",
   "شمس  ،  يمشي  ،  مشمش  ،  رموش": "Sun, he walks, apricots, eyelashes",
   "شَجَرَةُ دَمِ الْأَخَوَيْنِ": "The dragon's blood tree",
+  "شَرِبْتُ وَشَرِبْتُ! وَجَاءَتْ طُيُورٌ أُخْرَى تَشْرَبُ مَعِي.":
+    "I drank and drank! And other birds came to drink with me.",
   شَرْطٌ: "Condition",
   "شَكْلٌ آخَرُ": "Another shape",
   "شِرَاعُ الْقَارِبِ مُثَلَّثٌ، وَالْمُثَلَّثَاتُ خَضْرَاءُ. أَيْنَ الشِّرَاعُ؟":
@@ -672,8 +684,10 @@ export const EN_LINES: Record<string, string> = {
   "فِي الدَّفْتَرِ، كَتَبَتْ رَشَا عَنِ الطُّيُورِ!":
     "In the notebook, Rasha wrote about the birds!",
   "فِي الرِّيفِ": "In the countryside",
-  "تَحْتَ الصَّحْنِ وَرَقَةٌ مِنْ رَشَا. كُلُّ حَرْفٍ نَتَعَلَّمُهُ يُضِيءُ!":
-    "Under the bowl is a note from Rasha. Every letter we learn lights up!",
+  "فِي الصَّبَاحِ، بَقِيَ الصَّحْنُ فَارِغًا. اِنْتَظَرْتُ وَانْتَظَرْتُ، وَلَمْ تَأْتِ رَشَا.":
+    "In the morning the bowl stayed empty. I waited and waited, but Rasha did not come.",
+  "فِي الصَّيْفِ، كَانَ الْجَوُّ حَارًّا، وَلَمْ أَجِدْ مَاءً. كُنْتُ عَطْشَانَ جِدًّا.":
+    "In the summer it was hot, and I found no water. I was so thirsty.",
   "فِي الْحَدِيقَةِ": "In the garden",
   "فِي الْحَدِيقَةِ يُغَنِّي بُلْبُلُ صَابِرٍ. عَلَى الْغُصْنِ وَرَقَةٌ.":
     "In the garden, Saber's bulbul sings. There is a note on the branch.",
@@ -683,6 +697,8 @@ export const EN_LINES: Record<string, string> = {
     "On the terraces, the farmer has many seeds.",
   "فِي سَاحَةِ الْمَدْرَسَةِ ذَهَبَ وَلَدٌ وَبِنْتٌ. كَمِ الْبَاقِي؟":
     "In the schoolyard, a boy and a girl left. How many are left?",
+  "فِي صَبَاحٍ، جَاءَتْ بِنْتٌ، وَصَبَّتْ مَاءً فِي صَحْنٍ.":
+    "One morning a girl came and poured water into a bowl.",
   "ق ص ف مع الحركات": "ق ص ف with vowel marks",
   "ق: مُنِيرٌ وَالْقِرَاءَةُ": "ق: Munir and reading",
   "قرب  ،  نقود  ،  دقيق  ،  برقوق": "Near, money, flour, plums",
@@ -721,8 +737,6 @@ export const EN_LINES: Record<string, string> = {
   "كَبِرَتْ شَجَرَةُ السِّدْرِ! شُكْرًا لَكَ!": "The sidr tree has grown! Thank you!",
   "كَبِرَتْ شَجَرَةُ السِّدْرِ، وَجَاءَتِ الطُّيُورُ إِلَيْهَا.":
     "The sidr tree has grown, and the birds came to it.",
-  "تَحْتَ الصَّحْنِ وَرَقَةٌ مِنْهَا، وَبِذْرَةٌ. لَكِنِّي لَا أَعْرِفُ الْقِرَاءَةَ!":
-    "Under the bowl is a note from her, and a seed. But I cannot read!",
   "كَمِ الْبَاقِي فِي الْعُلْبَةِ؟": "How many are left in the box?",
   "كَمِ الْبَاقِي؟": "How many are left?",
   "كَمِ الْمَجْمُوعُ؟": "What is the total?",
@@ -739,8 +753,6 @@ export const EN_LINES: Record<string, string> = {
     "How many are left if we give some away? Let's count together!",
   "كَمْ يَبْقَى مَعَهُ؟ هَيَّا نَطْرَحُ!": "How many does he have left? Let's take away!",
   "كُرَةٌ أَمْ أُسْطُوَانَةٌ؟": "A sphere or a cylinder?",
-  "كُلَّ صَبَاحٍ، كَانَتْ بِنْتٌ تَضَعُ مَاءً لِلطُّيُورِ فِي صَحْنٍ.":
-    "Every morning, a girl put out water for the birds in a bowl.",
   "كُلُّ حَرْفٍ نَتَعَلَّمُهُ، يُضِيءُ فِي الْوَرَقَةِ!":
     "Every letter we learn lights up on the note!",
   "ل: اللَّبَنُ": "ل: Milk",
@@ -889,8 +901,6 @@ export const EN_LINES: Record<string, string> = {
   وَسَطَ: "Middle",
   وَصْفٌ: "Description",
   "وَضَعْنَا حَجَرًا آخَرَ!": "We placed another stone!",
-  "وَفِي يَوْمٍ، كَانَ الصَّحْنُ فَارِغًا، وَالْبِنْتُ ذَهَبَتْ.":
-    "And one day, the bowl was empty, and the girl was gone.",
   "وَهٰذَا سُلُوكٌ خَاطِئٌ، أَضْغَطُ عَلَامَةَ الْخَطَأِ.":
     "And this is the wrong behaviour, so I tap the cross.",
   "ي و أ مع الحركات": "ي و أ with vowel marks",
