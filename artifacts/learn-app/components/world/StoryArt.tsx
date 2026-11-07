@@ -6,7 +6,7 @@
  */
 
 import React from "react";
-import { Animated } from "react-native";
+import { Animated, View } from "react-native";
 import { Circle, Ellipse, G, Path, Rect, Svg } from "react-native-svg";
 
 import { CLAY, CLAY_DARK } from "./Bowl";
@@ -18,14 +18,28 @@ const GOLD = "#F4C14B";
 
 export type RashaPose = "stand" | "reach" | "wave";
 
+/** How a girl looks: smiling, happy (laughing eyes, an open smile), or sad (brows up, a tear). */
+export type RashaMood = "smile" | "happy" | "sad";
+
+/** Where her parts turn, as a share of the 70 × 130 drawing. */
+const R_NECK = "50% 39%";
+const R_WAIST = "50% 45%";
+const R_SHOULDER_FAR = "34% 41.5%";
+const R_SHOULDER_NEAR = "66% 41.5%";
+
 /**
  * Rasha, a girl of about eight: white headscarf, long pink dress with gold embroidery.
  * "reach" holds her hands out to the right (the jug is drawn on its own), "wave" lifts one hand.
+ *
+ * Like Hudhud she is drawn in parts that move: her feet, her dress, her arms, her head. She
+ * breathes, blinks and now and then tilts her head kindly; walking, her feet step in turn
+ * under the hem, her arms swing against them, her dress sways and she bobs with every step.
  */
 export function Rasha({
   size = 140,
   pose = "stand",
   sad = false,
+  mood,
   ownArm = false,
   dress = DRESS,
   walking = false,
@@ -34,19 +48,27 @@ export function Rasha({
   pose?: RashaPose;
   /** The dress colour: another girl wears another colour. */
   dress?: string;
-  /** Brows raised in the middle, the mouth turned down, a tear. */
+  /** Sad: brows raised in the middle, the mouth turned down, a tear (same as mood "sad"). */
   sad?: boolean;
+  mood?: RashaMood;
   /** "wave" without its raised arm: RashaArm draws it, so the arm can move. */
   ownArm?: boolean;
-  /** Walks: bobs and sways with every step. */
+  /** Walks: steps, swings her arms, sways and bobs. */
   walking?: boolean;
 }) {
-  // Like a cartoon: she breathes, blinks now and then, and bobs as she walks.
+  const face: RashaMood = mood ?? (sad ? "sad" : "smile");
   const breath = useCycle(!walking, 2600);
-  const step = useCycle(walking, 520);
-  const blink = useCycle(true, 3900, 1500);
+  const step = useCycle(walking, 560);
+  const blink = useCycle(face === "smile", 3900, 1500);
+  const tilt = useCycle(!walking && face !== "sad", 5200, 800);
   const lid = key(blink, [0, 0.9, 0.93, 0.97, 1], [0, 0, 1, 0, 0]);
   const width = (size * 70) / 130;
+  const layer = { position: "absolute" as const, top: 0, left: 0, width, height: size };
+  const svg = (children: React.ReactNode) => (
+    <Svg width={width} height={size} viewBox="0 0 70 130">
+      {children}
+    </Svg>
+  );
   const eyelid = (x: number) => (
     <Animated.View
       style={{
@@ -63,6 +85,14 @@ export function Rasha({
     />
   );
   const sleeve = { stroke: dress, strokeWidth: 7, strokeLinecap: "round" as const, fill: "none" };
+  // One step each: the foot lifts, the other stays; the arms swing against the feet.
+  const foot = (lift: number[]) => ({
+    transform: [{ translateY: key(step, [0, 0.25, 0.5, 0.75, 1], lift) }],
+  });
+  const swing = (from: string, to: string) => ({
+    transform: [{ rotate: key(step, [0, 0.5, 1], [from, to, from]) }],
+  });
+  const free = pose === "stand";
   return (
     <Animated.View
       style={{
@@ -70,74 +100,155 @@ export function Rasha({
         height: size,
         transformOrigin: "50% 100%",
         transform: walking
-          ? [
-              { translateY: key(step, [0, 0.25, 0.5, 0.75, 1], [0, -3, 0, -3, 0]) },
-              { rotate: key(step, [0, 0.5, 1], ["-3deg", "3deg", "-3deg"]) },
-            ]
+          ? [{ translateY: key(step, [0, 0.25, 0.5, 0.75, 1], [0, -2.5, 0, -2.5, 0]) }]
           : [{ scaleY: key(breath, [0, 0.5, 1], [1, 1.015, 1]) }],
       }}
     >
-      <Svg width={width} height={size} viewBox="0 0 70 130">
-        <Ellipse cx={27} cy={125} rx={6} ry={3} fill="#4A2C20" />
-        <Ellipse cx={43} cy={125} rx={6} ry={3} fill="#4A2C20" />
-        <Path d="M24 50 Q35 45 46 50 L56 122 Q35 128 14 122 Z" fill={dress} />
-        <Path d="M15 117 Q35 123 55 117" stroke={GOLD} strokeWidth={3} fill="none" />
-        <Path d="M30 60 L35 66 L40 60" stroke={GOLD} strokeWidth={2} fill="none" />
-        {/* Arms: the far one first, so the near one is in front. */}
-        {pose === "reach" ? (
+      <Animated.View style={[layer, walking ? foot([0, -4, 0, 0, 0]) : null]}>
+        {svg(<Ellipse cx={27} cy={125} rx={6} ry={3} fill="#4A2C20" />)}
+      </Animated.View>
+      <Animated.View style={[layer, walking ? foot([0, 0, 0, -4, 0]) : null]}>
+        {svg(<Ellipse cx={43} cy={125} rx={6} ry={3} fill="#4A2C20" />)}
+      </Animated.View>
+      {/* The dress sways from the waist as she walks. */}
+      <Animated.View
+        style={[layer, { transformOrigin: R_WAIST }, walking ? swing("-2.5deg", "2.5deg") : null]}
+      >
+        {svg(
           <>
-            <Path d="M24 56 Q40 72 60 70" {...sleeve} />
-            <Circle cx={62} cy={70} r={3.6} fill={SKIN} />
-            <Path d="M46 54 Q56 60 63 62" {...sleeve} />
-            <Circle cx={65} cy={62} r={3.6} fill={SKIN} />
-          </>
-        ) : (
-          <>
-            <Path d="M24 54 Q18 70 20 84" {...sleeve} />
-            <Circle cx={20} cy={87} r={3.6} fill={SKIN} />
-            {pose === "wave" ? (
-              ownArm ? null : (
-                <WaveArm />
-              )
-            ) : (
-              <>
-                <Path d="M46 54 Q52 70 50 84" {...sleeve} />
-                <Circle cx={50} cy={87} r={3.6} fill={SKIN} />
-              </>
-            )}
-          </>
+            <Path d="M24 50 Q35 45 46 50 L56 122 Q35 128 14 122 Z" fill={dress} />
+            <Path d="M15 117 Q35 123 55 117" stroke={GOLD} strokeWidth={3} fill="none" />
+            <Path d="M30 60 L35 66 L40 60" stroke={GOLD} strokeWidth={2} fill="none" />
+          </>,
         )}
-        <Path
-          d="M20 34 Q19 12 35 10 Q51 12 50 34 Q50 50 46 54 Q35 58 24 54 Q20 50 20 34 Z"
-          fill="#FFFFFF"
-          stroke="#E2DCD3"
-          strokeWidth={1}
-        />
-        <Circle cx={35} cy={30} r={11} fill={SKIN} />
-        <Circle cx={31} cy={29} r={1.5} fill="#2B1D16" />
-        <Circle cx={39} cy={29} r={1.5} fill="#2B1D16" />
-        <Circle cx={28} cy={33} r={1.8} fill="#E58B7B" opacity={0.6} />
-        <Circle cx={42} cy={33} r={1.8} fill="#E58B7B" opacity={0.6} />
-        {sad ? (
-          <>
-            <Path d="M28 26 L33 24.2 M42 26 L37 24.2" stroke="#2B1D16" strokeWidth={1.1} />
-            <Path d="M30.5 32 Q28.6 36 30.5 37.6 Q32.4 36 30.5 32 Z" fill="#7FB8E8" />
-          </>
-        ) : null}
-        <Path
-          d={sad ? "M31 36 Q35 33 39 36" : "M31 34 Q35 37.5 39 34"}
-          stroke="#7A3418"
-          strokeWidth={1.4}
-          fill="none"
-          strokeLinecap="round"
-        />
-      </Svg>
-      {sad ? null : (
+      </Animated.View>
+      {/* Arms: the far one first, so the near one is in front; free arms swing. */}
+      {pose === "reach" ? (
+        <View style={layer}>
+          {svg(
+            <>
+              <Path d="M24 56 Q40 72 60 70" {...sleeve} />
+              <Circle cx={62} cy={70} r={3.6} fill={SKIN} />
+              <Path d="M46 54 Q56 60 63 62" {...sleeve} />
+              <Circle cx={65} cy={62} r={3.6} fill={SKIN} />
+            </>,
+          )}
+        </View>
+      ) : (
         <>
-          {eyelid(31)}
-          {eyelid(39)}
+          <Animated.View
+            style={[
+              layer,
+              { transformOrigin: R_SHOULDER_FAR },
+              walking ? swing("14deg", "-14deg") : null,
+            ]}
+          >
+            {svg(
+              <>
+                <Path d="M24 54 Q18 70 20 84" {...sleeve} />
+                <Circle cx={20} cy={87} r={3.6} fill={SKIN} />
+              </>,
+            )}
+          </Animated.View>
+          {pose === "wave" ? (
+            ownArm ? null : (
+              <View style={layer}>{svg(<WaveArm />)}</View>
+            )
+          ) : (
+            <Animated.View
+              style={[
+                layer,
+                { transformOrigin: R_SHOULDER_NEAR },
+                walking && free ? swing("-14deg", "14deg") : null,
+              ]}
+            >
+              {svg(
+                <>
+                  <Path d="M46 54 Q52 70 50 84" {...sleeve} />
+                  <Circle cx={50} cy={87} r={3.6} fill={SKIN} />
+                </>,
+              )}
+            </Animated.View>
+          )}
         </>
       )}
+      {/* The head with her scarf: a kind tilt now and then. */}
+      <Animated.View
+        style={[
+          layer,
+          {
+            transformOrigin: R_NECK,
+            transform: [
+              {
+                rotate: key(
+                  tilt,
+                  [0, 0.3, 0.38, 0.62, 0.7, 1],
+                  ["0deg", "0deg", "7deg", "7deg", "0deg", "0deg"],
+                ),
+              },
+            ],
+          },
+        ]}
+      >
+        {svg(
+          <>
+            <Path
+              d="M20 34 Q19 12 35 10 Q51 12 50 34 Q50 50 46 54 Q35 58 24 54 Q20 50 20 34 Z"
+              fill="#FFFFFF"
+              stroke="#E2DCD3"
+              strokeWidth={1}
+            />
+            <Circle cx={35} cy={30} r={11} fill={SKIN} />
+            {face === "happy" ? (
+              // Laughing eyes and an open smile.
+              <>
+                <Path
+                  d="M28.8 29.6 Q31 27 33.2 29.6 M36.8 29.6 Q39 27 41.2 29.6"
+                  stroke="#2B1D16"
+                  strokeWidth={1.4}
+                  strokeLinecap="round"
+                  fill="none"
+                />
+                <Path d="M30.5 33.4 Q35 39.5 39.5 33.4 Z" fill="#7A3418" />
+                <Path
+                  d="M32.5 36.6 Q35 37.8 37.5 36.6"
+                  stroke="#E58B7B"
+                  strokeWidth={1.2}
+                  fill="none"
+                />
+              </>
+            ) : (
+              <>
+                <Circle cx={31} cy={29} r={1.5} fill="#2B1D16" />
+                <Circle cx={39} cy={29} r={1.5} fill="#2B1D16" />
+              </>
+            )}
+            <Circle cx={28} cy={33} r={1.8} fill="#E58B7B" opacity={face === "happy" ? 0.9 : 0.6} />
+            <Circle cx={42} cy={33} r={1.8} fill="#E58B7B" opacity={face === "happy" ? 0.9 : 0.6} />
+            {face === "sad" ? (
+              <>
+                <Path d="M28 26 L33 24.2 M42 26 L37 24.2" stroke="#2B1D16" strokeWidth={1.1} />
+                <Path d="M30.5 32 Q28.6 36 30.5 37.6 Q32.4 36 30.5 32 Z" fill="#7FB8E8" />
+              </>
+            ) : null}
+            {face === "happy" ? null : (
+              <Path
+                d={face === "sad" ? "M31 36 Q35 33 39 36" : "M31 34 Q35 37.5 39 34"}
+                stroke="#7A3418"
+                strokeWidth={1.4}
+                fill="none"
+                strokeLinecap="round"
+              />
+            )}
+          </>,
+        )}
+        {face === "smile" ? (
+          <>
+            {eyelid(31)}
+            {eyelid(39)}
+          </>
+        ) : null}
+      </Animated.View>
     </Animated.View>
   );
 }

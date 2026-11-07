@@ -22,6 +22,7 @@ import {
   RASHA_SHOULDER,
   Rasha,
   RashaArm,
+  type RashaMood,
   SunArt,
   TruckArt,
   WiltedPlantArt,
@@ -115,6 +116,12 @@ const NEWGIRL_ACTS = [
 ] as const;
 /** At a station he walks in, then stares at the thing there to read or count. */
 const STATION_ACTS = [[1500, "wonder"]] as const;
+
+/** Rasha is glad once the water is in the bowl. */
+const GIRL_MOOD = [[4300, "happy"]] as const;
+/** The little girl walks onto the roof, pours, and is glad. */
+const NEWGIRL_WALK = [[1000, false]] as const;
+const NEWGIRL_MOOD = [[3600, "happy"]] as const;
 
 /** Hudhud's thought bubbles in the resolve scene: left, top and size, from his head upwards. */
 const THOUGHT_DOTS: [number, number, number][] = [
@@ -354,7 +361,8 @@ function Thirst() {
 
 /** One morning a girl comes up to the roof, pours water into a bowl, and Hudhud peeks. */
 function Girl() {
-  const walk = useOnce(1500, 200, Easing.out(Easing.quad));
+  const walk = useOnce(1500, 200, Easing.linear);
+  const mood = useTimeline<RashaMood>("smile", GIRL_MOOD);
   const tilt = useOnce(600, 1800);
   const pour = useOnce(2000, 2300, Easing.linear);
   const flow = useSwing(180, 2300);
@@ -393,7 +401,7 @@ function Girl() {
       <Animated.View
         style={[styles.rashaPour, { transform: [{ translateX: lerp(walk, -150, 0) }] }]}
       >
-        <Rasha size={140} pose="reach" walking={!arrived} />
+        <Rasha size={140} pose="reach" walking={!arrived} mood={mood} />
       </Animated.View>
       <Animated.View
         style={[
@@ -440,7 +448,7 @@ function Drink() {
     <View style={styles.scene}>
       <Rooftop />
       <View style={styles.rasha}>
-        <Rasha size={140} />
+        <Rasha size={140} mood="happy" />
       </View>
       <Animated.View style={[styles.bowlOnWall, { opacity: lerp(shimmer, 0.92, 1) }]}>
         <BowlArt width={96} level={0.9} />
@@ -552,7 +560,7 @@ function Days() {
         }
       />
       <Animated.View style={[styles.rasha, { opacity: visit }]}>
-        <Rasha size={140} pose="wave" />
+        <Rasha size={140} pose="wave" mood="happy" />
       </Animated.View>
       <View style={styles.bowlOnWall}>
         <BowlArt width={96} level={0} />
@@ -862,7 +870,7 @@ function Turn() {
           },
         ]}
       >
-        <Rasha size={84} pose="wave" />
+        <Rasha size={84} pose="wave" mood="happy" />
       </Animated.View>
     </View>
   );
@@ -1302,9 +1310,13 @@ function Return() {
 
 /** On Hudhud's roof a little girl, new in the house, fills Rasha's bowl; he drinks. */
 function NewGirl() {
-  const tilt = useOnce(600, 900);
-  const pour = useOnce(1800, 1400, Easing.linear);
-  const flow = useSwing(180, 1400);
+  // She walks onto the roof with her jug, then pours.
+  const arrive = useOnce(1000, 0, Easing.linear);
+  const walking = useTimeline<boolean>(true, NEWGIRL_WALK);
+  const mood = useTimeline<RashaMood>("smile", NEWGIRL_MOOD);
+  const tilt = useOnce(600, 1200);
+  const pour = useOnce(1800, 1700, Easing.linear);
+  const flow = useSwing(180, 1700);
   const sip = useSwing(500, 3300);
   const act = useTimeline<Act>("stand", NEWGIRL_ACTS);
   const come = useOnce(1300, 900, Easing.linear);
@@ -1326,11 +1338,21 @@ function NewGirl() {
           },
         ]}
       />
-      <View style={styles.rashaPour}>
-        <Rasha size={120} pose="reach" dress="#2E8BC0" />
-      </View>
       <Animated.View
-        style={[styles.jug, { transform: [{ rotate: at(tilt, [0, 1], ["0deg", "62deg"]) }] }]}
+        style={[styles.rashaPour, { transform: [{ translateX: lerp(arrive, -130, 0) }] }]}
+      >
+        <Rasha size={120} pose="reach" dress="#2E8BC0" walking={walking} mood={mood} />
+      </Animated.View>
+      <Animated.View
+        style={[
+          styles.jug,
+          {
+            transform: [
+              { translateX: lerp(arrive, -130, 0) },
+              { rotate: at(tilt, [0, 1], ["0deg", "62deg"]) },
+            ],
+          },
+        ]}
       >
         <JugArt size={46} />
       </Animated.View>
