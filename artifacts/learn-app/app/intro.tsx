@@ -15,7 +15,7 @@ import { goBackOr } from "@/components/BackButton";
 import { ScreenBackground } from "@/components/ScreenBackground";
 import { UiText } from "@/components/UiText";
 import { Icon } from "@/components/world/Icon";
-import { BowlArt } from "@/components/world/Bowl";
+import { INK, Note } from "@/components/world/Bowl";
 import { SidrTreeArt } from "@/components/world/SidrTree";
 import { StoryPicture } from "@/components/world/StoryScenes";
 import { books, type Book } from "@/content";
@@ -173,9 +173,11 @@ function ChoicePicture({ book }: { book: Book }) {
       </View>
     );
   return (
+    // Rasha's note: reading it is the Arabic thread.
     <View style={styles.choicePicture}>
-      <BowlArt width={70} level={0.4} />
-      <Text style={styles.choiceGlyph}>أ ب ت</Text>
+      <Note width={84}>
+        <Text style={[styles.choiceGlyph, styles.noteGlyph]}>أ ب ت</Text>
+      </Note>
     </View>
   );
 }
@@ -429,6 +431,7 @@ const styles = StyleSheet.create({
   },
   choicePicture: { alignItems: "center", gap: 4 },
   choiceGlyph: { fontSize: 30, fontWeight: "900", color: "#FFFFFF" },
+  noteGlyph: { fontSize: 22, lineHeight: 32, color: INK },
   choiceCaption: { fontSize: 14, fontWeight: "700", color: "#FFFFFF" },
   pressed: { opacity: 0.88, transform: [{ scale: 0.96 }] },
 });

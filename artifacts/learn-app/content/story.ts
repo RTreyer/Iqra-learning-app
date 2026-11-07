@@ -3,10 +3,10 @@
  *
  * Hudhud lives on a roof in Sana'a. Every morning a girl, Rasha, put out a clay bowl of water
  * for the birds, though she did not know them: "you are thirsty". One day the bowl was empty
- * and she was gone. In the bowl she had scratched a message, and left a sidr seed. Hudhud
+ * and she was gone. Under the bowl she had tucked a note, and left a sidr seed. Hudhud
  * cannot read. Two threads, one per subject:
  * - Arabic: he follows Rasha's trail through the stories of the textbook (one station per
- *   unit) and learns the letters; the message in the bowl, «اِسْقِ الطُّيُورَ» signed «رَشَا»,
+ *   unit) and learns the letters; the note under the bowl, «اِسْقِ الطُّيُورَ» signed «رَشَا»,
  *   becomes readable letter by letter (its letters come in units 2, 3, 6, 7 and 8);
  * - maths: water is scarce; who can count can share. Each unit is a station with the seed, and
  *   the sidr tree grows with the maths path.
@@ -54,7 +54,7 @@ export const INTRO_STORY: readonly StoryScene[] = [
   { id: "gone", line: "وَفِي يَوْمٍ، كَانَ الصَّحْنُ فَارِغًا، وَالْبِنْتُ ذَهَبَتْ.", minMs: 3600 },
   {
     id: "inscription",
-    line: "كَتَبَتْ فِي الصَّحْنِ شَيْئًا، وَتَرَكَتْ بِذْرَةً. لَكِنِّي لَا أَعْرِفُ الْقِرَاءَةَ!",
+    line: "تَحْتَ الصَّحْنِ وَرَقَةٌ مِنْهَا، وَبِذْرَةٌ. لَكِنِّي لَا أَعْرِفُ الْقِرَاءَةَ!",
   },
   {
     id: "choose",
@@ -72,7 +72,7 @@ export const CHAPTERS: Record<ChapterId, readonly StoryScene[]> = {
       line: "سَأَتْبَعُ طَرِيقَهَا، وَفِي الطَّرِيقِ أَتَعَلَّمُ الْحُرُوفَ.",
       minMs: 3600,
     },
-    { id: "bowl", line: "كُلُّ حَرْفٍ نَتَعَلَّمُهُ، يُضِيءُ فِي الصَّحْنِ!", minMs: 3600 },
+    { id: "bowl", line: "كُلُّ حَرْفٍ نَتَعَلَّمُهُ، يُضِيءُ فِي الْوَرَقَةِ!", minMs: 3600 },
   ],
   math: [
     { id: "seed", line: "الْبِذْرَةُ تَحْتَاجُ مَاءً، وَالْمَاءُ قَلِيلٌ.", minMs: 3200 },
@@ -134,7 +134,7 @@ export const STATIONS: Record<string, Station> = {
     place: "roof",
     person: "🐦",
     thing: "✏",
-    where: "قَبْلَ أَنْ أَقْرَأَ، أَتَعَلَّمُ الْخُطُوطَ، مِثْلَ خُطُوطِ الصَّحْنِ.",
+    where: "قَبْلَ أَنْ أَقْرَأَ، أَتَعَلَّمُ الْخُطُوطَ، مِثْلَ خُطُوطِ رَشَا.",
     ask: "هَيَّا نَرْسُمُ الْخُطُوطَ!",
     outro: "صِرْتُ أَرْسُمُ الْخُطُوطَ! هَيَّا نَتَعَلَّمُ الْحُرُوفَ.",
   },

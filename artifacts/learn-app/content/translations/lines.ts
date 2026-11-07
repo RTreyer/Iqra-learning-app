@@ -672,8 +672,8 @@ export const EN_LINES: Record<string, string> = {
   "فِي الدَّفْتَرِ، كَتَبَتْ رَشَا عَنِ الطُّيُورِ!":
     "In the notebook, Rasha wrote about the birds!",
   "فِي الرِّيفِ": "In the countryside",
-  "فِي الصَّحْنِ رِسَالَةٌ مِنْ رَشَا. كُلُّ حَرْفٍ نَتَعَلَّمُهُ يُضِيءُ!":
-    "In the bowl is a message from Rasha. Every letter we learn lights up!",
+  "تَحْتَ الصَّحْنِ وَرَقَةٌ مِنْ رَشَا. كُلُّ حَرْفٍ نَتَعَلَّمُهُ يُضِيءُ!":
+    "Under the bowl is a note from Rasha. Every letter we learn lights up!",
   "فِي الْحَدِيقَةِ": "In the garden",
   "فِي الْحَدِيقَةِ يُغَنِّي بُلْبُلُ صَابِرٍ. عَلَى الْغُصْنِ وَرَقَةٌ.":
     "In the garden, Saber's bulbul sings. There is a note on the branch.",
@@ -692,8 +692,8 @@ export const EN_LINES: Record<string, string> = {
     "The bulbul said: Rasha used to feed me, just like you!",
   "قَالَ الْمُزَارِعُ: نَزْرَعُ لِلْغَدِ، لَا لِلْيَوْمِ فَقَطْ.":
     "The farmer said: we plant for tomorrow, not only for today.",
-  "قَبْلَ أَنْ أَقْرَأَ، أَتَعَلَّمُ الْخُطُوطَ، مِثْلَ خُطُوطِ الصَّحْنِ.":
-    "Before I can read, I learn lines, like the lines in the bowl.",
+  "قَبْلَ أَنْ أَقْرَأَ، أَتَعَلَّمُ الْخُطُوطَ، مِثْلَ خُطُوطِ رَشَا.":
+    "Before I can read, I learn lines, like Rasha's lines.",
   "قَرَأْنَا اللَّوْحَةَ: انْتَقَلَ أَهْلُ رَشَا إِلَى بَيْتٍ جَدِيدٍ.":
     "We read the sign: Rasha's family moved to a new home.",
   "قَرَأْنَا اللَّوْحَةَ: هَذَا الطَّرِيقُ إِلَى الْجِبَالِ.":
@@ -721,8 +721,8 @@ export const EN_LINES: Record<string, string> = {
   "كَبِرَتْ شَجَرَةُ السِّدْرِ! شُكْرًا لَكَ!": "The sidr tree has grown! Thank you!",
   "كَبِرَتْ شَجَرَةُ السِّدْرِ، وَجَاءَتِ الطُّيُورُ إِلَيْهَا.":
     "The sidr tree has grown, and the birds came to it.",
-  "كَتَبَتْ فِي الصَّحْنِ شَيْئًا، وَتَرَكَتْ بِذْرَةً. لَكِنِّي لَا أَعْرِفُ الْقِرَاءَةَ!":
-    "She wrote something in the bowl, and left a seed. But I cannot read!",
+  "تَحْتَ الصَّحْنِ وَرَقَةٌ مِنْهَا، وَبِذْرَةٌ. لَكِنِّي لَا أَعْرِفُ الْقِرَاءَةَ!":
+    "Under the bowl is a note from her, and a seed. But I cannot read!",
   "كَمِ الْبَاقِي فِي الْعُلْبَةِ؟": "How many are left in the box?",
   "كَمِ الْبَاقِي؟": "How many are left?",
   "كَمِ الْمَجْمُوعُ؟": "What is the total?",
@@ -741,8 +741,8 @@ export const EN_LINES: Record<string, string> = {
   "كُرَةٌ أَمْ أُسْطُوَانَةٌ؟": "A sphere or a cylinder?",
   "كُلَّ صَبَاحٍ، كَانَتْ بِنْتٌ تَضَعُ مَاءً لِلطُّيُورِ فِي صَحْنٍ.":
     "Every morning, a girl put out water for the birds in a bowl.",
-  "كُلُّ حَرْفٍ نَتَعَلَّمُهُ، يُضِيءُ فِي الصَّحْنِ!":
-    "Every letter we learn lights up in the bowl!",
+  "كُلُّ حَرْفٍ نَتَعَلَّمُهُ، يُضِيءُ فِي الْوَرَقَةِ!":
+    "Every letter we learn lights up on the note!",
   "ل: اللَّبَنُ": "ل: Milk",
   "ل: الْبَقَرَةُ": "ل: The cow",
   "لينا  ،  ليل  ،  بلبل  ،  دلال": "Lina, night, nightingale, Dalal",

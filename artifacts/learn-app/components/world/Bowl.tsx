@@ -3,12 +3,13 @@
  * - `BowlArt`: the bowl itself, with water up to a level;
  * - `BowlGoal`: the daily ritual on the home screen and the finish card: every lesson of the day
  *   fills it a little; with three, it is full and the birds come to drink (no streak, no loss);
- * - `BowlMessage`: the message Rasha scratched into it, «اِسْقِ الطُّيُورَ» and her name. Each
- *   letter lights up once the child has learnt it; the rest stays scratched and faint.
+ * - `Note`: the sheet of paper Rasha tucked under the bowl, folded once;
+ * - `BowlMessage`: the bowl with her note clamped under it, «اِسْقِ الطُّيُورَ» and her name.
+ *   Each letter lights up once the child has learnt it; the rest stays pale.
  */
 
 import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from "react-native";
 import { Ellipse, Path, Svg } from "react-native-svg";
 
 import { MESSAGE } from "@/content/story";
@@ -21,6 +22,9 @@ const CLAY = "#B5522E";
 const CLAY_DARK = "#7A3418";
 const CLAY_LIGHT = "#D9805A";
 const WATER = "#4F8FD6";
+/** Rasha's ink on the note, and the paper. */
+const INK = "#2F3A6E";
+const PAPER = "#FBF3DF";
 
 /** The clay bowl seen a little from above, with water from 0 (empty) to 1 (full). */
 export function BowlArt({ width = 120, level = 0 }: { width?: number; level?: number }) {
@@ -82,9 +86,62 @@ export function messageLetters(word: string): string[] {
   return [...word.replace(/[ً-ْٰ]/g, "")];
 }
 
+/** Rasha's note: a sheet of paper, folded once, with a pale crease across it. */
+export function Note({
+  children,
+  width,
+  style,
+}: {
+  children: React.ReactNode;
+  width?: number;
+  style?: StyleProp<ViewStyle>;
+}) {
+  return (
+    <View style={[styles.note, width ? { width } : null, style]}>
+      <View style={styles.crease} />
+      {children}
+    </View>
+  );
+}
+
+/** The message's letters on the note, one row per word: readable letters in ink, the rest pale. */
+export function NoteLetters({
+  readable: isReadable,
+  size = 22,
+}: {
+  readable: (letter: string) => boolean;
+  size?: number;
+}) {
+  const words = [...MESSAGE.words, MESSAGE.name];
+  return (
+    <>
+      {words.map((w, i) => (
+        <View
+          key={w}
+          style={[styles.letters, { gap: size * 0.22 }, i === words.length - 1 && styles.signature]}
+        >
+          {messageLetters(w).map((l, k) => (
+            <Text
+              key={k}
+              testID={isReadable(l) ? "bowl-letter-lit" : "bowl-letter-faint"}
+              style={[
+                styles.letter,
+                { fontSize: size, lineHeight: size * 1.45, minWidth: size * 0.65 },
+                isReadable(l) ? styles.lit : styles.faint,
+              ]}
+            >
+              {l}
+            </Text>
+          ))}
+        </View>
+      ))}
+    </>
+  );
+}
+
 /**
- * The message in the bowl, as separate letters (scratched, not yet joined into words): learnt
- * letters glow, the others stay faint. With every letter learnt it reads as a whole.
+ * The bowl with Rasha's note clamped under it. The letters stand apart (not yet joined into
+ * words): learnt letters in ink, the others pale. With every letter learnt it reads as a whole.
  */
 export function BowlMessage({
   learnt,
@@ -99,7 +156,8 @@ export function BowlMessage({
   const all = words.every((w) => messageLetters(w).every((l) => readable(l, learnt)));
   const line = all
     ? `${MESSAGE.words.join(" ")}. ${MESSAGE.name}.`
-    : "فِي الصَّحْنِ رِسَالَةٌ مِنْ رَشَا. كُلُّ حَرْفٍ نَتَعَلَّمُهُ يُضِيءُ!";
+    : "تَحْتَ الصَّحْنِ وَرَقَةٌ مِنْ رَشَا. كُلُّ حَرْفٍ نَتَعَلَّمُهُ يُضِيءُ!";
+  const bowlWidth = compact ? 112 : 132;
   return (
     <Pressable
       testID={testID}
@@ -113,7 +171,11 @@ export function BowlMessage({
       style={({ pressed }) => [styles.message, compact && styles.compact, pressed && styles.pressed]}
     >
       {all ? <View style={styles.glow} /> : null}
-      <View style={styles.inscription}>
+      <View style={styles.onTop}>
+        <BowlArt width={bowlWidth} level={all ? 1 : 0.35} />
+      </View>
+      {/* The note is clamped under the bowl: its top edge hides beneath the bowl's foot. */}
+      <Note width={compact ? 140 : 160} style={[styles.tucked, { marginTop: -bowlWidth * 0.14 }]}>
         {all ? (
           // Whole: the message reads joined, as Rasha wrote it.
           <>
@@ -121,22 +183,9 @@ export function BowlMessage({
             <Text style={[styles.name, styles.lit]}>{MESSAGE.name}</Text>
           </>
         ) : (
-          words.map((w, i) => (
-            <View key={w} style={[styles.letters, i === words.length - 1 && styles.signature]}>
-              {messageLetters(w).map((l, k) => (
-                <Text
-                  key={k}
-                  testID={readable(l, learnt) ? "bowl-letter-lit" : "bowl-letter-faint"}
-                  style={[styles.letter, readable(l, learnt) ? styles.lit : styles.faint]}
-                >
-                  {l}
-                </Text>
-              ))}
-            </View>
-          ))
+          <NoteLetters readable={(l) => readable(l, learnt)} />
         )}
-      </View>
-      <BowlArt width={compact ? 120 : 150} level={all ? 1 : 0.35} />
+      </Note>
     </Pressable>
   );
 }
@@ -156,23 +205,40 @@ const styles = StyleSheet.create({
     backgroundColor: "#F4C14B",
     opacity: 0.35,
   },
-  inscription: {
+  note: {
     alignItems: "center",
     gap: 2,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 14,
-    backgroundColor: "#F3DCC7",
-    borderWidth: 2,
-    borderColor: CLAY_LIGHT,
+    paddingHorizontal: 12,
+    paddingTop: 14,
+    paddingBottom: 8,
+    borderRadius: 4,
+    backgroundColor: PAPER,
+    borderWidth: 1,
+    borderColor: "#E2CFA4",
+    shadowColor: "#5E3220",
+    shadowOpacity: 0.18,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
   },
-  letters: { flexDirection: "row-reverse", gap: 5 },
+  crease: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: "50%",
+    height: 1,
+    backgroundColor: "#E8DAB8",
+  },
+  // Behind the bowl, a little askew, as if pushed under it in a hurry.
+  tucked: { transform: [{ rotate: "-3deg" }] },
+  onTop: { zIndex: 1 },
+  letters: { flexDirection: "row-reverse" },
   signature: { marginTop: 2 },
-  letter: { fontSize: 22, fontWeight: "900", lineHeight: 32, minWidth: 14, textAlign: "center" },
-  lit: { color: CLAY_DARK },
-  faint: { color: "#D9B79F" },
+  letter: { fontWeight: "900", textAlign: "center" },
+  lit: { color: INK },
+  faint: { color: "#D8CBAE" },
   word: { fontSize: 24, fontWeight: "900", lineHeight: 36 },
   name: { fontSize: 18, fontWeight: "800", lineHeight: 28 },
 });
 
-export { CLAY, CLAY_DARK, WATER };
+export { CLAY, CLAY_DARK, INK, PAPER, WATER };

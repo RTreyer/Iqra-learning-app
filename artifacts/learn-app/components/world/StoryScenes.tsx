@@ -12,7 +12,7 @@ import { Art } from "@/components/art/Art";
 import { Picture } from "@/components/pictures/Picture";
 import { MESSAGE, STATIONS, type StationPlace, type StoryScene } from "@/content/story";
 import { yemen } from "@/theme/tokens";
-import { BowlArt, messageLetters } from "./Bowl";
+import { BowlArt, INK, Note, NoteLetters, messageLetters } from "./Bowl";
 import { Hudhud } from "./Hudhud";
 import { SidrTreeArt } from "./SidrTree";
 import { Skyline } from "./Skyline";
@@ -223,26 +223,36 @@ function Gone() {
   );
 }
 
-/** The message scratched into the bowl, which Hudhud cannot read, and the seed she left. */
+/**
+ * The note clamped under the empty bowl: Hudhud tugs it out with his beak, looks at it, and
+ * cannot read it. Beside the bowl, the seed she left.
+ */
 function Inscription() {
-  const puzzle = useSwing(700);
+  // He pulls the note out from under the bowl once; then wonders.
+  const pull = useOnce(1500, 900);
+  const puzzle = useSwing(700, 2400);
   const glint = useSwing(1100, 400);
-  const letters = [...MESSAGE.words, MESSAGE.name].flatMap((w) => messageLetters(w));
+  const out = { transform: [{ translateY: lerp(pull, 0, 124) }, { translateX: lerp(pull, 0, 24) }] };
   return (
     <View style={styles.scene}>
       <View style={[styles.fill, { backgroundColor: "#F3DCC7" }]} />
-      <View style={styles.bigBowl}>
-        <BowlArt width={250} level={0} />
-        <View style={styles.scratches}>
-          {letters.map((l, i) => (
-            <Text key={i} style={styles.scratch}>
-              {l}
-            </Text>
-          ))}
+      <View style={styles.noteStage}>
+        <Animated.View
+          style={[
+            styles.pulledNote,
+            { transform: [...out.transform, { rotate: pull.interpolate({ inputRange: [0, 1], outputRange: ["-4deg", "5deg"] }) }] },
+          ]}
+        >
+          <Note width={150}>
+            <NoteLetters readable={() => false} size={18} />
+          </Note>
+        </Animated.View>
+        <View style={styles.bowlOver}>
+          <BowlArt width={210} level={0} />
         </View>
         <Animated.View
           style={[
-            styles.seed,
+            styles.seedBeside,
             { opacity: lerp(glint, 0.75, 1), transform: [{ scale: lerp(glint, 1, 1.15) }] },
           ]}
         >
@@ -251,23 +261,31 @@ function Inscription() {
             <Path d="M4 8 Q11 3 18 8" stroke="#5E3220" strokeWidth={1.5} fill="none" />
           </Svg>
         </Animated.View>
-      </View>
-      <View style={styles.inscriptionBird}>
-        <Hudhud size={90} hop={false} />
-        <Animated.View style={{ transform: [{ translateY: lerp(puzzle, 0, -6) }] }}>
-          <Picture emoji="❓" size={36} />
+        {/* Hudhud holds the note's corner in his beak and comes out with it. */}
+        <Animated.View style={[styles.puller, out]}>
+          <Animated.View
+            style={{
+              opacity: pull.interpolate({ inputRange: [0.85, 1], outputRange: [0, 1], extrapolate: "clamp" }),
+              transform: [{ translateY: lerp(puzzle, 0, -6) }],
+            }}
+          >
+            <Picture emoji="❓" size={30} />
+          </Animated.View>
+          <Hudhud size={84} hop={false} />
         </Animated.View>
       </View>
     </View>
   );
 }
 
-/** The choice: Hudhud with the bowl and the seed (the choices are buttons on the screen). */
+/** The choice: Hudhud with the note and the seed (the choices are buttons on the screen). */
 function Choose() {
   return (
     <View style={[styles.scene, styles.chooseScene]}>
       <View style={styles.chooseRow}>
-        <BowlArt width={90} level={0} />
+        <Note width={112} style={styles.heldNote}>
+          <NoteLetters readable={() => false} size={12} />
+        </Note>
         <Hudhud size={130} />
         <SidrTreeArt stage={0} size={80} />
       </View>
@@ -320,41 +338,53 @@ function Trail() {
 
 const TRAIL_DOTS = 9;
 
-/** The bowl's message: the letters light up one after another, as the child will learn them. */
+/** Rasha's note, unfolded: every letter we learn lights up on it, one after another. */
 function BowlScene() {
-  const letters = [...MESSAGE.words, MESSAGE.name].flatMap((w) => messageLetters(w));
-  // One clock: letter i lights up at its share of it.
-  const light = useOnce(letters.length * 260 + 400, 500, Easing.linear);
+  const words = [...MESSAGE.words, MESSAGE.name].map((w) => messageLetters(w));
+  const count = words.flat().length;
+  // One clock: letter i (counted over all words) lights up at its share of it.
+  const light = useOnce(count * 260 + 400, 500, Easing.linear);
+  let index = 0;
   return (
     <View style={styles.scene}>
       <View style={[styles.fill, { backgroundColor: "#F3DCC7" }]} />
-      <View style={styles.bigBowl}>
-        <BowlArt width={250} level={0.4} />
-        <View style={styles.scratches}>
-          {letters.map((l, i) => (
-            <View key={i}>
-              <Text style={styles.scratch}>{l}</Text>
-              <Animated.Text
-                style={[
-                  styles.scratch,
-                  styles.glowLetter,
-                  {
-                    opacity: light.interpolate({
-                      inputRange: [i / letters.length, (i + 1) / letters.length],
-                      outputRange: [0, 1],
-                      extrapolate: "clamp",
-                    }),
-                  },
-                ]}
-              >
-                {l}
-              </Animated.Text>
+      <View style={styles.ledge} />
+      <View style={styles.smallBowl}>
+        <BowlArt width={110} level={0.4} />
+      </View>
+      <View style={styles.bigNote}>
+        <Note width={250} style={styles.unfolded}>
+          {words.map((letters, w) => (
+            <View key={w} style={styles.noteRow}>
+              {letters.map((l) => {
+                const i = index++;
+                return (
+                  <View key={i}>
+                    <Text style={[styles.noteLetter, styles.paleLetter]}>{l}</Text>
+                    <Animated.Text
+                      style={[
+                        styles.noteLetter,
+                        styles.glowLetter,
+                        {
+                          opacity: light.interpolate({
+                            inputRange: [i / count, (i + 1) / count],
+                            outputRange: [0, 1],
+                            extrapolate: "clamp",
+                          }),
+                        },
+                      ]}
+                    >
+                      {l}
+                    </Animated.Text>
+                  </View>
+                );
+              })}
             </View>
           ))}
-        </View>
+        </Note>
       </View>
-      <View style={styles.inscriptionBird}>
-        <Hudhud size={90} pose="cheer" />
+      <View style={styles.noteBird}>
+        <Hudhud size={86} pose="cheer" />
       </View>
     </View>
   );
@@ -734,26 +764,35 @@ const styles = StyleSheet.create({
   facing: { left: 220 },
   heart: { position: "absolute", left: 160, top: 50 },
   door: { position: "absolute", left: 24, bottom: 62 },
-  bigBowl: { position: "absolute", top: 70, left: 0, right: 0, alignItems: "center" },
-  scratches: {
+  ledge: {
     position: "absolute",
-    top: 22,
-    flexDirection: "row-reverse",
-    flexWrap: "wrap",
-    width: 200,
-    justifyContent: "center",
-    gap: 6,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 64,
+    backgroundColor: "#E5C3A4",
   },
-  scratch: { fontSize: 22, fontWeight: "900", color: "#D9B79F", lineHeight: 30 },
+  noteStage: { position: "absolute", top: 16, left: 0, right: 0, height: 270, alignItems: "center" },
+  // Under the bowl at first; only a corner shows below its foot.
+  pulledNote: { position: "absolute", top: 34 },
+  bowlOver: { position: "absolute", top: 0 },
+  seedBeside: { position: "absolute", top: 118, left: "12%" },
+  puller: { position: "absolute", top: 4, right: "6%", alignItems: "center" },
+  smallBowl: { position: "absolute", left: 12, bottom: 34 },
+  bigNote: { position: "absolute", top: 26, left: 0, right: 0, alignItems: "center" },
+  unfolded: { paddingVertical: 18, transform: [{ rotate: "-2deg" }] },
+  noteRow: { flexDirection: "row-reverse", justifyContent: "center", gap: 6 },
+  noteLetter: { fontSize: 26, fontWeight: "900", lineHeight: 38, minWidth: 16, textAlign: "center" },
+  paleLetter: { color: "#D8CBAE" },
   glowLetter: {
     position: "absolute",
-    color: "#FFF1C2",
+    color: INK,
     textShadowColor: "#F4C14B",
     textShadowRadius: 8,
   },
-  seed: { position: "absolute", top: 96 },
-  inscriptionBird: { position: "absolute", top: 4, right: 12, alignItems: "center" },
+  noteBird: { position: "absolute", right: 14, bottom: 18 },
   chooseScene: { backgroundColor: "transparent", alignItems: "center", justifyContent: "center" },
+  heldNote: { flexShrink: 0, marginBottom: 24, transform: [{ rotate: "5deg" }] },
   chooseRow: { flexDirection: "row", alignItems: "flex-end", gap: 8 },
   trailDot: {
     position: "absolute",
