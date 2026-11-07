@@ -57,7 +57,9 @@ export function Guide({
 
   const bubble = (
     <View style={[styles.bubble, layout === "row" ? styles.bubbleRow : styles.bubbleStack]}>
-      <Icon name="speaker" size={22} color={yemen.clay} />
+      <View style={{ flexShrink: 0 }}>
+        <Icon name="speaker" size={22} color={yemen.clay} />
+      </View>
       <Text style={styles.text}>{text}</Text>
     </View>
   );

@@ -255,7 +255,9 @@ export default function IntroScreen() {
         <SceneStage index={index} />
         {/* A new line appears as the new scene comes in. */}
         <Appear key={scene.id} delay={TURN_MS / 3} style={styles.bubble}>
-          <Icon name="speaker" size={22} color={yemen.clay} />
+          <View style={styles.speaker}>
+            <Icon name="speaker" size={22} color={yemen.clay} />
+          </View>
           <Text style={styles.line}>{scene.line}</Text>
         </Appear>
       </Pressable>
@@ -341,6 +343,7 @@ const styles = StyleSheet.create({
     gap: 10,
     boxShadow: `0 4px 0 ${yemen.sandShadow}`,
   },
+  speaker: { flexShrink: 0 },
   line: {
     flex: 1,
     fontSize: 21,

@@ -4,7 +4,7 @@
  */
 
 import { router, useLocalSearchParams } from "expo-router";
-import React from "react";
+import React, { useCallback, useRef, type ComponentRef } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { BackButton } from "@/components/BackButton";
@@ -12,7 +12,6 @@ import { NotFoundCard } from "@/components/NotFoundCard";
 import { ScreenBackground } from "@/components/ScreenBackground";
 import { StarBadge } from "@/components/StarBadge";
 import { UiText } from "@/components/UiText";
-import { Guide } from "@/components/world/Guide";
 import { PathMap, type Stop } from "@/components/world/PathMap";
 import { getBook, unitLessonIds } from "@/content";
 import { SUBJECT_LINES } from "@/content/story";
@@ -28,6 +27,12 @@ export default function BookScreen() {
   const { progress, getUnitProgress } = useProgress();
   const { t, language, digits } = useLanguage();
   const pad = useScreenPadding();
+  const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
+  // Open the path where Hudhud stands, with some of the way behind him in view.
+  const scrollToGuide = useCallback(
+    (y: number) => scroll.current?.scrollTo({ y: Math.max(0, y - 220), animated: false }),
+    [],
+  );
 
   const book = getBook(bookId ?? "");
   if (!book) return <NotFoundCard message="الكتاب غير موجود" />;
@@ -75,13 +80,8 @@ export default function BookScreen() {
         </View>
         <StarBadge stars={progress.totalStars} />
       </View>
-      <Guide
-        text={SUBJECT_LINES[book.subject] ?? SUBJECT_LINES.arabic}
-        speakOnMount
-        birdSize={64}
-        style={styles.guide}
-      />
       <ScrollView
+        ref={scroll}
         style={styles.scroll}
         contentContainerStyle={{ paddingTop: 56, paddingBottom: pad.bottom + 32 }}
         showsVerticalScrollIndicator={false}
@@ -90,6 +90,8 @@ export default function BookScreen() {
           stops={stops}
           color={book.color}
           onPress={(unitId) => router.push(routes.unit(unitId))}
+          guide={SUBJECT_LINES[book.subject] ?? SUBJECT_LINES.arabic}
+          onGuideY={scrollToGuide}
         />
       </ScrollView>
     </ScreenBackground>
@@ -115,7 +117,6 @@ const styles = StyleSheet.create({
   },
   bookEmoji: { fontSize: 22 },
   bookTitle: { fontSize: 18, fontWeight: "800", color: yemen.ink, flexShrink: 1 },
-  guide: { paddingHorizontal: 16 },
   scroll: { flex: 1, width: "100%" },
   letters: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 4, justifyContent: "center" },
   letter: {

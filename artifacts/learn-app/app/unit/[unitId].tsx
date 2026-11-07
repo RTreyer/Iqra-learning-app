@@ -5,7 +5,7 @@
  */
 
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo, useRef, type ComponentRef } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { BackButton } from "@/components/BackButton";
@@ -13,7 +13,6 @@ import { NotFoundCard } from "@/components/NotFoundCard";
 import { ScreenBackground } from "@/components/ScreenBackground";
 import { StarBadge } from "@/components/StarBadge";
 import { UiText } from "@/components/UiText";
-import { Guide } from "@/components/world/Guide";
 import { lessonPicture } from "@/components/world/lessonPicture";
 import { PathMap, type Stop } from "@/components/world/PathMap";
 import { books, getUnit, unitLessonIds } from "@/content";
@@ -30,6 +29,12 @@ export default function UnitScreen() {
   const unitId = firstParam(useLocalSearchParams<{ unitId?: string | string[] }>().unitId);
   const { progress, getLessonProgress, getUnitProgress } = useProgress();
   const pad = useScreenPadding();
+  const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
+  // Open the path where Hudhud stands, with some of the way behind him in view.
+  const scrollToGuide = useCallback(
+    (y: number) => scroll.current?.scrollTo({ y: Math.max(0, y - 220), animated: false }),
+    [],
+  );
   const { language, digits } = useLanguage();
 
   const unit = getUnit(unitId ?? "");
@@ -106,9 +111,9 @@ export default function UnitScreen() {
         </View>
       ) : null}
       <UiText style={styles.progressLabel}>{`${summary.done} / ${summary.total} مكتمل`}</UiText>
-      <Guide text={unit.theme} speakOnMount birdSize={56} style={styles.guide} />
 
       <ScrollView
+        ref={scroll}
         style={styles.scroll}
         contentContainerStyle={{ paddingTop: 56, paddingBottom: pad.bottom + 32 }}
         showsVerticalScrollIndicator={false}
@@ -117,6 +122,8 @@ export default function UnitScreen() {
           stops={stops}
           color={unit.color}
           onPress={(lessonId) => router.push(routes.lesson(lessonId))}
+          guide={unit.theme}
+          onGuideY={scrollToGuide}
         />
       </ScrollView>
     </ScreenBackground>
@@ -166,7 +173,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 6,
   },
-  guide: { paddingHorizontal: 16, marginTop: 4 },
   scroll: { flex: 1 },
   section: {
     backgroundColor: "rgba(255,255,255,0.94)",

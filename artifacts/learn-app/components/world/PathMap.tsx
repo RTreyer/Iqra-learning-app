@@ -1,18 +1,21 @@
 /**
  * A winding path of round stops: the units of a book, or the lessons of a unit. Done stops
- * are gold, the stop to play now is big, coloured and breathing with Hudhud on it, later stops
- * are sand coloured but can still be opened. Pictures only; text is a small caption for parents.
+ * are gold, the stop to play now is big, coloured and breathing, later stops are sand coloured
+ * but can still be opened. Hudhud stands beside the stop to play now, his spoken line in a
+ * bubble above him (the only Hudhud on the screen). Pictures only; text is a small caption
+ * for parents.
  */
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View, type LayoutChangeEvent } from "react-native";
 import { Circle, Path, Svg } from "react-native-svg";
 
 import * as haptics from "@/lib/haptics";
-import { readableFill, yemen } from "@/theme/tokens";
+import { speak } from "@/lib/speech";
+import { readableFill, touchTarget, yemen } from "@/theme/tokens";
 import { Pulse } from "./Guide";
 import { Hudhud } from "./Hudhud";
-import { StarIcon } from "./Icon";
+import { Icon, StarIcon } from "./Icon";
 
 export type StopState = "done" | "current" | "open";
 
@@ -43,21 +46,41 @@ const SWING = 74;
 const OFFSETS = [0, 1, 0, -1];
 /** Until the path has measured itself (and in tests), assume a phone. */
 const FALLBACK_WIDTH = 360;
+/** Extra room above the stop where Hudhud stands, for him and his bubble. */
+const GUIDE_ROOM = 84;
+const BIRD = 74;
+const BIRD_H = Math.round((BIRD * 130) / 140);
+const BUBBLE_MAX = 210;
 
-type Props = { stops: Stop[]; color: string; onPress: (key: string) => void };
+type Props = {
+  stops: Stop[];
+  color: string;
+  onPress: (key: string) => void;
+  /** Hudhud's line beside the stop to play now; said once when the path opens. */
+  guide?: string;
+  /** Where the stop to play now sits (px from the top of the path), to scroll it into view. */
+  onGuideY?: (y: number) => void;
+};
 
-export function PathMap({ stops, color, onPress }: Props) {
+export function PathMap({ stops, color, onPress, guide, onGuideY }: Props) {
   const [measured, setMeasured] = useState(0);
   const width = measured || FALLBACK_WIDTH;
   const fill = readableFill(color);
   const onLayout = (e: LayoutChangeEvent) => setMeasured(e.nativeEvent.layout.width);
 
+  const current = stops.findIndex((s) => s.state === "current");
+  // Hudhud stands at the stop to play now, or at the last stop once everything is done.
+  const guideAt = guide ? (current >= 0 ? current : stops.length - 1) : -1;
   const centre = (i: number) => ({
     // Reading starts on the right: the path swings right first.
     x: width / 2 + OFFSETS[i % OFFSETS.length] * SWING,
-    y: i * ROW + 54,
+    y: i * ROW + 54 + (guideAt >= 0 && i >= guideAt ? GUIDE_ROOM : 0),
   });
-  const current = stops.findIndex((s) => s.state === "current");
+  const guideY = guideAt >= 0 ? centre(guideAt).y : null;
+  useEffect(() => {
+    if (guideY !== null) onGuideY?.(guideY);
+  }, [guideY, onGuideY]);
+  const height = stops.length * ROW + (guideAt >= 0 ? GUIDE_ROOM : 0);
   const goldEnd =
     current >= 0 ? current : stops.every((s) => s.state === "done") ? stops.length - 1 : -1;
   const pathTo = (end: number) => {
@@ -72,9 +95,9 @@ export function PathMap({ stops, color, onPress }: Props) {
   };
 
   return (
-    <View style={{ height: stops.length * ROW }} onLayout={onLayout}>
+    <View style={{ height }} onLayout={onLayout}>
       {stops.length > 0 ? (
-        <Svg width={width} height={stops.length * ROW} style={StyleSheet.absoluteFill}>
+        <Svg width={width} height={height} style={StyleSheet.absoluteFill}>
           <Path
             d={pathTo(stops.length - 1)}
             stroke={yemen.pathSand}
@@ -97,6 +120,7 @@ export function PathMap({ stops, color, onPress }: Props) {
         const { x, y } = centre(i);
         const size = stop.state === "current" ? BIG : SIZE;
         const onRight = OFFSETS[i % OFFSETS.length] > 0;
+        const guided = i === guideAt && guide !== undefined;
         const node = (
           <Pressable
             testID={stop.testID}
@@ -146,13 +170,17 @@ export function PathMap({ stops, color, onPress }: Props) {
             <View style={[styles.slot, { left: x - size / 2, top: y - size / 2 }]}>
               {stop.state === "current" ? <Pulse>{node}</Pulse> : node}
             </View>
-            {stop.state === "current" ? (
-              <View
-                pointerEvents="none"
-                style={[styles.bird, { left: x + size / 2 - 44, top: y - size / 2 - 50 }]}
-              >
-                <Hudhud size={62} />
-              </View>
+            {guided ? (
+              <PathGuide
+                text={guide}
+                // Same side as the stop's label: the label then moves below Hudhud.
+                side={onRight ? "left" : "right"}
+                x={x}
+                y={y}
+                size={size}
+                width={width}
+                height={height}
+              />
             ) : null}
             <View
               pointerEvents="none"
@@ -175,7 +203,11 @@ export function PathMap({ stops, color, onPress }: Props) {
                   onRight
                     ? { right: width - x + size / 2 + 14, left: 8 }
                     : { left: x + size / 2 + 14, right: 8 },
-                  { top: y - 26, alignItems: onRight ? "flex-end" : "flex-start" },
+                  {
+                    // Beside the stop, or below Hudhud where he stands.
+                    top: guided ? y + BIRD_H / 2 + 8 : y - 26,
+                    alignItems: onRight ? "flex-end" : "flex-start",
+                  },
                 ]}
               >
                 {stop.aside}
@@ -185,6 +217,74 @@ export function PathMap({ stops, color, onPress }: Props) {
         );
       })}
     </View>
+  );
+}
+
+/**
+ * Hudhud beside a stop with his line in a bubble above him, like a guide on the map. Tapping
+ * him or the bubble says the line again; it is said once when the path opens.
+ */
+function PathGuide({
+  text,
+  side,
+  x,
+  y,
+  size,
+  width,
+  height,
+}: {
+  text: string;
+  side: "left" | "right";
+  x: number;
+  y: number;
+  size: number;
+  width: number;
+  height: number;
+}) {
+  useEffect(() => {
+    const timer = setTimeout(() => speak(text), 300);
+    return () => clearTimeout(timer);
+  }, [text]);
+  const gap = 6;
+  const edge = 8;
+  const box =
+    side === "left"
+      ? {
+          right: width - (x - size / 2 - gap),
+          width: Math.min(BUBBLE_MAX, x - size / 2 - gap - edge),
+        }
+      : {
+          left: x + size / 2 + gap,
+          width: Math.min(BUBBLE_MAX, width - (x + size / 2 + gap) - edge),
+        };
+  return (
+    <Pressable
+      testID="guide"
+      accessibilityRole="button"
+      accessibilityLabel={text}
+      onPress={() => {
+        haptics.tap();
+        speak(text);
+      }}
+      // Anchored at the bottom: Hudhud stands level with the stop, the bubble grows upwards.
+      style={({ pressed }) => [
+        styles.guide,
+        box,
+        { bottom: height - (y + BIRD_H / 2) },
+        side === "left" ? styles.guideLeft : styles.guideRight,
+        pressed && styles.guidePressed,
+      ]}
+    >
+      <View style={styles.bubble}>
+        <View style={{ flexShrink: 0 }}>
+          <Icon name="speaker" size={18} color={yemen.clay} />
+        </View>
+        <Text style={styles.bubbleText}>{text}</Text>
+        <View style={[styles.tail, side === "left" ? styles.tailLeft : styles.tailRight]} />
+      </View>
+      {/* He looks at the stop: to the right when he stands on its left. */}
+      <Hudhud size={BIRD} mirrored={side === "left"} />
+    </Pressable>
   );
 }
 
@@ -228,7 +328,39 @@ const styles = StyleSheet.create({
     borderColor: "#FFFFFF",
   },
   pressed: { opacity: 0.88, transform: [{ scale: 0.95 }] },
-  bird: { position: "absolute" },
+  guide: { position: "absolute", gap: 6, minHeight: touchTarget },
+  guideLeft: { alignItems: "flex-end" },
+  guideRight: { alignItems: "flex-start" },
+  guidePressed: { opacity: 0.85 },
+  bubble: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 18,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 6,
+    boxShadow: `0 4px 0 ${yemen.sandShadow}`,
+  },
+  bubbleText: {
+    flexShrink: 1,
+    fontSize: 17,
+    fontWeight: "700",
+    color: yemen.ink,
+    textAlign: "center",
+    writingDirection: "rtl",
+    lineHeight: 26,
+  },
+  tail: {
+    position: "absolute",
+    bottom: -7,
+    width: 14,
+    height: 14,
+    backgroundColor: "#FFFFFF",
+    transform: [{ rotate: "45deg" }],
+  },
+  tailLeft: { right: BIRD / 2 - 7 },
+  tailRight: { left: BIRD / 2 - 7 },
   below: { position: "absolute", width: 120, alignItems: "center", gap: 2 },
   stars: { flexDirection: "row", gap: 2 },
   caption: { fontSize: 13, fontWeight: "700", color: yemen.inkSoft },
