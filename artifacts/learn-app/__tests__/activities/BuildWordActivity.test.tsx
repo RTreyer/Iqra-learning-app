@@ -63,7 +63,7 @@ test("a wrong tile shakes, says the needed syllable and costs the round", () => 
   tap("نُ");
   depart();
 
-  expect(screen.getByText("سؤال ٢ من ٥")).toBeTruthy();
+  expect(screen.getByTestId("progress-train")).toHaveProp("aria-valuenow", 2);
   for (const s of ["يَ", "دُ"]) tap(s);
   depart();
   for (const s of ["يُو", "لَـ", "دُ"]) tap(s);

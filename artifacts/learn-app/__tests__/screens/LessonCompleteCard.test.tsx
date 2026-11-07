@@ -49,3 +49,20 @@ test("back to the list replaces with the unit when there is no history", () => {
   expect(router.back).not.toHaveBeenCalled();
   expect(router.replace).toHaveBeenCalledWith(backTo);
 });
+
+test("a new sticker is shown and says its name", () => {
+  const Speech = jest.requireMock("expo-speech") as { speak: jest.Mock };
+  const sticker = { id: "qamariya" as const, name: "الْقَمَرِيَّةُ" };
+  renderScreen(
+    <LessonCompleteCard
+      stars={3}
+      onRepeat={jest.fn()}
+      next={next}
+      backTo={backTo}
+      today={2}
+      sticker={sticker}
+    />,
+  );
+  fireEvent.press(screen.getByTestId("new-sticker"));
+  expect(Speech.speak).toHaveBeenLastCalledWith("الْقَمَرِيَّةُ", expect.anything());
+});

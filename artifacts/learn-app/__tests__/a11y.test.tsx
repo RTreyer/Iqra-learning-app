@@ -1,12 +1,13 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { act, screen } from "@testing-library/react-native";
+import { act, fireEvent, screen } from "@testing-library/react-native";
 import React from "react";
 import { StyleSheet, type StyleProp, type ViewStyle } from "react-native";
 
 import HomeScreen from "@/app/index";
 import BookScreen from "@/app/book/[bookId]";
-import GradeScreen from "@/app/grade/[gradeId]";
+import AlbumScreen from "@/app/album";
 import LessonScreen from "@/app/lesson/[lessonId]";
+import ParentsScreen from "@/app/parents";
 import UnitScreen from "@/app/unit/[unitId]";
 import { DEMO_IDS } from "@/content/demos";
 import { resetDemoSeenCache } from "@/hooks/useDemoSeen";
@@ -42,12 +43,15 @@ function expectAccessiblePressables(exactly: number) {
     (node: ReturnType<typeof screen.UNSAFE_root.findAll>[number]) =>
       typeof node.type !== "string" &&
       (node.type as { name?: string }).name === "Pressable" &&
-      typeof node.props.onPress === "function",
+      (typeof node.props.onPress === "function" || typeof node.props.onLongPress === "function"),
   );
   expect(pressables.length).toBe(exactly);
   for (const node of pressables) {
     const where = String(node.props.testID ?? node.props.accessibilityLabel ?? "unnamed pressable");
-    expect({ where, role: node.props.accessibilityRole }).toEqual({ where, role: "button" });
+    // Switches in the parents' corner announce themselves as switches.
+    const role =
+      node.props.accessibilityRole === "switch" ? "button" : node.props.accessibilityRole;
+    expect({ where, role }).toEqual({ where, role: "button" });
     const label = node.props.accessibilityLabel;
     expect({ where, label: typeof label === "string" && label.trim().length > 0 }).toEqual({
       where,
@@ -77,34 +81,51 @@ beforeEach(async () => {
 });
 afterEach(() => jest.useRealTimers());
 
-test("home: language switch, continue, review and grade cards", async () => {
+test("home: play, islands, tiles, Hudhud and the parents' gear", async () => {
   await seed();
   withProgress(<HomeScreen />);
   await screen.findByTestId("review-card");
-  // 2 language buttons, continue, review and the 6 grade cards.
-  expectAccessiblePressables(10);
+  // Gear, Hudhud, play, 2 islands, today's window, album and review.
+  expectAccessiblePressables(8);
 });
 
-test("grade: back button and book cards", async () => {
-  setParams({ gradeId: "1" });
-  withProgress(<GradeScreen />);
-  await screen.findAllByTestId(/^book-/);
-  // Back and the 6 grade 1 book cards.
-  expectAccessiblePressables(7);
-});
-
-test("book: back button and unit cards", async () => {
+test("book: back button, Hudhud and the unit stations", async () => {
   setParams({ bookId: "arabic-1" });
   withProgress(<BookScreen />);
   await screen.findAllByTestId(/^unit-/);
-  expectAccessiblePressables(9);
+  expectAccessiblePressables(10);
 });
 
-test("unit: back button and lesson rows, including a completed one", async () => {
+test("unit: back button, Hudhud and the lesson stops, including a completed one", async () => {
   await seed();
   setParams({ unitId: "a1" });
   withProgress(<UnitScreen />);
   await screen.findAllByTestId(/^lesson-row-/);
+  expectAccessiblePressables(7);
+});
+
+test("unit with letters: each letter is a button that says itself", async () => {
+  setParams({ unitId: "a2" });
+  withProgress(<UnitScreen />);
+  await screen.findAllByTestId(/^lesson-row-/);
+  // Back, 7 letters, Hudhud and 31 lessons.
+  expectAccessiblePressables(40);
+});
+
+test("album: back button, nine stickers and Hudhud", async () => {
+  withProgress(<AlbumScreen />);
+  await screen.findByTestId("sticker-qamariya");
+  expectAccessiblePressables(11);
+});
+
+test("parents: the gate, then every control behind it", async () => {
+  withProgress(<ParentsScreen />);
+  // Back and the hold-to-open gate.
+  expectAccessiblePressables(2);
+  await act(async () => {
+    fireEvent(screen.getByTestId("parents-gate"), "longPress");
+  });
+  // Back, 2 languages, voice, vibration and reset.
   expectAccessiblePressables(6);
 });
 

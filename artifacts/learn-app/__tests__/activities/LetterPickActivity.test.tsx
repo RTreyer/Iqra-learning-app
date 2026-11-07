@@ -27,7 +27,7 @@ test("first tap scoring: wrong, wrong, right, right", () => {
       onRoundResult={onRoundResult}
     />,
   );
-  expect(screen.getByText("سؤال ١ من ٤")).toBeTruthy();
+  expect(screen.getByTestId("progress-train")).toHaveProp("aria-valuenow", 1);
 
   tap("بَ"); // target مَ
   tap("مَ"); // locked: ignored
@@ -70,11 +70,11 @@ test("resets when attemptKey changes", () => {
   );
   tap("مَ");
   advance();
-  expect(screen.getByText("سؤال ٢ من ٤")).toBeTruthy();
+  expect(screen.getByTestId("progress-train")).toHaveProp("aria-valuenow", 2);
   rerenderActivity(
     <LetterPickActivity lesson={lesson} color="#7C3AED" attemptKey="a:2" onComplete={jest.fn()} />,
   );
-  expect(screen.getByText("سؤال ١ من ٤")).toBeTruthy();
+  expect(screen.getByTestId("progress-train")).toHaveProp("aria-valuenow", 1);
   expect(screen.getByRole("button", { name: "مَ" })).not.toBeDisabled();
 });
 

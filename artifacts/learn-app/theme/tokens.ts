@@ -46,11 +46,37 @@ export function withAlpha(hex: string, alpha: number): string {
 
 export const subjects = SUBJECT_COLORS;
 
+/**
+ * The child's world: clay and sand of Old Sana'a, gypsum white, and the jewel colours of the
+ * qamariya windows. Every fill that carries white text reaches 4.5:1.
+ */
+export const yemen = {
+  ink: "#2B1D14",
+  inkSoft: "#5C4B3B",
+  clay: "#B5522E",
+  clayDeep: "#7A3418",
+  sand: "#F7E6CC",
+  sandLight: "#FFF8EC",
+  sandShadow: "#E6D3B8",
+  pathSand: "#E8D3B4",
+  blue: "#1F5FA8",
+  blueDeep: "#123F73",
+  green: "#2E7D4F",
+  greenDeep: "#1C5534",
+  red: "#C8402F",
+  gold: "#E9A81E",
+  goldDeep: "#9A6A00",
+  goldEdge: "#B57F0A",
+  paneEmpty: "#EADCC8",
+  locked: "#E4D7C5",
+  lockedInk: "#7D6A52",
+} as const;
+
 type Gradient = readonly [string, string, ...string[]];
 
 /** Subject gradients: subject color at about 12 percent over white, fading to cream. */
 export const gradients: Record<Subject | "home", Gradient> = {
-  home: ["#FFFDE7", "#FFF0A0", "#FFDC70"],
+  home: ["#FFF8EC", "#F7E6CC", "#EFD6B4"],
   arabic: ["#E5ECFD", "#FFFBF0"],
   lughati: ["#FDEBE1", "#FFFBF0"],
   math: ["#EFE7FD", "#FFFBF0"],

@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo } from "react";
 import { View } from "react-native";
-import { UiText } from "@/components/UiText";
 import { speak } from "@/lib/speech";
 import { PRAISE } from "./shared/strings";
 import { ChoiceCard } from "./shared/ChoiceCard";
@@ -57,9 +56,6 @@ function ListenPick({
   return (
     <View style={act.container}>
       <ProgressDots count={questions.length} current={quiz.roundIndex} color={color} />
-      <UiText
-        style={act.instruction}
-      >{`سؤال ${quiz.roundIndex + 1} من ${questions.length}`}</UiText>
       <ListenButton text={q.word} color={color} showText />
       <View style={act.choicesRow}>
         {options.items.map((choice, idx) => (

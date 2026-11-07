@@ -9,9 +9,25 @@ export type SpeakOptions = {
   onDone?: () => void;
 };
 
+let muted = false;
+
+/** Parents' switch (context/SettingsContext): when muted, speak() stays silent and reports done at once. */
+export function setSpeechMuted(value: boolean): void {
+  muted = value;
+  if (value) stopSpeaking();
+}
+
+export function isSpeechMuted(): boolean {
+  return muted;
+}
+
 /** Speaks Arabic text, stopping any current speech first. A number is read as the rate. */
 export function speak(text: string, options: number | SpeakOptions = {}): void {
   const { rate = ARABIC_RATE, onDone } = typeof options === "number" ? { rate: options } : options;
+  if (muted) {
+    onDone?.();
+    return;
+  }
   try {
     Speech.stop();
     if (onDone) {

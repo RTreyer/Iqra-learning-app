@@ -1,5 +1,7 @@
 import React from "react";
-import { Pressable, StyleSheet, Text } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
+
+import { Icon } from "@/components/world/Icon";
 
 import { useLanguage } from "@/context/LanguageContext";
 import * as haptics from "@/lib/haptics";
@@ -22,7 +24,7 @@ export function HelpButton({ onPress, disabled }: { onPress: () => void; disable
       accessibilityLabel={t("شاهد مثالاً")}
       accessibilityState={{ disabled: !!disabled }}
     >
-      <Text style={styles.icon}>👆</Text>
+      <Icon name="hand" size={30} color="#7A3418" />
     </Pressable>
   );
 }
@@ -39,5 +41,4 @@ const styles = StyleSheet.create({
   },
   disabled: { opacity: 0.45 },
   pressed: { opacity: 0.7, transform: [{ scale: 0.95 }] },
-  icon: { fontSize: 22 },
 });

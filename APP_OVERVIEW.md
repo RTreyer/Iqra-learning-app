@@ -48,7 +48,7 @@ Unit 1 uses `naming`, `listen_pick`, `behavior`, `matching` and `trace`. Math Un
 
 - Monorepo: pnpm workspaces with one package, Node 24, TypeScript 5.9.
 - App: Expo SDK 54, expo-router 6, React Native 0.81, React 19, New Architecture. Typed routes are off, a `lib/routes.ts` helper builds paths.
-- Storage: AsyncStorage only. Key `@kidlearn_progress_v1` (schema v2) for progress, `iqra_ui_language` for language, `@iqra_demo_seen_v1` for the worked examples already shown.
+- Storage: AsyncStorage only. Key `@kidlearn_progress_v1` (schema v2) for progress, `iqra_ui_language` for language, `@iqra_demo_seen_v1` for the worked examples already shown, `@iqra_settings_v1` for the parents' switches (voice, vibration).
 - Audio: expo-speech with Arabic locale. Haptics: expo-haptics.
 - Graphics and input: react-native-svg and react-native-gesture-handler (Pan) for letter tracing. No icon fonts, no `expo-font`, no custom fonts at runtime. Icons are inline SVG or emoji. Arabic trace guides are SVG outlines generated at build time from Noto Naskh Arabic (SIL OFL, `scripts/fonts/`) with HarfBuzz (`harfbuzzjs`, dev dependency): `npm run guides` writes `content/generated/traceGuides.ts`, and `test:data` fails when it is out of date.
 - Tests: jest-expo with Testing Library for unit and component tests, Node test runner for content and translation data, Playwright for web end to end.
@@ -64,14 +64,14 @@ netlify.toml                        web deploy, publishes artifacts/learn-app/di
 Start-Browser.cmd / Start-Handy.cmd Windows double click launchers
 docs/                               UI_PROPOSALS.md, CONTENT_REVIEW.md, content/, superpowers/plans/
 artifacts/learn-app/                the Expo app
-  app/                  routes: _layout, index, book/[bookId], unit/[unitId], lesson/[lessonId], review, +not-found
+  app/                  routes: _layout, index, book/[bookId], unit/[unitId], lesson/[lessonId], review, album, parents, +not-found
   components/           shared UI: cards, badges, BackButton, UiText (auto translating Text), ErrorBoundary, ActivityHost
   components/activities/  one component per activity type, ReviewRound, shared/ (useQuiz, shuffle, ChoiceCard...), math/, trace/ (validate.ts, path.ts)
   content/generated/     traceGuides.ts: outlines and masks of the Arabic trace guides (generated, do not edit)
   content/              types.ts, catalog.ts, index.ts, ui-translations.ts, arabic/ (8 units), math/ (5 book units, mathKit, validate), science/ (3)
   context/              ProgressContext (progress, hydration, persistence), LanguageContext
   hooks/                useLessonAttempt, useVoiceHint, useScreenPadding
-  lib/                  scoring, srs, progressState, reviewItems, nextLesson, streak, dates, routes, params, labels, arabicNumbers, speech, haptics
+  lib/                  scoring, srs, progressState, reviewItems, nextLesson, daily, stickers, dates, routes, params, labels, arabicNumbers, speech, haptics
   theme/tokens.ts       colours, spacing, touch target
   scripts/              content.test.mjs, ui-translations.test.mjs (test:data)
   e2e/                  Playwright specs and static server
@@ -81,9 +81,11 @@ artifacts/learn-app/                the Expo app
 ## 5. Routes
 
 ```
-/                       home: continue card, review card, streak, star badge, grades 1 to 6 (grade 1 books, others "قريباً"), language switch
-/book/[bookId]          units of a book
-/unit/[unitId]          lessons of a unit
+/                       home: Hudhud, play button (next lesson), one island per available book, today's qamariya, sticker album, review tile when due, star badge, parents' gear
+/book/[bookId]          units of a book as stations on a path
+/unit/[unitId]          lessons of a unit as stops on a path, letters of the unit
+/album                  sticker album (pictures of Yemen earned with stars)
+/parents                parents' corner behind a press-and-hold gate: grade, menu language, voice, vibration, progress, reset
 /lesson/[lessonId]      lesson (ids u1-1 .. u8-6, math-u1-1 .. math-u5-24, s1-1 .. s3-3), globally unique
 /review                 today's review session
 +not-found              fallback screen
@@ -96,11 +98,13 @@ artifacts/learn-app/                the Expo app
 - Answer positions are shuffled with a seeded shuffle at render time. Content data is not edited.
 - Replaying a lesson starts a fresh attempt. Best stars are kept, stars are never added twice. Total is the sum of best results.
 - Review session: items due today (Leitner boxes 1 to 5, intervals 1, 2, 4, 7, 14 days, local day). Up to 10 items, interleaved by kind, wrong items repeat once at the end, only the first answer is recorded. Correct promotes only when due, wrong resets to box 1. Review awards no stars.
-- Home guidance: a continue card for the next lesson below 3 stars, a review card with the due count, a streak badge from 2 days.
+- Home guidance: a play button for the next lesson below 3 stars, a review tile with the due count, today's qamariya (one pane per lesson finished today, three light it up; it never punishes a missed day). No streak. The child world is described in `docs/SPIELWELT.md`.
+- Stickers: one per 12 stars, in a fixed order (`lib/stickers.ts`), shown on the finish card when earned. No random rewards.
 - Voice hint banner appears when the device has no Arabic TTS voice.
 - Tracing: gesture handler Pan draws strokes on an SVG pad. A heuristic first checks stroke count, path length (50 percent of the shorter pad side), bounding box (20 percent of width or 15 percent of height) and centroid (within 35 percent of centre). For Arabic guides the drawing is then checked against the letter itself (`validateOnGuide`): at least 90 percent of the drawn points must lie on the letter (tolerance 2 cells of a 50 × 50 grid, about 4 percent of the pad) and at least 50 percent of the letter must be traced. All guides share one letter size, in book proportions. Letters that differ only by dots (ح ج، س ص) cannot be told apart by shape. The Unit 1 line drawings keep the heuristic only.
 - Opening a lesson speaks the title, then the spoken instruction of its activity type (`content/instructions.ts`), then the activity mounts. Maths types have no extra instruction: every round speaks its own task. The first time a child meets an activity type, a worked example plays before the lesson (`content/demos.ts`, `components/demo/`): a hand plays the real activity on content of its own while the voice explains, nothing is scored, and the 👆 button in the lesson header plays it again. See `docs/VOICE.md`.
-- Language switch persists and affects only strings wrapped in `UiText` or passed through `translateUi`.
+- Language switch (parents' corner) persists and affects only strings wrapped in `UiText` or passed through `translateUi`.
+- Voice off (parents' corner): `speak()` stays silent and reports done at once, so lesson intros and demos move on.
 - Progress is stored with a corrupt blob backup. Storage read errors never overwrite saved stars.
 - No network requests at runtime. Desktop browser shows a centered 480 px phone frame.
 

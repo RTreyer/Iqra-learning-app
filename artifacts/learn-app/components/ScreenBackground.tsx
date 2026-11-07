@@ -33,12 +33,8 @@ type Config = {
 const HOME: Config = {
   start: { x: 0.1, y: 0 },
   end: { x: 0.9, y: 1 },
-  decos: [
-    { emoji: "⭐", size: 110, opacity: 0.12, rotate: "20deg", top: "4%", left: "2%" },
-    { emoji: "🌟", size: 80, opacity: 0.09, rotate: "-15deg", top: "16%", right: "3%" },
-    { emoji: "🌟", size: 90, opacity: 0.09, rotate: "15deg", bottom: "8%", left: "5%" },
-    { emoji: "✨", size: 65, opacity: 0.1, rotate: "-30deg", bottom: "6%", right: "8%" },
-  ],
+  // Home draws Old Sana'a instead (components/world/Skyline).
+  decos: [],
 };
 
 const READING: Config = {

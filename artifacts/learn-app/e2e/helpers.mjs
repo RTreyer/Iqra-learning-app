@@ -92,8 +92,7 @@ export async function seedStorage(page, entries) {
 }
 
 const READY = [
-  [/^\/$/, (page) => page.getByTestId("grade-1")],
-  [/^\/grade\//, (page) => page.getByTestId("book-arabic-1")],
+  [/^\/$/, (page) => page.getByTestId("book-arabic-1")],
   [/^\/book\//, (page) => page.locator("[data-testid^='unit-']").first()],
   [/^\/unit\//, (page) => page.locator("[data-testid^='lesson-row-']").first()],
   [
@@ -109,6 +108,17 @@ export async function gotoAndWaitReady(page, path) {
   if (ready) await expect(ready[1](page)).toBeVisible();
   else await expect(page.locator("#root")).not.toBeEmpty();
   await dismissVoiceHint(page);
+}
+
+/** Opens the parents' corner by holding its gate, as a parent would. */
+export async function openParents(page) {
+  await gotoAndWaitReady(page, "/parents");
+  const box = await page.getByTestId("parents-gate").boundingBox();
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.waitForTimeout(1800);
+  await page.mouse.up();
+  await expect(page.getByTestId("parents-content")).toBeVisible();
 }
 
 /** Closes the voice hint banner if it is shown (normally suppressed by the stored flag). */

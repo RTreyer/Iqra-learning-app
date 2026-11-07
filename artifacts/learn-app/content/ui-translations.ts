@@ -3,6 +3,23 @@ export type UiLanguage = "ar" | "en";
 // Interface copy only. Lesson data, instructions, quiz answers and speech
 // deliberately stay Arabic, even when the interface is English.
 const english: Record<string, string> = {
+  "ركن الأهل": "Parents' corner",
+  "ألبوم الملصقات": "Sticker album",
+  "قمرية اليوم": "Today's window",
+  "هذا الركن للأهل. اضغط على الزر مطوّلاً.": "This corner is for parents. Press and hold the button.",
+  "اضغط مطوّلاً": "Press and hold",
+  الصف: "Grade",
+  "الصفوف ٢ إلى ٦ قريباً.": "Grades 2 to 6 are coming soon.",
+  "لغة القوائم": "Menu language",
+  الصوت: "Voice",
+  الاهتزاز: "Vibration",
+  التقدم: "Progress",
+  "سيُمسح كل التقدم: النجوم والدروس والملصقات. لا يمكن التراجع.":
+    "All progress will be deleted: stars, lessons and stickers. This cannot be undone.",
+  "نعم، امسح التقدم": "Yes, delete progress",
+  إلغاء: "Cancel",
+  "مسح التقدم": "Delete progress",
+  "تم مسح التقدم": "Progress deleted",
   أهلاً: "Hello",
   "اختَر الكتاب": "Choose a book",
   "اختَر صفّك": "Choose your grade",

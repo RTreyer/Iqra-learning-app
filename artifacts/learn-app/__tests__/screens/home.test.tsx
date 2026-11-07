@@ -1,8 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { fireEvent, screen } from "@testing-library/react-native";
+import { act, fireEvent, screen } from "@testing-library/react-native";
 import React from "react";
 
-import HomeScreen from "@/app/index";
+import HomeScreen, { windowLine } from "@/app/index";
 import { getLesson } from "@/content";
 import { ProgressProvider } from "@/context/ProgressContext";
 import { routes } from "@/lib/routes";
@@ -13,14 +13,19 @@ const KEY = "@kidlearn_progress_v1";
 const NOW = new Date(2026, 9, 16, 10, 0, 0);
 const DUE = new Date(2026, 9, 15).toISOString();
 const { router } = jest.requireMock("expo-router") as { router: { push: jest.Mock } };
+const Speech = jest.requireMock("expo-speech") as { speak: jest.Mock };
 
-async function seed(dueCount: number, days: string[]) {
+async function seed(
+  dueCount: number,
+  lessons: Record<string, { completed: boolean; stars: number; completedAt: string }> = {},
+) {
   const item = { box: 2, dueAt: DUE, lastSeenAt: DUE, lapses: 0 };
   const ids = Array.from(allItems().keys()).slice(0, dueCount);
   const items = Object.fromEntries(ids.map((id) => [id, item]));
+  const totalStars = Object.values(lessons).reduce((sum, l) => sum + l.stars, 0);
   await AsyncStorage.setItem(
     KEY,
-    JSON.stringify({ version: 2, lessons: {}, items, activity: { days }, totalStars: 0 }),
+    JSON.stringify({ version: 2, lessons, items, activity: { days: [] }, totalStars }),
   );
 }
 
@@ -39,56 +44,76 @@ beforeEach(async () => {
 });
 afterEach(() => jest.useRealTimers());
 
-test("first launch shows only the continue card, pointing at u1-1", async () => {
+test("first launch: the play button opens u1-1, Hudhud greets, no review", async () => {
   renderHome();
-  const card = await screen.findByTestId("continue-card");
+  const play = await screen.findByTestId("continue-card");
   const { unit, lesson } = getLesson("u1-1")!;
-  expect(card).toHaveTextContent(new RegExp(lesson.title));
-  expect(card).toHaveTextContent(new RegExp(unit.title));
+  expect(play.props.accessibilityLabel).toContain(lesson.title);
+  expect(play.props.accessibilityLabel).toContain(unit.title);
   expect(screen.queryByTestId("review-card")).toBeNull();
-  expect(screen.queryByTestId("streak-badge")).toBeNull();
-  fireEvent.press(card);
+  await act(async () => {
+    jest.advanceTimersByTime(500);
+  });
+  expect(Speech.speak).toHaveBeenCalledWith("بِسْمِ اللهِ! هَيَّا نَتَعَلَّمُ", expect.anything());
+  fireEvent.press(play);
   expect(router.push).toHaveBeenCalledWith(routes.lesson("u1-1"));
 });
 
-test("home shows grades 1 to 6; only grade 1 opens, the others are coming soon", async () => {
-  renderHome();
-  await screen.findByTestId("continue-card");
-  expect(screen.getByText("اختَر صفّك")).toBeTruthy();
-  expect(screen.getByTestId("grade-1")).toHaveTextContent(/١.*الصف الأول/);
-  expect(screen.getByTestId("grade-1")).not.toHaveTextContent(/قريباً/);
-  for (const n of [2, 3, 4, 5, 6])
-    expect(screen.getByTestId(`grade-${n}`)).toHaveTextContent(/قريباً/);
-  expect(screen.queryByTestId(/^book-/)).toBeNull();
-  fireEvent.press(screen.getByTestId("grade-2"));
-  expect(router.push).not.toHaveBeenCalled();
-  fireEvent.press(screen.getByTestId("grade-1"));
-  expect(router.push).toHaveBeenCalledWith(routes.grade(1));
-});
-
-test("two due items and a two day streak show the review card and streak badge", async () => {
-  await seed(2, ["2026-10-15", "2026-10-16"]);
+test("two due items show the review tile, which opens the review", async () => {
+  await seed(2);
   renderHome();
   const review = await screen.findByTestId("review-card");
   expect(screen.getByText("عُنْصُرَان")).toBeTruthy();
-  expect(screen.getByTestId("streak-badge")).toHaveTextContent("🔥 ٢");
-  expect(screen.getByLabelText("يَوْمَانِ مُتَتَالِيَانِ")).toBeTruthy();
   fireEvent.press(review);
   expect(router.push).toHaveBeenCalledWith(routes.review());
 });
 
-test("one due item uses the singular and a one day streak hides the badge", async () => {
-  await seed(1, ["2026-10-16"]);
-  renderHome();
+test("one and three due items use the singular and the plural", async () => {
+  await seed(1);
+  const first = renderHome();
   await screen.findByTestId("review-card");
   expect(screen.getByText("عُنْصُر وَاحِد")).toBeTruthy();
-  expect(screen.queryByTestId("streak-badge")).toBeNull();
-});
-
-test("three due items and a three day streak use the plural", async () => {
-  await seed(3, ["2026-10-14", "2026-10-15", "2026-10-16"]);
+  first.unmount();
+  await seed(3);
   renderHome();
   await screen.findByTestId("review-card");
   expect(screen.getByText("٣ عَنَاصِر")).toBeTruthy();
-  expect(screen.getByLabelText("٣ أَيَّام مُتَتَالِيَة")).toBeTruthy();
+});
+
+test("today's window counts lessons finished today and says what is left", async () => {
+  const today = NOW.toISOString();
+  const yesterday = new Date(2026, 9, 15, 10).toISOString();
+  await seed(0, {
+    "u1-1": { completed: true, stars: 3, completedAt: today },
+    "u1-2": { completed: true, stars: 2, completedAt: yesterday },
+  });
+  renderHome();
+  const window = await screen.findByLabelText(windowLine(1));
+  fireEvent.press(window);
+  expect(Speech.speak).toHaveBeenLastCalledWith(
+    "دَرْسَانِ، وَتُضِيءُ الْقَمَرِيَّةُ!",
+    expect.anything(),
+  );
+});
+
+test("the window lines name what is left, and glow at three", () => {
+  expect(windowLine(0)).toBe("ثَلَاثَةُ دُرُوسٍ، وَتُضِيءُ الْقَمَرِيَّةُ!");
+  expect(windowLine(2)).toBe("دَرْسٌ وَاحِدٌ، وَتُضِيءُ الْقَمَرِيَّةُ!");
+  expect(windowLine(3)).toBe("أَضَاءَتِ الْقَمَرِيَّةُ الْيَوْمَ!");
+  expect(windowLine(5)).toBe("أَضَاءَتِ الْقَمَرِيَّةُ الْيَوْمَ!");
+});
+
+test("the album tile shows how many stickers the stars have earned", async () => {
+  const at = NOW.toISOString();
+  const lessons = Object.fromEntries(
+    ["u1-1", "u1-2", "u1-3", "u1-4", "u1-5", "u2-1", "u2-2", "u2-3", "u2-4"].map((id) => [
+      id,
+      { completed: true, stars: 3, completedAt: at },
+    ]),
+  );
+  await seed(0, lessons);
+  renderHome();
+  // 27 stars: two stickers at 12 stars each.
+  await screen.findByText("٢٧");
+  expect(screen.getByTestId("album-button")).toHaveTextContent("٢");
 });

@@ -3,7 +3,7 @@
  */
 
 import { useLocalSearchParams } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { ActivityHost } from "@/components/ActivityHost";
@@ -21,11 +21,13 @@ import { useProgress } from "@/context/ProgressContext";
 import { useDemoSeen } from "@/hooks/useDemoSeen";
 import { useLessonAttempt } from "@/hooks/useLessonAttempt";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
+import { lessonsToday } from "@/lib/daily";
 import * as haptics from "@/lib/haptics";
 import { firstParam } from "@/lib/params";
 import { routes } from "@/lib/routes";
 import { starsForScore, type Score } from "@/lib/scoring";
 import { estimateSpeechMs, speak, stopSpeaking } from "@/lib/speech";
+import { newSticker, type Sticker } from "@/lib/stickers";
 import { colors, touchTarget } from "@/theme/tokens";
 
 /** The activity mounts when the title has been spoken, or after this at the latest. */
@@ -80,7 +82,9 @@ function useLessonIntro(
 export default function LessonScreen() {
   const lessonId =
     firstParam(useLocalSearchParams<{ lessonId?: string | string[] }>().lessonId) ?? "";
-  const { completeLesson, recordRoundResult } = useProgress();
+  const { progress, completeLesson, recordRoundResult, getLessonProgress } = useProgress();
+  const today = useMemo(() => lessonsToday(progress), [progress]);
+  const [sticker, setSticker] = useState<Sticker | null>(null);
   const pad = useScreenPadding();
   const { language } = useLanguage();
 
@@ -110,9 +114,14 @@ export default function LessonScreen() {
 
   const onComplete = (score: Score) => {
     const earned = starsForScore(score);
+    // Stars only grow by beating the lesson's best, so this is the new total.
+    const before = progress.totalStars;
+    const gained = Math.max(0, earned - getLessonProgress(lesson.id).stars);
+    const won = newSticker(before, before + gained);
+    setSticker(won);
     completeLesson(lesson.id, earned);
     haptics.success();
-    speak("أحسنت! لقد أتممت الدرس");
+    speak(won ? `أَحْسَنْت! مُلْصَقٌ جَدِيدٌ: ${won.name}` : "أحسنت! لقد أتممت الدرس");
     completeAttempt(earned);
   };
 
@@ -156,7 +165,8 @@ export default function LessonScreen() {
             onRepeat={restartAttempt}
             next={next}
             backTo={routes.unit(unit.id)}
-            color={unit.color}
+            today={today}
+            sticker={sticker}
           />
         ) : (
           <>

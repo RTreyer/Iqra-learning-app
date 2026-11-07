@@ -12,12 +12,17 @@ import { mockCanGoBack, renderScreen, setParams } from "@/test-utils/screens";
 const mockCompleteLesson = jest.fn();
 const mockRecordRoundResult = jest.fn();
 
-jest.mock("@/context/ProgressContext", () => ({
-  useProgress: () => ({
-    completeLesson: mockCompleteLesson,
-    recordRoundResult: mockRecordRoundResult,
-  }),
-}));
+jest.mock("@/context/ProgressContext", () => {
+  const progress = { version: 2, lessons: {}, items: {}, activity: { days: [] }, totalStars: 0 };
+  return {
+    useProgress: () => ({
+      progress,
+      completeLesson: mockCompleteLesson,
+      recordRoundResult: mockRecordRoundResult,
+      getLessonProgress: () => ({ completed: false, stars: 0 }),
+    }),
+  };
+});
 
 jest.mock("@/components/activities", () => {
   const { Pressable, Text } = jest.requireActual("react-native");

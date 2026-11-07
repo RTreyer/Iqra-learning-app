@@ -1,5 +1,6 @@
 /**
- * Book screen: one colored card per unit with its progress.
+ * Book screen: the units as stations on a path. The station to go to next breathes and Hudhud
+ * stands on it; a ring shows how much of each unit is done.
  */
 
 import { router, useLocalSearchParams } from "expo-router";
@@ -11,28 +12,54 @@ import { NotFoundCard } from "@/components/NotFoundCard";
 import { ScreenBackground } from "@/components/ScreenBackground";
 import { StarBadge } from "@/components/StarBadge";
 import { UiText } from "@/components/UiText";
-import { UnitCard } from "@/components/UnitCard";
-import { getBook, getGradeOfBook, unitLessonIds } from "@/content";
+import { Guide } from "@/components/world/Guide";
+import { PathMap, type Stop } from "@/components/world/PathMap";
+import { getBook, unitLessonIds } from "@/content";
 import { useLanguage } from "@/context/LanguageContext";
 import { useProgress } from "@/context/ProgressContext";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
 import { firstParam } from "@/lib/params";
 import { routes } from "@/lib/routes";
-import { colors, readableFill, shadow } from "@/theme/tokens";
+import { yemen } from "@/theme/tokens";
+
+const WHERE_TO = "أَيْنَ نَذْهَبُ الْيَوْمَ؟";
 
 export default function BookScreen() {
   const bookId = firstParam(useLocalSearchParams<{ bookId?: string | string[] }>().bookId);
   const { progress, getUnitProgress } = useProgress();
-  const { language } = useLanguage();
+  const { t, language, digits } = useLanguage();
   const pad = useScreenPadding();
 
   const book = getBook(bookId ?? "");
-  const grade = getGradeOfBook(bookId ?? "");
-  const units = book
-    ? book.units.map((unit) => ({ unit, progress: getUnitProgress(unitLessonIds(unit)) }))
-    : [];
-
   if (!book) return <NotFoundCard message="الكتاب غير موجود" />;
+
+  const units = book.units.map((unit) => ({
+    unit,
+    progress: getUnitProgress(unitLessonIds(unit)),
+  }));
+  const currentIndex = units.findIndex(({ progress: p }) => p.done < p.total);
+  const stops: Stop[] = units.map(({ unit, progress: p }, i) => ({
+    key: unit.id,
+    testID: `unit-${unit.id}`,
+    accessibilityLabel: `${t(unit.title)}، ${digits(`${p.done} / ${p.total}`)}`,
+    state: p.total > 0 && p.done >= p.total ? "done" : i === currentIndex ? "current" : "open",
+    ring: p.total ? p.done / p.total : 0,
+    caption: digits(`${p.done} / ${p.total}`),
+    picture: (_color, size) => <Text style={{ fontSize: size }}>{unit.emoji}</Text>,
+    aside: unit.letters ? (
+      <View style={styles.letters}>
+        {unit.letters.map((letter) => (
+          <View key={letter} style={styles.letter}>
+            <Text style={styles.letterText}>{letter}</Text>
+          </View>
+        ))}
+      </View>
+    ) : (
+      <View style={styles.label}>
+        <UiText style={styles.labelText}>{unit.badgeLabel}</UiText>
+      </View>
+    ),
+  }));
 
   return (
     <ScreenBackground
@@ -40,7 +67,7 @@ export default function BookScreen() {
       style={[styles.container, { paddingTop: pad.top + 4 }]}
     >
       <View style={[styles.header, { flexDirection: language === "en" ? "row" : "row-reverse" }]}>
-        <BackButton fallback={grade ? routes.grade(grade.number) : routes.home()} />
+        <BackButton fallback={routes.home()} />
         <View style={styles.headerCenter}>
           <Text style={styles.bookEmoji}>{book.emoji}</Text>
           <UiText style={styles.bookTitle} numberOfLines={1}>
@@ -49,54 +76,30 @@ export default function BookScreen() {
         </View>
         <StarBadge stars={progress.totalStars} />
       </View>
-
-      <View
-        style={[
-          styles.banner,
-          {
-            backgroundColor: readableFill(book.color),
-            flexDirection: language === "en" ? "row" : "row-reverse",
-          },
-        ]}
-      >
-        <Text style={styles.bannerEmoji}>{book.emoji}</Text>
-        <View
-          style={[styles.bannerText, { alignItems: language === "en" ? "flex-start" : "flex-end" }]}
-        >
-          <View style={styles.bannerLabel}>
-            <UiText style={styles.bannerSubject}>{book.subtitle}</UiText>
-          </View>
-          <UiText style={styles.bannerTitle}>{book.title}</UiText>
-        </View>
-      </View>
-
+      <Guide text={WHERE_TO} speakOnMount birdSize={64} style={styles.guide} />
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={[styles.list, { paddingBottom: pad.bottom + 24 }]}
+        contentContainerStyle={{ paddingTop: 56, paddingBottom: pad.bottom + 32 }}
         showsVerticalScrollIndicator={false}
       >
-        <UiText style={styles.subtitle}>اختَر ماذا تريد أن تتعلّم اليوم</UiText>
-        {units.map(({ unit, progress: unitProgress }) => (
-          <UnitCard
-            key={unit.id}
-            unit={unit}
-            progress={unitProgress}
-            onPress={() => router.push(routes.unit(unit.id))}
-          />
-        ))}
-        <UiText style={styles.footer}>هيّا نتعلّم! 🌟</UiText>
+        <PathMap
+          stops={stops}
+          color={book.color}
+          onPress={(unitId) => router.push(routes.unit(unitId))}
+        />
       </ScrollView>
     </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingHorizontal: 20, alignItems: "center" },
+  container: { flex: 1 },
   header: {
     width: "100%",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 14,
+    paddingHorizontal: 16,
+    marginBottom: 6,
   },
   headerCenter: {
     flexDirection: "row",
@@ -107,40 +110,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   bookEmoji: { fontSize: 22 },
-  bookTitle: { fontSize: 18, fontWeight: "800", color: colors.text, flexShrink: 1 },
-  banner: {
-    width: "100%",
-    borderRadius: 22,
-    padding: 18,
+  bookTitle: { fontSize: 18, fontWeight: "800", color: yemen.ink, flexShrink: 1 },
+  guide: { paddingHorizontal: 16 },
+  scroll: { flex: 1, width: "100%" },
+  letters: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 4, justifyContent: "center" },
+  letter: {
+    minWidth: 30,
+    height: 34,
+    borderRadius: 10,
+    backgroundColor: "rgba(255,255,255,0.92)",
     alignItems: "center",
-    gap: 16,
-    marginBottom: 12,
-    ...shadow.card,
+    justifyContent: "center",
+    paddingHorizontal: 4,
   },
-  bannerEmoji: { fontSize: 52 },
-  bannerText: { flex: 1, gap: 6 },
-  bannerLabel: {
-    backgroundColor: colors.pill,
+  letterText: { fontSize: 20, fontWeight: "800", color: yemen.ink },
+  label: {
+    backgroundColor: "rgba(255,255,255,0.92)",
     borderRadius: 10,
     paddingHorizontal: 8,
-    paddingVertical: 3,
+    paddingVertical: 4,
   },
-  bannerSubject: { fontSize: 13, color: colors.text, fontWeight: "700" },
-  bannerTitle: { fontSize: 22, fontWeight: "900", color: colors.white, lineHeight: 28 },
-  scroll: { width: "100%" },
-  list: { gap: 14, paddingTop: 4 },
-  subtitle: {
-    fontSize: 15,
-    color: colors.warmText,
-    textAlign: "center",
-    marginBottom: 2,
-    fontWeight: "700",
-  },
-  footer: {
-    fontSize: 18,
-    color: colors.warmDeep,
-    marginTop: 4,
-    textAlign: "center",
-    fontWeight: "700",
-  },
+  labelText: { fontSize: 14, fontWeight: "700", color: yemen.ink },
 });

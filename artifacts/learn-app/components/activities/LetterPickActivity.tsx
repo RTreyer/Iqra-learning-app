@@ -61,7 +61,6 @@ function LetterPick({
           {round.targetLetter}
         </Text>
       </View>
-      <UiText style={act.instruction}>{`سؤال ${quiz.roundIndex + 1} من ${rounds.length}`}</UiText>
       <View style={act.letterChoicesRow}>
         {options.items.map((letter, idx) => (
           <ChoiceCard

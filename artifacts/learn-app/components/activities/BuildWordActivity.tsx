@@ -49,7 +49,6 @@ function BuildWord({
   return (
     <View style={act.container}>
       <ProgressDots count={rounds.length} current={quiz.roundIndex} color={color} />
-      <UiText style={act.instruction}>{`سؤال ${quiz.roundIndex + 1} من ${rounds.length}`}</UiText>
       <UiText style={act.hint}>
         {isSentence(rounds[quiz.roundIndex])
           ? "رتّب الكلمات في القطار 🚂"

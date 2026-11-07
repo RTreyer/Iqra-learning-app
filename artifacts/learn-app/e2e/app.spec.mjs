@@ -1,4 +1,4 @@
-// End to end suite for the rebuilt routes: /, /grade/[gradeId], /book/[bookId], /unit/[unitId], /lesson/[lessonId].
+// End to end suite for the routes: /, /book/[bookId], /unit/[unitId], /lesson/[lessonId], /album, /parents.
 // Runs with: pnpm test:e2e (expo export, then playwright test; playwright.config.ts serves dist/ on 8787).
 // Every test starts from a fresh browser context; the page fixture fails a test on any console error.
 import fs from "node:fs";
@@ -8,6 +8,7 @@ import { mathBookUnit5 } from "../content/math/bookUnit5.ts";
 
 import {
   DEMO_SEEN_KEY,
+  PROGRESS_KEY,
   QUIZ_ROUNDS,
   answerRound,
   completeMathLesson,
@@ -17,6 +18,7 @@ import {
   gotoAndWaitReady,
   mathLesson,
   mathUnit1Lesson,
+  openParents,
   pictureChoiceByName,
   readProgress,
   seedStorage,
@@ -29,60 +31,35 @@ import {
   traceGuide,
 } from "./helpers.mjs";
 
-const BOOK_IDS = ["arabic-1", "arabic-2", "lughati-1", "math-1", "math-2", "science-1"];
 const AVAILABLE_BOOK_IDS = ["arabic-1", "math-1"];
 
 test.describe("navigation", () => {
-  test("home shows grades 1 to 6, grades 2 to 6 as soon, zero stars and no streak", async ({
+  test("home shows the play button and one island per available book, zero stars, no grades", async ({
     page,
   }) => {
     await gotoAndWaitReady(page, "/");
-    await expect(page.getByTestId("grade-1")).toContainText("الصف الأول");
-    await expect(page.getByTestId("grade-1")).not.toContainText("قريباً");
-    for (const n of [2, 3, 4, 5, 6]) {
-      await expect(page.getByTestId(`grade-${n}`)).toContainText("قريباً");
-      await expect(page.getByTestId(`grade-${n}`)).toHaveAttribute("aria-disabled", "true");
-    }
+    await expect(page.getByTestId("continue-card")).toBeVisible();
+    for (const id of AVAILABLE_BOOK_IDS) await expect(page.getByTestId(`book-${id}`)).toBeVisible();
+    await expect(page.locator("[data-testid^='book-']")).toHaveCount(AVAILABLE_BOOK_IDS.length);
+    await expect(page.locator("[data-testid^='grade-']")).toHaveCount(0);
     await expect(page.getByTestId("star-badge")).toContainText("٠");
-    await expect(page.getByTestId("streak-badge")).toHaveCount(0);
   });
 
-  test("grade 1 lists its books", async ({ page }) => {
-    await gotoAndWaitReady(page, "/");
-    await page.getByTestId("grade-1").click();
-    await expect(page).toHaveURL(/\/grade\/1$/);
-    for (const id of BOOK_IDS) await expect(page.getByTestId(`book-${id}`)).toBeVisible();
-  });
-
-  test("every available book card navigates to its book", async ({ page }) => {
+  test("every island navigates to its book", async ({ page }) => {
     for (const id of AVAILABLE_BOOK_IDS) {
-      await gotoAndWaitReady(page, "/grade/1");
-      const card = page.getByTestId(`book-${id}`);
-      await expect(card).not.toHaveAttribute("aria-disabled", "true");
-      await card.click();
+      await gotoAndWaitReady(page, "/");
+      await page.getByTestId(`book-${id}`).click();
       await expect(page).toHaveURL(new RegExp(`/book/${id}$`));
       await expect(page.locator("[data-testid^='unit-']").first()).toBeVisible();
     }
   });
 
-  test("an unavailable book card does not navigate", async ({ page }) => {
-    await gotoAndWaitReady(page, "/grade/1");
-    const unavailable = page.locator("[data-testid^='book-'][aria-disabled='true']");
-    test.skip((await unavailable.count()) === 0, "every book in the catalog is available");
-    await unavailable.first().click({ force: true });
-    await page.waitForTimeout(500);
-    await expect(page).toHaveURL(/\/grade\/1$/);
-  });
-
-  test("home → grade → book → unit → lesson by taps, and back returns to the unit", async ({
-    page,
-  }) => {
+  test("home → book → unit → lesson by taps, and back returns to the unit", async ({ page }) => {
     await gotoAndWaitReady(page, "/");
-    await page.getByTestId("grade-1").click();
     await page.getByTestId("book-arabic-1").click();
     await expect(page).toHaveURL(/\/book\/arabic-1$/);
     const unitCard = page.getByTestId("unit-a2");
-    await expect(unitCard).toContainText("٠ / ٣١");
+    await expect(unitCard).toHaveAttribute("aria-label", /٠ \/ ٣١/);
     await unitCard.click();
     await expect(page).toHaveURL(/\/unit\/a2$/);
     await page.getByTestId("lesson-row-u2-2").click();
@@ -93,6 +70,49 @@ test.describe("navigation", () => {
     await expect(page.getByText("ابحث عن الحرف")).toBeVisible();
     await page.getByRole("button", { name: "رجوع" }).click();
     await expect(page).toHaveURL(/\/unit\/a2$/);
+  });
+
+  test("the parents' corner opens only after holding the gate, and shows grade 1", async ({
+    page,
+  }) => {
+    await gotoAndWaitReady(page, "/");
+    await page.getByTestId("parents-button").click();
+    await expect(page).toHaveURL(/\/parents$/);
+    await page.getByTestId("parents-gate").click();
+    await expect(page.getByTestId("parents-content")).toHaveCount(0);
+    await openParents(page);
+    await expect(page.getByTestId("grade-1")).toHaveAttribute("aria-label", "الصف الأول");
+    for (const n of [2, 3, 4, 5, 6])
+      await expect(page.getByTestId(`grade-${n}`)).toHaveAttribute("aria-label", /قريباً/);
+  });
+
+  test("the album opens the stickers the stars have earned and keeps the rest locked", async ({
+    page,
+  }) => {
+    const at = new Date().toISOString();
+    const lessons = Object.fromEntries(
+      ["u1-1", "u1-2", "u1-3", "u1-4"].map((id) => [
+        id,
+        { completed: true, stars: 3, completedAt: at },
+      ]),
+    );
+    await seedStorage(page, {
+      [PROGRESS_KEY]: JSON.stringify({
+        version: 2,
+        lessons,
+        items: {},
+        activity: { days: [] },
+        totalStars: 12,
+      }),
+    });
+    await gotoAndWaitReady(page, "/");
+    await page.getByTestId("album-button").click();
+    await expect(page).toHaveURL(/\/album$/);
+    await expect(page.getByTestId("sticker-qamariya")).toHaveAttribute(
+      "aria-label",
+      "الْقَمَرِيَّةُ",
+    );
+    await expect(page.getByTestId("sticker-house")).toHaveAttribute("aria-label", /النُّجُومَ/);
   });
 
   test("an unknown lesson id shows the not found card", async ({ page }) => {
@@ -111,7 +131,7 @@ test.describe("scoring", () => {
     expect(await completeQuizLesson(page, "u2-29", 6)).toBe(3);
     await expect.poll(async () => (await readProgress(page))?.totalStars).toBe(3);
     await gotoAndWaitReady(page, "/book/arabic-1");
-    await expect(page.getByTestId("unit-a2")).toContainText("١ / ٣١");
+    await expect(page.getByTestId("unit-a2")).toHaveAttribute("aria-label", /١ \/ ٣١/);
     await gotoAndWaitReady(page, "/unit/a2");
     await expect(page.getByTestId("lesson-done-u2-29")).toBeVisible();
   });
@@ -136,7 +156,7 @@ test.describe("scoring", () => {
   test("replaying a lesson with a worse score keeps the best stars", async ({ page }) => {
     expect(await completeQuizLesson(page, "u2-29", 6)).toBe(3);
     await page.getByTestId("repeat-lesson").click();
-    await expect(page.getByText("سؤال ١ من ٦")).toBeVisible();
+    await expect(page.getByTestId("progress-train")).toHaveAttribute("aria-valuenow", "1");
     expect(await completeQuizLesson(page, "u2-29", 0, { navigate: false })).toBe(1);
     await expect.poll(async () => (await readProgress(page))?.lessons["u2-29"]?.stars).toBe(3);
     await gotoAndWaitReady(page, "/");
@@ -148,7 +168,7 @@ test.describe("scoring", () => {
     await gotoAndWaitReady(page, "/lesson/u2-29");
     for (let attempt = 0; attempt < 3; attempt++) {
       if (attempt > 0) await page.getByTestId("repeat-lesson").click();
-      await expect(page.getByText("سؤال ١ من ٦")).toBeVisible();
+      await expect(page.getByTestId("progress-train")).toHaveAttribute("aria-valuenow", "1");
       firstRoundOrders.push(
         await page.getByRole("button", { name: /^(رَ|دَ|تَ)$/, disabled: false }).allInnerTexts(),
       );
@@ -299,13 +319,14 @@ test.describe("worked example", () => {
 });
 
 test.describe("language", () => {
-  test("English mode shows Math and Science while lesson text stays Arabic", async ({ page }) => {
-    await gotoAndWaitReady(page, "/");
+  test("English menus, set in the parents' corner, while lesson text stays Arabic", async ({
+    page,
+  }) => {
+    await openParents(page);
     await page.getByTestId("language-en").click();
-    await expect(page.getByTestId("grade-1")).toContainText("Grade 1");
-    await gotoAndWaitReady(page, "/grade/1");
+    await expect(page.getByText("Parents' corner")).toBeVisible();
+    await gotoAndWaitReady(page, "/");
     await expect(page.getByTestId("book-math-1")).toContainText("Math");
-    await expect(page.getByTestId("book-science-1")).toContainText("Science");
     await page.reload();
     await expect(page.getByTestId("book-math-1")).toContainText("Math");
 
@@ -317,9 +338,10 @@ test.describe("language", () => {
       page.getByText("أَقْرَأُ الْقِصَّة").filter({ visible: true }).first(),
     ).toBeVisible();
 
-    await gotoAndWaitReady(page, "/");
+    await openParents(page);
     await page.getByTestId("language-ar").click();
-    await expect(page.getByTestId("grade-1")).toContainText("الصف الأول");
+    await gotoAndWaitReady(page, "/");
+    await expect(page.getByTestId("book-math-1")).toContainText("الرياضيات");
   });
 });
 
@@ -330,15 +352,16 @@ test.describe("accessibility", () => {
     axePath = require.resolve("axe-core/axe.min.js");
   } catch {}
 
-  test("axe: no serious or critical color contrast violations on home, grade, book, unit, lesson", async ({
+  test("axe: no serious or critical color contrast violations on home, book, unit, lesson, album", async ({
     page,
   }) => {
     test.skip(!axePath, "axe-core not installed");
     const axeSource = fs.readFileSync(axePath, "utf8");
     const found = {};
-    for (const path of ["/", "/grade/1", "/book/arabic-1", "/unit/a2", "/lesson/u2-29"]) {
+    for (const path of ["/", "/book/arabic-1", "/unit/a2", "/lesson/u2-29", "/album"]) {
       await gotoAndWaitReady(page, path);
-      if (path.startsWith("/lesson/")) await expect(page.getByText("سؤال ١ من ٦")).toBeVisible();
+      if (path.startsWith("/lesson/"))
+        await expect(page.getByTestId("progress-train")).toHaveAttribute("aria-valuenow", "1");
       await page.addScriptTag({ content: axeSource });
       const violations = await page.evaluate(async () => {
         // axe's own matcher drops text it takes for an icon ligature, and its canvas check flags
