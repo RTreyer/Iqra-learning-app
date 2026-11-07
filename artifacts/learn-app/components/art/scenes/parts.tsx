@@ -142,6 +142,33 @@ export function ShortHair({ cx, cy, r }: { cx: number; cy: number; r: number }) 
   );
 }
 
+/**
+ * Headscarf framing a face of radius `r` and falling onto the shoulders.
+ * Draw it before the Face so the face sits on top.
+ */
+export function Headscarf({
+  cx,
+  cy,
+  r,
+  fill = WHITE,
+  edge = "#E0E0E0",
+}: {
+  cx: number;
+  cy: number;
+  r: number;
+  fill?: string;
+  edge?: string;
+}) {
+  return (
+    <Path
+      d={`M${cx - r * 1.22},${cy + r * 1.44} Q${cx - r * 1.48},${cy - r * 1.43} ${cx},${cy - r * 1.52} Q${cx + r * 1.48},${cy - r * 1.43} ${cx + r * 1.22},${cy + r * 1.44} Q${cx},${cy + r * 1.87} ${cx - r * 1.22},${cy + r * 1.44} Z`}
+      fill={fill}
+      stroke={edge}
+      strokeWidth={r * 0.09}
+    />
+  );
+}
+
 /** Hand as a small skin coloured oval. */
 export function Hand({ cx, cy, r }: { cx: number; cy: number; r: number }) {
   return (

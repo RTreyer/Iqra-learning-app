@@ -344,26 +344,45 @@ function Ibriq() {
   );
 }
 
-/** "In the village": green terraces up a mountain, a tower house on top. */
-function Terraces() {
-  const bands: [string, string][] = [
-    ["M4 90 h92 l-9 -13 h-74 z", LEAF],
-    ["M13 77 h74 l-9 -13 h-56 z", LEAF_LIGHT],
-    ["M22 64 h56 l-9 -13 h-38 z", LEAF],
-    ["M31 51 h38 l-8 -11 h-22 z", LEAF_LIGHT],
-  ];
+/** "Rashida and the butterflies, Latifa and the bee": a butterfly over a flower, a bee nearby. */
+function Butterfly() {
   return (
     <>
-      <Circle cx={84} cy={16} r={8} fill={yemen.gold} />
-      {bands.map(([d, fill]) => (
-        <Path key={d} d={d} fill={fill} />
+      <Path d="M30 92 V66" stroke={LEAF} strokeWidth={4} strokeLinecap="round" />
+      <Path d="M30 80 Q18 76 14 66 Q26 66 30 80 Z" fill={LEAF_LIGHT} />
+      <Circle cx={30} cy={62} r={6} fill={yemen.gold} />
+      {[0, 72, 144, 216, 288].map((a) => (
+        <Ellipse
+          key={a}
+          cx={30}
+          cy={52}
+          rx={5}
+          ry={8}
+          fill={yemen.red}
+          transform={`rotate(${a} 30 62)`}
+        />
       ))}
-      <Path d="M13 77 h74 M22 64 h56 M31 51 h38" stroke="#A0764A" strokeWidth={2.5} />
-      <Rect x={41} y={16} width={18} height={25} fill="#A55B34" />
-      <Path d="M41 16 v-4 h4 v4 h3 v-4 h4 v4 h3 v-4 h4 v4" fill="#A55B34" />
-      <Rect x={41} y={23} width={18} height={2.5} fill="#F7F0E1" />
-      <Path d="M45 32 a5 5 0 0 1 10 0 z" fill={yemen.red} />
-      <Rect x={45} y={32} width={10} height={5} fill="#F7F0E1" />
+      <Circle cx={30} cy={62} r={5} fill={yemen.gold} />
+      <G transform="rotate(-12 62 40)">
+        <Path d="M60 40 Q44 10 30 22 Q26 40 60 42 Z" fill={yemen.blue} />
+        <Path d="M64 40 Q80 10 94 22 Q98 40 64 42 Z" fill={yemen.blue} />
+        <Path d="M60 44 Q40 48 40 62 Q52 66 61 46 Z" fill={yemen.gold} />
+        <Path d="M64 44 Q84 48 84 62 Q72 66 63 46 Z" fill={yemen.gold} />
+        <Circle cx={42} cy={26} r={4} fill="#FFFFFF" fillOpacity={0.6} />
+        <Circle cx={82} cy={26} r={4} fill="#FFFFFF" fillOpacity={0.6} />
+        <Ellipse cx={62} cy={44} rx={3.5} ry={14} fill={INK} />
+        <Path
+          d="M61 31 Q56 22 52 20 M63 31 Q68 22 72 20"
+          stroke={INK}
+          strokeWidth={2.5}
+          fill="none"
+          strokeLinecap="round"
+        />
+      </G>
+      <Ellipse cx={76} cy={80} rx={9} ry={6.5} fill="#F4C14B" stroke={INK} strokeWidth={1.5} />
+      <Path d="M73 74 V86 M79 74 V86" stroke={INK} strokeWidth={2.5} />
+      <Ellipse cx={74} cy={72} rx={5} ry={3.5} fill="#FFFFFF" fillOpacity={0.9} />
+      <Ellipse cx={80} cy={72} rx={5} ry={3.5} fill="#FFFFFF" fillOpacity={0.9} />
     </>
   );
 }
@@ -621,7 +640,7 @@ const DRAWN: Partial<Record<EmblemId, () => React.JSX.Element>> = {
   sand_house: SandHouse,
   bulbul: Bulbul,
   ibriq: Ibriq,
-  terraces: Terraces,
+  butterfly: Butterfly,
   basket: Basket,
   coffee_sacks: CoffeeSacks,
   dates_tray: DatesTray,

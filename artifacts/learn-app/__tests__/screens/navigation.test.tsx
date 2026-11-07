@@ -42,10 +42,10 @@ test("book screen shows the units as stations with their progress", () => {
   setParams({ bookId: "arabic-1" });
   renderScreen(<BookScreen />);
   expect(screen.getAllByTestId(/^unit-/)).toHaveLength(8);
-  expect(screen.getAllByText("٠ / ٦").length).toBeGreaterThan(0);
   const a2 = screen.getByTestId("unit-a2");
   expect(a2.props.accessibilityLabel).toMatch(/٠ \/ ٣١/);
-  expect(screen.getByText("٠ / ٣١")).toBeTruthy();
+  // Units 2 and 8 both have 31 lessons.
+  expect(screen.getAllByText("٠ / ٣١")).toHaveLength(2);
   fireEvent.press(a2);
   expect(router.push).toHaveBeenCalledWith(routes.unit("a2"));
 });

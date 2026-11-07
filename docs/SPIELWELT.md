@@ -44,7 +44,7 @@ Pro Bildschirm gibt es nur einen Hudhud. Die Elternecke hat keinen; sie ist für
   | A5 Klasse, Verkehr | Schule mit jemenitischer Fahne | Schule |
   | A6 صَابِرٌ وَالْبُلْبُلُ | Bülbül auf einem Zweig | Titelgeschichte |
   | A7 Sauberkeit, Zähne | Messing-Ibriq, Seifenblasen | Waschen |
-  | A8 فِي الْقَرْيَةِ | Terrassenfelder, Turmhaus auf dem Berg | Dorf im Hochland |
+  | A8 رَشِيدَةُ وَالْفَرَاشَاتُ، لَطِيفَةُ وَالنَّحْلَةُ | Schmetterling über einer Blume, eine Biene | Titelgeschichten |
   | M1 Sortieren, Muster | geflochtener Korb mit Zickzack, Perlen rot-gelb-rot | Muster |
   | M2 Zahlen | Kaffeesäcke ١ ٢ ٣ des Händlers | Hudhuds Geschichte |
   | M3 Addieren | Messingtablett mit Datteln, eine kommt dazu, «+» | dazu |
