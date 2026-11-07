@@ -89,7 +89,8 @@ const english: Record<string, string> = {
     "Munir and Reading, Sabir and the Nightingale, Mufid's Mousetrap",
   "النَّظَافَةُ، أَسْنَانُ وَسِيمٍ، جَارُ الْمَسْجِدِ":
     "Cleanliness, Waseem's Teeth, The Mosque Neighbor",
-  "فِي الْقَرْيَة": "In the Village",
+  "رَشِيدَةُ وَالْفَرَاشَاتُ، لَطِيفَةُ وَالنَّحْلَةُ، زِيَارَةُ جَدِّي":
+    "Rashida and the Butterflies, Latifa and the Bee, Visiting My Grandfather",
   "الأَعْدَادُ مِنْ ٠ إِلَى ١٠": "Numbers 0 to 10",
   أَعُدُّ: "Count",
   "الْجَمْعُ ضِمْنَ الْعَدَدِ ١٠": "Adding within 10",

@@ -47,7 +47,7 @@ test("book screen renders unit cards with progress pills", () => {
   renderScreen(<BookScreen />);
   expect(screen.getAllByTestId(/^unit-/)).toHaveLength(8);
   const a2 = screen.getByTestId("unit-a2");
-  expect(screen.getAllByText("٠ / ٦").length).toBeGreaterThan(0);
+  expect(screen.getByTestId("unit-a8")).toHaveTextContent(/٠ \/ ٣١/);
   expect(a2).toHaveTextContent(/٠ \/ ٣١/);
   fireEvent.press(a2);
   expect(router.push).toHaveBeenCalledWith(routes.unit("a2"));
