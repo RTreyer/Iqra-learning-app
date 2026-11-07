@@ -65,10 +65,12 @@ test.describe("navigation", () => {
     await expect(page).toHaveURL(/\/unit\/a2$/);
     await page.getByTestId("lesson-row-u2-2").click();
     await expect(page).toHaveURL(/\/lesson\/u2-2$/);
-    await expect(
-      page.getByText("أَقْرَأُ الْمَقَاطِع").filter({ visible: true }).first(),
-    ).toBeVisible();
-    await expect(page.getByText("ابحث عن الحرف")).toBeVisible();
+    // The lesson is named by its picture (spoken, announced), the letter to find shows big.
+    await expect(page.getByTestId("header-picture").filter({ visible: true })).toHaveAttribute(
+      "aria-label",
+      /أَقْرَأُ الْمَقَاطِع/,
+    );
+    await expect(page.getByTestId("letter-target")).toBeVisible();
     await page.getByRole("button", { name: "رجوع" }).click();
     await expect(page).toHaveURL(/\/unit\/a2$/);
   });
@@ -221,9 +223,10 @@ test.describe("scoring", () => {
     await completeQuizLesson(page, "u2-29", 6);
     await page.getByTestId("next-lesson").click();
     await expect(page).toHaveURL(/\/lesson\/u2-30$/);
-    await expect(
-      page.getByText("أَقْرَأُ الصَّوْتَ الأَوَّلَ").filter({ visible: true }).first(),
-    ).toBeVisible();
+    await expect(page.getByTestId("header-picture").filter({ visible: true })).toHaveAttribute(
+      "aria-label",
+      /أَقْرَأُ الصَّوْتَ الأَوَّلَ/,
+    );
   });
 });
 
@@ -307,7 +310,8 @@ test.describe("activities", () => {
 
     await page.getByTestId("next-lesson").click();
     await expect(page).toHaveURL(/\/lesson\/s1-2$/);
-    await expect(page.getByText("٦ كلمة متبقية")).toBeVisible();
+    // Six words: six wagons on the train, none heard yet.
+    await expect(page.getByTestId("progress-train")).toHaveAttribute("aria-valuemax", "6");
     await tapAllAndFinish(page, ["عَيْن", "أُذُن", "أَنْف", "فَم", "يَد", "قَدَم"]);
     expect(await earnedStars(page)).toBe(3);
     await expect.poll(async () => (await readProgress(page))?.totalStars).toBe(6);
@@ -373,9 +377,10 @@ test.describe("language", () => {
     await expect(
       page.getByRole("button", { name: "مَامَا تُوصِلُنِي إِلَى الْمَدْرَسَةِ", exact: true }),
     ).toBeVisible();
-    await expect(
-      page.getByText("أَقْرَأُ الْقِصَّة").filter({ visible: true }).first(),
-    ).toBeVisible();
+    await expect(page.getByTestId("header-picture").filter({ visible: true })).toHaveAttribute(
+      "aria-label",
+      /أَقْرَأُ الْقِصَّة/,
+    );
 
     await openParents(page);
     await page.getByTestId("language-ar").click();

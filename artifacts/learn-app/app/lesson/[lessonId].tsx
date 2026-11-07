@@ -4,20 +4,20 @@
 
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { ActivityHost } from "@/components/ActivityHost";
-import { BackButton } from "@/components/BackButton";
 import { LessonCompleteCard } from "@/components/LessonCompleteCard";
 import { NotFoundCard } from "@/components/NotFoundCard";
 import { ScreenBackground } from "@/components/ScreenBackground";
 import { DemoPlayer } from "@/components/demo/DemoPlayer";
 import { HelpButton } from "@/components/HelpButton";
+import { lessonPicture } from "@/components/world/lessonPicture";
+import { WorldHeader } from "@/components/world/WorldHeader";
 import { GuideProvider, LessonGuide, useGuideState } from "@/components/world/LessonGuide";
-import { getLesson } from "@/content";
+import { getLesson, unitLessonIds } from "@/content";
 import { demoIdFor } from "@/content/demos";
 import { instructionFor } from "@/content/instructions";
-import { useLanguage } from "@/context/LanguageContext";
 import { useProgress } from "@/context/ProgressContext";
 import { useDemoSeen } from "@/hooks/useDemoSeen";
 import { useLessonAttempt } from "@/hooks/useLessonAttempt";
@@ -29,7 +29,9 @@ import { routes } from "@/lib/routes";
 import { starsForScore, type Score } from "@/lib/scoring";
 import { estimateSpeechMs, speak, stopSpeaking } from "@/lib/speech";
 import { newSticker, type Sticker } from "@/lib/stickers";
-import { colors, touchTarget } from "@/theme/tokens";
+import { StoryGoal } from "@/components/world/StoryGoal";
+import { LETTER_LINES, MARKET_LINES, STORY_BEATS, storySymbols } from "@/content/story";
+import { storyStep, type StoryStep } from "@/lib/storyProgress";
 
 /** The activity mounts when the title has been spoken, or after this at the latest. */
 const INTRO_FALLBACK_MS = 1500;
@@ -86,8 +88,8 @@ export default function LessonScreen() {
   const { progress, completeLesson, recordRoundResult, getLessonProgress } = useProgress();
   const today = useMemo(() => lessonsToday(progress), [progress]);
   const [sticker, setSticker] = useState<Sticker | null>(null);
+  const [story, setStory] = useState<StoryStep | null>(null);
   const pad = useScreenPadding();
-  const { language } = useLanguage();
 
   const found = getLesson(lessonId);
   const { completed, stars, completeAttempt, restartAttempt, activityKey } = useLessonAttempt(
@@ -122,9 +124,27 @@ export default function LessonScreen() {
     const gained = Math.max(0, earned - getLessonProgress(lesson.id).stars);
     const won = newSticker(before, before + gained);
     setSticker(won);
+    // What the lesson brings back in Hudhud's story: a letter in his letter, a sack counted.
+    const ids = unitLessonIds(unit);
+    const step = storyStep(
+      storySymbols(unit, book.subject).length,
+      ids.length,
+      ids.filter((id) => getLessonProgress(id).completed).length,
+      getLessonProgress(lesson.id).completed,
+    );
+    setStory(step);
     completeLesson(lesson.id, earned);
     haptics.success();
-    speak(won ? `أَحْسَنْت! مُلْصَقٌ جَدِيدٌ: ${won.name}` : "أحسنت! لقد أتممت الدرس");
+    const math = book.subject === "math";
+    const beat = step.completed
+      ? (math ? MARKET_LINES : LETTER_LINES).complete
+      : step.fresh !== null
+        ? math
+          ? STORY_BEATS.sackCounted
+          : STORY_BEATS.letterBack
+        : "";
+    const praise = won ? `أَحْسَنْت! مُلْصَقٌ جَدِيدٌ: ${won.name}` : "أحسنت! لقد أتممت الدرس";
+    speak(beat && !step.completed ? `${praise} ${beat}` : step.completed ? beat : praise);
     completeAttempt(earned);
   };
 
@@ -133,28 +153,21 @@ export default function LessonScreen() {
       subject={book.subject}
       style={[styles.screen, { paddingTop: pad.top, paddingBottom: pad.bottom + 16 }]}
     >
-      <View style={[styles.header, { flexDirection: language === "en" ? "row" : "row-reverse" }]}>
-        <BackButton fallback={routes.unit(unit.id)} />
-        <View style={styles.headerCenter}>
-          <Text style={styles.lessonEmoji}>{lesson.emoji}</Text>
-          <View style={styles.headerText}>
-            <Text style={styles.lessonTitle} numberOfLines={1}>
-              {lesson.title}
-            </Text>
-            <Text style={styles.lessonSubtitle} numberOfLines={1}>
-              {lesson.subtitle}
-            </Text>
-          </View>
-        </View>
-        {completed ? (
-          <View style={styles.headerSpacer} />
-        ) : (
-          <HelpButton
-            disabled={!decided || showDemo}
-            onPress={() => setReplay({ lessonId, run: (replay?.run ?? 0) + 1 })}
-          />
-        )}
-      </View>
+      <WorldHeader
+        up={{ fallback: routes.unit(unit.id), icon: "map" }}
+        picture={lessonPicture(lesson.type, "#FFFFFF", 32)}
+        name={lesson.title}
+        detail={lesson.subtitle}
+        color={unit.color}
+        end={
+          completed ? undefined : (
+            <HelpButton
+              disabled={!decided || showDemo}
+              onPress={() => setReplay({ lessonId, run: (replay?.run ?? 0) + 1 })}
+            />
+          )
+        }
+      />
       {completed ? null : (
         <LessonGuide text={guide.line ?? instruction ?? lesson.subtitle} mood={guide.mood} />
       )}
@@ -174,6 +187,18 @@ export default function LessonScreen() {
               backTo={routes.unit(unit.id)}
               today={today}
               sticker={sticker}
+              story={
+                story ? (
+                  <StoryGoal
+                    unit={unit}
+                    subject={book.subject}
+                    share={story.share}
+                    fresh={story.completed ? null : story.fresh}
+                    compact
+                    testID="lesson-story"
+                  />
+                ) : null
+              }
             />
           ) : (
             <>
@@ -207,24 +232,6 @@ export default function LessonScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1 },
-  header: {
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-  },
-  headerCenter: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    flex: 1,
-    justifyContent: "center",
-  },
-  headerText: { alignItems: "center", flexShrink: 1 },
-  headerSpacer: { width: touchTarget },
-  lessonEmoji: { fontSize: 22 },
-  lessonTitle: { fontSize: 17, fontWeight: "800", color: colors.text, flexShrink: 1 },
-  lessonSubtitle: { fontSize: 12, fontWeight: "500", color: colors.mutedStrong, flexShrink: 1 },
   scrollContent: { flexGrow: 1, paddingBottom: 24 },
   activity: { flexGrow: 1 },
   hidden: { display: "none" },

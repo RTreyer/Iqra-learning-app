@@ -17,10 +17,8 @@ const LETTERS = ["letter:رَ", "letter:لَا", "letter:دَا", "letter:نَ",
 
 /** Target letter shown in the current review round. */
 async function reviewTarget(page) {
-  const round = page.getByTestId("review-round");
-  return (
-    await round.getByText("ابحث عن الحرف").locator("xpath=following-sibling::*[1]").innerText()
-  ).trim();
+  const label = await page.getByTestId("review-target").getAttribute("aria-label");
+  return label.replace("🔊", "").trim();
 }
 
 test("fresh start: Continue points at Unit 1 lesson 1 and there is no Review card", async ({

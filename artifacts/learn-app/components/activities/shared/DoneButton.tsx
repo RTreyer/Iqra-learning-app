@@ -1,11 +1,13 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { Pressable } from "@/components/demo/DemoPressable";
-import { UiText } from "@/components/UiText";
+import { Pulse } from "@/components/world/Guide";
+import { Icon } from "@/components/world/Icon";
 import { useLanguage } from "@/context/LanguageContext";
-import { colors, readableFill, touchTarget } from "@/theme/tokens";
+import { readableFill } from "@/theme/tokens";
 
 type Props = {
+  /** Spoken and announced name of the step (interface text, translated). */
   label: string;
   color: string;
   onPress: () => void;
@@ -13,34 +15,47 @@ type Props = {
   disabled?: boolean;
 };
 
-/** Continue button; the label is interface chrome and goes through UiText. */
+/**
+ * Continue: one big round play button that breathes, as in the design. No words on it; its
+ * name (e.g. the score) is announced for screen readers and parents.
+ */
 export function DoneButton({ label, color, onPress, testID, disabled }: Props) {
   const { t, digits } = useLanguage();
+  const fill = readableFill(color);
   return (
-    <Pressable
-      testID={testID}
-      accessibilityRole="button"
-      accessibilityLabel={digits(t(label))}
-      accessibilityState={{ disabled: !!disabled }}
-      disabled={disabled}
-      style={[styles.btn, { backgroundColor: readableFill(color) }, disabled && styles.disabled]}
-      onPress={onPress}
-    >
-      <UiText style={styles.text}>{label}</UiText>
-    </Pressable>
+    <Pulse style={styles.wrap}>
+      <Pressable
+        testID={testID}
+        accessibilityRole="button"
+        accessibilityLabel={digits(t(label))}
+        accessibilityState={{ disabled: !!disabled }}
+        disabled={disabled}
+        style={[
+          styles.btn,
+          { backgroundColor: fill, boxShadow: `0 6px 0 ${readableFill(color, 9)}` },
+          disabled && styles.disabled,
+        ]}
+        onPress={onPress}
+      >
+        <View style={styles.nudge}>
+          <Icon name="play" size={40} color="#FFFFFF" />
+        </View>
+      </Pressable>
+    </Pulse>
   );
 }
 
 const styles = StyleSheet.create({
+  wrap: { alignSelf: "center", marginTop: 12, borderRadius: 999 },
   btn: {
-    borderRadius: 16,
-    paddingVertical: 14,
-    paddingHorizontal: 32,
+    width: 84,
+    height: 84,
+    borderRadius: 42,
+    borderWidth: 5,
+    borderColor: "#FFFFFF",
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 8,
-    minHeight: touchTarget,
   },
+  nudge: { marginLeft: 5 },
   disabled: { opacity: 0.6 },
-  text: { fontSize: 16, fontWeight: "800", color: colors.white, textAlign: "center" },
 });

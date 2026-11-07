@@ -1,11 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { UiText } from "@/components/UiText";
 import * as haptics from "@/lib/haptics";
 import { toArabicDigits } from "@/lib/arabicNumbers";
 import type { ReviewItem } from "@/lib/reviewItems";
 import { speak } from "@/lib/speech";
-import { colors, readableFill, touchTarget } from "@/theme/tokens";
+import { colors, touchTarget } from "@/theme/tokens";
 import { mathStyles } from "./math/NumberQuiz";
 import { COUNT_PROMPT, answerOf, arithmeticPrompt } from "./math/prompts";
 import { ChoiceCard, type ChoiceVariant } from "./shared/ChoiceCard";
@@ -17,6 +16,7 @@ import { useLatest } from "./shared/useLatest";
 import { useShuffled } from "./shared/useShuffled";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import { useGuide } from "@/components/world/LessonGuide";
+import { TargetCard } from "./shared/TargetCard";
 
 type Props = {
   item: ReviewItem;
@@ -86,14 +86,7 @@ function roundOf(item: ReviewItem): RoundSpec {
 function Prompt({ item, color, spoken }: { item: ReviewItem; color: string; spoken: string }) {
   switch (item.kind) {
     case "letter":
-      return (
-        <View style={[styles.display, { borderColor: color }]}>
-          <UiText style={styles.displayHint}>ابحث عن الحرف</UiText>
-          <Text style={[styles.displayBig, { color: readableFill(color) }]}>
-            {item.targetLetter}
-          </Text>
-        </View>
-      );
+      return <TargetCard text={item.targetLetter} color={color} testID="review-target" />;
     case "word":
       return <ListenButton text={item.word} color={color} />;
     case "question":
@@ -216,17 +209,6 @@ function Round({ item, attemptKey, onFirstTap, onAdvance, color = colors.success
 export const ReviewRound = withAttemptReset(Round, "ReviewRound");
 
 const styles = StyleSheet.create({
-  display: {
-    alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.9)",
-    borderRadius: 20,
-    padding: 16,
-    borderWidth: 3,
-    width: "75%",
-    gap: 2,
-  },
-  displayHint: { fontSize: 13, color: colors.muted, fontWeight: "600" },
-  displayBig: { fontSize: 72, fontWeight: "900", lineHeight: 88 },
   numberPrompt: { alignItems: "center", gap: 16, maxWidth: 300 },
   question: {
     flexDirection: "row",

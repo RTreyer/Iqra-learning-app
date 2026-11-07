@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Pressable } from "@/components/demo/DemoPressable";
-import { UiText } from "@/components/UiText";
 import { useLanguage } from "@/context/LanguageContext";
 import * as haptics from "@/lib/haptics";
 import { speak } from "@/lib/speech";
@@ -71,7 +70,6 @@ function Matching({ lesson, color, attemptKey, onComplete }: ActivityProps<"matc
 
   return (
     <View style={act.container}>
-      <UiText style={act.instruction}>اضغط على شيء في اليمين ثم ما يناسبه في اليسار</UiText>
       {/* Mirrored in Arabic so the first column sits on the right, as the hint says. */}
       <View
         testID="match-grid"

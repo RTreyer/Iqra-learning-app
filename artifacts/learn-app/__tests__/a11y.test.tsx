@@ -94,7 +94,7 @@ test("book: back button, Hudhud and the unit stations", async () => {
   setParams({ bookId: "arabic-1" });
   withProgress(<BookScreen />);
   await screen.findAllByTestId(/^unit-/);
-  expectAccessiblePressables(10);
+  expectAccessiblePressables(11);
 });
 
 test("unit: back button, Hudhud, the lesson stops (one completed) and Hudhud's letter", async () => {
@@ -102,15 +102,15 @@ test("unit: back button, Hudhud, the lesson stops (one completed) and Hudhud's l
   setParams({ unitId: "a1" });
   withProgress(<UnitScreen />);
   await screen.findAllByTestId(/^lesson-row-/);
-  expectAccessiblePressables(8);
+  expectAccessiblePressables(9);
 });
 
 test("unit with letters: each letter is a button that says itself", async () => {
   setParams({ unitId: "a2" });
   withProgress(<UnitScreen />);
   await screen.findAllByTestId(/^lesson-row-/);
-  // Back, 7 letters, Hudhud, 31 lessons and Hudhud's letter at the end.
-  expectAccessiblePressables(41);
+  // Back, the unit picture, 7 letters, Hudhud, 31 lessons and Hudhud's letter at the end.
+  expectAccessiblePressables(42);
 });
 
 test("album: back button, nine stickers and Hudhud", async () => {
@@ -138,7 +138,7 @@ test("lesson u2-2: back button, Hudhud, help button and the activity controls", 
   await act(async () => {
     jest.advanceTimersByTime(10000);
   });
-  expectAccessiblePressables(6);
+  expectAccessiblePressables(8);
 });
 
 test("lesson u2-2 with its worked example: the Skip button is accessible too", async () => {

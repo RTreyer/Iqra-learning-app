@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Pressable } from "@/components/demo/DemoPressable";
-import { UiText } from "@/components/UiText";
 import { useLanguage } from "@/context/LanguageContext";
 import * as haptics from "@/lib/haptics";
 import { speak } from "@/lib/speech";
@@ -50,7 +49,6 @@ function Behavior({ lesson, color, onComplete }: ActivityProps<"behavior">) {
 
   return (
     <View style={act.container}>
-      <UiText style={act.instruction}>اضغط ✓ للسلوك الصحيح و ✗ للسلوك الخطأ</UiText>
       {behaviors.map((item, i) => {
         const result = results[i];
         return (

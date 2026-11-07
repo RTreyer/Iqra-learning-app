@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { fireEvent, screen } from "@testing-library/react-native";
+import { fireEvent, screen, waitFor } from "@testing-library/react-native";
 import { StyleSheet } from "react-native";
 import React from "react";
 import { MatchingActivity } from "@/components/activities/MatchingActivity";
@@ -86,7 +86,6 @@ describe("grid direction follows the interface language", () => {
         onComplete={jest.fn()}
       />,
     );
-    await screen.findByText("Tap an item on the left, then its match on the right");
-    expect(direction()).toBe("row");
+    await waitFor(() => expect(direction()).toBe("row"));
   });
 });

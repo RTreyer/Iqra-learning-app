@@ -63,7 +63,9 @@ test("unit screen shows one stop per lesson on the path and opens a lesson", () 
   expect(screen.getAllByTestId(/^lesson-row-/)).toHaveLength(31);
   // Lessons are grouped by textbook lesson: one flag per letter plus the exercises.
   expect(screen.getAllByTestId(/^section-/)).toHaveLength(8);
-  expect(screen.getByTestId("section-u2-1")).toHaveTextContent("م: أُحِبُّ مَامَا");
+  // A letter's lessons start with a small flag with the letter; its name is announced.
+  expect(screen.getByTestId("section-u2-1")).toHaveTextContent("م");
+  expect(screen.getByTestId("section-u2-1").props.accessibilityLabel).toBe("م: أُحِبُّ مَامَا");
   fireEvent.press(screen.getByTestId("lesson-row-u2-3"));
   expect(router.push).toHaveBeenCalledWith(routes.lesson("u2-3"));
 });
@@ -96,9 +98,11 @@ test("Hudhud stands beside the next stop of a path, once, and says its line", ()
   setParams({ unitId: "a2" });
   renderScreen(<UnitScreen />);
   expect(screen.getAllByTestId("guide")).toHaveLength(1);
-  expect(screen.getByTestId("guide").props.accessibilityLabel).toBe(getUnit("a2")!.theme);
+  // In the story: collecting the letters of his letter.
+  const line = "هَيَّا نَجْمَعُ حُرُوفَ رِسَالَتِي!";
+  expect(screen.getByTestId("guide").props.accessibilityLabel).toBe(line);
   // On a first visit he flies in from the stop before; he speaks once he has landed.
   jest.advanceTimersByTime(2000);
-  expect(Speech.speak).toHaveBeenCalledWith(getUnit("a2")!.theme, expect.anything());
+  expect(Speech.speak).toHaveBeenCalledWith(line, expect.anything());
   jest.useRealTimers();
 });

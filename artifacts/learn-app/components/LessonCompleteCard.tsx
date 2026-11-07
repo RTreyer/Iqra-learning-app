@@ -32,6 +32,8 @@ type Props = {
   today?: number;
   /** A sticker this lesson earned, shown and named. */
   sticker?: Sticker | null;
+  /** The unit's goal in Hudhud's story, with what this lesson brought back shining. */
+  story?: React.ReactNode;
 };
 
 /** One short fall of paper in the qamariya colours; it plays once and stops. */
@@ -119,6 +121,7 @@ export function LessonCompleteCard({
   backTo,
   today = 0,
   sticker = null,
+  story = null,
 }: Props) {
   const { language, t, digits } = useLanguage();
   const row = language === "en" ? "row" : "row-reverse";
@@ -136,6 +139,7 @@ export function LessonCompleteCard({
       </View>
       <Hudhud size={130} pose="cheer" />
       <UiText style={styles.title}>أَحْسَنْت!</UiText>
+      {story}
 
       <View style={[styles.rewards, { flexDirection: row }]}>
         <View style={styles.window} accessible accessibilityLabel={t("قمرية اليوم")}>

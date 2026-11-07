@@ -9,6 +9,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Circle, Path, Svg } from "react-native-svg";
 
 import * as haptics from "@/lib/haptics";
+import { symbolsBack } from "@/lib/storyProgress";
 import { speak } from "@/lib/speech";
 import { touchTarget, yemen } from "@/theme/tokens";
 
@@ -19,16 +20,21 @@ type Props = {
   share: number;
   /** Hudhud's line about the letter, said when it is tapped. */
   line: string;
+  /** Index of the letter this lesson just brought back, shown shining. */
+  fresh?: number | null;
+  /** Smaller, for the finish card. */
+  compact?: boolean;
   testID?: string;
 };
 
-/** How many of the symbols are back on the paper at this share of the unit. */
-export function symbolsBack(count: number, share: number): number {
-  if (share >= 1) return count;
-  return Math.min(count - 1, Math.floor(share * count));
-}
-
-export function LetterGoal({ symbols, share, line, testID = "unit-letter" }: Props) {
+export function LetterGoal({
+  symbols,
+  share,
+  line,
+  fresh = null,
+  compact = false,
+  testID = "unit-letter",
+}: Props) {
   const complete = share >= 1;
   const back = symbolsBack(symbols.length, share);
   return (
@@ -41,14 +47,14 @@ export function LetterGoal({ symbols, share, line, testID = "unit-letter" }: Pro
         haptics.tap();
         speak(line);
       }}
-      style={({ pressed }) => [styles.wrap, pressed && styles.pressed]}
+      style={({ pressed }) => [styles.wrap, compact && styles.compact, pressed && styles.pressed]}
     >
       {complete ? <View style={styles.glow} /> : null}
       <View style={[styles.paper, complete ? styles.paperDone : styles.paperOpen]}>
         <View style={styles.symbols}>
           {symbols.map((symbol, i) =>
             i < back ? (
-              <Text key={`${symbol}-${i}`} style={styles.symbol}>
+              <Text key={`${symbol}-${i}`} style={[styles.symbol, fresh === i && styles.fresh]}>
                 {symbol}
               </Text>
             ) : (
@@ -89,7 +95,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  compact: { width: 150 },
   pressed: { opacity: 0.88, transform: [{ scale: 0.97 }] },
+  fresh: { backgroundColor: "#F4C14B", borderRadius: 8, overflow: "hidden", color: yemen.clayDeep },
   glow: {
     position: "absolute",
     width: 196,

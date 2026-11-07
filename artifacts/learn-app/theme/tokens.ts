@@ -74,13 +74,16 @@ export const yemen = {
 
 type Gradient = readonly [string, string, ...string[]];
 
-/** Subject gradients: subject color at about 12 percent over white, fading to cream. */
+/**
+ * Backgrounds of the child's world (the design): warm sand, with only a breath of the subject
+ * colour at the top, so every screen feels like the same place.
+ */
 export const gradients: Record<Subject | "home", Gradient> = {
   home: ["#FFF8EC", "#F7E6CC", "#EFD6B4"],
-  arabic: ["#E5ECFD", "#FFFBF0"],
-  lughati: ["#FDEBE1", "#FFFBF0"],
-  math: ["#EFE7FD", "#FFFBF0"],
-  science: ["#E1F2ED", "#FFFBF0"],
+  arabic: ["#EEF2FA", "#FFF8EC", "#F6E4C9"],
+  lughati: ["#FBEEE6", "#FFF8EC", "#F6E4C9"],
+  math: ["#F2EEFA", "#FFF8EC", "#F6E4C9"],
+  science: ["#EAF4EF", "#FFF8EC", "#F6E4C9"],
 };
 
 export const radius = { sm: 12, md: 20, lg: 28 } as const;

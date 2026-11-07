@@ -11,13 +11,22 @@ Hudhud ist auf jedem Kinder-Bildschirm die eine Figur, die durch die Welt geht u
 | Start | begrüsst, lädt zur Geschichte ein | `app/index.tsx` |
 | Geschichte | ist der Held: Briefbote, Sturm, Bitte um Hilfe | `app/intro.tsx`, `components/world/StoryScenes.tsx` |
 | Lernpfade (mit Palmen am Wegrand) | fliegt im Bogen vom letzten Stopp zum nächsten, landet und sagt dort seinen Satz | `components/world/PathMap.tsx` |
-| Ende jeder Einheit | sein Brief, den der Sturm verweht hat: mit jeder Lektion kehren Buchstaben zurück, mit der ganzen Einheit ist er vollständig, versiegelt und leuchtet | `components/world/LetterGoal.tsx` |
+| Ende jeder Einheit | Arabisch: sein Brief, den der Sturm verweht hat; mit jeder Lektion kehren Buchstaben zurück, mit der ganzen Einheit ist er vollständig, versiegelt und leuchtet. Mathe: die Kaffeesäcke des Händlers in Mokka, einer nach dem anderen gezählt, bis das Schiff ablegt | `components/world/StoryGoal.tsx` |
+| Nach jeder Lektion | zeigt auf dem Abschluss den Brief bzw. die Säcke; was die Lektion zurückgebracht hat, leuchtet, und er sagt es («رَجَعَ حَرْفٌ إِلَى رِسَالَتِي!» / «عَدَدْنَا كِيسًا آخَرَ!») | `lib/storyProgress.ts`, `app/lesson/[lessonId].tsx` |
 | Jede Übung | steht über der Aufgabe, seine Sprechblase zeigt die Anweisung (Antippen wiederholt sie); hüpft bei richtigen Antworten, wackelt verwundert bei falschen | `components/world/LessonGuide.tsx` |
 | Vorgemachtes Beispiel | erzählt in seiner Sprechblase, was die Hand vormacht | `components/demo/DemoPlayer.tsx` |
 | Wiederholung | bringt «die Briefe des Tages» und reagiert auf die Antworten | `app/review.tsx` |
 | Geschafft, Album | jubelt, nennt Sticker | `components/LessonCompleteCard.tsx`, `app/album.tsx` |
 
 Pro Bildschirm gibt es nur einen Hudhud. Die Elternecke hat keinen; sie ist für Erwachsene.
+
+## Lernpfade und Übungen nach dem Entwurf
+
+- **Kopfzeile ohne Text**: runder Bild-Knopf eine Stufe nach oben (Haus zum Start, Karte zum Pfad), in der Mitte das Bild der Einheit bzw. der Übungsart (antippen sagt den Namen), links die Sterne bzw. die Hilfe-Hand. Titel und «x / y مكتمل» sind nur noch für Screenreader angesagt.
+- **Buchstaben der Einheit**: gesammelt (alle Lektionen des Buchstabens fertig) gefüllt, sonst gestrichelt. Wo die Lektionen eines Buchstabens beginnen, trägt der Stopp ein Fähnchen mit dem Buchstaben.
+- **Weg**: gold bis zum aktuellen Stopp, danach gestrichelt bis zum Ziel. Palmen am Rand.
+- **Hintergrund**: warmer Sand mit einem Hauch Fachfarbe, keine Deko-Emojis.
+- **Übungen ohne Lesen**: Hudhud sagt die Aufgabe; die früheren Texthinweise («ابحث عن الحرف», «اضغط على كل جملة…», «٤ جملة متبقية», «رتّب…») sind entfernt. Geschichte und Benennen zeigen den Fortschritt als Zug. Der gesuchte Buchstabe steht gross auf einer Karte mit Lautsprecher zum Nochmal-Hören; die Antwortkarten sind grösser. Weiter ist ein grosser runder Play-Knopf, Nachzeichnen hat Bild-Knöpfe (neu anfangen, fertig).
 
 ## Hudhuds Geschichte
 

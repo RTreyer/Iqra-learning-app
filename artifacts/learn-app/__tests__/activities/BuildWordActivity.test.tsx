@@ -94,7 +94,6 @@ test("complete the word: given wagons start full, only the gap is loaded", () =>
       onComplete={onComplete}
     />,
   );
-  expect(screen.getByText("أكمل القطار بالمقطع الناقص 🚂")).toBeTruthy();
   expect(screen.getByTestId("wagon-1")).toHaveProp("accessibilityLabel", "رُ");
   expect(screen.getByTestId("wagon-0")).toHaveProp("accessibilityLabel", "؟");
   expect(screen.queryByRole("button", { name: "رُ" })).toBeNull();
@@ -115,7 +114,6 @@ test("sentence train: the words are loaded in reading order", () => {
       onComplete={onComplete}
     />,
   );
-  expect(screen.getByText("رتّب الكلمات في القطار 🚂")).toBeTruthy();
   tap("جُبْرَانُ"); // ذَهَبَ comes first
   expect(spoken().at(-1)).toBe("ذَهَبَ");
   for (const word of ["ذَهَبَ", "جُبْرَانُ", "إِلَى", "الْمَسْجِدِ"]) tap(word);

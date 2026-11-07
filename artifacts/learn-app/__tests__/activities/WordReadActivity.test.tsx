@@ -49,10 +49,10 @@ test("asks again after a wrong tap without saying the answer, and shows the scor
   );
   expect(screen.queryByTestId("activity-next")).toBeNull();
   fireEvent.press(screen.getByRole("button", { name: "مَامَا" }));
-  expect(screen.getByText("التالي ←")).toBeTruthy();
+  expect(screen.getByLabelText("التالي ←")).toBeTruthy();
   fireEvent.press(screen.getByTestId("activity-next"));
   fireEvent.press(screen.getByRole("button", { name: "أَنَا" }));
   fireEvent.press(screen.getByTestId("activity-next"));
   fireEvent.press(screen.getByRole("button", { name: "أُحِبُّ" }));
-  expect(screen.getByText("أَحْسَنْت! ٢/٣ 🌟 تابع")).toBeTruthy();
+  expect(screen.getByLabelText("أَحْسَنْت! ٢/٣ 🌟 تابع")).toBeTruthy();
 });

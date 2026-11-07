@@ -110,7 +110,8 @@ const iconStyles = StyleSheet.create({
 });
 
 const cardStyles = StyleSheet.create({
-  letter: { width: 80, height: 80, borderRadius: 16, borderWidth: 3 },
+  // Big letter cards, as in the design: easy to hit, easy to see.
+  letter: { width: 96, height: 104, borderRadius: 22, borderWidth: 4, ...shadow.card },
   word: {
     flexDirection: "row",
     borderRadius: 16,
@@ -130,7 +131,7 @@ const cardStyles = StyleSheet.create({
 });
 
 const textStyles = StyleSheet.create({
-  letter: { fontSize: 40, fontWeight: "900", color: colors.text },
+  letter: { fontSize: 54, fontWeight: "900", color: colors.text, lineHeight: 74 },
   word: { fontSize: 22, fontWeight: "800", color: colors.text, textAlign: "center" },
   picture: { fontSize: 15, fontWeight: "700", color: colors.text, textAlign: "center" },
   number: { fontSize: 36, fontWeight: "800", color: colors.successText },

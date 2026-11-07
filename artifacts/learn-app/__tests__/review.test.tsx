@@ -64,7 +64,9 @@ function labels(item: ReviewItem): { right: string; wrong: string } {
 function answer(id: string, correct: boolean) {
   const { right, wrong } = labels(allItems().get(id)!);
   if (!correct) fireEvent.press(screen.getByRole("button", { name: wrong }));
-  fireEvent.press(screen.getByRole("button", { name: right }));
+  // The target card says the letter too ("🔊 letter"): tap the answer card.
+  const answers = screen.getAllByRole("button", { name: right });
+  fireEvent.press(answers.find((n) => n.props.testID !== "review-target")!);
   act(() => jest.advanceTimersByTime(900));
 }
 

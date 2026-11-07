@@ -46,6 +46,8 @@ export type Stop = {
   asideTestID?: string;
   /** testID on the gold done mark, for tests. */
   doneTestID?: string;
+  /** A small flag on the stop, e.g. the letter whose lessons start here (design). */
+  badge?: { text: string; label: string; testID?: string };
 };
 
 const ROW = 128;
@@ -145,6 +147,16 @@ export function PathMap({ stops, color, onPress, guide, onGuideY, pathKey, goal 
     return d;
   };
 
+  const pathFrom = (start: number, end: number) => {
+    let d = `M${centre(start).x} ${centre(start).y}`;
+    for (let i = start + 1; i <= end; i++) {
+      const a = centre(i - 1);
+      const b = centre(i);
+      d += ` C${a.x} ${a.y + ROW / 2} ${b.x} ${b.y - ROW / 2} ${b.x} ${b.y}`;
+    }
+    return d;
+  };
+
   return (
     <View style={{ height }} onLayout={onLayout}>
       {stops.length > 0 ? (
@@ -156,6 +168,17 @@ export function PathMap({ stops, color, onPress, guide, onGuideY, pathKey, goal 
             strokeLinecap="round"
             fill="none"
           />
+          {current >= 0 && current < ends ? (
+            // The way still ahead: a dashed line along the sand (design).
+            <Path
+              d={pathFrom(current, ends)}
+              stroke="#FFFFFF"
+              strokeWidth={3}
+              strokeLinecap="round"
+              strokeDasharray="2 12"
+              fill="none"
+            />
+          ) : null}
           {goldEnd > 0 ? (
             <Path
               d={pathTo(goldEnd)}
@@ -242,6 +265,17 @@ export function PathMap({ stops, color, onPress, guide, onGuideY, pathKey, goal 
           <React.Fragment key={stop.key}>
             <View style={[styles.slot, { left: x - size / 2, top: y - size / 2 }]}>
               {stop.state === "current" ? <Pulse>{node}</Pulse> : node}
+              {stop.badge ? (
+                <View
+                  testID={stop.badge.testID}
+                  accessible
+                  accessibilityRole="header"
+                  accessibilityLabel={stop.badge.label}
+                  style={[styles.badge, { borderColor: fill, left: size - 26, top: -10 }]}
+                >
+                  <Text style={[styles.badgeText, { color: fill }]}>{stop.badge.text}</Text>
+                </View>
+              ) : null}
             </View>
             {guided ? (
               <PathGuide
@@ -453,6 +487,17 @@ const styles = StyleSheet.create({
   pressed: { opacity: 0.88, transform: [{ scale: 0.95 }] },
   guide: { position: "absolute", gap: 6, minHeight: touchTarget },
   palm: { position: "absolute", opacity: 0.9 },
+  badge: {
+    position: "absolute",
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 3,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  badgeText: { fontSize: 20, fontWeight: "900", lineHeight: 30 },
   goal: { position: "absolute" },
   guideLeft: { alignItems: "flex-end" },
   guideRight: { alignItems: "flex-start" },

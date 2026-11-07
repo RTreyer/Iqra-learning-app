@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Animated, Easing, StyleSheet, Text, View } from "react-native";
 import { Pressable } from "@/components/demo/DemoPressable";
 import { Circle, Path, Rect, Svg } from "react-native-svg";
-import { UiText } from "@/components/UiText";
 import type { BuildWordRound } from "@/content/types";
 import * as haptics from "@/lib/haptics";
 import { speak } from "@/lib/speech";
@@ -52,13 +51,6 @@ function BuildWord({
   return (
     <View style={act.container}>
       <ProgressDots count={rounds.length} current={quiz.roundIndex} color={color} />
-      <UiText style={act.hint}>
-        {isSentence(rounds[quiz.roundIndex])
-          ? "رتّب الكلمات في القطار 🚂"
-          : rounds[quiz.roundIndex].given
-            ? "أكمل القطار بالمقطع الناقص 🚂"
-            : "رتّب المقاطع في القطار 🚂"}
-      </UiText>
       <TrainRound
         key={quiz.roundIndex}
         round={rounds[quiz.roundIndex]}

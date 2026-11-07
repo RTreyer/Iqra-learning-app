@@ -7,12 +7,11 @@ import { router, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useRef, type ComponentRef } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { BackButton } from "@/components/BackButton";
 import { NotFoundCard } from "@/components/NotFoundCard";
-import { ScreenBackground } from "@/components/ScreenBackground";
-import { StarBadge } from "@/components/StarBadge";
 import { UiText } from "@/components/UiText";
+import { ScreenBackground } from "@/components/ScreenBackground";
 import { PathMap, type Stop } from "@/components/world/PathMap";
+import { WorldHeader } from "@/components/world/WorldHeader";
 import { getBook, unitLessonIds } from "@/content";
 import { SUBJECT_LINES } from "@/content/story";
 import { useLanguage } from "@/context/LanguageContext";
@@ -26,7 +25,7 @@ export default function BookScreen() {
   const bookId = firstParam(useLocalSearchParams<{ bookId?: string | string[] }>().bookId);
   const { progress, hydrated, loadSettled, getUnitProgress } = useProgress();
   const progressReady = hydrated || loadSettled;
-  const { t, language, digits } = useLanguage();
+  const { t, digits } = useLanguage();
   const pad = useScreenPadding();
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
   // Open the path where Hudhud stands, with some of the way behind him in view.
@@ -71,16 +70,14 @@ export default function BookScreen() {
       subject={book.subject}
       style={[styles.container, { paddingTop: pad.top + 4 }]}
     >
-      <View style={[styles.header, { flexDirection: language === "en" ? "row" : "row-reverse" }]}>
-        <BackButton fallback={routes.home()} />
-        <View style={styles.headerCenter}>
-          <Text style={styles.bookEmoji}>{book.emoji}</Text>
-          <UiText style={styles.bookTitle} numberOfLines={1}>
-            {book.title}
-          </UiText>
-        </View>
-        <StarBadge stars={progress.totalStars} />
-      </View>
+      <WorldHeader
+        up={{ fallback: routes.home(), icon: "home" }}
+        picture={<Text style={styles.bookEmoji}>{book.emoji}</Text>}
+        name={t(book.title)}
+        detail={t(book.subtitle)}
+        color={book.color}
+        stars={progress.totalStars}
+      />
       <ScrollView
         ref={scroll}
         style={styles.scroll}
@@ -103,23 +100,7 @@ export default function BookScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: {
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    marginBottom: 6,
-  },
-  headerCenter: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    flex: 1,
-    justifyContent: "center",
-    paddingHorizontal: 8,
-  },
-  bookEmoji: { fontSize: 22 },
-  bookTitle: { fontSize: 18, fontWeight: "800", color: yemen.ink, flexShrink: 1 },
+  bookEmoji: { fontSize: 34, color: "#FFFFFF" },
   scroll: { flex: 1, width: "100%" },
   letters: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 4, justifyContent: "center" },
   letter: {

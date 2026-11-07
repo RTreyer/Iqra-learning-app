@@ -57,3 +57,29 @@ export const LETTER_LINES = {
   missing: "فِي آخِرِ الطَّرِيقِ رِسَالَتِي، نُكْمِلُهَا مَعًا!",
   complete: "اِكْتَمَلَتِ الرِّسَالَةُ! أَحْسَنْت!",
 };
+
+/** At the end of a maths unit: the trader's coffee sacks, counted, and the ship that can sail. */
+export const MARKET_LINES = {
+  missing: "التَّاجِرُ يَنْتَظِرُ، نَعُدُّ أَكْيَاسَهُ مَعًا!",
+  complete: "عَدَدْنَا كُلَّ الْأَكْيَاسِ، وَأَبْحَرَتِ السَّفِينَةُ! أَحْسَنْت!",
+};
+
+/** What a lesson brings back to the story, said on its finish card. */
+export const STORY_BEATS = {
+  letterBack: "رَجَعَ حَرْفٌ إِلَى رِسَالَتِي!",
+  sackCounted: "عَدَدْنَا كِيسًا آخَرَ!",
+};
+
+/** The letters (or numbers) a unit's goal holds: its own letters, else by subject. */
+export function storySymbols(unit: { letters?: string[] }, subject: string): string[] {
+  if (unit.letters?.length) return unit.letters;
+  return subject === "math" ? ["١", "٢", "٣", "٤", "٥"] : ["أ", "ب", "ت", "ث", "ج"];
+}
+
+/** Hudhud's line on a unit's path, in the story: collecting letters, or counting in the market. */
+export function unitStoryLine(unit: { letters?: string[] }, subject: string): string {
+  if (subject === "math") return "هَيَّا نَعُدُّ أَكْيَاسَ الْبُنِّ لِلتَّاجِرِ!";
+  // The letters themselves stand above the path; the line stays short.
+  if (unit.letters?.length) return "هَيَّا نَجْمَعُ حُرُوفَ رِسَالَتِي!";
+  return "هَيَّا نَبْدَأُ رِحْلَتَنَا!";
+}

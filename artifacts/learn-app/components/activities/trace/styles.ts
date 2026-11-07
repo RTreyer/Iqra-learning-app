@@ -63,6 +63,4 @@ export const trace = StyleSheet.create({
     minHeight: touchTarget,
   },
   clear: { backgroundColor: "rgba(237,233,254,0.9)", borderWidth: 2, borderColor: "#C4B5FD" },
-  clearText: { fontSize: 17, fontWeight: "700", color: "#7C3AED" },
-  doneText: { fontSize: 17, fontWeight: "700", color: colors.white },
 });

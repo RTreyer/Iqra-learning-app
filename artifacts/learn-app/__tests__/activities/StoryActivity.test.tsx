@@ -1,6 +1,5 @@
 import { fireEvent, screen } from "@testing-library/react-native";
 import React from "react";
-import { toArabicDigits } from "@/lib/arabicNumbers";
 import { StoryActivity } from "@/components/activities/StoryActivity";
 import { lessonOf, renderActivity } from "@/test-utils/activities";
 
@@ -15,13 +14,13 @@ test("completes with an empty score once every line was heard", () => {
     <StoryActivity lesson={lesson} color="#2563EB" attemptKey="s:1" onComplete={onComplete} />,
   );
   expect(screen.getByText(lesson.storyTitle)).toBeTruthy();
-  expect(screen.getByText(`${toArabicDigits(lesson.lines.length)} جملة متبقية`)).toBeTruthy();
+  expect(screen.getByTestId("progress-train")).toHaveProp("aria-valuenow", 1);
 
   const first = lesson.lines[0].text;
   fireEvent.press(screen.getByRole("button", { name: first }));
   fireEvent.press(screen.getByRole("button", { name: first }));
   expect(speech.speak).toHaveBeenCalledWith(first, expect.anything());
-  expect(screen.getByText(`${toArabicDigits(lesson.lines.length - 1)} جملة متبقية`)).toBeTruthy();
+  expect(screen.getByTestId("progress-train")).toHaveProp("aria-valuenow", 2);
   expect(screen.queryByTestId("activity-done")).toBeNull();
 
   for (const line of lesson.lines.slice(1))
@@ -38,7 +37,7 @@ test("resets heard lines when attemptKey changes", () => {
   rerenderActivity(
     <StoryActivity lesson={lesson} color="#2563EB" attemptKey="s:2" onComplete={jest.fn()} />,
   );
-  expect(screen.getByText(`${toArabicDigits(lesson.lines.length)} جملة متبقية`)).toBeTruthy();
+  expect(screen.getByTestId("progress-train")).toHaveProp("aria-valuenow", 1);
 });
 
 test("Done fires onComplete once even when tapped twice", () => {

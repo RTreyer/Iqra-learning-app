@@ -58,8 +58,8 @@ test("renders the guide and label and speaks the first target", () => {
   expect(screen.getByText(lesson.targets[0].label)).toBeTruthy();
   expect(screen.getByTestId("trace-guide")).toBeTruthy(); // the letter outline
   expect(speech.speak).toHaveBeenCalledWith(lesson.targets[0].tts, expect.anything());
-  expect(screen.getByText("مسح")).toBeTruthy();
-  expect(screen.getByText("تم")).toBeTruthy();
+  expect(screen.getByLabelText("مسح")).toBeTruthy();
+  expect(screen.getByLabelText("تم")).toBeTruthy();
 });
 
 test("Done with no strokes shows the error banner and does not complete", () => {

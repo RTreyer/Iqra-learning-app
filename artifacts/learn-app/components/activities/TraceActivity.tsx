@@ -4,7 +4,6 @@ import { Pressable } from "@/components/demo/DemoPressable";
 import { GestureDetector, usePanGesture } from "react-native-gesture-handler";
 import { Path, Svg } from "react-native-svg";
 import { measureNode, useDemoEntry, type DemoEntry } from "@/components/demo/DemoContext";
-import { UiText } from "@/components/UiText";
 import { useLanguage } from "@/context/LanguageContext";
 import * as haptics from "@/lib/haptics";
 import { readableFill } from "@/theme/tokens";
@@ -21,6 +20,7 @@ import { decodeMask, validateOnGuide, validateTracing } from "./trace/validate";
 import { TRACE_GRID, traceGuides } from "@/content/generated/traceGuides";
 import type { ActivityProps } from "./types";
 import { useGuide } from "@/components/world/LessonGuide";
+import { Icon } from "@/components/world/Icon";
 
 const ERROR_VISIBLE_MS = 3000;
 /** Distance between the points of a demo line, in pixels. */
@@ -326,7 +326,7 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
             style={[trace.button, trace.clear]}
             onPress={handleClear}
           >
-            <UiText style={trace.clearText}>مسح</UiText>
+            <Icon name="replay" size={28} color="#7C3AED" strokeWidth={2.6} />
           </Pressable>
           <Pressable
             testID="trace-done"
@@ -335,7 +335,7 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
             style={[trace.button, { backgroundColor: readableFill(color) }]}
             onPress={handleDone}
           >
-            <UiText style={trace.doneText}>تم</UiText>
+            <Icon name="check" size={34} color="#FFFFFF" strokeWidth={3} />
           </Pressable>
         </View>
       </View>

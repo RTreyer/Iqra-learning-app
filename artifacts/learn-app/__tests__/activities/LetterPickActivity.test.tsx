@@ -12,7 +12,10 @@ beforeEach(() => {
 });
 afterEach(() => jest.useRealTimers());
 
-const tap = (letter: string) => fireEvent.press(screen.getByRole("button", { name: letter }));
+/** The answer card for `letter` (the target card above says it too, as "🔊 letter"). */
+const choice = (letter: string) =>
+  screen.getAllByRole("button", { name: letter }).find((n) => n.props.testID !== "letter-target")!;
+const tap = (letter: string) => fireEvent.press(choice(letter));
 const advance = () => act(() => jest.advanceTimersByTime(900));
 
 test("first tap scoring: wrong then found, wrong then found, right, right", () => {
@@ -63,7 +66,7 @@ test("a wrong letter greys out, the voice asks again, and the child tries again"
   expect(speech.speak).toHaveBeenLastCalledWith("حَاوِلْ مَرَّةً أُخْرَى، مَ", expect.anything());
   // The wrong letter cannot be tapped again; the answer is not revealed and stays open.
   expect(screen.getByRole("button", { name: "نَ، خطأ" })).toBeDisabled();
-  expect(screen.getByRole("button", { name: "مَ" })).not.toBeDisabled();
+  expect(choice("مَ")).not.toBeDisabled();
   tap("نَ");
   expect(speech.speak).toHaveBeenCalledTimes(2);
   tap("مَ");
@@ -84,7 +87,7 @@ test("resets when attemptKey changes", () => {
     <LetterPickActivity lesson={lesson} color="#7C3AED" attemptKey="a:2" onComplete={jest.fn()} />,
   );
   expect(screen.getByTestId("progress-train")).toHaveProp("aria-valuenow", 1);
-  expect(screen.getByRole("button", { name: "مَ" })).not.toBeDisabled();
+  expect(choice("مَ")).not.toBeDisabled();
 });
 
 test("uses the latest callbacks when the parent re-renders before the advance", () => {

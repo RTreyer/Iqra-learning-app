@@ -3,7 +3,6 @@ import { Animated, StyleSheet, Text, View } from "react-native";
 import { Pressable } from "@/components/demo/DemoPressable";
 import { Art } from "@/components/art/Art";
 import { Scene } from "@/components/art/scenes/Scene";
-import { UiText } from "@/components/UiText";
 import * as haptics from "@/lib/haptics";
 import { speak } from "@/lib/speech";
 import { colors, readableFill, touchTarget, withAlpha } from "@/theme/tokens";
@@ -13,6 +12,7 @@ import { useOnce } from "./shared/useOnce";
 import { useBounce } from "./shared/useQuiz";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import type { ActivityProps } from "./types";
+import { ProgressDots } from "./shared/ProgressDots";
 
 function Story({ lesson, color, onComplete }: ActivityProps<"story">) {
   const { lines } = lesson;
@@ -44,7 +44,8 @@ function Story({ lesson, color, onComplete }: ActivityProps<"story">) {
         </View>
       ) : null}
       <Text style={styles.title}>{lesson.storyTitle}</Text>
-      <UiText style={act.instruction}>اضغط على كل جملة لتسمعها 🔊</UiText>
+      {/* Each sentence heard fills a wagon; Hudhud says what to do. */}
+      <ProgressDots count={lines.length} current={heard.size} color={color} />
       <View style={act.fullWidth}>
         {lines.map((line, i) => {
           const done = heard.has(i);
@@ -87,9 +88,7 @@ function Story({ lesson, color, onComplete }: ActivityProps<"story">) {
           onPress={finish.fire}
           disabled={finish.done}
         />
-      ) : (
-        <UiText style={act.hint}>{`${remaining} جملة متبقية`}</UiText>
-      )}
+      ) : null}
     </View>
   );
 }

@@ -106,8 +106,10 @@ test("speaks the title, then the instruction, and mounts the activity once both 
   });
   renderScreen(<LessonScreen />);
   expect(order).toEqual([`speak:${lesson.title}`, `speak:${instruction}`]);
-  expect(screen.getByText(lesson.title)).toBeTruthy();
-  expect(screen.getByText(lesson.subtitle)).toBeTruthy();
+  // The header shows the lesson as a picture; its name is spoken and announced.
+  expect(screen.getByTestId("header-picture").props.accessibilityLabel).toBe(
+    `${lesson.title}، ${lesson.subtitle}`,
+  );
   expect(screen.getByText("stub:letter_pick")).toBeTruthy();
 });
 

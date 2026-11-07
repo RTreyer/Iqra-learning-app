@@ -3,7 +3,7 @@ import { fireEvent, screen } from "@testing-library/react-native";
 import React from "react";
 
 import UnitScreen from "@/app/unit/[unitId]";
-import { symbolsBack } from "@/components/world/LetterGoal";
+import { symbolsBack } from "@/lib/storyProgress";
 import { getUnit } from "@/content";
 import { LETTER_LINES } from "@/content/story";
 import { ProgressProvider } from "@/context/ProgressContext";
