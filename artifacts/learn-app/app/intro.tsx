@@ -15,8 +15,8 @@ import { goBackOr } from "@/components/BackButton";
 import { ScreenBackground } from "@/components/ScreenBackground";
 import { UiText } from "@/components/UiText";
 import { Icon } from "@/components/world/Icon";
+import { Picture } from "@/components/pictures/Picture";
 import { INK, Note } from "@/components/world/Bowl";
-import { SidrTreeArt } from "@/components/world/SidrTree";
 import { StoryPicture } from "@/components/world/StoryScenes";
 import { books, type Book } from "@/content";
 import {
@@ -163,12 +163,12 @@ function Appear({
   );
 }
 
-/** The picture on a choice card: Rasha's bowl with letters, or her seed with numbers. */
+/** The picture on a choice card: Rasha's note with letters, or a coffee sack with numbers. */
 function ChoicePicture({ book }: { book: Book }) {
   if (book.subject === "math")
     return (
       <View style={styles.choicePicture}>
-        <SidrTreeArt stage={1} size={64} />
+        <Picture emoji="🫘" size={64} />
         <Text style={styles.choiceGlyph}>١ ٢ ٣</Text>
       </View>
     );

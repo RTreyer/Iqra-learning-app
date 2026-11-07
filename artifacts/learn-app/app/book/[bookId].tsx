@@ -17,9 +17,9 @@ import { getBook, unitLessonIds } from "@/content";
 import { SUBJECT_DONE, SUBJECT_LINES, chapterFor, stationScenes } from "@/content/story";
 import type { Lesson } from "@/content/types";
 import { useSettings } from "@/context/SettingsContext";
-import { learntLetters, treeStage } from "@/lib/storyProgress";
+import { learntLetters, voyageStage } from "@/lib/storyProgress";
 import { BowlMessage } from "@/components/world/Bowl";
-import { SidrTreeGoal } from "@/components/world/SidrTree";
+import { VoyageGoal } from "@/components/world/Voyage";
 import { useLanguage } from "@/context/LanguageContext";
 import { useProgress } from "@/context/ProgressContext";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
@@ -50,8 +50,8 @@ export default function BookScreen() {
   }));
   const currentIndex = units.findIndex(({ progress: p }) => p.done < p.total);
   const isDone = (lesson: Lesson) => getLessonProgress(lesson.id).completed;
-  // At the end of the way, the heart of each thread: Rasha's bowl, whose message lights up
-  // with every letter learnt, or the sidr tree, growing with every maths unit.
+  // At the end of the way, the heart of each thread: Rasha's bowl, whose note lights up with
+  // every letter learnt, or the coffee trader's ship, loaded with every maths unit.
   const thread = chapterFor(book.subject);
   const goal =
     thread === "arabic"
@@ -61,11 +61,11 @@ export default function BookScreen() {
         }
       : thread === "math"
         ? (() => {
-            const stage = treeStage(book.units, isDone);
+            const stage = voyageStage(book.units, isDone);
             return {
               done: stage >= 5,
               node: (
-                <SidrTreeGoal
+                <VoyageGoal
                   stage={stage}
                   line={stage >= 5 ? SUBJECT_DONE.math : SUBJECT_LINES.math}
                 />

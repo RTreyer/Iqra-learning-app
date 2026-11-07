@@ -19,7 +19,7 @@ import {
   sectionLetter,
   storyStep,
   symbolsBack,
-  treeStage,
+  voyageStage,
 } from "@/lib/storyProgress";
 
 const none = () => false;
@@ -61,13 +61,13 @@ test("every unit has its goal: writing, letters, vowels, then one market station
     "letters",
     "letters",
   ]);
-  // The seed's journey: each maths station once.
+  // The coffee trader's journey, Haraz to Mocha: each maths station once.
   expect(math.units.map((u) => goalKind(u, "math"))).toEqual([
-    "seeds",
-    "jars",
-    "drops",
+    "sort",
+    "count",
+    "add",
     "give",
-    "stones",
+    "ship",
   ]);
   expect(goalKind({}, "science")).toBeNull();
 });
@@ -147,6 +147,8 @@ test("every unit is a station on Hudhud's journey, and ends with its clue or les
     }
   // Rasha's trail leads to her new home: she is well.
   expect(STATIONS.a8.outro).toContain("بِخَيْرٍ");
+  // The trader's ship sails, and he passes Rasha's kindness on: water for the birds.
+  expect(STATIONS["math-u5"].outro).toContain("صَحْنَ مَاءٍ لِلطُّيُورِ");
 });
 
 test("Rasha's message becomes readable only with the letters of the whole book", () => {
@@ -161,15 +163,15 @@ test("Rasha's message becomes readable only with the letters of the whole book",
   expect([...letters].some((l) => l !== "ا" && !after2.has(l))).toBe(true);
 });
 
-test("the sidr tree grows with every maths unit finished", () => {
+test("one more sack goes on the ship with every maths unit finished; with all it sails", () => {
   const math = books.find((b) => b.id === "math-1")!;
-  expect(treeStage(math.units, () => false)).toBe(0);
-  expect(treeStage(math.units, () => true)).toBe(5);
+  expect(voyageStage(math.units, () => false)).toBe(0);
+  expect(voyageStage(math.units, () => true)).toBe(5);
   const first = new Set(math.units[0].lessons.map((l) => l.id));
-  expect(treeStage(math.units, (l) => first.has(l.id))).toBe(1);
+  expect(voyageStage(math.units, (l) => first.has(l.id))).toBe(1);
 });
 
-test("the story ends by thread: the message read, the tree grown", () => {
+test("the story ends by thread: the message read, the ship sailed", () => {
   expect(SUBJECT_DONE.arabic).toContain("رَشَا");
-  expect(SUBJECT_DONE.math).toContain("السِّدْرِ");
+  expect(SUBJECT_DONE.math).toContain("السَّفِينَةُ");
 });

@@ -6,7 +6,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Animated, Easing, StyleSheet, Text, View } from "react-native";
-import { Ellipse, Path, Polygon, Rect, Svg } from "react-native-svg";
+import { Circle, G, Path, Polygon, Rect, Svg } from "react-native-svg";
 
 import { Art } from "@/components/art/Art";
 import { Picture } from "@/components/pictures/Picture";
@@ -26,7 +26,7 @@ import {
   TruckArt,
   WiltedPlantArt,
 } from "./StoryArt";
-import { SidrTreeArt } from "./SidrTree";
+import { DhowArt } from "./Voyage";
 import { Skyline } from "./Skyline";
 import { StickerArt } from "./StickerArt";
 import { LOOP_NATIVE } from "./motion";
@@ -73,6 +73,9 @@ function useSwing(duration: number, delay = 0) {
   }, [v, duration, delay]);
   return v;
 }
+
+/** Eastern Arabic numerals, for counting in the pictures. */
+const NUMBERS = ["١", "٢", "٣", "٤", "٥"];
 
 /** Rasha's size on the back of the pick-up, and where her waving arm turns. */
 const RASHA_ON_TRUCK = 96;
@@ -646,13 +649,12 @@ function Gone() {
 
 /**
  * The note clamped under the empty bowl: Hudhud tugs it out with his beak, looks at it, and
- * cannot read it. Beside the bowl, the seed she left.
+ * cannot read it.
  */
 function Inscription() {
   // He pulls the note out from under the bowl once; then wonders.
   const pull = useOnce(1500, 900);
   const puzzle = useSwing(700, 2400);
-  const glint = useSwing(1100, 400);
   const out = {
     transform: [{ translateY: lerp(pull, 0, 124) }, { translateX: lerp(pull, 0, 24) }],
   };
@@ -680,17 +682,6 @@ function Inscription() {
         <View style={styles.bowlOver}>
           <BowlArt width={210} level={0} />
         </View>
-        <Animated.View
-          style={[
-            styles.seedBeside,
-            { opacity: lerp(glint, 0.75, 1), transform: [{ scale: lerp(glint, 1, 1.15) }] },
-          ]}
-        >
-          <Svg width={22} height={16} viewBox="0 0 22 16">
-            <Ellipse cx={11} cy={8} rx={10} ry={7} fill="#8E5A36" />
-            <Path d="M4 8 Q11 3 18 8" stroke="#5E3220" strokeWidth={1.5} fill="none" />
-          </Svg>
-        </Animated.View>
         {/* Hudhud holds the note's corner in his beak and comes out with it. */}
         <Animated.View style={[styles.puller, out]}>
           <Animated.View
@@ -713,8 +704,8 @@ function Inscription() {
 }
 
 /**
- * Hudhud's resolve: Rasha gave the birds water when they were thirsty; now it is his turn. The
- * sun rises behind him, the note and the seed glow.
+ * Hudhud's resolve: Rasha gave the birds water when they were thirsty; now it is his turn, and
+ * he sets out to find her. The sun rises behind him; her note and her empty bowl glow.
  */
 function Turn() {
   const rise = useOnce(2200, 200, Easing.out(Easing.cubic));
@@ -754,9 +745,9 @@ function Turn() {
           <NoteLetters readable={() => false} size={11} />
         </Note>
       </Animated.View>
-      <Animated.View style={[styles.turnSeed, { transform: [{ translateY: lerp(glow, -8, 0) }] }]}>
-        <Animated.View style={[styles.halo, styles.seedHalo, { opacity: lerp(glow, 0.8, 0.3) }]} />
-        <Picture emoji="🌱" size={46} />
+      <Animated.View style={[styles.turnBowl, { transform: [{ translateY: lerp(glow, -6, 0) }] }]}>
+        <Animated.View style={[styles.halo, styles.bowlHalo, { opacity: lerp(glow, 0.8, 0.3) }]} />
+        <BowlArt width={84} level={0} />
       </Animated.View>
       <Animated.View style={[styles.turnBird, { transform: [{ translateY: lerp(rise, 40, 0) }] }]}>
         <Hudhud size={130} pose="cheer" />
@@ -765,7 +756,7 @@ function Turn() {
   );
 }
 
-/** The choice: Hudhud with the note and the seed (the choices are buttons on the screen). */
+/** The choice: Hudhud between the note to read and a coffee sack to count (the choices are buttons). */
 function Choose() {
   return (
     <View style={[styles.scene, styles.chooseScene]}>
@@ -774,7 +765,7 @@ function Choose() {
           <NoteLetters readable={() => false} size={12} />
         </Note>
         <Hudhud size={130} />
-        <SidrTreeArt stage={0} size={80} />
+        <Picture emoji="🫘" size={80} />
       </View>
     </View>
   );
@@ -877,162 +868,246 @@ function BowlScene() {
   );
 }
 
-/** The seed in dry earth, and only a few drops of water. */
-function Seed() {
-  const drop = useSwing(900);
+/** The coffee terraces of Haraz, with a village of tower houses on the ridge (fills the scene). */
+function Terraces({ village = false }: { village?: boolean }) {
   return (
-    <View style={styles.scene}>
-      <View style={[styles.fill, { backgroundColor: "#F6E2C2" }]} />
-      <Svg width="100%" height={300} viewBox="0 0 360 300" style={StyleSheet.absoluteFill}>
-        <Rect x={0} y={190} width={360} height={110} fill="#C9A16B" />
-        <Path
-          d="M40 230 l30 10 l20 -14 M150 260 l26 -12 l18 16 M250 228 l30 14 l26 -10"
-          stroke="#8E6A4A"
-          strokeWidth={3}
-          fill="none"
-        />
-      </Svg>
-      <View style={styles.seedSoil}>
-        <SidrTreeArt stage={0} size={110} />
-      </View>
-      <Animated.View
-        style={[
-          styles.fallingDrop,
-          { opacity: lerp(drop, 1, 0.2), transform: [{ translateY: lerp(drop, -20, 70) }] },
-        ]}
-      >
-        <Picture emoji="💧" size={30} />
-      </Animated.View>
-      <View style={styles.seedBird}>
-        <Hudhud size={96} hop={false} />
-      </View>
-    </View>
-  );
-}
-
-/** Who counts can share: the jar pours, half for the birds' bowl, half for the seedling. */
-function Share() {
-  const pour = useSwing(1300);
-  const n1 = useOnce(400, 1200);
-  const n2 = useOnce(400, 2000);
-  return (
-    <View style={styles.scene}>
-      <View style={[styles.fill, { backgroundColor: "#EEF6E8" }]} />
-      <View style={styles.ground} />
-      <Animated.View
-        style={[
-          styles.jar,
-          {
-            transform: [
-              { rotate: pour.interpolate({ inputRange: [0, 1], outputRange: ["0deg", "-30deg"] }) },
-            ],
-          },
-        ]}
-      >
-        <Svg width={80} height={80} viewBox="0 0 40 40">
+    <Svg width="100%" height={300} viewBox="0 0 360 300" style={StyleSheet.absoluteFill}>
+      <Path d="M0 300 L0 150 Q90 80 180 120 Q270 70 360 140 L360 300 Z" fill="#B48A50" />
+      {village
+        ? [70, 104, 230, 262].map((x, i) => (
+            <G key={x}>
+              <Rect x={x} y={92 - (i % 2) * 16} width={28} height={50} fill="#A55B34" />
+              <Path d={`M${x} ${100 - (i % 2) * 16} h28`} stroke="#FFFFFF" strokeWidth={3} />
+            </G>
+          ))
+        : null}
+      {[0, 1, 2, 3, 4].map((i) => (
+        <G key={i}>
           <Path
-            d="M14 6 H26 V10 Q34 16 32 28 Q30 37 20 37 Q10 37 8 28 Q6 16 14 10 Z"
-            fill={yemen.clay}
-            stroke={yemen.clayDeep}
-            strokeWidth={2}
+            d={`M0 ${300 - i * 30} H360 V${274 - i * 30} H0 Z`}
+            fill={i % 2 ? "#5BA05F" : "#3F8A4E"}
           />
-        </Svg>
-      </Animated.View>
-      <View style={styles.shareRow}>
-        <View style={styles.shareSide}>
-          <Animated.Text style={[styles.shareNum, { opacity: n1 }]}>١</Animated.Text>
-          <BowlArt width={90} level={0.5} />
-        </View>
-        <View style={styles.shareSide}>
-          <Animated.Text style={[styles.shareNum, { opacity: n2 }]}>٢</Animated.Text>
-          <SidrTreeArt stage={1} size={90} />
-        </View>
-      </View>
-      <View style={styles.shareBird}>
-        <Hudhud size={84} />
-      </View>
-    </View>
+          <Path d={`M0 ${274 - i * 30} H360`} stroke="#8E6A4A" strokeWidth={3} />
+          {/* Coffee shrubs with red cherries along each terrace. */}
+          {[30, 100, 170, 240, 310].map((x) => (
+            <G key={x}>
+              <Circle cx={x + (i % 2) * 30} cy={280 - i * 30} r={9} fill="#2F6B3B" />
+              <Circle cx={x + (i % 2) * 30 + 4} cy={278 - i * 30} r={2.2} fill="#C8402F" />
+            </G>
+          ))}
+        </G>
+      ))}
+    </Svg>
   );
 }
 
-/** The sidr tree stands in the courtyard, and the birds come to it. */
-function Tree() {
-  const sway = useSwing(2200);
-  const birds = useSwing(1400, 600);
+/**
+ * In the Haraz mountains: the coffee trader sits by his sacks and does not know how many there
+ * are; his helper has gone. Hudhud flies in and lands beside him.
+ */
+function Trader() {
+  const land = useOnce(1600, 500, Easing.out(Easing.quad));
+  const wonder = useSwing(800, 1600);
   return (
     <View style={styles.scene}>
       <View style={[styles.fill, { backgroundColor: "#E7F0FA" }]} />
-      <View style={styles.ground} />
+      <Terraces village />
+      <View style={styles.trader}>
+        <Picture emoji="👨" size={96} />
+      </View>
+      <View style={styles.sackPile}>
+        <View style={styles.sackRow}>
+          <Picture emoji="🫘" size={50} />
+          <Picture emoji="🫘" size={50} />
+          <Picture emoji="🫘" size={50} />
+        </View>
+        <View style={[styles.sackRow, styles.sackTop]}>
+          <Picture emoji="🫘" size={50} />
+          <Picture emoji="🫘" size={50} />
+        </View>
+      </View>
       <Animated.View
         style={[
-          styles.bigTree,
+          styles.wonder,
+          {
+            opacity: at(land, [0, 0.8, 1], [0, 0, 1]),
+            transform: [{ translateY: lerp(wonder, 0, -6) }],
+          },
+        ]}
+      >
+        <Picture emoji="❓" size={34} />
+      </Animated.View>
+      <Animated.View
+        style={[
+          styles.arriving,
           {
             transform: [
-              {
-                rotate: sway.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: ["-1.5deg", "1.5deg"],
-                }),
-              },
+              { translateX: lerp(land, 140, 0) },
+              { translateY: at(land, [0, 1], [-120, 0]) },
             ],
           },
         ]}
       >
-        <SidrTreeArt stage={5} size={230} />
+        <Hudhud size={80} hop={false} />
       </Animated.View>
-      <Animated.View
-        style={[styles.treeBirds, { transform: [{ translateY: lerp(birds, 0, -10) }] }]}
-      >
-        <Picture emoji="🐦" size={34} />
-        <Picture emoji="🕊" size={34} />
+    </View>
+  );
+}
+
+/**
+ * Who can count can help: Hudhud counts the trader's sacks, a number over each in turn; far
+ * off, the ship in Mocha waits on the sea.
+ */
+function Sacks() {
+  const count = useOnce(3000, 600, Easing.linear);
+  const sail = useSwing(2400);
+  return (
+    <View style={styles.scene}>
+      <View style={[styles.fill, { backgroundColor: "#F6E2C2" }]} />
+      <View style={styles.farSea} />
+      <Animated.View style={[styles.farShip, { transform: [{ translateX: lerp(sail, 0, 14) }] }]}>
+        <Picture emoji="⛵" size={44} />
       </Animated.View>
-      <View style={styles.treeBowl}>
-        <BowlArt width={80} level={1} />
+      <View style={[styles.ground, { backgroundColor: "#C9A16B" }]} />
+      <View style={styles.trader}>
+        <Picture emoji="👨" size={90} />
+      </View>
+      <View style={styles.sackLine}>
+        {NUMBERS.map((n, i) => (
+          <View key={n} style={styles.countedSack}>
+            <Animated.Text
+              style={[
+                styles.sackNumber,
+                {
+                  opacity: at(count, [i / 5, (i + 0.6) / 5], [0, 1]),
+                  transform: [
+                    { scale: at(count, [i / 5, (i + 0.4) / 5, (i + 0.8) / 5], [0.4, 1.3, 1]) },
+                  ],
+                },
+              ]}
+            >
+              {n}
+            </Animated.Text>
+            <Picture emoji="🫘" size={46} />
+          </View>
+        ))}
+      </View>
+      <View style={styles.countBird}>
+        <Hudhud size={84} pose="cheer" />
       </View>
     </View>
   );
 }
 
-/** A little girl comes and waters the tree with Hudhud. */
-function NewGirl() {
-  const pour = useSwing(1100);
+/** On the way home: a bowl of water for the birds at every door, and birds drinking. */
+function Return() {
+  const fly = useLoop(7000);
+  const stops = ["🏪", "house", "⛵", "house", "🏪", "house", "⛵", "house"];
   return (
     <View style={styles.scene}>
       <View style={[styles.fill, { backgroundColor: "#F9E3BF" }]} />
+      <View style={styles.hills}>
+        <HillsArt />
+      </View>
       <View style={styles.ground} />
-      <View style={styles.midTree}>
-        <SidrTreeArt stage={5} size={200} />
-      </View>
-      <View style={styles.smallGirl}>
-        <Art art="girl" size={100} />
-      </View>
-      <Animated.View
-        style={[
-          styles.pourDrop,
-          { opacity: lerp(pour, 1, 0.2), transform: [{ translateY: lerp(pour, 0, 40) }] },
-        ]}
-      >
-        <Picture emoji="💧" size={24} />
+      {/* The way slides by: two rounds of the same doors, so it never ends. */}
+      <Animated.View style={[styles.wayStrip, { transform: [{ translateX: lerp(fly, 0, 600) }] }]}>
+        {stops.map((stop, i) => (
+          <View key={i} style={styles.wayStop}>
+            {stop === "house" ? <Art art="house" size={96} /> : <Picture emoji={stop} size={86} />}
+            <View style={styles.wayBowl}>
+              <BowlArt width={46} level={1} />
+            </View>
+            <View style={styles.wayBird}>
+              <Picture emoji={i % 2 ? "🕊" : "🐦"} size={22} />
+            </View>
+          </View>
+        ))}
       </Animated.View>
-      <View style={styles.branchBird}>
-        <Hudhud size={70} hop={false} />
+      <View style={styles.flyingHome}>
+        <Hudhud size={80} flap hop={false} />
       </View>
     </View>
   );
 }
 
-/** Rasha's kindness stayed: Hudhud flies over the mountains, and always comes back. */
+/** On Hudhud's roof a little girl, new in the house, fills Rasha's bowl; he drinks. */
+function NewGirl() {
+  const tilt = useOnce(600, 900);
+  const pour = useOnce(1800, 1400, Easing.linear);
+  const flow = useSwing(180, 1400);
+  const sip = useSwing(500, 3300);
+  return (
+    <View style={styles.scene}>
+      <Rooftop />
+      <View style={[styles.bowlOnWall, styles.bowlPour]}>
+        <BowlArt width={96} level={0} />
+        <Animated.View style={[StyleSheet.absoluteFill, { opacity: pour }]}>
+          <BowlArt width={96} level={1} />
+        </Animated.View>
+      </View>
+      <Animated.View
+        style={[
+          styles.stream,
+          {
+            opacity: at(pour, [0, 0.05, 0.9, 1], [0, 1, 1, 0]),
+            transform: [{ scaleX: lerp(flow, 0.8, 1.2) }],
+          },
+        ]}
+      />
+      <View style={styles.rashaPour}>
+        <Rasha size={120} pose="reach" dress="#2E8BC0" />
+      </View>
+      <Animated.View
+        style={[styles.jug, { transform: [{ rotate: at(tilt, [0, 1], ["0deg", "62deg"]) }] }]}
+      >
+        <JugArt size={46} />
+      </Animated.View>
+      <Animated.View
+        style={[
+          styles.drinker,
+          styles.newGirlBird,
+          {
+            transform: [
+              { translateY: lerp(sip, 0, 8) },
+              { rotate: at(sip, [0, 1], ["0deg", "-10deg"]) },
+            ],
+          },
+        ]}
+      >
+        <Hudhud size={86} hop={false} />
+      </Animated.View>
+    </View>
+  );
+}
+
+/** Rasha's kindness stayed: at sunset the birds drink from her bowl, Hudhud circles over Sana'a. */
 function Home() {
   const fly = useSwing(2600);
+  const peck = useSwing(450, 400);
   return (
     <View style={styles.scene}>
       <View style={[styles.fill, { backgroundColor: "#F7C98B" }]} />
       <View style={styles.sunset} />
+      <View style={styles.hills}>
+        <HillsArt color="#E3B07E" />
+      </View>
       <View style={styles.city}>
         <Skyline />
       </View>
-      <View style={styles.homeTree}>
-        <SidrTreeArt stage={5} size={120} />
+      <View style={styles.homeBowl}>
+        <BowlArt width={110} level={1} />
+        <Animated.View
+          style={[
+            styles.homeSparrow,
+            { transform: [{ rotate: at(peck, [0, 1], ["0deg", "18deg"]) }] },
+          ]}
+        >
+          <Picture emoji="🐦" size={34} />
+        </Animated.View>
+        <View style={styles.homeDove}>
+          <Picture emoji="🕊" size={40} />
+        </View>
       </View>
       <Animated.View
         style={[
@@ -1056,8 +1131,8 @@ const PLACE_SKY: Record<StationPlace, string> = {
   well: "#F6E9D4",
   village: "#E7F0FA",
   terraces: "#E7F0FA",
-  rain: "#D9E4EE",
-  courtyard: "#F6E2C2",
+  market: "#F6E2C2",
+  port: "#E7F0FA",
 };
 
 /** The ground of a station: the city, the sea, the mountains, a garden. */
@@ -1106,16 +1181,35 @@ function PlaceGround({ place }: { place: StationPlace }) {
         </Svg>
       );
     case "garden":
-    case "courtyard":
       return (
         <>
-          <View style={[styles.ground, place === "courtyard" && { backgroundColor: "#C9A16B" }]} />
+          <View style={styles.ground} />
           <View style={styles.gardenTree}>
-            {place === "garden" ? (
-              <Art art="palm" size={140} />
-            ) : (
-              <SidrTreeArt stage={1} size={110} />
-            )}
+            <Art art="palm" size={140} />
+          </View>
+        </>
+      );
+    case "market":
+      // The trader's storehouse in the market: his sacks along the wall.
+      return (
+        <>
+          <View style={styles.city}>
+            <Skyline />
+          </View>
+          <View style={[styles.ground, { backgroundColor: "#C9A16B" }]} />
+          <View style={styles.stationArt}>
+            <Picture emoji="🏪" size={120} />
+          </View>
+        </>
+      );
+    case "port":
+      // Mocha: the sea, the quay, the trader's dhow.
+      return (
+        <>
+          <View style={styles.sea} />
+          <View style={[styles.sand, styles.quay]} />
+          <View style={styles.boat}>
+            <DhowArt stage={3} size={130} />
           </View>
         </>
       );
@@ -1142,42 +1236,8 @@ function PlaceGround({ place }: { place: StationPlace }) {
       );
     case "village":
     case "terraces":
-      return (
-        <Svg width="100%" height={300} viewBox="0 0 360 300" style={StyleSheet.absoluteFill}>
-          <Path d="M0 300 L0 160 Q90 90 180 130 Q270 80 360 150 L360 300 Z" fill="#B48A50" />
-          {[0, 1, 2, 3].map((i) => (
-            <Path
-              key={i}
-              d={`M0 ${300 - i * 30} H360 V${276 - i * 30} H0 Z`}
-              fill={i % 2 ? "#5BA05F" : "#3F8A4E"}
-            />
-          ))}
-          {place === "village"
-            ? [60, 110, 250].map((x, i) => (
-                <Rect key={i} x={x} y={130 - (i % 2) * 14} width={30} height={46} fill="#A55B34" />
-              ))
-            : null}
-        </Svg>
-      );
-    case "rain":
-      return (
-        <>
-          <View style={styles.ground} />
-          <RainDrops />
-        </>
-      );
+      return <Terraces village={place === "village"} />;
   }
-}
-
-function RainDrops() {
-  const fall = useSwing(800);
-  return (
-    <Animated.View style={[styles.rain, { transform: [{ translateY: lerp(fall, -10, 20) }] }]}>
-      {Array.from({ length: 8 }, (_, i) => (
-        <View key={i} style={[styles.rainDrop, { left: 20 + i * 42, top: (i % 3) * 30 }]} />
-      ))}
-    </Animated.View>
-  );
 }
 
 /**
@@ -1223,9 +1283,9 @@ const SCENES: Record<StoryScene["id"], (props: { unit?: string }) => React.React
   choose: Choose,
   trail: Trail,
   bowl: BowlScene,
-  seed: Seed,
-  share: Share,
-  tree: Tree,
+  trader: Trader,
+  sacks: Sacks,
+  return: Return,
   newgirl: NewGirl,
   home: Home,
   station: Station,
@@ -1329,8 +1389,6 @@ const styles = StyleSheet.create({
     borderRadius: 60,
     backgroundColor: "#FFF1C2",
   },
-  seedHalo: { left: -17, top: -17, width: 80, height: 80, borderRadius: 40 },
-  turnSeed: { position: "absolute", right: 36, top: 150 },
   turnBird: { position: "absolute", left: 0, right: 0, bottom: 34, alignItems: "center" },
   sun: { position: "absolute", top: 26, left: 40 },
   roofBird: { position: "absolute", right: 46, bottom: 92 },
@@ -1358,7 +1416,6 @@ const styles = StyleSheet.create({
   // Under the bowl at first; only a corner shows below its foot.
   pulledNote: { position: "absolute", top: 34 },
   bowlOver: { position: "absolute", top: 0 },
-  seedBeside: { position: "absolute", top: 118, left: "12%" },
   puller: { position: "absolute", top: 4, right: "6%", alignItems: "center" },
   smallBowl: { position: "absolute", left: 12, bottom: 34 },
   bigNote: { position: "absolute", top: 26, left: 0, right: 0, alignItems: "center" },
@@ -1398,37 +1455,6 @@ const styles = StyleSheet.create({
     height: 70,
     backgroundColor: "#8FB27A",
   },
-  seedSoil: { position: "absolute", left: 0, right: 0, bottom: 60, alignItems: "center" },
-  fallingDrop: { position: "absolute", left: 160, top: 40 },
-  seedBird: { position: "absolute", right: 20, top: 30 },
-  jar: { position: "absolute", top: 20, left: 140 },
-  shareRow: {
-    position: "absolute",
-    bottom: 40,
-    left: 0,
-    right: 0,
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "flex-end",
-  },
-  shareSide: { alignItems: "center" },
-  shareNum: { fontSize: 30, fontWeight: "900", color: yemen.blue },
-  shareBird: { position: "absolute", right: 8, top: 8 },
-  bigTree: { position: "absolute", left: 0, right: 0, bottom: 30, alignItems: "center" },
-  treeBirds: {
-    position: "absolute",
-    top: 40,
-    left: 0,
-    right: 0,
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 60,
-  },
-  treeBowl: { position: "absolute", left: 30, bottom: 30 },
-  midTree: { position: "absolute", right: 20, bottom: 40 },
-  smallGirl: { position: "absolute", left: 40, bottom: 40 },
-  pourDrop: { position: "absolute", left: 150, bottom: 110 },
-  branchBird: { position: "absolute", right: 70, top: 60 },
   sunset: {
     position: "absolute",
     left: 30,
@@ -1438,8 +1464,52 @@ const styles = StyleSheet.create({
     borderRadius: 45,
     backgroundColor: "#F6A53C",
   },
-  homeTree: { position: "absolute", right: 30, bottom: 50 },
   homeBird: { position: "absolute", left: 140, top: 50 },
+  homeBowl: { position: "absolute", right: 34, bottom: 34 },
+  homeSparrow: { position: "absolute", left: -6, top: -22 },
+  homeDove: { position: "absolute", right: -10, top: -30 },
+  bowlHalo: { left: -18, top: -24, width: 120, height: 100, borderRadius: 50 },
+  turnBowl: { position: "absolute", right: 26, top: 150 },
+  trader: { position: "absolute", left: 18, bottom: 40 },
+  sackPile: { position: "absolute", left: 120, bottom: 34, alignItems: "center" },
+  sackRow: { flexDirection: "row", gap: -6 },
+  sackTop: { position: "absolute", top: -34 },
+  wonder: { position: "absolute", left: 170, top: 128 },
+  arriving: { position: "absolute", right: 14, bottom: 40 },
+  farSea: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 96,
+    height: 40,
+    backgroundColor: "#9CC3E0",
+  },
+  farShip: { position: "absolute", right: 40, top: 70 },
+  sackLine: {
+    position: "absolute",
+    left: 92,
+    right: 88,
+    bottom: 40,
+    flexDirection: "row-reverse",
+    justifyContent: "center",
+  },
+  countedSack: { alignItems: "center", marginHorizontal: -3 },
+  sackNumber: { fontSize: 26, fontWeight: "900", color: yemen.blue, lineHeight: 34 },
+  countBird: { position: "absolute", right: 8, bottom: 44 },
+  wayStrip: {
+    position: "absolute",
+    bottom: 40,
+    right: 0,
+    flexDirection: "row",
+    alignItems: "flex-end",
+  },
+  wayStop: { width: 150, alignItems: "center", justifyContent: "flex-end" },
+  wayBowl: { position: "absolute", right: 6, bottom: -4 },
+  wayBird: { position: "absolute", right: 18, bottom: 22 },
+  flyingHome: { position: "absolute", left: "38%", top: 40 },
+  newGirlBird: { left: 236 },
+  // Mocha's stone quay, wide enough for the trader to stand on.
+  quay: { height: 96, backgroundColor: "#B9A58E" },
   stationArt: { position: "absolute", left: 20, bottom: 50 },
   sea: {
     position: "absolute",
@@ -1459,14 +1529,6 @@ const styles = StyleSheet.create({
   },
   boat: { position: "absolute", left: 30, bottom: 100 },
   gardenTree: { position: "absolute", left: 20, bottom: 40 },
-  rain: { position: "absolute", top: 0, left: 0, right: 0, height: 120 },
-  rainDrop: {
-    position: "absolute",
-    width: 4,
-    height: 16,
-    borderRadius: 2,
-    backgroundColor: "#4F8FD6",
-  },
   person: { position: "absolute", left: 150, bottom: 40 },
   thing: {
     position: "absolute",

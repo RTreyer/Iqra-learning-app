@@ -80,15 +80,15 @@ test("a vowels unit shows its letters bare, and a letter wears its mark once its
   );
 });
 
-test("a maths unit ends with its station of the seed's journey", () => {
+test("a maths unit ends with its station of the coffee trader's journey", () => {
   setParams({ unitId: "math-u4" });
   renderScreen(<UnitScreen />);
   expect(screen.getByTestId("unit-letter").props.accessibilityLabel).toBe(GOAL_LINES.give.missing);
-  // The neighbours who get the fish.
+  // The neighbours who get the coffee.
   expect(screen.getByTestId("goal-neighbours")).toBeTruthy();
   setParams({ unitId: "math-u2" });
   renderScreen(<UnitScreen />);
   expect(screen.getAllByTestId("unit-letter").pop()!.props.accessibilityLabel).toBe(
-    GOAL_LINES.jars.missing,
+    GOAL_LINES.count.missing,
   );
 });

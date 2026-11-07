@@ -206,10 +206,11 @@ export type EmblemId =
  * - writing: lines Hudhud learns to draw (the preparation unit, no letters yet);
  * - letters: the letters of a station's clue, learnt one section after another; vowels: the
  *   same letters getting their vowel marks (the units that teach damma, kasra, sukun);
- * - the sidr seed's journey in maths, one station per unit: sort the seeds, count the water
- *   jars, add the drops the birds bring, give away and see what is left, build a ring of stones.
+ * - the coffee trader's journey in maths, one station per unit: sort the ripe cherries, count
+ *   the sacks, add what the camel brings, give away and see what is left, load the ship with
+ *   parcels of every shape.
  */
-export type GoalKind = "writing" | "letters" | "vowels" | "seeds" | "jars" | "drops" | "give" | "stones";
+export type GoalKind = "writing" | "letters" | "vowels" | "sort" | "count" | "add" | "give" | "ship";
 
 export type Unit = {
   id: string;

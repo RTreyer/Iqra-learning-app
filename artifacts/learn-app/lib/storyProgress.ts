@@ -38,7 +38,7 @@ type GoalUnit = Pick<Unit, "letters" | "goal">;
 /** The unit's goal: as set in the content, else from its subject and letters. Null: no story. */
 export function goalKind(unit: GoalUnit, subject: string): GoalKind | null {
   if (unit.goal) return unit.goal;
-  if (subject === "math") return "jars";
+  if (subject === "math") return "count";
   if (subject === "arabic" || subject === "lughati")
     return unit.letters?.length ? "letters" : "writing";
   return null;
@@ -47,11 +47,11 @@ export function goalKind(unit: GoalUnit, subject: string): GoalKind | null {
 /** Places of a goal that are not letters: lines on the page, baskets, sacks, parcels. */
 const PLACES: Record<Exclude<GoalKind, "letters" | "vowels">, number> = {
   writing: 4,
-  seeds: 3,
-  jars: 5,
-  drops: 5,
+  sort: 3,
+  count: 5,
+  add: 5,
   give: 4,
-  stones: 4,
+  ship: 4,
 };
 
 /** The letters a goal is about (letters, vowels), else none. */
@@ -117,8 +117,11 @@ export function learntLetters(units: Unit[], done: (lesson: Lesson) => boolean):
   return learnt;
 }
 
-/** The sidr tree's stage on the maths path: one more for every maths unit finished (0 to 5). */
-export function treeStage(units: Unit[], done: (lesson: Lesson) => boolean): number {
+/**
+ * How far the coffee has come on the maths path: one more sack on the ship for every maths
+ * unit finished (0 to 5); at 5 it sails.
+ */
+export function voyageStage(units: Unit[], done: (lesson: Lesson) => boolean): number {
   const finished = units.filter((u) => u.lessons.length > 0 && u.lessons.every(done)).length;
   return Math.min(5, Math.round((finished / Math.max(1, units.length)) * 5));
 }

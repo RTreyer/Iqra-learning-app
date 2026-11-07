@@ -664,7 +664,7 @@ export const mathBookUnit1: Unit = {
   theme: "التَّصْنِيفُ وَالأَنْمَاطُ",
   emoji: "🧩",
   emblem: "basket",
-  goal: "seeds",
+  goal: "sort",
   color,
   badgeLabel: "أُصَنِّفُ",
   lessons: numberMathLessons(1, drafts),

@@ -653,7 +653,7 @@ export const mathBookUnit3: Unit = {
   theme: "الْجَمْعُ ضِمْنَ الْعَدَدِ ١٠",
   emoji: "➕",
   emblem: "dates_tray",
-  goal: "drops",
+  goal: "add",
   color,
   badgeLabel: "أَجْمَعُ",
   lessons: numberMathLessons(3, drafts),

@@ -4,17 +4,19 @@
  * Hudhud lives on a roof in Sana'a. One hot summer, when he found no water, a girl, Rasha,
  * put out a clay bowl of water for the birds, though she did not know them: "you are thirsty".
  * Every morning he waited for her, and she came. One sad day her family packed their things
- * and moved far away; the bowl stayed empty. Under it she had tucked a note, and left a sidr
- * seed. Hudhud cannot read. She gave them water when they were thirsty: now it is his turn.
- * Two threads, one per subject:
+ * and moved far away; the bowl stayed empty. Under it she had tucked a note. Hudhud cannot
+ * read. She gave them water when they were thirsty: now it is his turn, and he sets out to find
+ * her. On the way he needs to read and to count. Two threads, one per subject:
  * - Arabic: he follows Rasha's trail through the stories of the textbook (one station per
  *   unit) and learns the letters; the note under the bowl, «اِسْقِ الطُّيُورَ» signed «رَشَا»,
  *   becomes readable letter by letter (its letters come in units 2, 3, 6, 7 and 8);
- * - maths: water is scarce; who can count can share. Each unit is a station with the seed, and
- *   the sidr tree grows with the maths path.
- * The end: the tree stands in a courtyard, a little girl waters it with him; Rasha is gone,
- * her kindness stayed. Spoken by the app's voice, fully vocalised, simple Fusha. Native
- * speaker review pending (docs/CONTENT_REVIEW.md).
+ * - maths: in the Haraz mountains he meets a coffee trader whose helper has gone; he cannot
+ *   count his sacks, and the ship in Mocha will not wait. Hudhud helps as Rasha helped him:
+ *   sort the ripe cherries, count the sacks, add what the camel brings, give to the neighbours,
+ *   load the ship. When it sails, the trader puts out a bowl of water for the birds.
+ * The end: on his way home Hudhud sees bowls of water for the birds everywhere, and on his roof
+ * a little girl fills Rasha's bowl. Rasha is gone, her kindness stayed. Spoken by the app's
+ * voice, fully vocalised, simple Fusha. Native speaker review pending (docs/CONTENT_REVIEW.md).
  */
 
 import type { GoalKind } from "./types";
@@ -33,9 +35,9 @@ export type StorySceneId =
   | "choose"
   | "trail"
   | "bowl"
-  | "seed"
-  | "share"
-  | "tree"
+  | "trader"
+  | "sacks"
+  | "return"
   | "newgirl"
   | "home"
   | "station";
@@ -88,17 +90,17 @@ export const INTRO_STORY: readonly StoryScene[] = [
   },
   {
     id: "inscription",
-    line: "ثُمَّ رَأَيْتُ تَحْتَ الصَّحْنِ وَرَقَةً، وَبِذْرَةً. لَكِنِّي لَا أَعْرِفُ الْقِرَاءَةَ!",
+    line: "ثُمَّ رَأَيْتُ تَحْتَ الصَّحْنِ وَرَقَةً مِنْهَا. لَكِنِّي لَا أَعْرِفُ الْقِرَاءَةَ!",
     minMs: 3600,
   },
   {
     id: "turn",
-    line: "رَشَا سَقَتْنَا حِينَ كُنَّا عِطَاشًا. الْآنَ جَاءَ دَوْرِي!",
+    line: "رَشَا سَقَتْنَا حِينَ كُنَّا عِطَاشًا. الْآنَ جَاءَ دَوْرِي: سَأَبْحَثُ عَنْهَا!",
     minMs: 3600,
   },
   {
     id: "choose",
-    line: "هَلْ تُسَاعِدُنِي؟ نَقْرَأُ رِسَالَتَهَا، أَوْ نَزْرَعُ بِذْرَتَهَا. اِخْتَرْ!",
+    line: "فِي الطَّرِيقِ، أَحْتَاجُ أَنْ أَقْرَأَ، وَأَنْ أَعُدَّ. هَلْ تُسَاعِدُنِي؟ اِخْتَرْ!",
   },
 ];
 
@@ -115,20 +117,28 @@ export const CHAPTERS: Record<ChapterId, readonly StoryScene[]> = {
     { id: "bowl", line: "كُلُّ حَرْفٍ نَتَعَلَّمُهُ، يُضِيءُ فِي الْوَرَقَةِ!", minMs: 3600 },
   ],
   math: [
-    { id: "seed", line: "الْبِذْرَةُ تَحْتَاجُ مَاءً، وَالْمَاءُ قَلِيلٌ.", minMs: 3200 },
     {
-      id: "share",
-      line: "مَنْ يَعُدُّ، يَعْرِفُ كَيْفَ يَقْسِمُ الْمَاءَ. هَيَّا نَعُدُّ!",
-      minMs: 3600,
+      id: "trader",
+      line: "فِي جِبَالِ حَرَازٍ، وَجَدْتُ تَاجِرَ بُنٍّ حَزِينًا. ذَهَبَ مَنْ كَانَ يُسَاعِدُهُ.",
+      minMs: 4000,
+    },
+    {
+      id: "sacks",
+      line: "لَا يَعْرِفُ كَمْ كِيسًا عِنْدَهُ، وَالسَّفِينَةُ فِي الْمُخَا لَا تَنْتَظِرُ. رَشَا سَاعَدَتْنَا، فَهَيَّا نُسَاعِدُهُ!",
+      minMs: 4400,
     },
   ],
   end: [
     {
-      id: "tree",
-      line: "كَبِرَتْ شَجَرَةُ السِّدْرِ، وَجَاءَتِ الطُّيُورُ إِلَيْهَا.",
+      id: "return",
+      line: "رَجَعْتُ إِلَى صَنْعَاءَ. وَفِي الطَّرِيقِ، رَأَيْتُ صُحُونَ مَاءٍ لِلطُّيُورِ فِي كُلِّ مَكَانٍ!",
+      minMs: 4400,
+    },
+    {
+      id: "newgirl",
+      line: "وَعَلَى سَطْحِي، بِنْتٌ صَغِيرَةٌ تَمْلَأُ صَحْنَ رَشَا.",
       minMs: 3600,
     },
-    { id: "newgirl", line: "وَجَاءَتْ بِنْتٌ صَغِيرَةٌ، وَسَقَتِ الشَّجَرَةَ مَعِي.", minMs: 3600 },
     {
       id: "home",
       line: "رَشَا ذَهَبَتْ، لَكِنَّ لُطْفَهَا بَقِيَ. اِسْقِ الطُّيُورَ، يَا صَدِيقِي!",
@@ -158,8 +168,8 @@ export type StationPlace =
   | "well"
   | "village"
   | "terraces"
-  | "rain"
-  | "courtyard";
+  | "market"
+  | "port";
 
 /**
  * A stop on Hudhud's journey: one per unit. Told the first time the child opens the unit
@@ -245,42 +255,42 @@ export const STATIONS: Record<string, Station> = {
   "math-u1": {
     place: "terraces",
     person: "👨",
-    thing: "🌱",
-    where: "فِي الْمُدَرَّجَاتِ، عِنْدَ الْمُزَارِعِ بُذُورٌ كَثِيرَةٌ.",
-    ask: "أَيُّهَا بِذْرَةُ السِّدْرِ؟ هَيَّا نُصَنِّفُ!",
-    outro: "قَالَ الْمُزَارِعُ: نَزْرَعُ لِلْغَدِ، لَا لِلْيَوْمِ فَقَطْ.",
+    thing: "🍒",
+    where: "فِي مُدَرَّجَاتِ حَرَازٍ، يَقْطِفُ التَّاجِرُ حَبَّاتِ الْبُنِّ.",
+    ask: "الْحَمْرَاءُ هُنَا، وَالْخَضْرَاءُ هُنَاكَ. هَيَّا نُصَنِّفُ!",
+    outro: "صَنَّفْنَا الْحَبَّاتِ! قَالَ التَّاجِرُ: الْحَمْرَاءُ نَاضِجَةٌ.",
   },
   "math-u2": {
-    place: "rain",
+    place: "market",
     person: "👨",
-    thing: "💧",
-    where: "رَجُلٌ يَعُدُّ الْمَطَرَ، وَعِنْدَهُ جِرَارٌ كَثِيرَةٌ.",
-    ask: "كَمْ جَرَّةً عِنْدَهُ؟ هَيَّا نَعُدُّ!",
-    outro: "عَدَدْنَا الْجِرَارَ، وَرَأَيْنَا الشَّجَرَةَ الْعَطْشَى. أَعْطَاهَا مَاءً!",
+    thing: "🫘",
+    where: "فِي مَخْزَنِ التَّاجِرِ، أَكْيَاسُ الْبُنِّ كَثِيرَةٌ.",
+    ask: "كَمْ كِيسًا عِنْدَهُ؟ هَيَّا نَعُدُّ!",
+    outro: "عَدَدْنَا الْأَكْيَاسَ، وَابْتَسَمَ التَّاجِرُ لِأَوَّلِ مَرَّةٍ!",
   },
   "math-u3": {
-    place: "courtyard",
-    person: "🕊",
-    thing: "💧",
-    where: "جَاءَ الْعُصْفُورُ بِقَطْرَةٍ، وَجَاءَتِ الْحَمَامَةُ بِقَطْرَةٍ.",
-    ask: "كَمْ قَطْرَةً مَعًا؟ هَيَّا نَجْمَعُ!",
-    outro: "قَطْرَةٌ وَقَطْرَةٌ، صَارَ الْمَاءُ كَافِيًا!",
+    place: "road",
+    person: "🐪",
+    thing: "🫘",
+    where: "عَلَى الطَّرِيقِ إِلَى الْبَحْرِ، يَحْمِلُ الْجَمَلُ أَكْيَاسًا جَدِيدَةً.",
+    ask: "كِيسٌ وَكِيسٌ: كَمْ مَعًا؟ هَيَّا نَجْمَعُ!",
+    outro: "جَمَعْنَا الْأَكْيَاسَ، وَنَزَلْنَا إِلَى تِهَامَةَ.",
   },
   "math-u4": {
-    place: "beach",
+    place: "village",
     person: "👨",
-    thing: "🐟",
-    where: "الصَّيَّادُ يُعْطِي مِنْ سَمَكِهِ لِلْجِيرَانِ.",
+    thing: "☕",
+    where: "فِي الْقَرْيَةِ، يُعْطِي التَّاجِرُ مِنْ بُنِّهِ لِلْجِيرَانِ.",
     ask: "كَمْ يَبْقَى مَعَهُ؟ هَيَّا نَطْرَحُ!",
-    outro: "مَنْ يُعْطِي، لَا يَصِيرُ أَفْقَرَ.",
+    outro: "قَالَ التَّاجِرُ: مَنْ يُعْطِي، لَا يَصِيرُ أَفْقَرَ.",
   },
   "math-u5": {
-    place: "courtyard",
-    person: "🌱",
-    thing: "🔺",
-    where: "نَبْنِي حَوْلَ النَّبْتَةِ دَائِرَةً مِنَ الْحِجَارَةِ.",
-    ask: "دَائِرَةٌ، مُرَبَّعٌ، مُثَلَّثٌ: هَيَّا نَبْنِي!",
-    outro: "نِصْفُ الْمَاءِ لِلطُّيُورِ، وَنِصْفُهُ لِلشَّجَرَةِ!",
+    place: "port",
+    person: "👨",
+    thing: "⛵",
+    where: "فِي مِينَاءِ الْمُخَا، السَّفِينَةُ تَنْتَظِرُ الْبُنَّ.",
+    ask: "مُرَبَّعٌ، دَائِرَةٌ، مُثَلَّثٌ: هَيَّا نُحَمِّلُ السَّفِينَةَ!",
+    outro: "أَبْحَرَتِ السَّفِينَةُ! وَوَضَعَ التَّاجِرُ صَحْنَ مَاءٍ لِلطُّيُورِ.",
   },
 };
 
@@ -298,7 +308,7 @@ export function stationScenes(unitId: string): StoryScene[] | null {
 export const SUBJECT_LINES: Record<string, string> = {
   arabic: "هَيَّا نَتْبَعُ طَرِيقَ رَشَا!",
   lughati: "هَيَّا نَتْبَعُ طَرِيقَ رَشَا!",
-  math: "هَيَّا نَسْقِي بِذْرَةَ السِّدْرِ!",
+  math: "هَيَّا نُسَاعِدُ تَاجِرَ الْبُنِّ!",
   science: "هَيَّا نَتَعَلَّمُ!",
 };
 
@@ -333,35 +343,35 @@ export const GOAL_LINES: Record<GoalKind, GoalLines> = {
     beat: "تَعَلَّمْنَا حَرَكَاتِ حَرْفٍ!",
     complete: "قَرَأْنَا!",
   },
-  seeds: {
-    path: "هَيَّا نُصَنِّفُ الْبُذُورَ!",
-    missing: "أَيُّهَا بِذْرَةُ السِّدْرِ؟ نُصَنِّفُ مَعًا!",
+  sort: {
+    path: "هَيَّا نُصَنِّفُ حَبَّاتِ الْبُنِّ!",
+    missing: "الْحَمْرَاءُ أَمِ الْخَضْرَاءُ؟ نُصَنِّفُ مَعًا!",
     beat: "صَنَّفْنَا سَلَّةً أُخْرَى!",
-    complete: "وَجَدْنَا بِذْرَةَ السِّدْرِ!",
+    complete: "صَنَّفْنَا كُلَّ الْحَبَّاتِ!",
   },
-  jars: {
-    path: "هَيَّا نَعُدُّ جِرَارَ الْمَاءِ!",
-    missing: "كَمْ جَرَّةً عِنْدَهُ؟ نَعُدُّ مَعًا!",
-    beat: "عَدَدْنَا جَرَّةً أُخْرَى!",
-    complete: "عَدَدْنَا كُلَّ الْجِرَارِ!",
+  count: {
+    path: "هَيَّا نَعُدُّ أَكْيَاسَ الْبُنِّ!",
+    missing: "كَمْ كِيسًا عِنْدَهُ؟ نَعُدُّ مَعًا!",
+    beat: "عَدَدْنَا كِيسًا آخَرَ!",
+    complete: "عَدَدْنَا كُلَّ الْأَكْيَاسِ!",
   },
-  drops: {
-    path: "هَيَّا نَجْمَعُ الْقَطَرَاتِ!",
-    missing: "قَطْرَةٌ وَقَطْرَةٌ، نَجْمَعُ مَعًا!",
-    beat: "جَاءَتْ قَطْرَةٌ أُخْرَى!",
-    complete: "جَمَعْنَا مَاءً كَافِيًا!",
+  add: {
+    path: "هَيَّا نَجْمَعُ الْأَكْيَاسَ الْجَدِيدَةَ!",
+    missing: "الْجَمَلُ يَحْمِلُ أَكْيَاسًا، نَجْمَعُهَا مَعًا!",
+    beat: "وَصَلَ كِيسٌ جَدِيدٌ!",
+    complete: "جَمَعْنَا كُلَّ الْأَكْيَاسِ!",
   },
   give: {
     path: "هَيَّا نُعْطِي مِمَّا عِنْدَنَا!",
     missing: "كَمْ يَبْقَى إِذَا أَعْطَيْنَا؟ نَعُدُّ مَعًا!",
-    beat: "أَعْطَيْنَا سَمَكَةً لِلْجِيرَانِ!",
+    beat: "أَعْطَيْنَا الْجِيرَانَ بُنًّا!",
     complete: "أَعْطَيْنَا، وَمَا زَالَ عِنْدَنَا!",
   },
-  stones: {
-    path: "هَيَّا نَبْنِي دَائِرَةً حَوْلَ النَّبْتَةِ!",
-    missing: "حَجَرًا بَعْدَ حَجَرٍ، نَبْنِي مَعًا!",
-    beat: "وَضَعْنَا حَجَرًا آخَرَ!",
-    complete: "بَنَيْنَا الدَّائِرَةَ!",
+  ship: {
+    path: "هَيَّا نُحَمِّلُ السَّفِينَةَ!",
+    missing: "طَرْدًا بَعْدَ طَرْدٍ، نُحَمِّلُ مَعًا!",
+    beat: "حَمَّلْنَا طَرْدًا آخَرَ!",
+    complete: "حَمَّلْنَا السَّفِينَةَ!",
   },
 };
 
@@ -395,6 +405,6 @@ export const giftLine = (sticker: string) => `تِذْكَارٌ مِنَ الر
 export const SUBJECT_DONE: Record<string, string> = {
   arabic: "قَرَأْنَا رِسَالَةَ رَشَا: اِسْقِ الطُّيُورَ! شُكْرًا لَكَ!",
   lughati: "قَرَأْنَا رِسَالَةَ رَشَا: اِسْقِ الطُّيُورَ! شُكْرًا لَكَ!",
-  math: "كَبِرَتْ شَجَرَةُ السِّدْرِ! شُكْرًا لَكَ!",
+  math: "أَبْحَرَتِ السَّفِينَةُ، وَالتَّاجِرُ سَعِيدٌ! شُكْرًا لَكَ!",
   science: "مَا شَاءَ اللهُ! أَتْمَمْتَ كُلَّ الدُّرُوسِ",
 };

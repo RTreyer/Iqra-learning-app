@@ -25,20 +25,23 @@ export function Rasha({
   pose = "stand",
   sad = false,
   ownArm = false,
+  dress = DRESS,
 }: {
   size?: number;
   pose?: RashaPose;
+  /** The dress colour: another girl wears another colour. */
+  dress?: string;
   /** Brows raised in the middle, the mouth turned down, a tear. */
   sad?: boolean;
   /** "wave" without its raised arm: RashaArm draws it, so the arm can move. */
   ownArm?: boolean;
 }) {
-  const sleeve = { stroke: DRESS, strokeWidth: 7, strokeLinecap: "round" as const, fill: "none" };
+  const sleeve = { stroke: dress, strokeWidth: 7, strokeLinecap: "round" as const, fill: "none" };
   return (
     <Svg width={(size * 70) / 130} height={size} viewBox="0 0 70 130">
       <Ellipse cx={27} cy={125} rx={6} ry={3} fill="#4A2C20" />
       <Ellipse cx={43} cy={125} rx={6} ry={3} fill="#4A2C20" />
-      <Path d="M24 50 Q35 45 46 50 L56 122 Q35 128 14 122 Z" fill={DRESS} />
+      <Path d="M24 50 Q35 45 46 50 L56 122 Q35 128 14 122 Z" fill={dress} />
       <Path d="M15 117 Q35 123 55 117" stroke={GOLD} strokeWidth={3} fill="none" />
       <Path d="M30 60 L35 66 L40 60" stroke={GOLD} strokeWidth={2} fill="none" />
       {/* Arms: the far one first, so the near one is in front. */}

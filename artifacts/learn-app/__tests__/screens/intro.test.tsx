@@ -105,12 +105,16 @@ test("Hudhud's story: Rasha, her bowl and the note he cannot read, then two thre
   // Her name is told once she is known, and the turn: she gave water, now it is his turn.
   expect(line("days")).toContain("رَشَا");
   expect(line("turn")).toContain("دَوْرِي");
+  // No seed: under the bowl there is only her note; the maths thread is the coffee trader.
+  for (const scene of [...INTRO_STORY, ...CHAPTERS.math, ...CHAPTERS.end])
+    expect(scene.line).not.toMatch(/بِذْر|السِّدْر/);
+  expect(CHAPTERS.math[0].line).toContain("تَاجِرَ بُنٍّ");
   // Every picture with a slow animation plays long enough to be seen.
   for (const id of ["thirst", "girl", "days", "leave", "gone"])
     expect(INTRO_STORY.find((s) => s.id === id)!.minMs).toBeGreaterThanOrEqual(3800);
   expect(CHAPTERS.arabic.map((s) => s.id)).toEqual(["trail", "bowl"]);
-  expect(CHAPTERS.math.map((s) => s.id)).toEqual(["seed", "share"]);
-  expect(CHAPTERS.end.map((s) => s.id)).toEqual(["tree", "newgirl", "home"]);
+  expect(CHAPTERS.math.map((s) => s.id)).toEqual(["trader", "sacks"]);
+  expect(CHAPTERS.end.map((s) => s.id)).toEqual(["return", "newgirl", "home"]);
 });
 
 test("a thread tells its beginning, then opens its path and is remembered", async () => {
@@ -118,7 +122,7 @@ test("a thread tells its beginning, then opens its path and is remembered", asyn
   await AsyncStorage.setItem(SETTINGS_KEY, JSON.stringify({ introSeen: true, bookId: "math-1" }));
   renderIntro();
   await act(async () => {});
-  expect(screen.getByTestId("intro-scene-seed")).toBeTruthy();
+  expect(screen.getByTestId("intro-scene-trader")).toBeTruthy();
   expect(screen.queryByTestId("choose-math-1")).toBeNull();
   for (const scene of CHAPTERS.math) {
     expect(screen.getByTestId(`intro-scene-${scene.id}`)).toBeTruthy();
