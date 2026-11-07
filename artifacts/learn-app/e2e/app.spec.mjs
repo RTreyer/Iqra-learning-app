@@ -127,13 +127,14 @@ test.describe("navigation", () => {
     await page.getByTestId("continue-card").click();
     await expect(page).toHaveURL(/\/intro$/);
     // The voice tells each scene and the story moves on by itself (speech ends at once here).
-    await expect(page.getByTestId("intro-scene-choose")).toBeVisible({ timeout: 15000 });
+    await expect(page.getByTestId("intro-scene-choose")).toBeVisible({ timeout: 30000 });
     const told = await page.evaluate(() => window.__spoken);
-    expect(told).toContain(
-      "هَبَّتْ عَاصِفَةٌ قَوِيَّةٌ، فَطَارَتِ الْحُرُوفُ وَحَرَكَاتُهَا مِنْ رَسَائِلِي!",
-    );
+    // Hudhud is a day worker who dreams of a school in his village.
+    expect(told.some((line) => line.includes("مَدْرَسَةً فِي قَرْيَتِي"))).toBe(true);
     await page.getByTestId("choose-math-1").click();
-    await expect(page).toHaveURL(/\/book\/math-1$/);
+    // Today's job is told (the coffee trader), then its path opens.
+    await expect(page).toHaveURL(/\/intro\?chapter=math$/);
+    await expect(page).toHaveURL(/\/book\/math-1$/, { timeout: 30000 });
 
     await gotoAndWaitReady(page, "/");
     await expect(page.getByTestId("play-subject")).toHaveText("١");
@@ -142,6 +143,9 @@ test.describe("navigation", () => {
 
     await gotoAndWaitReady(page, "/");
     await page.getByTestId("book-arabic-1").click();
+    // The first time with the postman's job, Hudhud tells it; Skip opens the path at once.
+    await expect(page).toHaveURL(/\/intro\?chapter=arabic$/);
+    await page.getByTestId("intro-skip").click();
     await expect(page).toHaveURL(/\/book\/arabic-1$/);
     await gotoAndWaitReady(page, "/");
     await expect(page.getByTestId("play-subject")).toHaveText("أ");

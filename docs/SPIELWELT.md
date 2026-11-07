@@ -57,15 +57,24 @@ Pro Bildschirm gibt es nur einen Hudhud. Die Elternecke hat keinen; sie ist für
 
 ## Hudhuds Geschichte
 
-Beim ersten Tipp auf Play erzählt Hudhud seine Geschichte (`content/story.ts`, `app/intro.tsx`), fünf Szenen mit Stimme, jede mit einem bewegten Bild:
+Hudhud ist ein Tagelöhner des Jemen: Jeden Tag macht er eine andere Arbeit, und in jeder lernt er etwas, denn er träumt davon, in seinem Dorf eine Schule zu bauen, in der alle Kinder lernen. Das ist sein Antrieb, und es ist der des Kindes: Wer lesen und rechnen kann, kann allen helfen. Die Geschichte (`content/story.ts`, `app/intro.tsx`, Bilder in `components/world/DayScenes.tsx` und `StoryScenes.tsx`) hat einen gemeinsamen Anfang und zwei Kapitel, eines pro Arbeit.
 
-1. Hudhud ist der Briefbote des Jemen und bringt die Briefe zu allen Häusern. Er fliegt mit Flügelschlag über Sanaa, eine lederne Brieftasche umgeschnallt, aus der die Briefe hervorschauen.
-2. Ein Sandsturm zieht auf: dunkle Wolken, Sandschleier und Sandkörner jagen durchs Bild, Hudhud kämpft mit schlagenden Flügeln gegen die Böen. Der Sturm reisst die drei Briefe nacheinander vorne aus der Tasche, unter dem Schnabel hindurch und vor Hudhud hoch (nie über ihn hinweg); in der Luft platzt jeder Brief auf, und seine Buchstaben wirbeln als Papierkärtchen davon. Danach ist die Tasche leer und bleibt es in den folgenden Szenen. Die Szene dauert mindestens 5,6 Sekunden, damit der Sturm fertig spielt.
-3. Auf dem Markt von Mokka weiss der Händler nicht, wie viele Säcke Kaffee er hat.
-4. Die Menschen warten, das Schiff wartet: «Ich brauche deine Hilfe!»
-5. «Hilfst du mir? Wir sammeln Buchstaben oder zählen auf dem Markt. Wähle!»
+**Anfang** (beim ersten Tipp auf Play, fünf Szenen mit Stimme):
 
-Zwischen den Szenen blättert die Geschichte wie ein arabisches Buch um: Die alte Szene spielt weiter, während sie ausblendet und nach rechts gleitet, die neue gleitet von links herein; der gesprochene Satz und am Ende die Fachwahl erscheinen sanft. Die Szenen gehen weiter, sobald die Stimme fertig ist; Antippen geht sofort weiter, «تخطَّ» springt zur Wahl. Die Wahl legt das Fach fest (Briefe = Arabisch, Markt = Mathe) und öffnet dessen Lernpfad. Hudhud ist ein ausgedachter Bote; Figuren aus dem Koran werden nicht dargestellt. Die fünf Sätze sind einfaches Hocharabisch und die ersten Kandidaten für Aufnahmen.
+1. **Morgen über Sanaa**: Die Nacht weicht, die Sonne geht auf, ein Vogelschwarm zieht vorbei, Hudhud erwacht auf einem Dach: «Ich bin Hudhud. Jeden Morgen fliege ich über den Jemen und mache eine neue Arbeit.»
+2. **Seine Arbeiten**: Hudhud fliegt, und das Land zieht unter ihm von rechts nach links vorbei: die Terrassenfelder des Bauern, das Meer mit Sanbuq und springendem Fisch, die Berge des Imkers mit Honig und Bienen.
+3. **Sein Traum**: Nachts unter funkelnden Sternen liest er im Laternenlicht. In seiner Gedankenblase zeichnet sich eine Schule mit jemenitischer Fahne, und Kinder kommen eins nach dem anderen: «Ich träume davon, in meinem Dorf eine Schule zu bauen, in der alle Kinder lernen.»
+4. **Heute zwei Arbeiten**: links der Kaffee mit Säcken, rechts die Post mit Brief und Häusern; Hudhud schaut hin und her: «Darum lerne ich bei jeder Arbeit. Heute habe ich zwei Arbeiten und brauche deine Hilfe!»
+5. **Wahl**: «Soll ich Postbote sein oder dem Kaffeehändler helfen? Wähle!»
+
+**Kapitel** (wird beim ersten Mal in einem Fach erzählt, danach öffnet sich dessen Lernpfad; gespeichert in `chaptersSeen`):
+
+- **Postbote (Arabisch, «Read and learn»)**: Hudhud fliegt mit der Posttasche über Sanaa; der Sandsturm bläst die Buchstaben und ihre Vokalzeichen aus den Briefen; die Menschen warten auf ihre Briefe: «Sammeln wir die Buchstaben gemeinsam!»
+- **Kaffeehändler (Mathe)**: Auf dem Markt von Mokka hat der Händler viel Kaffee; Bohnen kullern aus einem Sack, Hudhud beginnt zu zählen (١ ٢ ٣) und verliert den Überblick (؟ ؟): «Er weiss nicht, wie viele Bohnen und wie viele Säcke er hat.» Im Hafen schaukelt das Schiff, das auf den Kaffee wartet: «Zählen wir gemeinsam!»
+
+Die Wahl im Anfang führt direkt ins Kapitel der gewählten Arbeit; tippt das Kind später zum ersten Mal auf die Insel des anderen Fachs, wird dessen Kapitel erzählt. Am Ende eines Fachs sagt Hudhud: «Ein weiterer Schritt zu meiner Schule. Danke!»
+
+Zwischen den Szenen blättert die Geschichte wie ein arabisches Buch um: Die alte Szene spielt weiter, während sie ausblendet und nach rechts gleitet, die neue gleitet von links herein; der gesprochene Satz und am Ende die Fachwahl erscheinen sanft. Die Szenen gehen weiter, sobald die Stimme fertig ist (bewegte Szenen spielen mindestens bis zum Ende ihrer Bewegung); Antippen geht sofort weiter, «تخطَّ» springt zur Wahl bzw. aus dem Kapitel in den Lernpfad. Hudhud ist ein ausgedachter Vogel, inspiriert vom Wiedehopf; Figuren aus dem Koran werden nicht dargestellt. Alle Sätze sind einfaches Hocharabisch, zur Sprachprüfung in `docs/CONTENT_REVIEW.md`, und die ersten Kandidaten für Aufnahmen.
 
 ### Die Geschichte in den Lernpfaden
 

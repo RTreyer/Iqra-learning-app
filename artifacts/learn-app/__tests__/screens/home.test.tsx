@@ -41,8 +41,11 @@ function renderHome() {
 }
 
 /** After the story: the child chose `bookId` (or nothing yet). */
-async function storyTold(bookId: string | null = null) {
-  await AsyncStorage.setItem(SETTINGS_KEY, JSON.stringify({ introSeen: true, bookId }));
+async function storyTold(bookId: string | null = null, chaptersSeen = ["arabic", "math"]) {
+  await AsyncStorage.setItem(
+    SETTINGS_KEY,
+    JSON.stringify({ introSeen: true, bookId, chaptersSeen }),
+  );
 }
 
 beforeEach(async () => {
@@ -106,6 +109,20 @@ test("an island switches the subject: play then continues there", async () => {
     getLesson("u1-1")!.lesson.title,
   );
   expect(JSON.parse((await AsyncStorage.getItem(SETTINGS_KEY))!).bookId).toBe("arabic-1");
+});
+
+test("the first time on an island, Hudhud tells that job before its path opens", async () => {
+  await storyTold("arabic-1", ["arabic"]);
+  renderHome();
+  await screen.findByTestId("intro-button");
+  await act(async () => {
+    fireEvent.press(screen.getByTestId("book-math-1"));
+  });
+  expect(router.push).toHaveBeenCalledWith(routes.intro("math"));
+  await act(async () => {
+    fireEvent.press(screen.getByTestId("book-arabic-1"));
+  });
+  expect(router.push).toHaveBeenCalledWith(routes.book("arabic-1"));
 });
 
 test("two due items show the review tile, which opens the review", async () => {

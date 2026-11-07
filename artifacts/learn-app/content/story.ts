@@ -1,16 +1,30 @@
 /**
- * Hudhud's story, told once before the first lesson (app/intro.tsx). Hudhud is the postman of
- * Yemen; a gust of wind blows the letters out of his messages, and in the market of Mocha the
- * trader cannot count his coffee sacks. The child helps: collecting letters (Arabic) or
- * counting in the market (Math). Spoken by the app's voice, fully vocalised, simple Fusha.
- * Native speaker review pending (docs/CONTENT_REVIEW.md); the lines are the first candidates
- * for recorded audio.
+ * Hudhud's story (app/intro.tsx). Hudhud is a day worker of Yemen: every day a new job (the
+ * farmer's terraces, the fishermen's sea, the beekeeper's mountains), and in each he learns,
+ * because he dreams of building a school in his village where all children learn. Today he has
+ * two jobs, the child chooses one, and each has its own short chapter, told the first time:
+ * - Arabic ("Read and learn"): Hudhud the postman; a storm blows the letters and their vowel
+ *   marks out of his messages, and the child collects them back;
+ * - maths: Hudhud helps the coffee trader of Mocha, who cannot count his beans and sacks; the
+ *   ship waits for the coffee.
+ * Spoken by the app's voice, fully vocalised, simple Fusha. Native speaker review pending
+ * (docs/CONTENT_REVIEW.md); the lines are the first candidates for recorded audio.
  */
 
 import type { GoalKind, Recipient } from "./types";
 
-export type StorySceneId = "postman" | "wind" | "market" | "waiting" | "choose";
-
+export type StorySceneId =
+  | "dawn"
+  | "jobs"
+  | "dream"
+  | "today"
+  | "choose"
+  | "postman"
+  | "wind"
+  | "waiting"
+  | "market"
+  | "beans"
+  | "ship";
 export type StoryScene = {
   id: StorySceneId;
   line: string;
@@ -18,36 +32,89 @@ export type StoryScene = {
   minMs?: number;
 };
 
+/**
+ * Who Hudhud is and why: a day worker who does a different job in Yemen every day, and learns
+ * something in each, because he dreams of building a school in his village where all children
+ * learn. Today he has two jobs; the child chooses which one to help with.
+ */
 export const INTRO_STORY: readonly StoryScene[] = [
   {
-    id: "postman",
-    line: "أَنَا هُدْهُدٌ، سَاعِي الْبَرِيدِ فِي الْيَمَنِ. أَحْمِلُ الرَّسَائِلَ إِلَى كُلِّ الْبُيُوتِ.",
+    id: "dawn",
+    line: "أَنَا هُدْهُدٌ. كُلَّ صَبَاحٍ أَطِيرُ فَوْقَ الْيَمَنِ، وَأَعْمَلُ عَمَلًا جَدِيدًا.",
+    minMs: 3600,
   },
-  // The storm tears out the three letters one by one: let it finish (components/world/StoryScenes).
+  // The country passes below him from job to job: let the flight finish.
   {
-    id: "wind",
-    line: "هَبَّتْ عَاصِفَةٌ قَوِيَّةٌ، فَطَارَتِ الْحُرُوفُ وَحَرَكَاتُهَا مِنْ رَسَائِلِي!",
-    minMs: 5600,
-  },
-  {
-    id: "market",
-    line: "وَفِي سُوقِ الْمُخَا، التَّاجِرُ لَا يَعْرِفُ كَمْ كِيسًا مِنَ الْبُنِّ عِنْدَهُ.",
+    id: "jobs",
+    line: "أُسَاعِدُ الْمُزَارِعَ فِي الْمُدَرَّجَاتِ، وَالصَّيَّادَ فِي الْبَحْرِ، وَالنَّحَّالَ فِي الْجَبَلِ.",
+    minMs: 8600,
   },
   {
-    id: "waiting",
-    line: "النَّاسُ يَنْتَظِرُونَ، وَالسَّفِينَةُ تَنْتَظِرُ. أَحْتَاجُ مُسَاعَدَتَكَ!",
+    id: "dream",
+    line: "وَفِي اللَّيْلِ أَحْلُمُ: أَنْ أَبْنِيَ مَدْرَسَةً فِي قَرْيَتِي، يَتَعَلَّمُ فِيهَا كُلُّ الْأَطْفَالِ.",
+    minMs: 4200,
+  },
+  {
+    id: "today",
+    line: "لِذَلِكَ أَتَعَلَّمُ فِي كُلِّ عَمَلٍ. وَالْيَوْمَ عِنْدِي عَمَلَانِ، وَأَحْتَاجُ مُسَاعَدَتَكَ!",
   },
   {
     id: "choose",
-    line: "هَلْ تُسَاعِدُنِي؟ نَجْمَعُ الْحُرُوفَ، أَوْ نَعُدُّ فِي السُّوقِ. اِخْتَرْ!",
+    line: "هَلْ أَكُونُ سَاعِيَ الْبَرِيدِ، أَمْ أُسَاعِدُ تَاجِرَ الْبُنِّ؟ اِخْتَرْ!",
   },
 ];
+
+/** The two jobs, told when the child first helps with them: Arabic and maths. */
+export type ChapterId = "arabic" | "math";
+
+export const CHAPTERS: Record<ChapterId, readonly StoryScene[]> = {
+  // Read and learn: Hudhud the postman, and the storm that blows the letters away.
+  arabic: [
+    {
+      id: "postman",
+      line: "الْيَوْمَ أَنَا سَاعِي الْبَرِيدِ. أَحْمِلُ الرَّسَائِلَ إِلَى كُلِّ الْبُيُوتِ.",
+    },
+    // The storm tears out the three letters one by one: let it finish (StoryScenes).
+    {
+      id: "wind",
+      line: "هَبَّتْ عَاصِفَةٌ قَوِيَّةٌ، فَطَارَتِ الْحُرُوفُ وَحَرَكَاتُهَا مِنْ رَسَائِلِي!",
+      minMs: 5600,
+    },
+    {
+      id: "waiting",
+      line: "النَّاسُ يَنْتَظِرُونَ رَسَائِلَهُمْ. هَيَّا نَجْمَعُ الْحُرُوفَ مَعًا!",
+    },
+  ],
+  // Maths: Hudhud helps the coffee trader of Mocha count his beans and sacks.
+  math: [
+    {
+      id: "market",
+      line: "الْيَوْمَ أُسَاعِدُ تَاجِرَ الْبُنِّ فِي سُوقِ الْمُخَا. عِنْدَهُ بُنٌّ كَثِيرٌ!",
+    },
+    {
+      id: "beans",
+      line: "لَكِنَّهُ لَا يَعْرِفُ: كَمْ حَبَّةً عِنْدَهُ؟ وَكَمْ كِيسًا؟",
+      minMs: 4000,
+    },
+    {
+      id: "ship",
+      line: "وَالسَّفِينَةُ تَنْتَظِرُ الْبُنَّ. هَيَّا نَعُدُّ مَعًا!",
+    },
+  ],
+};
+
+/** The job a subject belongs to, if it has one in the story. */
+export function chapterFor(subject: string | undefined): ChapterId | null {
+  if (subject === "arabic" || subject === "lughati") return "arabic";
+  if (subject === "math") return "math";
+  return null;
+}
 
 /** What Hudhud says when the child picks or switches a subject, by book subject. */
 export const SUBJECT_LINES: Record<string, string> = {
   arabic: "هَيَّا نَجْمَعُ الْحُرُوفَ!",
   lughati: "هَيَّا نَجْمَعُ الْحُرُوفَ!",
-  math: "هَيَّا نُسَاعِدُ التَّاجِرَ فِي السُّوقِ!",
+  math: "هَيَّا نُسَاعِدُ تَاجِرَ الْبُنِّ!",
   science: "هَيَّا نَتَعَلَّمُ!",
 };
 
@@ -134,8 +201,8 @@ export const giftLine = (sticker: string) => `هَدِيَّةُ شُكْرٍ ل
 
 /** The end of the story in a subject: every lesson done with three stars. */
 export const SUBJECT_DONE: Record<string, string> = {
-  arabic: "وَصَلَتْ كُلُّ رَسَائِلِي! شُكْرًا لَكَ!",
-  lughati: "وَصَلَتْ كُلُّ رَسَائِلِي! شُكْرًا لَكَ!",
-  math: "أَبْحَرَتِ السَّفِينَةُ، وَالتَّاجِرُ سَعِيدٌ! شُكْرًا لَكَ!",
+  arabic: "وَصَلَتْ كُلُّ رَسَائِلِي! خُطْوَةٌ أُخْرَى نَحْوَ مَدْرَسَتِي. شُكْرًا لَكَ!",
+  lughati: "وَصَلَتْ كُلُّ رَسَائِلِي! خُطْوَةٌ أُخْرَى نَحْوَ مَدْرَسَتِي. شُكْرًا لَكَ!",
+  math: "أَبْحَرَتِ السَّفِينَةُ، وَالتَّاجِرُ سَعِيدٌ! خُطْوَةٌ أُخْرَى نَحْوَ مَدْرَسَتِي. شُكْرًا لَكَ!",
   science: "مَا شَاءَ اللهُ! أَتْمَمْتَ كُلَّ الدُّرُوسِ",
 };

@@ -9,8 +9,8 @@ export const EN_LINES: Record<string, string> = {
   "أكمل كتابة الحرف كله 📏": "Finish writing the whole letter 📏",
   "أكمل كتابة الكلمة كلها 📏": "Finish writing the whole word 📏",
   "أنا  ،  إنارة  ،  مأمون  ،  نبأ": "I, lighting, Mamoun, news",
-  "أَبْحَرَتِ السَّفِينَةُ، وَالتَّاجِرُ سَعِيدٌ! شُكْرًا لَكَ!":
-    "The ship has set sail, and the trader is happy! Thank you!",
+  "أَبْحَرَتِ السَّفِينَةُ، وَالتَّاجِرُ سَعِيدٌ! خُطْوَةٌ أُخْرَى نَحْوَ مَدْرَسَتِي. شُكْرًا لَكَ!":
+    "The ship has set sail, and the trader is happy! One more step towards my school. Thank you!",
   أَتَدَرَّبُ: "I practise",
   "أَتَعَرَّفُ الأَشْكَالَ": "I learn the shapes",
   "أَتَعَرَّفُ الْمُجَسَّمَاتِ": "I learn the 3D shapes",
@@ -187,8 +187,8 @@ export const EN_LINES: Record<string, string> = {
   "أَمْشِي بِإِصْبَعِي عَلَى الْحَرْفِ.": "I trace the letter with my finger.",
   "أَمْشِي بِإِصْبَعِي عَلَى الْخَطِّ، مِنَ الْيَمِينِ إِلَى الْيَسَارِ.":
     "I move my finger along the line, from right to left.",
-  "أَنَا هُدْهُدٌ، سَاعِي الْبَرِيدِ فِي الْيَمَنِ. أَحْمِلُ الرَّسَائِلَ إِلَى كُلِّ الْبُيُوتِ.":
-    "I am Hudhud, the postman of Yemen. I carry messages to every house.",
+  "أَنَا هُدْهُدٌ. كُلَّ صَبَاحٍ أَطِيرُ فَوْقَ الْيَمَنِ، وَأَعْمَلُ عَمَلًا جَدِيدًا.":
+    "I am Hudhud. Every morning I fly over Yemen and do a new job.",
   "أَنْظُرُ إِلَى الصُّورَةِ وَأَجْمَعُ": "I look at the picture and add",
   "أَنْمَاطُ الأَعْدَادِ": "Number patterns",
   "أَهْدَتِ الْبِنْتُ وُرُودًا. كَمِ الْبَاقِي؟":
@@ -288,6 +288,8 @@ export const EN_LINES: Record<string, string> = {
   "أُحِبُّ بَابَا": "I love Baba",
   "أُحِبُّ مَامَا": "I love Mama",
   "أُرَتِّبُ الأَعْدَادَ": "I put the numbers in order",
+  "أُسَاعِدُ الْمُزَارِعَ فِي الْمُدَرَّجَاتِ، وَالصَّيَّادَ فِي الْبَحْرِ، وَالنَّحَّالَ فِي الْجَبَلِ.":
+    "I help the farmer on the terraces, the fisherman at sea, and the beekeeper in the mountains.",
   "أُسَمِّي الصُّوَر": "I name the pictures",
   "أُصَنِّفُ أَدَوَاتِي": "I sort my school things",
   "أُصَنِّفُ الأَشْكَالَ": "I sort the shapes",
@@ -401,8 +403,8 @@ export const EN_LINES: Record<string, string> = {
   العربية: "Arabic",
   اللَّوْنُ: "Colour",
   "المقطع الناقص": "The missing syllable",
-  "النَّاسُ يَنْتَظِرُونَ، وَالسَّفِينَةُ تَنْتَظِرُ. أَحْتَاجُ مُسَاعَدَتَكَ!":
-    "The people are waiting, and the ship is waiting. I need your help!",
+  "النَّاسُ يَنْتَظِرُونَ رَسَائِلَهُمْ. هَيَّا نَجْمَعُ الْحُرُوفَ مَعًا!":
+    "People are waiting for their messages. Let's collect the letters together!",
   "النَّبَاتُ يَنْمُو": "The plant is growing",
   "النَّحْلُ أَكْثَرُ أَمْ أَقَلُّ أَمْ يُسَاوِي الْوُرُودَ؟":
     "Are there more bees than roses, fewer, or the same number?",
@@ -449,6 +451,10 @@ export const EN_LINES: Record<string, string> = {
   الْمِقْلَمَةُ: "The pencil case",
   "الْوُرُودُ أَكْثَرُ أَمْ أَقَلُّ أَمْ تُسَاوِي النَّحْلَ؟":
     "Are there more roses than bees, fewer, or the same number?",
+  "الْيَوْمَ أَنَا سَاعِي الْبَرِيدِ. أَحْمِلُ الرَّسَائِلَ إِلَى كُلِّ الْبُيُوتِ.":
+    "Today I am the postman. I carry messages to every house.",
+  "الْيَوْمَ أُسَاعِدُ تَاجِرَ الْبُنِّ فِي سُوقِ الْمُخَا. عِنْدَهُ بُنٌّ كَثِيرٌ!":
+    "Today I help the coffee trader in the market of Mocha. He has so much coffee!",
   "انْطَفَأَتْ شُمُوعٌ. كَمِ الْبَاقِي؟": "Some candles went out. How many are left?",
   "اَلْآنَ دَوْرُكَ!": "Now it's your turn!",
   "اُكتب فوق الحرف المرسوم ✏️": "Trace over the letter ✏️",
@@ -718,9 +724,13 @@ export const EN_LINES: Record<string, string> = {
     "There is no Arabic voice on this device. Ask an adult to install an Arabic voice in the text-to-speech settings.",
   لَبِيبٌ: "Labib",
   "لَطِيفَةُ وَالنَّحْلَةُ": "Latifa and the bee",
+  "لَكِنَّهُ لَا يَعْرِفُ: كَمْ حَبَّةً عِنْدَهُ؟ وَكَمْ كِيسًا؟":
+    "But he doesn't know: how many beans does he have? And how many sacks?",
   "لَمْ يَطِرْ أَيُّ بَالُونٍ. كَمِ الْبَاقِي؟": "No balloon flew away. How many are left?",
   "لَهُ الشَّكْلُ نَفْسُهُ": "It has the same shape",
   لَيْلٌ: "Night",
+  "لِذَلِكَ أَتَعَلَّمُ فِي كُلِّ عَمَلٍ. وَالْيَوْمَ عِنْدِي عَمَلَانِ، وَأَحْتَاجُ مُسَاعَدَتَكَ!":
+    "That's why I learn in every job. And today I have two jobs, and I need your help!",
   "لِلْبِنْتِ حَقِيبَةٌ، وَلِلْوَلَدِ حَقِيبَةٌ. كَمْ حَقِيبَةً مَعَهُمَا؟":
     "The girl has a bag, and the boy has a bag. How many bags do they have together?",
   "لِنَتَسَابَقْ فِي الْحَلِّ": "Let's race to solve it",
@@ -817,8 +827,8 @@ export const EN_LINES: Record<string, string> = {
     "Is the coloured part a quarter of the shape? Yes or no?",
   "هَلِ الْجُزْءُ الْمُلَوَّنُ نِصْفُ الشَّكْلِ؟ نَعَمْ أَمْ لَا؟":
     "Is the coloured part half of the shape? Yes or no?",
-  "هَلْ تُسَاعِدُنِي؟ نَجْمَعُ الْحُرُوفَ، أَوْ نَعُدُّ فِي السُّوقِ. اِخْتَرْ!":
-    "Will you help me? We can collect the letters, or count in the market. Choose!",
+  "هَلْ أَكُونُ سَاعِيَ الْبَرِيدِ، أَمْ أُسَاعِدُ تَاجِرَ الْبُنِّ؟ اِخْتَرْ!":
+    "Shall I be the postman, or help the coffee trader? You choose!",
   "هَلْ هُوَ رُبْعٌ؟": "Is it a quarter?",
   "هَلْ هُوَ نِصْفٌ؟": "Is it a half?",
   "هَيَّا نَتَعَلَّمُ كِتَابَةَ الرَّسَائِلِ!": "Let's learn to write messages!",
@@ -828,7 +838,7 @@ export const EN_LINES: Record<string, string> = {
   "هَيَّا نَحْمِلُ الْأَكْيَاسَ إِلَى السَّفِينَةِ!": "Let's carry the sacks to the ship!",
   "هَيَّا نَعُدُّ أَكْيَاسَ الْبُنِّ لِلتَّاجِرِ!": "Let's count the coffee sacks for the trader!",
   "هَيَّا نُرَتِّبُ بَضَائِعَ التَّاجِرِ!": "Let's sort the trader's goods!",
-  "هَيَّا نُسَاعِدُ التَّاجِرَ فِي السُّوقِ!": "Let's help the trader in the market!",
+  "هَيَّا نُسَاعِدُ تَاجِرَ الْبُنِّ!": "Let's help the coffee trader!",
   "هَيَّا نُعِيدُ إِلَى الْحُرُوفِ حَرَكَاتِهَا!": "Let's give the letters back their vowel marks!",
   "هَيَّا نُغَلِّفُ الْبَضَائِعَ لِلسَّفَرِ!": "Let's pack the goods for the journey!",
   "هٰذَا سُلُوكٌ صَحِيحٌ، أَضْغَطُ عَلَامَةَ الصَّحِّ.":
@@ -837,16 +847,19 @@ export const EN_LINES: Record<string, string> = {
   "و: أَخِي مَرِيضٌ": "و: My brother is sick",
   "وداد  ،  يوم  ،  ينمو  ،  دود": "Widad, day, it grows, worms",
   وَاحِد: "One",
+  "وَالسَّفِينَةُ تَنْتَظِرُ الْبُنَّ. هَيَّا نَعُدُّ مَعًا!":
+    "And the ship is waiting for the coffee. Let's count together!",
   "وَتُضِيءُ الْقَمَرِيَّةُ!": "And the qamariya lights up!",
   وَرْدَةٌ: "Rose",
   وَسَطَ: "Middle",
   "وَصَلَ كِيسٌ جَدِيدٌ!": "A new sack has arrived!",
   "وَصَلَتْ أَكْيَاسٌ جَدِيدَةٌ، هَيَّا نَجْمَعُهَا!":
     "New sacks have arrived. Come on, let's collect them!",
-  "وَصَلَتْ كُلُّ رَسَائِلِي! شُكْرًا لَكَ!": "All my messages have arrived! Thank you!",
+  "وَصَلَتْ كُلُّ رَسَائِلِي! خُطْوَةٌ أُخْرَى نَحْوَ مَدْرَسَتِي. شُكْرًا لَكَ!":
+    "All my messages have arrived! One more step towards my school. Thank you!",
   وَصْفٌ: "Description",
-  "وَفِي سُوقِ الْمُخَا، التَّاجِرُ لَا يَعْرِفُ كَمْ كِيسًا مِنَ الْبُنِّ عِنْدَهُ.":
-    "And in the market of Mocha, the trader does not know how many sacks of coffee he has.",
+  "وَفِي اللَّيْلِ أَحْلُمُ: أَنْ أَبْنِيَ مَدْرَسَةً فِي قَرْيَتِي، يَتَعَلَّمُ فِيهَا كُلُّ الْأَطْفَالِ.":
+    "And at night I dream: to build a school in my village, where all the children can learn.",
   "وَهٰذَا سُلُوكٌ خَاطِئٌ، أَضْغَطُ عَلَامَةَ الْخَطَأِ.":
     "And this is the wrong behaviour, so I tap the cross.",
   "ي و أ مع الحركات": "ي و أ with vowel marks",

@@ -126,6 +126,7 @@ export function collectExplainStrings(): { lines: string[]; gloss: string[] } {
   }
   strings([DEMO_START, DEMO_END], lines);
   strings(story.INTRO_STORY, lines);
+  strings(story.CHAPTERS, lines);
   strings(story.SUBJECT_LINES, lines);
   strings(story.GOAL_LINES, lines);
   strings(story.SUBJECT_DONE, lines);

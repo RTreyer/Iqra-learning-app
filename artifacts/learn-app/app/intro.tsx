@@ -1,10 +1,12 @@
 /**
- * Hudhud's story (content/story.ts): a few scenes, each told by the voice, then the child
- * chooses how to help, which picks the subject the play button continues in. Shown on the
- * first play; the home screen can play it again. A tap moves on, Skip jumps to the choice.
+ * Hudhud's story (content/story.ts), scene by scene, each told by the voice. Without a chapter:
+ * who Hudhud is (a day worker with a dream), ending in the choice of today's job, which picks
+ * the subject the play button continues in; then that job's chapter. With a chapter
+ * (`?chapter=arabic|math`): only that job, told the first time the child helps with it, then
+ * its path opens. A tap moves on; Skip jumps to the choice, or past the chapter.
  */
 
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useLine } from "@/components/Gloss";
 import React, { useEffect, useState } from "react";
 import { Animated, Easing, Pressable, StyleSheet, Text, View } from "react-native";
@@ -15,7 +17,16 @@ import { UiText } from "@/components/UiText";
 import { Icon } from "@/components/world/Icon";
 import { Envelope, Sack, StoryPicture } from "@/components/world/StoryScenes";
 import { books, type Book } from "@/content";
-import { INTRO_STORY, SUBJECT_LINES } from "@/content/story";
+import {
+  CHAPTERS,
+  INTRO_STORY,
+  SUBJECT_LINES,
+  chapterFor,
+  type ChapterId,
+  type StoryScene,
+} from "@/content/story";
+import { firstParam } from "@/lib/params";
+import { useLatest } from "@/components/activities/shared/useLatest";
 import { useLanguage } from "@/context/LanguageContext";
 import { useSettings } from "@/context/SettingsContext";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
@@ -26,7 +37,6 @@ import { readableFill, touchTarget, yemen } from "@/theme/tokens";
 
 /** Pause after a line before the next scene, so a child can look at the picture. */
 const LINGER_MS = 900;
-const LAST = INTRO_STORY.length - 1;
 /** How long one scene takes to give way to the next, like turning a page. */
 const TURN_MS = 700;
 /** How far a scene glides while it comes in or goes (px). */
@@ -37,7 +47,7 @@ const GLIDE = 40;
  * keeps playing) while it fades and glides out to the right, and the new one fades and glides
  * in from the left, the way pages of an Arabic book turn.
  */
-function SceneStage({ index }: { index: number }) {
+function SceneStage({ scenes, index }: { scenes: readonly StoryScene[]; index: number }) {
   const [current, setCurrent] = useState(index);
   const [leaving, setLeaving] = useState<number | null>(null);
   const [turn] = useState(() => new Animated.Value(1));
@@ -66,7 +76,7 @@ function SceneStage({ index }: { index: number }) {
     <View style={styles.picture}>
       {turning ? (
         <Animated.View
-          key={INTRO_STORY[leaving].id}
+          key={scenes[leaving].id}
           pointerEvents="none"
           style={[
             styles.layer,
@@ -79,12 +89,12 @@ function SceneStage({ index }: { index: number }) {
             },
           ]}
         >
-          <StoryPicture id={INTRO_STORY[leaving].id} />
+          <StoryPicture id={scenes[leaving].id} />
         </Animated.View>
       ) : null}
       <Animated.View
-        key={INTRO_STORY[current].id}
-        testID={`intro-scene-${INTRO_STORY[current].id}`}
+        key={scenes[current].id}
+        testID={`intro-scene-${scenes[current].id}`}
         style={[
           styles.layer,
           turning
@@ -100,7 +110,7 @@ function SceneStage({ index }: { index: number }) {
             : null,
         ]}
       >
-        <StoryPicture id={INTRO_STORY[current].id} />
+        <StoryPicture id={scenes[current].id} />
       </Animated.View>
     </View>
   );
@@ -167,14 +177,36 @@ function ChoicePicture({ book }: { book: Book }) {
 }
 
 export default function IntroScreen() {
+  const param = firstParam(useLocalSearchParams<{ chapter?: string | string[] }>().chapter);
+  const chapter = param === "arabic" || param === "math" ? param : null;
+  // A new chapter is a new story: start it from its first scene.
+  return <Story key={chapter ?? "intro"} chapter={chapter} />;
+}
+
+function Story({ chapter }: { chapter: ChapterId | null }) {
   const { t, language, loaded: languageLoaded } = useLanguage();
   const line = useLine();
-  const { update } = useSettings();
+  const { settings, update } = useSettings();
   const pad = useScreenPadding();
+  const scenes = chapter ? CHAPTERS[chapter] : INTRO_STORY;
+  const LAST = scenes.length - 1;
   const [index, setIndex] = useState(0);
-  const scene = INTRO_STORY[index];
-  const choosing = index === LAST;
+  const scene = scenes[index];
+  const choosing = !chapter && index === LAST;
   const choices = books.filter((book) => book.available);
+
+  /** The chapter is told: remember it and open its path (the book the child chose, if it fits). */
+  const finishChapter = () => {
+    if (!chapter) return;
+    const chosen = books.find((book) => book.id === settings.bookId);
+    const book =
+      chosen && chapterFor(chosen.subject) === chapter
+        ? chosen
+        : books.find((b) => b.available && chapterFor(b.subject) === chapter);
+    update({ chaptersSeen: [...new Set([...settings.chaptersSeen, chapter])] });
+    router.replace(book ? routes.book(book.id) : routes.home());
+  };
+  const finishRef = useLatest(finishChapter);
 
   // Tell the scene; move on when the voice is done (or after a fallback), except on the choice.
   useEffect(() => {
@@ -188,7 +220,11 @@ export default function IntroScreen() {
       moved = true;
       // Stay at least as long as the scene's picture needs (the storm), then a short pause.
       const wait = Math.max(LINGER_MS, (scene.minMs ?? 0) - (Date.now() - shownAt));
-      linger = setTimeout(() => setIndex((i) => Math.min(LAST, i + 1)), wait);
+      linger = setTimeout(() => {
+        // The last scene of a chapter opens the job's path.
+        if (index === LAST) finishRef.current();
+        else setIndex((i) => Math.min(LAST, i + 1));
+      }, wait);
     };
     const fallback = setTimeout(done, estimateSpeechMs(scene.line));
     speak(scene.line, { onDone: done });
@@ -197,20 +233,22 @@ export default function IntroScreen() {
       clearTimeout(fallback);
       clearTimeout(linger);
     };
-  }, [scene.line, scene.minMs, choosing, languageLoaded]);
+  }, [scene.line, scene.minMs, choosing, languageLoaded, index, LAST]);
 
   useEffect(() => () => stopSpeaking(), []);
 
   const next = () => {
     haptics.tap();
-    setIndex((i) => Math.min(LAST, i + 1));
+    if (chapter && index === LAST) finishChapter();
+    else setIndex((i) => Math.min(LAST, i + 1));
   };
 
   const choose = (book: Book) => {
     haptics.success();
     update({ introSeen: true, bookId: book.id });
-    // The book's path greets with this subject's line (app/book/[bookId].tsx).
-    router.replace(routes.book(book.id));
+    // Today's job: its chapter is told next, then its path opens (app/book/[bookId].tsx).
+    const job = chapterFor(book.subject);
+    router.replace(job ? routes.intro(job) : routes.book(book.id));
   };
 
   return (
@@ -226,7 +264,7 @@ export default function IntroScreen() {
           <Icon name="home" size={26} color={yemen.clay} />
         </Pressable>
         <View style={styles.dots} accessible accessibilityLabel={`${index + 1} / ${LAST + 1}`}>
-          {INTRO_STORY.map((s, i) => (
+          {scenes.map((s, i) => (
             <View
               key={s.id}
               style={[styles.dot, i === index && styles.dotOn, i < index && styles.dotDone]}
@@ -240,7 +278,7 @@ export default function IntroScreen() {
             testID="intro-skip"
             accessibilityRole="button"
             accessibilityLabel={t("تخطَّ")}
-            onPress={() => setIndex(LAST)}
+            onPress={() => (chapter ? finishChapter() : setIndex(LAST))}
             style={styles.skip}
           >
             <UiText style={styles.skipText}>تخطَّ</UiText>
@@ -256,7 +294,7 @@ export default function IntroScreen() {
         onPress={next}
         style={styles.stage}
       >
-        <SceneStage index={index} />
+        <SceneStage scenes={scenes} index={index} />
         {/* A new line appears as the new scene comes in. */}
         <Appear key={scene.id} delay={TURN_MS / 3} style={styles.bubble}>
           <View style={styles.speaker}>

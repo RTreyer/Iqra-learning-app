@@ -19,7 +19,7 @@ import { QamariyaGoal } from "@/components/world/QamariyaGoal";
 import { Skyline } from "@/components/world/Skyline";
 import { StickerArt } from "@/components/world/StickerArt";
 import { books, unitLessonIds, type Book } from "@/content";
-import { SUBJECT_DONE } from "@/content/story";
+import { SUBJECT_DONE, chapterFor } from "@/content/story";
 import { useLanguage } from "@/context/LanguageContext";
 import { useProgress } from "@/context/ProgressContext";
 import { useSettings } from "@/context/SettingsContext";
@@ -171,7 +171,13 @@ export default function HomeScreen() {
               // Choosing an island makes it the subject the play button continues in.
               onPress={tap(() => {
                 update({ bookId: book.id });
-                router.push(routes.book(book.id));
+                // The first time the child helps with this job, Hudhud tells it first.
+                const job = chapterFor(book.subject);
+                router.push(
+                  job && !settings.chaptersSeen.includes(job)
+                    ? routes.intro(job)
+                    : routes.book(book.id),
+                );
               })}
               style={({ pressed }) => [
                 styles.island,

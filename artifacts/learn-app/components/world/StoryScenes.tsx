@@ -15,6 +15,7 @@ import { Hudhud } from "./Hudhud";
 import { Skyline } from "./Skyline";
 import { StickerArt } from "./StickerArt";
 import { LOOP_NATIVE } from "./motion";
+import { Beans, Dawn, Dream, Jobs, Ship, Today, Waiting } from "./DayScenes";
 
 /** A value that swings 0 → 1 → 0 forever while mounted. */
 function useSwing(duration = 1400): Animated.Value {
@@ -64,7 +65,7 @@ function Envelope({ size = 34, letter }: { size?: number; letter?: string }) {
   );
 }
 
-/** Scene 1: Hudhud, the postman, flies over Sana'a, his mail bag strapped across his chest. */
+/** The postman chapter: Hudhud flies over Sana'a, his mail bag strapped across his chest. */
 function Postman() {
   // A slow glide back and forth, a lighter bob on top of it, and a slight bank into the turn.
   const glide = useSwing(2600);
@@ -470,7 +471,7 @@ function Sack({ x, size = 70 }: { x: number; size?: number }) {
   );
 }
 
-/** Scene 3: the market of Mocha, sacks of coffee, a dhow, and nobody can count. */
+/** The coffee chapter: the market of Mocha, sacks of coffee, a dhow, and nobody can count. */
 function Market() {
   const swing = useSwing(900);
   return (
@@ -508,49 +509,33 @@ function Market() {
         </Animated.Text>
       ))}
       <View style={styles.marketBird}>
-        <Hudhud size={96} bag={0} />
+        <Hudhud size={96} />
       </View>
     </View>
   );
 }
 
-/** Scene 4: the children wait at home for their messages; the ship waits too. */
-function Waiting() {
-  return (
-    <View style={styles.scene}>
-      <View style={styles.sky} />
-      <View style={styles.waitHouse}>
-        <Art art="house" size={170} />
-      </View>
-      <View style={styles.waitPeople}>
-        <Art art="girl" size={84} />
-        <Art art="boy" size={84} />
-      </View>
-      <View style={styles.waitShip}>
-        <StickerArt id="dhow" size={84} />
-      </View>
-      <View style={styles.waitBird}>
-        <Hudhud size={110} pose="cheer" bag={0} />
-      </View>
-    </View>
-  );
-}
-
-/** Scene 5 shows Hudhud between the two choices (the choices are buttons on the screen). */
+/** The choice: Hudhud between the two jobs (the choices are buttons on the screen). */
 function Choose() {
   return (
     <View style={[styles.scene, styles.chooseScene]}>
-      <Hudhud size={140} bag={0} />
+      <Hudhud size={140} />
     </View>
   );
 }
 
 const SCENES: Record<StorySceneId, () => React.ReactElement> = {
+  dawn: Dawn,
+  jobs: Jobs,
+  dream: Dream,
+  today: Today,
+  choose: Choose,
   postman: Postman,
   wind: Storm,
-  market: Market,
   waiting: Waiting,
-  choose: Choose,
+  market: Market,
+  beans: Beans,
+  ship: Ship,
 };
 
 export function StoryPicture({ id }: { id: StorySceneId }) {

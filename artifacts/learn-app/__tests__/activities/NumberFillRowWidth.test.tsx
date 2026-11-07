@@ -13,7 +13,9 @@ const lesson: Extract<Lesson, { type: "number_fill" }> = {
   emoji: "➖",
   color: "#7C3AED",
   type: "number_fill",
-  rounds: [{ prompt: "أُكْمِلُ", cells: [10, "-", 2, "=", "?"], layout: "row", options: [7, 8, 9] }],
+  rounds: [
+    { prompt: "أُكْمِلُ", cells: [10, "-", 2, "=", "?"], layout: "row", options: [7, 8, 9] },
+  ],
 };
 
 test("a five cell row fits a 360 px phone inside the activity padding", () => {

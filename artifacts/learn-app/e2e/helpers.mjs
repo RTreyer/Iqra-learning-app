@@ -64,9 +64,12 @@ function prepareBrowser({ demoKey, demoTypes, settingsKey }) {
     localStorage.setItem("@iqra_voice_hint_shown", "1");
     if (localStorage.getItem(demoKey) === null)
       localStorage.setItem(demoKey, JSON.stringify(demoTypes));
-    // Hudhud's story already told, unless a test stored its own settings (seedStorage).
+    // Hudhud's story and both jobs already told, unless a test stored its own settings.
     if (localStorage.getItem(settingsKey) === null)
-      localStorage.setItem(settingsKey, JSON.stringify({ introSeen: true }));
+      localStorage.setItem(
+        settingsKey,
+        JSON.stringify({ introSeen: true, chaptersSeen: ["arabic", "math"] }),
+      );
   } catch {}
 }
 

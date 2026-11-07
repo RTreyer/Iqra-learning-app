@@ -24,10 +24,11 @@ test("home shows one island per available book and opens it; no grade cards", ()
   expect(screen.getAllByTestId(/^book-/)).toHaveLength(available.length);
   expect(screen.queryByTestId(/^grade-/)).toBeNull();
   expect(screen.queryByTestId("language-en")).toBeNull();
+  // The first time, Hudhud tells the job first (the chapter opens the path when it ends).
   fireEvent.press(screen.getByTestId("book-arabic-1"));
-  expect(router.push).toHaveBeenCalledWith(routes.book("arabic-1"));
+  expect(router.push).toHaveBeenCalledWith(routes.intro("arabic"));
   fireEvent.press(screen.getByTestId("book-math-1"));
-  expect(router.push).toHaveBeenCalledWith(routes.book("math-1"));
+  expect(router.push).toHaveBeenCalledWith(routes.intro("math"));
 });
 
 test("home opens the album and the parents' corner", () => {
