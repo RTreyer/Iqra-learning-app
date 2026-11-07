@@ -318,7 +318,7 @@ function Story({ chapter }: { chapter: string | null }) {
                 const place = MAP_PLACES[thread];
                 return [
                   {
-                    thread,
+                    place: thread,
                     testID: `choose-${book.id}`,
                     accessibilityLabel: `${line(place.name)}: ${line(place.what)}، ${t(book.title)}`,
                     onPress: () => choose(book),

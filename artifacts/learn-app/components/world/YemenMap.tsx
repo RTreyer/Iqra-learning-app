@@ -4,8 +4,12 @@
  * Arabian Sea, where he works as the postman (reading), and Mocha on the Red Sea, where the
  * coffee trader needs him (counting). Dotted flight paths lead from Sana'a to each.
  *
+ * Socotra is on the map too, marked as coming soon (a place for a subject still to come).
+ *
  * The same component draws the picture (the scene) and, with `only`, just the places as
  * buttons over it, at exactly the same spots: both fit the 360 × 260 map into their box alike.
+ * On the home screen it is the subject choice: each place shows its book's progress, the
+ * subject the play button continues in is ringed in gold.
  */
 
 import React, { useState } from "react";
@@ -14,11 +18,12 @@ import { Ellipse, G, Path, Polygon, Rect, Svg } from "react-native-svg";
 
 import { useLine } from "@/components/Gloss";
 import { Picture } from "@/components/pictures/Picture";
-import { HOME_PLACE, MAP_PLACES, type MapPlace, type Thread } from "@/content/story";
+import { HOME_PLACE, MAP_PLACES, type MapPlace, type PlaceId } from "@/content/story";
 import * as haptics from "@/lib/haptics";
 import { touchTarget, yemen } from "@/theme/tokens";
 import { BowlArt } from "./Bowl";
 import { Hudhud } from "./Hudhud";
+import { StickerArt } from "./StickerArt";
 
 const MAP_W = 360;
 const MAP_H = 260;
@@ -75,15 +80,45 @@ function fit(width: number, height: number) {
 }
 
 export type MapPin = {
-  thread: Thread;
+  place: PlaceId;
   testID?: string;
   accessibilityLabel?: string;
   onPress?: () => void;
+  /** Under the place's name instead of who waits there: the book's title on the home screen. */
+  caption?: React.ReactNode;
+  /** How much of the place's book is done (0 to 1), as a bar under its label. */
+  share?: number;
+  /** The subject the play button continues in. */
+  selected?: boolean;
 };
 
 const PIN = 58;
+/** A place still to come is drawn smaller. */
+const PIN_SOON = 46;
+/** A label's height: the name and one line under it; the progress bar adds its own. */
+const LABEL_H = 44;
+const TRACK_H = 14;
 
-export function YemenMap({ pins, only = false }: { pins: MapPin[]; only?: boolean }) {
+/**
+ * Where each place's label goes, so none covers another: Mukalla's above it (over Hadramawt),
+ * Mocha's beside it (it sits on the coast at the map's edge), Socotra's beside it.
+ */
+const LABEL_AT: Record<PlaceId, "above" | "below" | "beside"> = {
+  arabic: "above",
+  math: "beside",
+  socotra: "beside",
+};
+
+export function YemenMap({
+  pins,
+  only = false,
+  bird = true,
+}: {
+  pins: MapPin[];
+  only?: boolean;
+  /** Hudhud on his roof in Sana'a, with her note in his bag. */
+  bird?: boolean;
+}) {
   const [box, setBox] = useState({ width: 0, height: 0 });
   const line = useLine();
   const onLayout = (e: LayoutChangeEvent) => {
@@ -153,20 +188,22 @@ export function YemenMap({ pins, only = false }: { pins: MapPin[]; only?: boolea
               strokeWidth={1.5}
             />
             {/* The ways Hudhud can fly, from his roof in Sana'a. */}
-            {pins.map(({ thread }) => {
+            {pins.map(({ place }) => {
               const from = project(HOME_PLACE.lon, HOME_PLACE.lat);
-              const to = project(MAP_PLACES[thread].lon, MAP_PLACES[thread].lat);
+              const to = project(MAP_PLACES[place].lon, MAP_PLACES[place].lat);
               const mx = (from.x + to.x) / 2;
               const my = Math.min(from.y, to.y) - 30;
+              const soon = MAP_PLACES[place].soon;
               return (
                 <Path
-                  key={thread}
+                  key={place}
                   d={`M${from.x} ${from.y} Q${mx} ${my} ${to.x} ${to.y}`}
-                  stroke="#7A3418"
-                  strokeWidth={2.4}
-                  strokeDasharray="5 6"
+                  stroke={soon ? "#8A8378" : "#7A3418"}
+                  strokeWidth={soon ? 1.6 : 2.4}
+                  strokeDasharray={soon ? "2 6" : "5 6"}
                   strokeLinecap="round"
                   fill="none"
+                  opacity={soon ? 0.6 : 1}
                 />
               );
             })}
@@ -176,17 +213,20 @@ export function YemenMap({ pins, only = false }: { pins: MapPin[]; only?: boolea
             <BowlArt width={40} level={0} />
             <Text style={styles.homeName}>{line(HOME_PLACE.name)}</Text>
           </View>
-          <View style={[styles.bird, { left: home.left - 6, top: home.top - 66 }]}>
-            <Hudhud size={58} bag={1} />
-          </View>
+          {bird ? (
+            <View style={[styles.bird, { left: home.left - 6, top: home.top - 66 }]}>
+              <Hudhud size={58} bag={1} />
+            </View>
+          ) : null}
         </>
       )}
       {pins.map((pin) => (
         <Place
-          key={pin.thread}
+          key={pin.place}
+          id={pin.place}
           pin={pin}
-          place={MAP_PLACES[pin.thread]}
-          spot={at(MAP_PLACES[pin.thread])}
+          place={MAP_PLACES[pin.place]}
+          spot={at(MAP_PLACES[pin.place])}
           width={width}
           height={height}
           only={only}
@@ -199,6 +239,7 @@ export function YemenMap({ pins, only = false }: { pins: MapPin[]; only?: boolea
 /** A place to fly to: its picture in a round badge, its name and who is waiting there. */
 function Place({
   pin,
+  id,
   place,
   spot,
   width,
@@ -206,6 +247,7 @@ function Place({
   only,
 }: {
   pin: MapPin;
+  id: PlaceId;
   place: MapPlace;
   spot: { left: number; top: number };
   width: number;
@@ -213,36 +255,81 @@ function Place({
   only: boolean;
 }) {
   const line = useLine();
-  const LABEL = 112;
-  // Near the bottom of the map the label goes beside the badge, else below it; both are kept
-  // inside the map at the edges.
-  const beside = spot.top + PIN / 2 + 46 > height;
-  const span = beside ? PIN + 4 + LABEL : LABEL;
-  const left = beside
-    ? Math.max(4, Math.min(width - span - 4, spot.left - PIN / 2))
-    : Math.max(4, Math.min(width - LABEL - 4, spot.left - LABEL / 2));
+  const soon = place.soon === true;
+  const pinSize = soon ? PIN_SOON : PIN;
+  const LABEL = soon ? 92 : 118;
+  const labelHeight = pin.share !== undefined ? LABEL_H + TRACK_H : LABEL_H;
+  // The label goes where LABEL_AT says (beside: towards the middle of the map); the whole
+  // place stays inside the map at the edges.
+  const at = LABEL_AT[id];
+  const beside = at === "beside";
+  const leftward = beside && spot.left > width / 2;
+  const span = beside ? pinSize + 4 + LABEL : LABEL;
+  const want = beside
+    ? leftward
+      ? spot.left + pinSize / 2 - span
+      : spot.left - pinSize / 2
+    : spot.left - LABEL / 2;
+  const left = Math.max(4, Math.min(width - span - 4, want));
+  const top =
+    at === "above" ? spot.top + pinSize / 2 - pinSize - 2 - labelHeight : spot.top - pinSize / 2;
+  const clampedTop = Math.max(4, Math.min(height - pinSize - 4, top));
   const content = (
     <>
-      <View style={[styles.badge, { borderColor: place.color }]}>
-        <Picture emoji={place.picture} size={36} />
+      <View
+        style={[
+          styles.badge,
+          { width: pinSize, height: pinSize, borderRadius: pinSize / 2 },
+          { borderColor: pin.selected ? yemen.gold : place.color },
+          pin.selected && styles.badgeOn,
+          soon && styles.badgeSoon,
+        ]}
+      >
+        {place.sticker ? (
+          <StickerArt id={place.sticker} size={soon ? 32 : 40} />
+        ) : (
+          <Picture emoji={place.picture} size={36} />
+        )}
       </View>
-      <View style={[styles.label, { backgroundColor: place.color }]}>
+      <View
+        style={[
+          styles.label,
+          { backgroundColor: place.color, height: labelHeight },
+          pin.selected && styles.labelOn,
+        ]}
+      >
         <Text style={styles.name}>{line(place.name)}</Text>
-        <Text style={styles.what}>{line(place.what)}</Text>
+        {pin.caption ?? <Text style={styles.what}>{line(place.what)}</Text>}
+        {pin.share !== undefined ? (
+          <View style={styles.track}>
+            <View style={[styles.fill, { width: `${Math.round(pin.share * 100)}%` }]} />
+          </View>
+        ) : null}
       </View>
     </>
   );
   const style = [
     styles.place,
-    beside && styles.beside,
-    { left, top: spot.top - PIN / 2, width: span },
+    beside && (leftward ? styles.besideLeft : styles.beside),
+    at === "above" && styles.above,
+    { left, top: clampedTop, width: span },
   ];
-  if (!pin.onPress) return <View style={[style, only && styles.hidden]}>{content}</View>;
+  if (!pin.onPress)
+    return (
+      <View
+        style={[style, only && styles.hidden]}
+        accessible={soon}
+        accessibilityLabel={soon ? `${line(place.name)}: ${line(place.what)}` : undefined}
+      >
+        {content}
+      </View>
+    );
   return (
     <Pressable
       testID={pin.testID}
       accessibilityRole="button"
       accessibilityLabel={pin.accessibilityLabel}
+      accessibilityState={{ selected: pin.selected === true, disabled: soon }}
       onPress={() => {
         haptics.tap();
         pin.onPress?.();
@@ -271,6 +358,22 @@ const styles = StyleSheet.create({
   place: { position: "absolute", alignItems: "center", minHeight: touchTarget, gap: 2 },
   hidden: { opacity: 0 },
   beside: { flexDirection: "row", gap: 4 },
+  above: { flexDirection: "column-reverse" },
+  besideLeft: { flexDirection: "row-reverse", gap: 4 },
+  badgeOn: { borderWidth: 5, transform: [{ scale: 1.08 }] },
+  badgeSoon: { borderStyle: "dashed", opacity: 0.85 },
+  labelOn: { borderWidth: 3, borderColor: yemen.gold },
+  track: {
+    width: 76,
+    height: 7,
+    borderRadius: 4,
+    marginTop: 3,
+    marginBottom: 2,
+    backgroundColor: "rgba(255,255,255,0.35)",
+    overflow: "hidden",
+    flexDirection: "row-reverse",
+  },
+  fill: { height: 7, borderRadius: 4, backgroundColor: "#F4C14B", minWidth: 7 },
   badge: {
     width: PIN,
     height: PIN,
@@ -281,7 +384,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     boxShadow: "0 3px 0 rgba(94, 50, 32, 0.35)",
   },
-  label: { borderRadius: 10, paddingHorizontal: 8, paddingVertical: 2, alignItems: "center" },
+  label: {
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    alignItems: "center",
+    justifyContent: "center",
+    maxWidth: "100%",
+  },
   name: { fontSize: 14, fontWeight: "900", color: "#FFFFFF", lineHeight: 20 },
   what: { fontSize: 11, fontWeight: "700", color: "#FFFFFF", lineHeight: 16 },
   pressed: { opacity: 0.85, transform: [{ scale: 0.95 }] },

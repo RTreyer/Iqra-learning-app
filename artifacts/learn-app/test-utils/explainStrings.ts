@@ -132,6 +132,7 @@ export function collectExplainStrings(): { lines: string[]; gloss: string[] } {
   // The map of Yemen at the end of chapter 1: the names of the places, who waits there.
   strings(story.HOME_PLACE, lines);
   strings(story.MAP_PLACES, lines);
+  lines.add(story.SOON_LINE);
   strings(ACTIVITY_INSTRUCTIONS, lines);
   for (const sticker of STICKERS) {
     lines.add(sticker.name);

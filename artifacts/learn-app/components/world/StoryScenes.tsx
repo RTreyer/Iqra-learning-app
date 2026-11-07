@@ -874,7 +874,7 @@ function FlyOff() {
 function MapScene() {
   return (
     <View style={styles.scene}>
-      <YemenMap pins={[{ thread: "arabic" }, { thread: "math" }]} />
+      <YemenMap pins={[{ place: "arabic" }, { place: "math" }, { place: "socotra" }]} />
     </View>
   );
 }

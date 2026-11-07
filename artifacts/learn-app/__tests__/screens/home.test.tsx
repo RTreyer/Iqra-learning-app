@@ -6,6 +6,7 @@ import HomeScreen, { windowLine } from "@/app/index";
 import { getLesson } from "@/content";
 import { ProgressProvider } from "@/context/ProgressContext";
 import { SETTINGS_KEY, SettingsProvider } from "@/context/SettingsContext";
+import { SOON_LINE } from "@/content/story";
 import { routes } from "@/lib/routes";
 import { allItems } from "@/lib/reviewItems";
 import { renderScreen } from "@/test-utils/screens";
@@ -182,4 +183,19 @@ test("the album tile shows how many stickers the stars have earned", async () =>
   // 27 stars: two stickers at 12 stars each.
   await screen.findByText("٢٧");
   expect(screen.getByTestId("album-button")).toHaveTextContent("٢");
+});
+
+test("the subjects are places on the map of Yemen; Socotra is still to come", async () => {
+  await seed(0);
+  renderHome();
+  await screen.findByTestId("book-arabic-1");
+  // Reading in Mukalla, counting in Mocha: each place shows its book's title.
+  expect(screen.getByTestId("book-arabic-1")).toHaveTextContent(/الْمُكَلَّا/);
+  expect(screen.getByTestId("book-math-1")).toHaveTextContent(/الْمُخَا/);
+  // Socotra is on the map but not open yet: tapping it, Hudhud says it comes soon.
+  const socotra = screen.getByTestId("place-socotra");
+  expect(socotra.props.accessibilityState).toMatchObject({ disabled: true });
+  fireEvent.press(socotra);
+  expect(Speech.speak).toHaveBeenLastCalledWith(SOON_LINE, expect.anything());
+  expect(router.push).not.toHaveBeenCalled();
 });

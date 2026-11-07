@@ -1,5 +1,6 @@
 /**
- * Home: one big play button that opens the next lesson, the subjects as picture islands,
+ * Home: one big play button that opens the next lesson, the subjects as places on the map of
+ * Yemen (Hudhud's journey: Mukalla for reading, Mocha for counting, Socotra still to come),
  * today's bowl (Rasha's, filled by the day's lessons), the sticker album and, when due,
  * today's review. Hudhud speaks;
  * nothing here needs reading. Grade, language and sound live in the parents' corner.
@@ -12,15 +13,16 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { ScreenBackground } from "@/components/ScreenBackground";
 import { StarBadge } from "@/components/StarBadge";
 import { UiText } from "@/components/UiText";
-import { EmblemDisc } from "@/components/world/Emblem";
 import { Guide, Pulse } from "@/components/world/Guide";
 import { AlbumArt } from "@/components/world/AlbumArt";
 import { Icon } from "@/components/world/Icon";
 import { BowlGoal } from "@/components/world/Bowl";
 import { Skyline } from "@/components/world/Skyline";
 import { StickerArt } from "@/components/world/StickerArt";
+import { YemenMap, type MapPin } from "@/components/world/YemenMap";
 import { books, unitLessonIds, type Book } from "@/content";
-import { SUBJECT_DONE, bowlLine, chapterFor } from "@/content/story";
+import { SOON_LINE, SUBJECT_DONE, bowlLine, chapterFor } from "@/content/story";
+import { useLine } from "@/components/Gloss";
 import { useLanguage } from "@/context/LanguageContext";
 import { useProgress } from "@/context/ProgressContext";
 import { useSettings } from "@/context/SettingsContext";
@@ -32,7 +34,7 @@ import { nextLesson } from "@/lib/nextLesson";
 import { routes } from "@/lib/routes";
 import { speak } from "@/lib/speech";
 import { STICKERS, stickersEarned } from "@/lib/stickers";
-import { readableFill, shadow, yemen } from "@/theme/tokens";
+import { readableFill, yemen } from "@/theme/tokens";
 
 const GREETING = "بِسْمِ اللهِ! هَيَّا نَتَعَلَّمُ";
 /** Before the story has been told: the play button starts it. */
@@ -51,6 +53,7 @@ export default function HomeScreen() {
   const { t, digits, language, loaded: languageLoaded } = useLanguage();
   const { progress, getDueItemIds, getUnitProgress } = useProgress();
   const { settings, loaded, update } = useSettings();
+  const line = useLine();
   const pad = useScreenPadding();
   // The subject the child chose in the story or on an island; Arabic until then.
   const current =
@@ -166,43 +169,48 @@ export default function HomeScreen() {
           </Pulse>
         ) : null}
 
-        <View
-          style={[styles.islands, { flexDirection: language === "en" ? "row" : "row-reverse" }]}
-        >
-          {islands.map(({ book, share }) => (
-            <Pressable
-              key={book.id}
-              testID={`book-${book.id}`}
-              accessibilityRole="button"
-              accessibilityLabel={`${t(book.title)}، ${t(book.subtitle)}`}
-              accessibilityState={{ selected: !story && book.id === current?.id }}
-              // Choosing an island makes it the subject the play button continues in.
-              onPress={tap(() => {
-                update({ bookId: book.id });
-                // The first time the child helps with this job, Hudhud tells it first.
-                const job = chapterFor(book.subject);
-                router.push(
-                  job && !settings.chaptersSeen.includes(job)
-                    ? routes.intro(job)
-                    : routes.book(book.id),
-                );
-              })}
-              style={({ pressed }) => [
-                styles.island,
-                { backgroundColor: readableFill(book.color) },
-                !story && book.id === current?.id && styles.islandOn,
-                pressed && styles.pressed,
-              ]}
-            >
-              <EmblemDisc id={book.emblem} size={68} />
-              <View style={styles.islandTrack}>
-                <View style={[styles.islandFill, { width: `${Math.round(share * 100)}%` }]} />
-              </View>
-              <UiText style={styles.islandCaption} numberOfLines={1}>
-                {book.title}
-              </UiText>
-            </Pressable>
-          ))}
+        {/* The subjects are places on Hudhud's map; the chosen one is ringed in gold. */}
+        <View style={styles.map}>
+          <YemenMap
+            bird={false}
+            pins={[
+              ...islands.flatMap(({ book, share }): MapPin[] => {
+                const thread = chapterFor(book.subject);
+                if (!thread) return [];
+                return [
+                  {
+                    place: thread,
+                    testID: `book-${book.id}`,
+                    accessibilityLabel: `${t(book.title)}، ${t(book.subtitle)}`,
+                    selected: !story && book.id === current?.id,
+                    share,
+                    caption: (
+                      <UiText style={styles.placeCaption} numberOfLines={1}>
+                        {book.title}
+                      </UiText>
+                    ),
+                    // Choosing a place makes it the subject the play button continues in.
+                    onPress: () => {
+                      update({ bookId: book.id });
+                      // The first time the child helps there, Hudhud tells it first.
+                      router.push(
+                        !settings.chaptersSeen.includes(thread)
+                          ? routes.intro(thread)
+                          : routes.book(book.id),
+                      );
+                    },
+                  },
+                ];
+              }),
+              // Still being made: tapping it, Hudhud says so.
+              {
+                place: "socotra",
+                testID: "place-socotra",
+                accessibilityLabel: line(SOON_LINE),
+                onPress: () => speak(SOON_LINE),
+              },
+            ]}
+          />
         </View>
 
         <View style={[styles.tiles, { flexDirection: language === "en" ? "row" : "row-reverse" }]}>
@@ -301,29 +309,8 @@ const styles = StyleSheet.create({
   },
   playSubjectText: { color: "#FFFFFF", fontSize: 22, fontWeight: "900", lineHeight: 30 },
   pressed: { opacity: 0.88, transform: [{ scale: 0.96 }] },
-  islands: { width: "100%", paddingHorizontal: 16, gap: 16, marginTop: 6 },
-  island: {
-    flex: 1,
-    minHeight: 136,
-    borderRadius: 28,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-    ...shadow.card,
-  },
-  islandOn: { borderWidth: 5, borderColor: yemen.gold },
-  islandTrack: {
-    width: "70%",
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: "rgba(255,255,255,0.3)",
-    overflow: "hidden",
-    flexDirection: "row-reverse",
-  },
-  islandFill: { height: 10, borderRadius: 5, backgroundColor: "#F4C14B", minWidth: 10 },
-  islandCaption: { fontSize: 13, fontWeight: "700", color: "#FFFFFF" },
+  map: { width: "100%", height: 280, paddingHorizontal: 16, marginTop: 6 },
+  placeCaption: { fontSize: 11, fontWeight: "700", color: "#FFFFFF", lineHeight: 16 },
   tiles: { width: "100%", paddingHorizontal: 16, gap: 14 },
   tile: {
     flex: 1,

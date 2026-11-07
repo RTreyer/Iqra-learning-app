@@ -535,6 +535,8 @@ export const EN_LINES: Record<string, string> = {
   "ج: جَارُ الْمَسْجِدِ": "ج: The mosque's neighbour",
   "جبران  ،  مسجد  ،  يحج  ،  تاج": "Jubran, mosque, he goes on Hajj, crown",
   "جَارُ الْمَسْجِدِ": "The mosque's neighbour",
+  "جَزِيرَةُ سُقُطْرَى! سَأَطِيرُ إِلَيْهَا قَرِيبًا.":
+    "The island of Socotra! I will fly there soon.",
   "جَمَعْنَا الْأَكْيَاسَ، وَكُلُّهَا الْآنَ فِي الْمَخْزَنِ.":
     "We added up the sacks, and now they are all in the storehouse.",
   "جَمَعْنَا كُلَّ الْأَكْيَاسِ!": "We added up all the sacks!",
@@ -626,6 +628,7 @@ export const EN_LINES: Record<string, string> = {
   "سَلَّةٌ فِيهَا كُرَاتٌ، وَسَلَّةٌ فَارِغَةٌ. كَمْ كُرَةً فِي السَّلَّتَيْنِ؟":
     "A basket with balls in it, and an empty basket. How many balls are in the two baskets?",
   سُرُورٌ: "Joy",
+  سُقُطْرَى: "Socotra",
   سُوسٌ: "Tooth decay",
   سِتَّة: "Six",
   "سِتَّةَ عَشَر": "Sixteen",
@@ -736,6 +739,7 @@ export const EN_LINES: Record<string, string> = {
   "قَرَأْنَا رِسَالَةَ رَشَا: اِسْقِ الطُّيُورَ! شُكْرًا لَكَ!":
     "We read Rasha's message: Give the birds water! Thank you!",
   "قَرَأْنَا!": "We read it!",
+  قَرِيبًا: "coming soon",
   قَصْرٌ: "Palace",
   "قَفَزَتْ أَرَانِبُ بَعِيدًا. كَمِ الْبَاقِي؟": "Some rabbits hopped away. How many are left?",
   "قَهْوَةُ الْمُخَا": "Mocha coffee",

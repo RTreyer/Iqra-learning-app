@@ -19,6 +19,7 @@
  * voice, fully vocalised, simple Fusha. Native speaker review pending (docs/CONTENT_REVIEW.md).
  */
 
+import type { StickerId } from "../lib/stickers.ts";
 import type { GoalKind } from "./types";
 
 export type StorySceneId =
@@ -168,16 +169,22 @@ export function chapterFor(subject: string | undefined): Thread | null {
 /** A thread of the story: reading (Arabic) or counting (maths). */
 export type Thread = "arabic" | "math";
 
+/** The places on the map: one per thread, and places still being made. */
+export type PlaceId = Thread | "socotra";
+
 /** A place on the map of Yemen (components/world/YemenMap). */
 export type MapPlace = {
   name: string;
-  /** Who waits there for Hudhud. */
+  /** Who waits there for Hudhud, or that the place is still to come. */
   what: string;
   lon: number;
   lat: number;
-  /** The picture on its badge (components/pictures). */
+  /** The picture on its badge: a drawing of components/pictures, or a sticker (lib/stickers). */
   picture: string;
+  sticker?: StickerId;
   color: string;
+  /** Still being made: shown on the map, not yet open. */
+  soon?: boolean;
 };
 
 /** Hudhud's home: his roof in Sana'a, with Rasha's bowl. */
@@ -186,9 +193,10 @@ export const HOME_PLACE = { name: "صَنْعَاءُ", lon: 44.2, lat: 15.35 };
 /**
  * Where Hudhud can fly at the end of chapter 1, one place per thread: Mukalla on the Arabian
  * Sea, where he works as the postman and asks about Rasha at every door (reading), and Mocha,
- * the old coffee port on the Red Sea, where the coffee trader needs him (counting).
+ * the old coffee port on the Red Sea, where the coffee trader needs him (counting). Socotra is
+ * on the map too, marked as coming soon. On the home screen the same map is the subject choice.
  */
-export const MAP_PLACES: Record<Thread, MapPlace> = {
+export const MAP_PLACES: Record<PlaceId, MapPlace> = {
   arabic: {
     name: "الْمُكَلَّا",
     what: "سَاعِي الْبَرِيدِ",
@@ -205,7 +213,22 @@ export const MAP_PLACES: Record<Thread, MapPlace> = {
     picture: "🫘",
     color: "#6D3FC4",
   },
+  // The island of the dragon blood trees: a place for a subject still to come.
+  socotra: {
+    name: "سُقُطْرَى",
+    what: "قَرِيبًا",
+    lon: 53.8,
+    lat: 12.5,
+    picture: "🌳",
+    sticker: "dragon_tree",
+    // Grey, still to come; dark enough for white writing (contrast 4.5 : 1 and more).
+    color: "#635C53",
+    soon: true,
+  },
 };
+
+/** What Hudhud says when Socotra, still to come, is tapped on the map. */
+export const SOON_LINE = "جَزِيرَةُ سُقُطْرَى! سَأَطِيرُ إِلَيْهَا قَرِيبًا.";
 
 /** Rasha's message in the bowl, read at the end of the Arabic path, and her name. */
 export const MESSAGE = { words: ["اِسْقِ", "الطُّيُورَ"], name: "رَشَا" };
