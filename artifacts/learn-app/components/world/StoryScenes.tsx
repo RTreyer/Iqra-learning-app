@@ -297,12 +297,18 @@ function Girl() {
   const tilt = useOnce(600, 1800);
   const pour = useOnce(2000, 2300, Easing.linear);
   const flow = useSwing(180, 2300);
-  const peek = useOnce(900, 3400, Easing.out(Easing.back(1.6)));
+  const peek = useOnce(1100, 3400, Easing.out(Easing.quad));
   // She walks in (bobbing with her steps), then stands to pour.
   const [arrived, setArrived] = useState(false);
+  // Hudhud walks up to the bowl, step by step, and stares: water!
+  const [hudhud, setHudhud] = useState<"away" | "walk" | "wonder">("away");
   useEffect(() => {
-    const stop = setTimeout(() => setArrived(true), 1700);
-    return () => clearTimeout(stop);
+    const timers = [
+      setTimeout(() => setArrived(true), 1700),
+      setTimeout(() => setHudhud("walk"), 3400),
+      setTimeout(() => setHudhud("wonder"), 4500),
+    ];
+    return () => timers.forEach(clearTimeout);
   }, []);
   return (
     <View style={styles.scene}>
@@ -350,7 +356,12 @@ function Girl() {
           },
         ]}
       >
-        <Hudhud size={84} mirrored={false} hop={false} />
+        <Hudhud
+          size={84}
+          hop={false}
+          walk={hudhud === "walk"}
+          pose={hudhud === "wonder" ? "wonder" : "stand"}
+        />
       </Animated.View>
     </View>
   );
@@ -595,6 +606,13 @@ function Gone() {
   // Once night has fallen, a tear runs down, again and again.
   const tear = useLoop(1800, 3400);
   const leaf = useOnce(4000, 900, Easing.inOut(Easing.sin));
+  // He paces along the wall, step by step, then turns back to look at her door.
+  const pace = useOnce(1600, 300, Easing.linear);
+  const [walking, setWalking] = useState(true);
+  useEffect(() => {
+    const t = setTimeout(() => setWalking(false), 1900);
+    return () => clearTimeout(t);
+  }, []);
   return (
     <View style={styles.scene}>
       <Rooftop dusk />
@@ -609,15 +627,16 @@ function Gone() {
           styles.drinker,
           {
             transform: [
+              { translateX: lerp(pace, 0, 44) },
               { translateY: lerp(dusk, 0, 10) },
-              { rotate: at(look, [0, 1], ["-4deg", "4deg"]) },
+              { rotate: at(look, [0, 1], ["-3deg", "3deg"]) },
             ],
           },
         ]}
       >
         {/* Waiting, looking about; as the night comes he gives up and hangs his head. */}
         <Animated.View style={{ opacity: at(dusk, [0, 0.4, 0.6], [1, 1, 0]) }}>
-          <Hudhud size={86} hop={false} />
+          <Hudhud size={86} hop={false} walk={walking} mirrored={walking} />
         </Animated.View>
         <Animated.View
           style={[StyleSheet.absoluteFill, { opacity: at(dusk, [0, 0.4, 0.6], [0, 0, 1]) }]}
@@ -670,6 +689,12 @@ function Inscription() {
   // He pulls the note out from under the bowl once; then wonders.
   const pull = useOnce(1500, 900);
   const puzzle = useSwing(700, 2400);
+  // Out from under the bowl comes a note: he stares at it, astonished.
+  const [stare, setStare] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setStare(true), 2400);
+    return () => clearTimeout(t);
+  }, []);
   const out = {
     transform: [{ translateY: lerp(pull, 0, 124) }, { translateX: lerp(pull, 0, 24) }],
   };
@@ -711,7 +736,7 @@ function Inscription() {
           >
             <Picture emoji="❓" size={30} />
           </Animated.View>
-          <Hudhud size={84} hop={false} />
+          <Hudhud size={84} hop={false} pose={stare ? "wonder" : "stand"} />
         </Animated.View>
       </View>
     </View>
@@ -987,12 +1012,12 @@ function Post() {
       ))}
       <View style={styles.postBird}>
         <Animated.View style={{ opacity: at(letters, [0, 0.95, 1], [1, 1, 0]) }}>
-          <Hudhud size={88} bag={1} hop={false} />
+          <Hudhud size={88} bag={1} hop={false} pose="wonder" />
         </Animated.View>
         <Animated.View
           style={[StyleSheet.absoluteFill, { opacity: at(letters, [0, 0.95, 1], [0, 0, 1]) }]}
         >
-          <Hudhud size={88} bag={3} hop={false} />
+          <Hudhud size={88} bag={3} pose="cheer" />
         </Animated.View>
       </View>
     </View>
@@ -1038,6 +1063,12 @@ function Terraces({ village = false }: { village?: boolean }) {
  */
 function Trader() {
   const land = useOnce(1600, 500, Easing.out(Easing.quad));
+  // He beats his wings as he comes down, folds them as he lands.
+  const [landed, setLanded] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setLanded(true), 2100);
+    return () => clearTimeout(t);
+  }, []);
   const wonder = useSwing(800, 1600);
   return (
     <View style={styles.scene}>
@@ -1083,7 +1114,7 @@ function Trader() {
           },
         ]}
       >
-        <Hudhud size={80} hop={false} />
+        <Hudhud size={80} hop={false} flap={!landed} />
       </Animated.View>
     </View>
   );
