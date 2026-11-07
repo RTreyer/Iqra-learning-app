@@ -75,6 +75,47 @@ function useSwing(duration: number, delay = 0) {
   return v;
 }
 
+/**
+ * A value that changes at set times after the scene starts: a little screenplay for what
+ * Hudhud does (walk, stop, stare, cheer). The steps are constants, so it runs once.
+ */
+function useTimeline<T>(first: T, steps: readonly (readonly [number, T])[]): T {
+  const [value, setValue] = useState(first);
+  useEffect(() => {
+    const timers = steps.map(([ms, v]) => setTimeout(() => setValue(v), ms));
+    return () => timers.forEach(clearTimeout);
+  }, [steps]);
+  return value;
+}
+
+type Act = "sleep" | "fly" | "walk" | "stand" | "wonder" | "cheer";
+/** He wakes, stares at the sunrise, then cheers. */
+const ROOF_ACTS = [
+  [2900, "wonder"],
+  [4000, "cheer"],
+] as const;
+/** Tired, he walks over to the empty jar, then stands there. */
+const THIRST_ACTS = [[2300, "stand"]] as const;
+/** Drinking, he looks up in wonder as the sparrow and the dove come, then drinks on. */
+const DRINK_ACTS = [
+  [2000, "wonder"],
+  [3500, "stand"],
+] as const;
+/** He takes a few steps towards Rasha. */
+const WHY_ACTS = [[1400, "stand"]] as const;
+/** He lands, walks up to the trader, and stares at the sacks he cannot count. */
+const TRADER_ACTS = [
+  [2100, "walk"],
+  [2800, "wonder"],
+] as const;
+/** He walks up to Rasha's bowl as the girl fills it. */
+const NEWGIRL_ACTS = [
+  [900, "walk"],
+  [2200, "stand"],
+] as const;
+/** At a station he walks in, then stares at the thing there to read or count. */
+const STATION_ACTS = [[1500, "wonder"]] as const;
+
 /** Hudhud's thought bubbles in the resolve scene: left, top and size, from his head upwards. */
 const THOUGHT_DOTS: [number, number, number][] = [
   [212, 150, 10],
@@ -183,6 +224,7 @@ function Roof() {
   const sun = useOnce(3600, 200, Easing.out(Easing.cubic));
   const rays = useSwing(2400, 1500);
   const wake = useOnce(700, 2200, Easing.out(Easing.back(2)));
+  const act = useTimeline<Act>("sleep", ROOF_ACTS);
   return (
     <View style={styles.scene}>
       <View style={[styles.fill, { backgroundColor: "#F9D9A6" }]} />
@@ -209,7 +251,7 @@ function Roof() {
           { transform: [{ translateY: lerp(wake, 10, 0) }, { scale: lerp(wake, 0.92, 1) }] },
         ]}
       >
-        <Hudhud size={112} pose="cheer" />
+        <Hudhud size={112} pose={act === "wonder" ? "wonder" : "cheer"} hop={act === "cheer"} />
       </Animated.View>
     </View>
   );
@@ -245,6 +287,8 @@ function HeatWave({ clock, left }: { clock: Animated.Value; left: `${number}%` }
 function Thirst() {
   const burn = useSwing(1300);
   const tired = useSwing(1500, 300);
+  const act = useTimeline<Act>("walk", THIRST_ACTS);
+  const trudge = useOnce(2000, 300, Easing.linear);
   const wave1 = useLoop(2400, 0);
   const wave2 = useLoop(2400, 800);
   const wave3 = useLoop(2400, 1600);
@@ -281,13 +325,14 @@ function Thirst() {
           styles.thirstyBird,
           {
             transform: [
+              { translateX: lerp(trudge, 70, 0) },
               { translateY: lerp(tired, 0, 5) },
               { rotate: at(tired, [0, 1], ["2deg", "10deg"]) },
             ],
           },
         ]}
       >
-        <Hudhud size={96} hop={false} />
+        <Hudhud size={96} hop={false} walk={act === "walk"} />
       </Animated.View>
       <Animated.View
         style={[
@@ -390,6 +435,7 @@ function Drink() {
   const sparrow = useOnce(1300, 1100, Easing.out(Easing.quad));
   const dove = useOnce(1400, 2100, Easing.out(Easing.quad));
   const peck = useSwing(420, 2400);
+  const act = useTimeline<Act>("stand", DRINK_ACTS);
   return (
     <View style={styles.scene}>
       <Rooftop />
@@ -402,15 +448,17 @@ function Drink() {
       <Animated.View
         style={[
           styles.drinker,
-          {
-            transform: [
-              { translateY: lerp(sip, 0, 8) },
-              { rotate: at(sip, [0, 1], ["0deg", "-10deg"]) },
-            ],
-          },
+          act === "wonder"
+            ? null
+            : {
+                transform: [
+                  { translateY: lerp(sip, 0, 8) },
+                  { rotate: at(sip, [0, 1], ["0deg", "-10deg"]) },
+                ],
+              },
         ]}
       >
-        <Hudhud size={86} hop={false} />
+        <Hudhud size={86} hop={false} pose={act === "wonder" ? "wonder" : "stand"} />
       </Animated.View>
       <Animated.View
         style={[
@@ -446,6 +494,8 @@ function Drink() {
 /** "You don't know us!" "But you are thirsty." A small heart rises between them. */
 function Why() {
   const heart = useSwing(1200);
+  const act = useTimeline<Act>("walk", WHY_ACTS);
+  const near = useOnce(1100, 300, Easing.linear);
   return (
     <View style={styles.scene}>
       <Rooftop />
@@ -466,9 +516,11 @@ function Why() {
       >
         <Picture emoji="❤" size={40} />
       </Animated.View>
-      <View style={[styles.drinker, styles.facing]}>
-        <Hudhud size={90} hop={false} />
-      </View>
+      <Animated.View
+        style={[styles.drinker, styles.facing, { transform: [{ translateX: lerp(near, 30, 0) }] }]}
+      >
+        <Hudhud size={90} hop={false} walk={act === "walk"} />
+      </Animated.View>
     </View>
   );
 }
@@ -1080,11 +1132,8 @@ function Terraces({ village = false }: { village?: boolean }) {
 function Trader() {
   const land = useOnce(1600, 500, Easing.out(Easing.quad));
   // He beats his wings as he comes down, folds them as he lands.
-  const [landed, setLanded] = useState(false);
-  useEffect(() => {
-    const t = setTimeout(() => setLanded(true), 2100);
-    return () => clearTimeout(t);
-  }, []);
+  const act = useTimeline<Act>("fly", TRADER_ACTS);
+  const stroll = useOnce(700, 2100, Easing.linear);
   const wonder = useSwing(800, 1600);
   return (
     <View style={styles.scene}>
@@ -1130,7 +1179,15 @@ function Trader() {
           },
         ]}
       >
-        <Hudhud size={80} hop={false} flap={!landed} />
+        <Animated.View style={{ transform: [{ translateX: lerp(stroll, 0, -14) }] }}>
+          <Hudhud
+            size={80}
+            hop={false}
+            flap={act === "fly"}
+            walk={act === "walk"}
+            pose={act === "wonder" ? "wonder" : "stand"}
+          />
+        </Animated.View>
       </Animated.View>
     </View>
   );
@@ -1249,6 +1306,8 @@ function NewGirl() {
   const pour = useOnce(1800, 1400, Easing.linear);
   const flow = useSwing(180, 1400);
   const sip = useSwing(500, 3300);
+  const act = useTimeline<Act>("stand", NEWGIRL_ACTS);
+  const come = useOnce(1300, 900, Easing.linear);
   return (
     <View style={styles.scene}>
       <Rooftop />
@@ -1281,13 +1340,14 @@ function NewGirl() {
           styles.newGirlBird,
           {
             transform: [
+              { translateX: lerp(come, 110, 0) },
               { translateY: lerp(sip, 0, 8) },
               { rotate: at(sip, [0, 1], ["0deg", "-10deg"]) },
             ],
           },
         ]}
       >
-        <Hudhud size={86} hop={false} />
+        <Hudhud size={86} hop={false} walk={act === "walk"} />
       </Animated.View>
     </View>
   );
@@ -1454,11 +1514,14 @@ function PlaceGround({ place }: { place: StationPlace }) {
  * A stop on Hudhud's journey (STATIONS): the place, the person he meets, and the thing to read
  * or count, which glows gently, with Hudhud beside it.
  */
-function Station({ unit }: { unit?: string }) {
+function Station({ unit, line }: { unit?: string; line?: string }) {
   const station = STATIONS[unit ?? ""];
   const glow = useSwing(1000);
   const bob = useSwing(700);
+  const act = useTimeline<Act>("walk", STATION_ACTS);
+  const enter = useOnce(1300, 200, Easing.linear);
   if (!station) return <View style={styles.scene} />;
+  const asking = line === station.ask;
   return (
     <View style={styles.scene}>
       <View style={[styles.fill, { backgroundColor: PLACE_SKY[station.place] }]} />
@@ -1470,16 +1533,30 @@ function Station({ unit }: { unit?: string }) {
         <View style={styles.thingHalo} />
         <Picture emoji={station.thing} size={52} />
       </Animated.View>
+      {/* Where he is: he walks in and stares at it; what to do: he cheers, ready. */}
       <Animated.View
-        style={[styles.stationBird, { transform: [{ translateY: lerp(bob, 0, -6) }] }]}
+        style={[
+          styles.stationBird,
+          asking
+            ? { transform: [{ translateY: lerp(bob, 0, -6) }] }
+            : { transform: [{ translateX: lerp(enter, 100, 0) }] },
+        ]}
       >
-        <Hudhud size={92} hop={false} />
+        <Hudhud
+          size={92}
+          hop={asking}
+          walk={!asking && act === "walk"}
+          pose={asking ? "cheer" : act === "wonder" ? "wonder" : "stand"}
+        />
       </Animated.View>
     </View>
   );
 }
 
-const SCENES: Record<StoryScene["id"], (props: { unit?: string }) => React.ReactElement> = {
+const SCENES: Record<
+  StoryScene["id"],
+  (props: { unit?: string; line?: string }) => React.ReactElement
+> = {
   roof: Roof,
   thirst: Thirst,
   girl: Girl,
@@ -1524,10 +1601,10 @@ function Camera({ children }: { children: React.ReactNode }) {
 
 export function StoryPicture({ scene }: { scene: StoryScene }) {
   const Scene = SCENES[scene.id];
-  if (scene.id === "map") return <Scene unit={scene.unit} />;
+  if (scene.id === "map") return <Scene unit={scene.unit} line={scene.line} />;
   return (
     <Camera>
-      <Scene unit={scene.unit} />
+      <Scene unit={scene.unit} line={scene.line} />
     </Camera>
   );
 }
