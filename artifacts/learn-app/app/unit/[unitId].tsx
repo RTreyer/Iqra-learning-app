@@ -27,7 +27,8 @@ import { readableFill, touchTarget, yemen } from "@/theme/tokens";
 
 export default function UnitScreen() {
   const unitId = firstParam(useLocalSearchParams<{ unitId?: string | string[] }>().unitId);
-  const { progress, getLessonProgress, getUnitProgress } = useProgress();
+  const { progress, hydrated, loadSettled, getLessonProgress, getUnitProgress } = useProgress();
+  const progressReady = hydrated || loadSettled;
   const pad = useScreenPadding();
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
   // Open the path where Hudhud stands, with some of the way behind him in view.
@@ -122,8 +123,10 @@ export default function UnitScreen() {
           stops={stops}
           color={unit.color}
           onPress={(lessonId) => router.push(routes.lesson(lessonId))}
-          guide={unit.theme}
+          // Hudhud appears once the stored progress is known, so he flies to the right stop.
+          guide={progressReady ? unit.theme : undefined}
           onGuideY={scrollToGuide}
+          pathKey={unit.id}
         />
       </ScrollView>
     </ScreenBackground>

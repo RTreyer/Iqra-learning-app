@@ -5,6 +5,7 @@ import * as haptics from "@/lib/haptics";
 import { itemIdFor } from "@/lib/reviewItems";
 import type { Score } from "@/lib/scoring";
 import type { ChoiceState } from "./ChoiceCard";
+import { useGuide } from "@/components/world/LessonGuide";
 import { useLatest } from "./useLatest";
 
 /** Legacy LetterPick delay between the first tap and the next round. */
@@ -48,6 +49,7 @@ export function useQuiz({
   const tried = useRef(false);
   const finished = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const guide = useGuide();
   // Timers call the latest callbacks, never a closure from the render that scheduled them.
   const callbacks = useLatest({ onComplete, onRoundResult });
 
@@ -89,6 +91,7 @@ export function useQuiz({
         const itemId = itemIdFor(lesson, roundIndex);
         if (itemId !== null) callbacks.current.onRoundResult?.(itemId, isCorrect);
       }
+      guide.react(isCorrect ? "right" : "wrong");
       if (!isCorrect && retry) {
         haptics.error();
         setWrong([...wrong, displayIndex]);
@@ -104,7 +107,7 @@ export function useQuiz({
         timer.current = setTimeout(() => advance(count), autoAdvanceMs);
       return true;
     },
-    [correctCount, wrong, lesson, roundIndex, callbacks, autoAdvanceMs, advance, retry],
+    [correctCount, wrong, lesson, roundIndex, callbacks, autoAdvanceMs, advance, retry, guide],
   );
 
   const next = useCallback(() => {

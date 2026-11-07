@@ -7,7 +7,15 @@
  */
 
 import React, { useEffect, useState } from "react";
-import { Pressable, StyleSheet, Text, View, type LayoutChangeEvent } from "react-native";
+import {
+  Animated,
+  Easing,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  type LayoutChangeEvent,
+} from "react-native";
 import { Circle, Path, Svg } from "react-native-svg";
 
 import * as haptics from "@/lib/haptics";
@@ -60,9 +68,21 @@ type Props = {
   guide?: string;
   /** Where the stop to play now sits (px from the top of the path), to scroll it into view. */
   onGuideY?: (y: number) => void;
+  /** Names this path (a book or unit id), so Hudhud flies on from where he last stood on it. */
+  pathKey?: string;
 };
 
-export function PathMap({ stops, color, onPress, guide, onGuideY }: Props) {
+/** Where Hudhud last stood on each path this session (stop index), to fly on from there. */
+const lastStop = new Map<string, number>();
+/** How long Hudhud's flight from one stop to the next takes. */
+const FLIGHT_MS = 1200;
+
+/** Tests only: forget where Hudhud stood. */
+export function resetPathMemory(): void {
+  lastStop.clear();
+}
+
+export function PathMap({ stops, color, onPress, guide, onGuideY, pathKey }: Props) {
   const [measured, setMeasured] = useState(0);
   const width = measured || FALLBACK_WIDTH;
   const fill = readableFill(color);
@@ -77,6 +97,26 @@ export function PathMap({ stops, color, onPress, guide, onGuideY }: Props) {
     y: i * ROW + 54 + (guideAt >= 0 && i >= guideAt ? GUIDE_ROOM : 0),
   });
   const guideY = guideAt >= 0 ? centre(guideAt).y : null;
+  // Hudhud goes through the map: he flies in from where he stood last time on this path (or
+  // from the stop before, on a first visit) and lands beside the stop to play now; when that
+  // stop changes while the path is open, he flies on from the old one.
+  const [flight, setFlight] = useState<{ to: number; from: number | null } | null>(null);
+  if (guideAt >= 0 && flight?.to !== guideAt) {
+    const last = flight ? flight.to : pathKey !== undefined ? lastStop.get(pathKey) : undefined;
+    const from =
+      last !== undefined
+        ? last !== guideAt && last < stops.length
+          ? last
+          : null
+        : guideAt > 0
+          ? guideAt - 1
+          : null;
+    setFlight({ to: guideAt, from });
+  }
+  const flyFrom = flight?.to === guideAt ? flight.from : null;
+  useEffect(() => {
+    if (pathKey !== undefined && guideAt >= 0) lastStop.set(pathKey, guideAt);
+  }, [pathKey, guideAt]);
   useEffect(() => {
     if (guideY !== null) onGuideY?.(guideY);
   }, [guideY, onGuideY]);
@@ -172,6 +212,7 @@ export function PathMap({ stops, color, onPress, guide, onGuideY }: Props) {
             </View>
             {guided ? (
               <PathGuide
+                key={`guide-${guideAt}`}
                 text={guide}
                 // Same side as the stop's label: the label then moves below Hudhud.
                 side={onRight ? "left" : "right"}
@@ -180,6 +221,11 @@ export function PathMap({ stops, color, onPress, guide, onGuideY }: Props) {
                 size={size}
                 width={width}
                 height={height}
+                from={
+                  flyFrom !== null
+                    ? { dx: centre(flyFrom).x - x, dy: centre(flyFrom).y - y }
+                    : undefined
+                }
               />
             ) : null}
             <View
@@ -232,6 +278,7 @@ function PathGuide({
   size,
   width,
   height,
+  from,
 }: {
   text: string;
   side: "left" | "right";
@@ -240,11 +287,45 @@ function PathGuide({
   size: number;
   width: number;
   height: number;
+  /** He flies in from this offset (another stop) before he lands and speaks. */
+  from?: { dx: number; dy: number };
 }) {
+  const [flight] = useState(() => new Animated.Value(from ? 0 : 1));
+  const [flying, setFlying] = useState(from !== undefined);
+  const [start] = useState(from);
   useEffect(() => {
-    const timer = setTimeout(() => speak(text), 300);
+    if (!start) return;
+    const anim = Animated.timing(flight, {
+      toValue: 1,
+      duration: FLIGHT_MS,
+      easing: Easing.inOut(Easing.quad),
+      useNativeDriver: true,
+    });
+    anim.start(() => setFlying(false));
+    return () => anim.stop();
+  }, [flight, start]);
+  useEffect(() => {
+    // He speaks once he has landed.
+    const timer = setTimeout(() => speak(text), (start ? FLIGHT_MS : 0) + 300);
     return () => clearTimeout(timer);
-  }, [text]);
+  }, [text, start]);
+  const travel = start
+    ? [
+        {
+          translateX: flight.interpolate({
+            inputRange: [0, 0.5, 1],
+            outputRange: [start.dx, start.dx * 0.45, 0],
+          }),
+        },
+        {
+          // An arc: up over the path, then down beside the stop.
+          translateY: flight.interpolate({
+            inputRange: [0, 0.5, 1],
+            outputRange: [start.dy, start.dy * 0.5 - 46, 0],
+          }),
+        },
+      ]
+    : [];
   const gap = 6;
   const edge = 8;
   const box =
@@ -275,15 +356,24 @@ function PathGuide({
         pressed && styles.guidePressed,
       ]}
     >
-      <View style={styles.bubble}>
+      <Animated.View
+        style={[
+          styles.bubble,
+          start
+            ? { opacity: flight.interpolate({ inputRange: [0, 0.8, 1], outputRange: [0, 0, 1] }) }
+            : null,
+        ]}
+      >
         <View style={{ flexShrink: 0 }}>
           <Icon name="speaker" size={18} color={yemen.clay} />
         </View>
         <Text style={styles.bubbleText}>{text}</Text>
         <View style={[styles.tail, side === "left" ? styles.tailLeft : styles.tailRight]} />
-      </View>
+      </Animated.View>
       {/* He looks at the stop: to the right when he stands on its left. */}
-      <Hudhud size={BIRD} mirrored={side === "left"} />
+      <Animated.View style={{ transform: travel }}>
+        <Hudhud size={BIRD} mirrored={side === "left"} flap={flying} hop={!flying} />
+      </Animated.View>
     </Pressable>
   );
 }

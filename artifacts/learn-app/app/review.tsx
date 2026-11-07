@@ -19,6 +19,10 @@ import { itemsLabel } from "@/lib/labels";
 import { routes } from "@/lib/routes";
 import { allItems, type ReviewItem } from "@/lib/reviewItems";
 import { colors, touchTarget } from "@/theme/tokens";
+import { GuideProvider, LessonGuide, useGuideState } from "@/components/world/LessonGuide";
+
+/** Hudhud's task in the review: today's letters, the ones that need practice again. */
+const REVIEW_LINE = "هَذِهِ رَسَائِلُ الْيَوْمِ! اِسْمَعْ، وَاخْتَرِ الصَّوَابَ.";
 
 type Session = {
   /** Items to play in order; a wrong first answer appends its item once (due ids are unique). */
@@ -58,9 +62,12 @@ function ReviewSession({ initialIds }: { initialIds: string[] }) {
     }));
   };
   const onAdvance = () => setSession((s) => ({ ...s, index: s.index + 1 }));
+  // Hudhud brings today's letters and reacts to the answers, as in the lessons.
+  const guide = useGuideState();
 
   return (
-    <>
+    <GuideProvider api={guide.api}>
+      {current ? <LessonGuide text={REVIEW_LINE} mood={guide.mood} /> : null}
       {total > 0 ? (
         <Text style={styles.count} numberOfLines={1}>
           {digits(itemsLabel(total, language))}
@@ -79,7 +86,7 @@ function ReviewSession({ initialIds }: { initialIds: string[] }) {
       ) : (
         <ReviewCompleteCard score={total > 0 ? { correct: session.correct, total } : undefined} />
       )}
-    </>
+    </GuideProvider>
   );
 }
 

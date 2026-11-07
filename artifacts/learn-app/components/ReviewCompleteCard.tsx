@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { goBackOr } from "@/components/BackButton";
 import { useLanguage } from "@/context/LanguageContext";
 import { UiText } from "@/components/UiText";
+import { Hudhud } from "@/components/world/Hudhud";
 import { routes } from "@/lib/routes";
 import { colors, radius, shadow, spacing, touchTarget } from "@/theme/tokens";
 
@@ -18,7 +19,7 @@ export function ReviewCompleteCard({ score }: Props) {
   const backLabel = score ? "تَابِعْ" : "العودة إلى الرئيسية";
   return (
     <View style={styles.card} testID={score ? "review-complete" : "review-empty"}>
-      <Text style={styles.emoji}>{score ? "🎉" : "🌙"}</Text>
+      <Hudhud size={110} pose={score ? "cheer" : "stand"} />
       <UiText style={styles.title}>
         {score
           ? "أَحْسَنْت! مُرَاجَعَة الْيَوْم مُكْتَمِلَة"
@@ -53,7 +54,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     ...shadow.card,
   },
-  emoji: { fontSize: 56 },
   title: { fontSize: 22, fontWeight: "900", color: colors.text, textAlign: "center" },
   score: { fontSize: 36, fontWeight: "900", color: colors.successText },
   button: {

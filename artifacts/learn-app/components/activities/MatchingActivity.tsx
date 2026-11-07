@@ -13,6 +13,7 @@ import { useOnce } from "./shared/useOnce";
 import { useShuffled } from "./shared/useShuffled";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import type { ActivityProps } from "./types";
+import { useGuide } from "@/components/world/LessonGuide";
 
 type State = {
   selectedLeft: number | null;
@@ -25,6 +26,7 @@ type State = {
 const INITIAL: State = { selectedLeft: null, matched: new Set(), missed: new Set() };
 
 function Matching({ lesson, color, attemptKey, onComplete }: ActivityProps<"matching">) {
+  const guide = useGuide();
   const { pairs } = lesson;
   const { language } = useLanguage();
   const [state, setState] = useState<State>(INITIAL);
@@ -46,14 +48,16 @@ function Matching({ lesson, color, attemptKey, onComplete }: ActivityProps<"matc
       if (left === null || state.matched.has(pairIdx)) return;
       if (left === pairIdx) {
         haptics.success();
+        guide.react("right");
         speak(PRAISE);
         setState((s) => ({ ...s, selectedLeft: null, matched: new Set(s.matched).add(pairIdx) }));
       } else {
         haptics.error();
+        guide.react("wrong");
         setState((s) => ({ ...s, selectedLeft: null, missed: new Set(s.missed).add(left) }));
       }
     },
-    [state],
+    [state, guide],
   );
 
   const allMatched = state.matched.size >= pairs.length;

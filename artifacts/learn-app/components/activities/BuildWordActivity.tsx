@@ -16,6 +16,7 @@ import { PROMPT_DELAY_MS, useBounce, useQuiz } from "./shared/useQuiz";
 import { useLatest } from "./shared/useLatest";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import type { ActivityProps } from "./types";
+import { useGuide } from "@/components/world/LessonGuide";
 
 /** From the last syllable loaded to the next round: the train whistles and leaves. */
 export const DEPART_MS = 2000;
@@ -82,6 +83,7 @@ type RoundProps = {
 };
 
 function TrainRound({ round, color, seed, onDone }: RoundProps) {
+  const guide = useGuide();
   const { word, syllables, given } = round;
   const sentence = isSentence(round);
   /** Wagons the child loads, in reading order; given wagons start full. */
@@ -127,6 +129,7 @@ function TrainRound({ round, color, seed, onDone }: RoundProps) {
         setMissed(true);
         setWrongTile(index);
         haptics.error();
+        guide.react("wrong");
         speak(spokenSyllable(expected));
         Animated.sequence(
           [1, -1, 1, 0].map((toValue) =>
@@ -157,7 +160,21 @@ function TrainRound({ round, color, seed, onDone }: RoundProps) {
         }).start();
       }, 500);
     },
-    [done, used, tiles, syllables, open, loaded, missed, word, shake, bounce, drive, latestDone],
+    [
+      done,
+      used,
+      tiles,
+      syllables,
+      open,
+      loaded,
+      missed,
+      word,
+      shake,
+      bounce,
+      drive,
+      latestDone,
+      guide,
+    ],
   );
 
   const trainX = drive.interpolate({ inputRange: [0, 1], outputRange: [0, -600] });

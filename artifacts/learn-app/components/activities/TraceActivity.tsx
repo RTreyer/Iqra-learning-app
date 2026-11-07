@@ -20,6 +20,7 @@ import { addPoint, startStroke, type DrawnStroke } from "./trace/path";
 import { decodeMask, validateOnGuide, validateTracing } from "./trace/validate";
 import { TRACE_GRID, traceGuides } from "@/content/generated/traceGuides";
 import type { ActivityProps } from "./types";
+import { useGuide } from "@/components/world/LessonGuide";
 
 const ERROR_VISIBLE_MS = 3000;
 /** Distance between the points of a demo line, in pixels. */
@@ -36,6 +37,7 @@ export function guideScale(guide: string): number {
 const PLATFORM_PAD = Platform.OS === "web" ? webPad : null;
 
 function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
+  const guide = useGuide();
   const { targets } = lesson;
   const { t } = useLanguage();
   const [targetIndex, setTargetIndex] = useState(0);
@@ -173,6 +175,7 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
       setError(result.msg);
       setPadError(true);
       haptics.warning();
+      guide.react("wrong");
       speak("حاول مرة أخرى");
       shake.setValue(0);
       Animated.sequence([
@@ -190,6 +193,7 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
     setError(null);
     setPadError(false);
     haptics.success();
+    guide.react("right");
     speak(PRAISE);
     advanceTimer.current = setTimeout(() => {
       if (targetIndex + 1 >= targets.length) {
@@ -211,6 +215,7 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
     targetIndex,
     targets.length,
     completeRef,
+    guide,
   ]);
 
   const translateX = shake.interpolate({ inputRange: [0, 1], outputRange: [0, 8] });

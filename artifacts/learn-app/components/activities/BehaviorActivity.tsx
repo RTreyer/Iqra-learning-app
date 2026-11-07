@@ -12,8 +12,10 @@ import { act } from "./shared/styles";
 import { useOnce } from "./shared/useOnce";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import type { ActivityProps } from "./types";
+import { useGuide } from "@/components/world/LessonGuide";
 
 function Behavior({ lesson, color, onComplete }: ActivityProps<"behavior">) {
+  const guide = useGuide();
   const { behaviors } = lesson;
   const { t } = useLanguage();
   /** index -> whether the single answer matched `isCorrect`. */
@@ -26,13 +28,15 @@ function Behavior({ lesson, color, onComplete }: ActivityProps<"behavior">) {
       setResults((prev) => (prev[index] !== undefined ? prev : { ...prev, [index]: right }));
       if (right) {
         haptics.success();
+        guide.react("right");
         speak(PRAISE);
       } else {
         haptics.error();
+        guide.react("wrong");
         speak("حاول مرة أخرى");
       }
     },
-    [results, behaviors],
+    [results, behaviors, guide],
   );
 
   const answered = Object.keys(results).length;

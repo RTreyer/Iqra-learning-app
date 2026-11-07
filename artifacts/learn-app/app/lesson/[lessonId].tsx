@@ -13,6 +13,7 @@ import { NotFoundCard } from "@/components/NotFoundCard";
 import { ScreenBackground } from "@/components/ScreenBackground";
 import { DemoPlayer } from "@/components/demo/DemoPlayer";
 import { HelpButton } from "@/components/HelpButton";
+import { GuideProvider, LessonGuide, useGuideState } from "@/components/world/LessonGuide";
 import { getLesson } from "@/content";
 import { demoIdFor } from "@/content/demos";
 import { instructionFor } from "@/content/instructions";
@@ -93,6 +94,8 @@ export default function LessonScreen() {
     found ? found.lesson.id : "",
   );
   const instruction = found ? instructionFor(found.lesson) : undefined;
+  // Hudhud tells the task above the activity and reacts to the child's answers.
+  const guide = useGuideState();
   const ready = useLessonIntro(lessonId, found?.lesson.title, instruction);
 
   // Worked example: shown on the first lesson of each activity type, and again on request.
@@ -152,47 +155,52 @@ export default function LessonScreen() {
           />
         )}
       </View>
-      <ScrollView
-        key={activityKey}
-        scrollEnabled={lesson.type !== "trace"}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-      >
-        {completed ? (
-          <LessonCompleteCard
-            stars={stars}
-            onRepeat={restartAttempt}
-            next={next}
-            backTo={routes.unit(unit.id)}
-            today={today}
-            sticker={sticker}
-          />
-        ) : (
-          <>
-            {showDemo ? (
-              <DemoPlayer
-                key={`${lessonId}-${replay?.run ?? 0}`}
-                id={demoIdFor(lesson)}
-                color={unit.color}
-                preface={replaying ? instruction : undefined}
-                onDone={finishDemo}
-              />
-            ) : null}
-            {showActivity ? (
-              <View style={showDemo ? styles.hidden : styles.activity}>
-                <ActivityHost
-                  lesson={lesson}
+      {completed ? null : (
+        <LessonGuide text={guide.line ?? instruction ?? lesson.subtitle} mood={guide.mood} />
+      )}
+      <GuideProvider api={guide.api}>
+        <ScrollView
+          key={activityKey}
+          scrollEnabled={lesson.type !== "trace"}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          {completed ? (
+            <LessonCompleteCard
+              stars={stars}
+              onRepeat={restartAttempt}
+              next={next}
+              backTo={routes.unit(unit.id)}
+              today={today}
+              sticker={sticker}
+            />
+          ) : (
+            <>
+              {showDemo ? (
+                <DemoPlayer
+                  key={`${lessonId}-${replay?.run ?? 0}`}
+                  id={demoIdFor(lesson)}
                   color={unit.color}
-                  attemptKey={activityKey}
-                  onComplete={onComplete}
-                  onRoundResult={recordRoundResult}
+                  preface={replaying ? instruction : undefined}
+                  onDone={finishDemo}
                 />
-              </View>
-            ) : null}
-          </>
-        )}
-      </ScrollView>
+              ) : null}
+              {showActivity ? (
+                <View style={showDemo ? styles.hidden : styles.activity}>
+                  <ActivityHost
+                    lesson={lesson}
+                    color={unit.color}
+                    attemptKey={activityKey}
+                    onComplete={onComplete}
+                    onRoundResult={recordRoundResult}
+                  />
+                </View>
+              ) : null}
+            </>
+          )}
+        </ScrollView>
+      </GuideProvider>
     </ScreenBackground>
   );
 }

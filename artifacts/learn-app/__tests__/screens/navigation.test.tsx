@@ -4,6 +4,7 @@ import HomeScreen from "@/app/index";
 import BookScreen from "@/app/book/[bookId]";
 import UnitScreen from "@/app/unit/[unitId]";
 import { books, getUnit } from "@/content";
+import { resetPathMemory } from "@/components/world/PathMap";
 import { routes } from "@/lib/routes";
 import { mockCanGoBack, renderScreen, setParams } from "@/test-utils/screens";
 
@@ -14,6 +15,7 @@ const { router } = jest.requireMock("expo-router") as {
 beforeEach(() => {
   jest.clearAllMocks();
   mockCanGoBack(false);
+  resetPathMemory();
 });
 
 test("home shows one island per available book and opens it; no grade cards", () => {
@@ -86,4 +88,17 @@ test("array params use the first value", () => {
   params.unitId = ["a2", "a3"];
   renderScreen(<UnitScreen />);
   expect(screen.getAllByTestId(/^lesson-row-/)).toHaveLength(31);
+});
+
+test("Hudhud stands beside the next stop of a path, once, and says its line", () => {
+  jest.useFakeTimers();
+  const Speech = jest.requireMock("expo-speech") as { speak: jest.Mock };
+  setParams({ unitId: "a2" });
+  renderScreen(<UnitScreen />);
+  expect(screen.getAllByTestId("guide")).toHaveLength(1);
+  expect(screen.getByTestId("guide").props.accessibilityLabel).toBe(getUnit("a2")!.theme);
+  // On a first visit he flies in from the stop before; he speaks once he has landed.
+  jest.advanceTimersByTime(2000);
+  expect(Speech.speak).toHaveBeenCalledWith(getUnit("a2")!.theme, expect.anything());
+  jest.useRealTimers();
 });

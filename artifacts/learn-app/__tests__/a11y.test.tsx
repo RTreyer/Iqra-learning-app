@@ -130,7 +130,7 @@ test("parents: the gate, then every control behind it", async () => {
   expectAccessiblePressables(6);
 });
 
-test("lesson u2-2: back button, help button and the activity controls", async () => {
+test("lesson u2-2: back button, Hudhud, help button and the activity controls", async () => {
   resetDemoSeenCache(DEMO_IDS);
   setParams({ lessonId: "u2-2" });
   withProgress(<LessonScreen />);
@@ -138,7 +138,7 @@ test("lesson u2-2: back button, help button and the activity controls", async ()
   await act(async () => {
     jest.advanceTimersByTime(10000);
   });
-  expectAccessiblePressables(5);
+  expectAccessiblePressables(6);
 });
 
 test("lesson u2-2 with its worked example: the Skip button is accessible too", async () => {

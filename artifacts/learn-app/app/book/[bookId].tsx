@@ -24,7 +24,8 @@ import { yemen } from "@/theme/tokens";
 
 export default function BookScreen() {
   const bookId = firstParam(useLocalSearchParams<{ bookId?: string | string[] }>().bookId);
-  const { progress, getUnitProgress } = useProgress();
+  const { progress, hydrated, loadSettled, getUnitProgress } = useProgress();
+  const progressReady = hydrated || loadSettled;
   const { t, language, digits } = useLanguage();
   const pad = useScreenPadding();
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
@@ -90,8 +91,10 @@ export default function BookScreen() {
           stops={stops}
           color={book.color}
           onPress={(unitId) => router.push(routes.unit(unitId))}
-          guide={SUBJECT_LINES[book.subject] ?? SUBJECT_LINES.arabic}
+          // Hudhud appears once the stored progress is known, so he flies to the right stop.
+          guide={progressReady ? (SUBJECT_LINES[book.subject] ?? SUBJECT_LINES.arabic) : undefined}
           onGuideY={scrollToGuide}
+          pathKey={book.id}
         />
       </ScrollView>
     </ScreenBackground>

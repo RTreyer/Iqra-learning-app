@@ -16,6 +16,7 @@ import { ADVANCE_MS, PROMPT_DELAY_MS, TRY_AGAIN, choiceState, useBounce } from "
 import { useLatest } from "./shared/useLatest";
 import { useShuffled } from "./shared/useShuffled";
 import { withAttemptReset } from "./shared/withAttemptReset";
+import { useGuide } from "@/components/world/LessonGuide";
 
 type Props = {
   item: ReviewItem;
@@ -132,6 +133,7 @@ function Prompt({ item, color, spoken }: { item: ReviewItem; color: string; spok
  * greys its option out and the child tries again until the answer is found.
  */
 function Round({ item, attemptKey, onFirstTap, onAdvance, color = colors.success }: Props) {
+  const guide = useGuide();
   const round = useMemo(() => roundOf(item), [item]);
   const shuffled = useShuffled(round.options, round.correctIndex, attemptKey, item.id);
   const { values, bounce } = useBounce(round.options.length);
@@ -165,6 +167,7 @@ function Round({ item, attemptKey, onFirstTap, onAdvance, color = colors.success
       }
       if (!correct) {
         haptics.error();
+        guide.react("wrong");
         setWrong([...wrong, idx]);
         speak(`${TRY_AGAIN}، ${round.prompt}`);
         return;
@@ -172,11 +175,12 @@ function Round({ item, attemptKey, onFirstTap, onAdvance, color = colors.success
       locked.current = true;
       setPicked(idx);
       haptics.success();
+      guide.react("right");
       speak(PRAISE);
       bounce(idx, 1.15);
       timer.current = setTimeout(() => latest.current.onAdvance(), ADVANCE_MS);
     },
-    [shuffled.correctIndex, bounce, round.prompt, latest, wrong],
+    [shuffled.correctIndex, bounce, round.prompt, latest, wrong, guide],
   );
 
   const rowStyle =

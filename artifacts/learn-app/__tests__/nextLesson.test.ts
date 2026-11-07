@@ -39,7 +39,13 @@ test("once every lesson is done, the first one below three stars comes back", ()
 test("the chosen subject: only lessons of that book", () => {
   const next = nextLesson(createEmptyState(), books, "math-1");
   expect(next?.lesson.id).toBe("math-u1-1");
-  expect(nextLesson(withStars((b) => b.id === "math-1"), books, "math-1")).toBeNull();
+  expect(
+    nextLesson(
+      withStars((b) => b.id === "math-1"),
+      books,
+      "math-1",
+    ),
+  ).toBeNull();
 });
 
 test("without a chosen subject, all Arabic done moves on to Math", () => {
