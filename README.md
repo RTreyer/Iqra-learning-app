@@ -49,7 +49,7 @@ Home lists grades 1 to 6 (`grades` in `content/catalog.ts`). Grade 1 shows its b
 | Principle | How the app applies it | Where in code |
 |---|---|---|
 | Score based stars | 3 stars at 100 percent, 2 at 60 percent or more, otherwise 1. Replays keep the best result. Review awards no stars | `lib/scoring.ts`, `lib/progressState.ts` |
-| First tap scoring | Only the first tap on a question counts. The round locks after it and the correct answer is shown | `components/activities/shared/useQuiz.ts` |
+| First tap scoring, then try again | Only the first tap on a question counts. A wrong option greys out and the voice asks again without giving the answer; the child tries until it is found | `components/activities/shared/useQuiz.ts` |
 | Seeded shuffle | Answer order varies per attempt but is stable inside a render, so content data stays untouched | `components/activities/shared/shuffle.ts`, `useShuffled.ts` |
 | Spaced repetition | Leitner boxes 1 to 5 with intervals of 1, 2, 4, 7 and 14 days. A correct answer promotes only when the item is due. A wrong answer resets to box 1. Due is by local day | `lib/srs.ts`, `lib/progressState.ts` |
 | Retrieval practice | Review is always active recall (pick, read, solve) | `lib/reviewItems.ts`, `app/review.tsx` |

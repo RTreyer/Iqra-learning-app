@@ -7,7 +7,14 @@ import { PRAISE } from "./shared/strings";
 import { ChoiceCard } from "./shared/ChoiceCard";
 import { ProgressDots } from "./shared/ProgressDots";
 import { act } from "./shared/styles";
-import { ADVANCE_MS, PROMPT_DELAY_MS, choiceState, useBounce, useQuiz } from "./shared/useQuiz";
+import {
+  ADVANCE_MS,
+  PROMPT_DELAY_MS,
+  TRY_AGAIN,
+  choiceState,
+  useBounce,
+  useQuiz,
+} from "./shared/useQuiz";
 import { useShuffled } from "./shared/useShuffled";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import type { ActivityProps } from "./types";
@@ -46,7 +53,7 @@ function LetterPick({
         speak(PRAISE);
         bounce(idx);
       } else {
-        speak(round.targetLetter);
+        speak(`${TRY_AGAIN}، ${round.targetLetter}`);
       }
     },
     [options.correctIndex, pick, bounce, round.targetLetter],
@@ -68,7 +75,7 @@ function LetterPick({
             index={idx}
             word={letter}
             variant="letter"
-            state={choiceState(idx, quiz.picked, options.correctIndex)}
+            state={choiceState(idx, quiz.picked, options.correctIndex, quiz.wrong)}
             selected={quiz.picked === idx}
             locked={quiz.locked}
             onPick={handlePick}

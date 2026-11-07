@@ -94,7 +94,7 @@ artifacts/learn-app/                the Expo app
 ## 6. Key behaviours
 
 - Stars come from the score: 3 at 100 percent, 2 at 60 percent or more, otherwise 1 (`starsForScore`).
-- Only the first tap of a round counts. The round locks after it.
+- Only the first tap of a round counts (score and review items). A wrong tap greys its option out, shakes it and the voice asks again ("حَاوِلْ مَرَّةً أُخْرَى" plus the task, never the answer); the child tries again until the answer is found, then the round locks. The syllable train keeps its own tile-by-tile retry (`retry: false`). The review session follows the same rule.
 - Answer positions are shuffled with a seeded shuffle at render time. Content data is not edited.
 - Replaying a lesson starts a fresh attempt. Best stars are kept, stars are never added twice. Total is the sum of best results.
 - Review session: items due today (Leitner boxes 1 to 5, intervals 1, 2, 4, 7, 14 days, local day). Up to 10 items, interleaved by kind, wrong items repeat once at the end, only the first answer is recorded. Correct promotes only when due, wrong resets to box 1. Review awards no stars.

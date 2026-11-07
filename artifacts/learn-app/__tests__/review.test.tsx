@@ -6,7 +6,6 @@ import ReviewScreen from "@/app/review";
 import { ReviewRound } from "@/components/activities/ReviewRound";
 import { books } from "@/content";
 import { ProgressProvider, type ProgressItem } from "@/context/ProgressContext";
-import { numberToArabicWord } from "@/lib/arabicNumbers";
 import { routes } from "@/lib/routes";
 import { allItems, itemsForLesson, type ReviewItem } from "@/lib/reviewItems";
 import { pickDue } from "@/lib/srs";
@@ -61,9 +60,11 @@ function labels(item: ReviewItem): { right: string; wrong: string } {
 }
 
 /** Taps the right or wrong option of the shown item, then lets the 900 ms advance run. */
+/** Answers a round: a wrong first tap, then the child tries again and finds the answer. */
 function answer(id: string, correct: boolean) {
   const { right, wrong } = labels(allItems().get(id)!);
-  fireEvent.press(screen.getByRole("button", { name: correct ? right : wrong }));
+  if (!correct) fireEvent.press(screen.getByRole("button", { name: wrong }));
+  fireEvent.press(screen.getByRole("button", { name: right }));
   act(() => jest.advanceTimersByTime(900));
 }
 
@@ -170,7 +171,7 @@ describe("ReviewRound", () => {
     options: [2, 3, 4],
   };
 
-  test("calc: Eastern digits, first tap only, reports at the tap and advances after 900 ms", () => {
+  test("calc: Eastern digits, first tap reported, retry until found, then advance after 900 ms", () => {
     const onFirstTap = jest.fn();
     const onAdvance = jest.fn();
     renderScreen(
@@ -179,9 +180,16 @@ describe("ReviewRound", () => {
     expect(screen.getByText("٣ + ٢ = ؟")).toBeTruthy();
     fireEvent.press(screen.getByRole("button", { name: "٤" }));
     expect(onFirstTap).toHaveBeenCalledWith(false);
-    fireEvent.press(screen.getByRole("button", { name: "٥، صحيح" }));
+    // Asked again, the answer not given away; the round waits for the child to find it.
+    expect(speech.speak).toHaveBeenLastCalledWith(
+      "حَاوِلْ مَرَّةً أُخْرَى، ثَلاثَة زَائِد اثْنَان يُسَاوِي كَمْ؟",
+      expect.anything(),
+    );
+    act(() => jest.advanceTimersByTime(2000));
+    expect(onAdvance).not.toHaveBeenCalled();
+    fireEvent.press(screen.getByRole("button", { name: "٥" }));
     expect(onFirstTap).toHaveBeenCalledTimes(1);
-    expect(speech.speak).toHaveBeenLastCalledWith(numberToArabicWord(5), expect.anything());
+    expect(screen.getByRole("button", { name: "٥، صحيح" })).toBeDisabled();
     act(() => jest.advanceTimersByTime(899));
     expect(onAdvance).not.toHaveBeenCalled();
     act(() => jest.advanceTimersByTime(1));

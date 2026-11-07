@@ -136,7 +136,7 @@ test.describe("scoring", () => {
     await expect(page.getByTestId("lesson-done-u2-29")).toBeVisible();
   });
 
-  test("4 of 6 first taps correct gives 2 stars; a later tap does not change the score", async ({
+  test("4 of 6 first taps correct gives 2 stars; finding the answer after a miss does not change it", async ({
     page,
   }) => {
     await gotoAndWaitReady(page, "/lesson/u2-29");
@@ -144,8 +144,17 @@ test.describe("scoring", () => {
     for (let i = 0; i < rounds.length; i++) {
       if (i < 2) {
         await answerRound(page, rounds[i].wrong);
-        // The round is locked after the first tap: the right answer is now disabled.
-        await expect(page.getByRole("button", { name: `${rounds[i].right}، صحيح` })).toBeDisabled();
+        // The round stays open: the wrong option greys out, the answer is not shown yet.
+        await expect(page.getByRole("button", { name: `${rounds[i].wrong}، خطأ` })).toBeDisabled();
+        await expect(
+          page.getByRole("button", { name: rounds[i].right, exact: true }),
+        ).toBeEnabled();
+        await expect(page.getByTestId("progress-train")).toHaveAttribute(
+          "aria-valuenow",
+          String(i + 1),
+        );
+        // Finding it now does not change the score.
+        await answerRound(page, rounds[i].right);
       } else {
         await answerRound(page, rounds[i].right);
       }

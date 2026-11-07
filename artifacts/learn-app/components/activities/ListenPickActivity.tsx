@@ -7,7 +7,7 @@ import { DoneButton } from "./shared/DoneButton";
 import { ListenButton } from "./shared/ListenButton";
 import { ProgressDots } from "./shared/ProgressDots";
 import { act } from "./shared/styles";
-import { PROMPT_DELAY_MS, choiceState, useBounce, useQuiz } from "./shared/useQuiz";
+import { PROMPT_DELAY_MS, TRY_AGAIN, choiceState, useBounce, useQuiz } from "./shared/useQuiz";
 import { useShuffled } from "./shared/useShuffled";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import type { ActivityProps } from "./types";
@@ -43,7 +43,7 @@ function ListenPick({
         speak(PRAISE);
         bounce(idx, 1.15);
       } else {
-        speak(q.choices[q.correctIndex].word);
+        speak(`${TRY_AGAIN}، ${q.word}`);
       }
     },
     [options.correctIndex, pick, bounce, q],
@@ -65,7 +65,7 @@ function ListenPick({
             word={choice.word}
             emoji={choice.emoji}
             variant="picture"
-            state={choiceState(idx, quiz.picked, options.correctIndex)}
+            state={choiceState(idx, quiz.picked, options.correctIndex, quiz.wrong)}
             selected={quiz.picked === idx}
             locked={quiz.locked}
             onPick={handlePick}

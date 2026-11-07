@@ -8,7 +8,7 @@ const lesson = lessonOf("u2-3", "word_read");
 
 beforeEach(() => jest.clearAllMocks());
 
-test("scores first taps only and advances with the Next button", () => {
+test("scores first taps only, retries until found, and advances with the Next button", () => {
   const onComplete = jest.fn();
   const onRoundResult = jest.fn();
   renderActivity(
@@ -38,12 +38,17 @@ test("scores first taps only and advances with the Next button", () => {
   ]);
 });
 
-test("speaks the right answer after a wrong first tap and shows the score on the last round", () => {
+test("asks again after a wrong tap without saying the answer, and shows the score at the end", () => {
   renderActivity(
     <WordReadActivity lesson={lesson} color="#D97706" attemptKey="w:1" onComplete={jest.fn()} />,
   );
   fireEvent.press(screen.getByRole("button", { name: "أَنَا" }));
-  expect(speech.speak).toHaveBeenLastCalledWith("مَامَا", expect.anything());
+  expect(speech.speak).toHaveBeenLastCalledWith(
+    "حَاوِلْ مَرَّةً أُخْرَى، مَامَا",
+    expect.anything(),
+  );
+  expect(screen.queryByTestId("activity-next")).toBeNull();
+  fireEvent.press(screen.getByRole("button", { name: "مَامَا" }));
   expect(screen.getByText("التالي ←")).toBeTruthy();
   fireEvent.press(screen.getByTestId("activity-next"));
   fireEvent.press(screen.getByRole("button", { name: "أَنَا" }));

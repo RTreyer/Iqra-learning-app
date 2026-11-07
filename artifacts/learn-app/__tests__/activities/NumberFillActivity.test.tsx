@@ -50,14 +50,16 @@ test("shows each layout with an empty box, never reads the sum aloud", () => {
   act(() => jest.advanceTimersByTime(900));
   expect(screen.getByTestId("number-fill-sentence")).toBeTruthy();
   fireEvent.press(screen.getByRole("button", { name: "٨" }));
-  expect(screen.getByRole("button", { name: "٤" })).toBeDisabled();
+  expect(screen.getByRole("button", { name: "٨، خطأ" })).toBeDisabled();
+  expect(screen.getByRole("button", { name: "٤" })).not.toBeDisabled();
+  fireEvent.press(screen.getByRole("button", { name: "٤" }));
   act(() => jest.advanceTimersByTime(900));
   fireEvent.press(screen.getByRole("button", { name: "٣" }));
   act(() => jest.advanceTimersByTime(900));
   expect(onComplete).toHaveBeenCalledWith({ correct: 2, total: 3 });
 });
 
-test("a wrong first tap is not undone by pressing the right option", () => {
+test("finding the answer after a wrong first tap does not count", () => {
   const onComplete = jest.fn();
   const single = { ...lesson, rounds: [lesson.rounds[1]] };
   renderActivity(

@@ -12,7 +12,7 @@ import { ListenButton } from "./shared/ListenButton";
 import { ProgressDots } from "./shared/ProgressDots";
 import { EMPTY_BOX, PRAISE } from "./shared/strings";
 import { act } from "./shared/styles";
-import { ADVANCE_MS, choiceState, useBounce, useQuiz } from "./shared/useQuiz";
+import { ADVANCE_MS, TRY_AGAIN, choiceState, useBounce, useQuiz } from "./shared/useQuiz";
 import { useShuffled } from "./shared/useShuffled";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import type { ActivityProps } from "./types";
@@ -60,6 +60,8 @@ function NumberFill({
       if (ok) {
         speak(PRAISE);
         bounce(idx, 1.2);
+      } else {
+        speak(TRY_AGAIN);
       }
     },
     [shuffled.correctIndex, pick, bounce],
@@ -95,7 +97,7 @@ function NumberFill({
             index={idx}
             word={label}
             variant="number"
-            state={choiceState(idx, quiz.picked, shuffled.correctIndex)}
+            state={choiceState(idx, quiz.picked, shuffled.correctIndex, quiz.wrong)}
             selected={quiz.picked === idx}
             locked={quiz.locked}
             onPick={handlePick}

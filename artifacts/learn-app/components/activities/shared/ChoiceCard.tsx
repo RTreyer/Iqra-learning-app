@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Animated, StyleSheet, Text } from "react-native";
 import { Pressable } from "@/components/demo/DemoPressable";
 import { colors, shadow, touchTarget } from "@/theme/tokens";
@@ -20,7 +20,7 @@ type Props = {
   scale?: Animated.Value;
 };
 
-const ICON: Record<ChoiceState, string | null> = { idle: null, correct: "✅", wrong: "❌" };
+const ICON: Record<ChoiceState, string | null> = { idle: null, correct: "✅", wrong: "✗" };
 /** Number cards are solid coloured, so a plain glyph keeps the feedback visible without colour. */
 const GLYPH: Record<ChoiceState, string | null> = { idle: null, correct: "✓", wrong: "✗" };
 const SPOKEN: Record<ChoiceState, string> = { idle: "", correct: "، صحيح", wrong: "، خطأ" };
@@ -38,13 +38,16 @@ export function ChoiceCard({
 }: Props) {
   const solid = variant === "number";
   const icon = variant === "letter" ? null : solid ? GLYPH[state] : ICON[state];
+  const shake = useShake(state === "wrong");
+  // A wrong option stays greyed out and cannot be tapped again while the child tries again.
+  const disabled = locked || state === "wrong";
   return (
-    <Animated.View style={scale ? { transform: [{ scale }] } : undefined}>
+    <Animated.View style={{ transform: [...(scale ? [{ scale }] : []), { translateX: shake }] }}>
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={word + SPOKEN[state]}
-        accessibilityState={{ disabled: locked, selected }}
-        disabled={locked}
+        accessibilityState={{ disabled, selected }}
+        disabled={disabled}
         onPress={() => onPick(index)}
         style={[styles.base, cardStyles[variant], (solid ? solidStates : softStates)[state]]}
       >
@@ -63,6 +66,22 @@ export function ChoiceCard({
       </Pressable>
     </Animated.View>
   );
+}
+
+/** A short sideways shake when `active` turns on: "not this one", without alarm. */
+export function useShake(active: boolean): Animated.Value {
+  const [x] = useState(() => new Animated.Value(0));
+  useEffect(() => {
+    if (!active) return;
+    const anim = Animated.sequence(
+      [-8, 7, -5, 3, 0].map((toValue) =>
+        Animated.timing(x, { toValue, duration: 60, useNativeDriver: true }),
+      ),
+    );
+    anim.start();
+    return () => anim.stop();
+  }, [active, x]);
+  return x;
 }
 
 const styles = StyleSheet.create({
@@ -120,19 +139,20 @@ const textStyles = StyleSheet.create({
 const softStates = StyleSheet.create({
   idle: { backgroundColor: colors.surface, borderColor: colors.border },
   correct: { backgroundColor: colors.successSoft, borderColor: colors.success },
-  wrong: { backgroundColor: colors.dangerSoft, borderColor: colors.danger },
+  // Greyed out, not alarm red: the child simply tries another one.
+  wrong: { backgroundColor: "#EFEAE3", borderColor: "#D6CBBB", opacity: 0.7 },
 });
 
 const softText = StyleSheet.create({
   idle: {},
   correct: { color: colors.successText },
-  wrong: {},
+  wrong: { color: "#8A7D6C" },
 });
 
 const solidStates = StyleSheet.create({
   idle: { backgroundColor: "rgba(255,255,255,0.85)", borderColor: "#CBD5E1" },
   correct: { backgroundColor: colors.successText, borderColor: colors.successText },
-  wrong: { backgroundColor: colors.dangerText, borderColor: colors.dangerText },
+  wrong: { backgroundColor: "#8A7D6C", borderColor: "#8A7D6C", opacity: 0.7 },
 });
 
 const solidText = StyleSheet.create({

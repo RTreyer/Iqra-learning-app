@@ -134,6 +134,18 @@ export async function answerRound(page, text) {
   await choice.click();
 }
 
+/**
+ * Answers a round wrong first: the wrong option greys out (announced as wrong), and the child
+ * tries again and finds `right`, which does not change the score.
+ */
+export async function answerWrongThenRight(page, { wrong, right }) {
+  await answerRound(page, wrong);
+  await expect(
+    page.getByRole("button", { name: `${wrong}، خطأ`, exact: true, disabled: true }),
+  ).toHaveCount(1);
+  await answerRound(page, right);
+}
+
 /** Earned stars shown on the completion card. */
 export async function earnedStars(page) {
   await expect(page.getByTestId("lesson-complete")).toBeVisible();
@@ -141,7 +153,8 @@ export async function earnedStars(page) {
 }
 
 /**
- * Plays a quiz lesson from QUIZ_ROUNDS: the first `correctCount` rounds right, the rest wrong.
+ * Plays a quiz lesson from QUIZ_ROUNDS: the first `correctCount` rounds right on the first tap,
+ * the rest wrong first and then found.
  * Pass `{ navigate: false }` to play the attempt already on screen. Returns the stars shown.
  */
 export async function completeQuizLesson(page, lessonId, correctCount, { navigate = true } = {}) {
@@ -149,8 +162,8 @@ export async function completeQuizLesson(page, lessonId, correctCount, { navigat
   if (!rounds) throw new Error(`no QUIZ_ROUNDS for ${lessonId}`);
   if (navigate) await gotoAndWaitReady(page, `/lesson/${lessonId}`);
   for (let i = 0; i < rounds.length; i++) {
-    const { right, wrong } = rounds[i];
-    await answerRound(page, i < correctCount ? right : wrong);
+    if (i < correctCount) await answerRound(page, rounds[i].right);
+    else await answerWrongThenRight(page, rounds[i]);
   }
   return earnedStars(page);
 }

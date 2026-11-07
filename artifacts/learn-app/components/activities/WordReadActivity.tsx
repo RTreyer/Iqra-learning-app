@@ -7,7 +7,7 @@ import { DoneButton } from "./shared/DoneButton";
 import { ListenButton } from "./shared/ListenButton";
 import { ProgressDots } from "./shared/ProgressDots";
 import { act } from "./shared/styles";
-import { PROMPT_DELAY_MS, choiceState, useBounce, useQuiz } from "./shared/useQuiz";
+import { PROMPT_DELAY_MS, TRY_AGAIN, choiceState, useBounce, useQuiz } from "./shared/useQuiz";
 import { useShuffled } from "./shared/useShuffled";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import type { ActivityProps } from "./types";
@@ -40,7 +40,7 @@ function WordRead({
         speak(PRAISE);
         bounce(idx, 1.1);
       } else {
-        speak(round.choices[round.correctIndex]);
+        speak(`${TRY_AGAIN}، ${round.word}`);
       }
     },
     [options.correctIndex, pick, bounce, round],
@@ -61,7 +61,7 @@ function WordRead({
             index={idx}
             word={choice}
             variant="word"
-            state={choiceState(idx, quiz.picked, options.correctIndex)}
+            state={choiceState(idx, quiz.picked, options.correctIndex, quiz.wrong)}
             selected={quiz.picked === idx}
             locked={quiz.locked}
             onPick={handlePick}

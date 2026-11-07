@@ -4,10 +4,10 @@ import { Pressable } from "@/components/demo/DemoPressable";
 import { groupLabel } from "@/content/math/picLabel";
 import type { MathPic } from "@/content/types";
 import { colors, touchTarget } from "@/theme/tokens";
-import type { ChoiceState } from "../shared/ChoiceCard";
+import { useShake, type ChoiceState } from "../shared/ChoiceCard";
 import { PicGroup } from "./MathPic";
 
-const ICON: Record<ChoiceState, string | null> = { idle: null, correct: "✅", wrong: "❌" };
+const ICON: Record<ChoiceState, string | null> = { idle: null, correct: "✅", wrong: "✗" };
 const SPOKEN: Record<ChoiceState, string> = { idle: "", correct: "، صحيح", wrong: "، خطأ" };
 
 const COMPACT_PIC = 36;
@@ -26,14 +26,17 @@ type Props = {
 
 /** A tappable card holding one picture or a group, with the same feedback as ChoiceCard. */
 export function PicCard({ index, pics, state, selected, locked, onPick, scale, compact }: Props) {
+  const shake = useShake(state === "wrong");
+  // A wrong card stays greyed out while the child tries again.
+  const disabled = locked || state === "wrong";
   return (
-    <Animated.View style={scale ? { transform: [{ scale }] } : undefined}>
+    <Animated.View style={{ transform: [...(scale ? [{ scale }] : []), { translateX: shake }] }}>
       <Pressable
         testID={`pic-card-${index}`}
         accessibilityRole="button"
         accessibilityLabel={groupLabel(pics) + SPOKEN[state]}
-        accessibilityState={{ disabled: locked, selected }}
-        disabled={locked}
+        accessibilityState={{ disabled, selected }}
+        disabled={disabled}
         onPress={() => onPick(index)}
         style={[styles.card, compact && styles.compact, stateStyles[state]]}
       >
@@ -67,5 +70,5 @@ const styles = StyleSheet.create({
 const stateStyles = StyleSheet.create({
   idle: { backgroundColor: colors.surface, borderColor: colors.border },
   correct: { backgroundColor: colors.successSoft, borderColor: colors.success },
-  wrong: { backgroundColor: colors.dangerSoft, borderColor: colors.danger },
+  wrong: { backgroundColor: "#EFEAE3", borderColor: "#D6CBBB", opacity: 0.6 },
 });

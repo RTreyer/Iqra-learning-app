@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, type ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import type { Lesson } from "@/content/types";
-import { numberToArabicWord, toArabicDigits } from "@/lib/arabicNumbers";
+import { toArabicDigits } from "@/lib/arabicNumbers";
 import { useLanguage } from "@/context/LanguageContext";
 import { speak } from "@/lib/speech";
 import { colors, touchTarget } from "@/theme/tokens";
@@ -9,7 +9,14 @@ import { ChoiceCard } from "../shared/ChoiceCard";
 import { ProgressDots } from "../shared/ProgressDots";
 import { PRAISE } from "../shared/strings";
 import { act } from "../shared/styles";
-import { ADVANCE_MS, PROMPT_DELAY_MS, choiceState, useBounce, useQuiz } from "../shared/useQuiz";
+import {
+  ADVANCE_MS,
+  PROMPT_DELAY_MS,
+  TRY_AGAIN,
+  choiceState,
+  useBounce,
+  useQuiz,
+} from "../shared/useQuiz";
 import { useShuffled } from "../shared/useShuffled";
 import type { ActivityProps } from "../types";
 
@@ -63,10 +70,11 @@ export function NumberQuiz({
         speak(PRAISE);
         bounce(idx, 1.2);
       } else {
-        speak(numberToArabicWord(answer));
+        // Ask again rather than say the answer: the child finds it.
+        speak(TRY_AGAIN);
       }
     },
-    [shuffled.correctIndex, pick, bounce, answer],
+    [shuffled.correctIndex, pick, bounce],
   );
 
   return (
@@ -89,7 +97,7 @@ export function NumberQuiz({
             index={idx}
             word={label}
             variant="number"
-            state={choiceState(idx, quiz.picked, shuffled.correctIndex)}
+            state={choiceState(idx, quiz.picked, shuffled.correctIndex, quiz.wrong)}
             selected={quiz.picked === idx}
             locked={quiz.locked}
             onPick={handlePick}

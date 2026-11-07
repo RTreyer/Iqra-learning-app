@@ -43,11 +43,15 @@ test("word buttons for groups, symbol buttons for numbers, first tap counts", ()
   expect(screen.getAllByText("٤")).toHaveLength(2);
   // Symbol buttons are named by the words, drawn as SVG.
   fireEvent.press(screen.getByRole("button", { name: "أَكْبَرُ مِنْ" }));
+  expect(screen.getByRole("button", { name: "أَكْبَرُ مِنْ" })).toBeDisabled();
+  act(() => jest.advanceTimersByTime(900));
+  expect(onComplete).not.toHaveBeenCalled();
+  fireEvent.press(screen.getByTestId("compare-answer-equal"));
   act(() => jest.advanceTimersByTime(900));
   expect(onComplete).toHaveBeenCalledWith({ correct: 1, total: 2 });
 });
 
-test("a wrong first tap is not undone by pressing the right button", () => {
+test("finding the answer after a wrong first tap does not count", () => {
   const onComplete = jest.fn();
   const single = { ...lesson, rounds: [lesson.rounds[0]] };
   renderActivity(

@@ -42,6 +42,8 @@ function BuildWord({
     onComplete,
     onRoundResult,
     autoAdvanceMs: DEPART_MS,
+    // The train already lets the child retry tile by tile; it reports the whole round once.
+    retry: false,
   });
   const { pick } = quiz;
   const handleDone = useCallback((correct: boolean) => pick(0, correct), [pick]);
