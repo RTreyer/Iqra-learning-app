@@ -1,16 +1,22 @@
 import React, { useCallback, useEffect, useMemo } from "react";
-import { StyleSheet, Text, View } from "react-native";
-import { UiText } from "@/components/UiText";
+import { View } from "react-native";
 import { speak } from "@/lib/speech";
-import { colors, readableFill } from "@/theme/tokens";
 import { PRAISE } from "./shared/strings";
 import { ChoiceCard } from "./shared/ChoiceCard";
-import { ProgressDots } from "./shared/ProgressDots";
+import { StoryProgress } from "./shared/StoryProgress";
 import { act } from "./shared/styles";
-import { ADVANCE_MS, PROMPT_DELAY_MS, choiceState, useBounce, useQuiz } from "./shared/useQuiz";
+import {
+  ADVANCE_MS,
+  PROMPT_DELAY_MS,
+  TRY_AGAIN,
+  choiceState,
+  useBounce,
+  useQuiz,
+} from "./shared/useQuiz";
 import { useShuffled } from "./shared/useShuffled";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import type { ActivityProps } from "./types";
+import { TargetCard } from "./shared/TargetCard";
 
 function LetterPick({
   lesson,
@@ -46,7 +52,7 @@ function LetterPick({
         speak(PRAISE);
         bounce(idx);
       } else {
-        speak(round.targetLetter);
+        speak(`${TRY_AGAIN}، ${round.targetLetter}`);
       }
     },
     [options.correctIndex, pick, bounce, round.targetLetter],
@@ -54,14 +60,8 @@ function LetterPick({
 
   return (
     <View style={act.container}>
-      <ProgressDots count={rounds.length} current={quiz.roundIndex} color={color} />
-      <View style={[styles.display, { borderColor: color }]}>
-        <UiText style={styles.displayHint}>ابحث عن الحرف</UiText>
-        <Text style={[styles.displayBig, { color: readableFill(color) }]}>
-          {round.targetLetter}
-        </Text>
-      </View>
-      <UiText style={act.instruction}>{`سؤال ${quiz.roundIndex + 1} من ${rounds.length}`}</UiText>
+      <StoryProgress count={rounds.length} current={quiz.roundIndex} color={color} />
+      <TargetCard text={round.targetLetter} color={color} testID="letter-target" />
       <View style={act.letterChoicesRow}>
         {options.items.map((letter, idx) => (
           <ChoiceCard
@@ -69,7 +69,7 @@ function LetterPick({
             index={idx}
             word={letter}
             variant="letter"
-            state={choiceState(idx, quiz.picked, options.correctIndex)}
+            state={choiceState(idx, quiz.picked, options.correctIndex, quiz.wrong)}
             selected={quiz.picked === idx}
             locked={quiz.locked}
             onPick={handlePick}
@@ -82,17 +82,3 @@ function LetterPick({
 }
 
 export const LetterPickActivity = withAttemptReset(LetterPick, "LetterPickActivity");
-
-const styles = StyleSheet.create({
-  display: {
-    alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.9)",
-    borderRadius: 20,
-    padding: 16,
-    borderWidth: 3,
-    width: "75%",
-    gap: 2,
-  },
-  displayHint: { fontSize: 13, color: colors.muted, fontWeight: "600" },
-  displayBig: { fontSize: 72, fontWeight: "900", lineHeight: 88 },
-});

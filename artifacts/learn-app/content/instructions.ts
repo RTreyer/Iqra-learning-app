@@ -31,7 +31,7 @@ export const ACTIVITY_INSTRUCTIONS: Record<Exclude<LessonType, SpokenPerRound>, 
     "اِضْغَطْ عَلَامَةَ الصَّحِّ لِلسُّلُوكِ الصَّحِيحِ، وَعَلَامَةَ الْخَطَأِ لِلسُّلُوكِ الْخَطَأِ.",
   matching: "اِضْغَطْ عَلَى شَيْءٍ فِي الْيَمِينِ، ثُمَّ عَلَى مَا يُنَاسِبُهُ فِي الْيَسَارِ.",
   trace: "تَتَبَّعِ الشَّكْلَ بِإِصْبَعِكَ، ثُمَّ اضْغَطْ تَمَّ.",
-  build_word: "اِسْمَعْ جَيِّدًا، وَحَمِّلِ الْقِطَارَ.",
+  build_word: "اِسْمَعْ جَيِّدًا، وَاكْتُبِ الْكَلِمَةَ فِي رِسَالَتِي.",
 };
 
 /** The spoken instruction of a lesson, or undefined when its rounds speak the task. */

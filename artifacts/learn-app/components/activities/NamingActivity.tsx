@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
+import { Picture } from "@/components/pictures/Picture";
 import { Animated, StyleSheet, Text, View } from "react-native";
 import { Pressable } from "@/components/demo/DemoPressable";
-import { UiText } from "@/components/UiText";
 import * as haptics from "@/lib/haptics";
 import { speak } from "@/lib/speech";
 import { colors, readableFill, withAlpha } from "@/theme/tokens";
@@ -11,6 +11,7 @@ import { useOnce } from "./shared/useOnce";
 import { useBounce } from "./shared/useQuiz";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import type { ActivityProps } from "./types";
+import { StoryProgress } from "./shared/StoryProgress";
 
 function Naming({ lesson, color, onComplete }: ActivityProps<"naming">) {
   const { items } = lesson;
@@ -32,7 +33,8 @@ function Naming({ lesson, color, onComplete }: ActivityProps<"naming">) {
 
   return (
     <View style={act.container}>
-      <UiText style={act.instruction}>اضغط على كل كلمة لتسمعها 🔊</UiText>
+      {/* Each word heard fills a wagon; Hudhud says what to do. */}
+      <StoryProgress count={items.length} current={tapped.size} color={color} />
       <View style={styles.grid}>
         {items.map((item, i) => {
           const done = tapped.has(i);
@@ -53,7 +55,7 @@ function Naming({ lesson, color, onComplete }: ActivityProps<"naming">) {
                 ]}
                 onPress={() => handleTap(i)}
               >
-                <Text style={styles.emoji}>{item.emoji}</Text>
+                <Picture emoji={item.emoji} size={46} />
                 <Text style={[styles.word, done && { color: readableFill(color) }]}>
                   {item.word}
                 </Text>
@@ -70,9 +72,7 @@ function Naming({ lesson, color, onComplete }: ActivityProps<"naming">) {
           onPress={finish.fire}
           disabled={finish.done}
         />
-      ) : (
-        <UiText style={act.hint}>{`${remaining} كلمة متبقية`}</UiText>
-      )}
+      ) : null}
     </View>
   );
 }
@@ -98,6 +98,5 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     gap: 4,
   },
-  emoji: { fontSize: 34 },
   word: { fontSize: 15, fontWeight: "700", color: colors.text, textAlign: "center" },
 });

@@ -30,11 +30,18 @@ test("first tap scoring and itemIds per question", () => {
     />,
   );
   expect(screen.getByText(lesson.questions[0].word)).toBeTruthy();
-  for (const word of ["بَـ", "دَا", "تَـ", "لَا", "دَا", "نَا"]) {
+  ["بَـ", "دَا", "تَـ", "لَا", "دَا", "نَا"].forEach((word, i) => {
     fireEvent.press(choice(word));
     expect(choice(word)).toBeDisabled();
+    const q = lesson.questions[i];
+    const right = q.choices[q.correctIndex].word;
+    if (word !== right) {
+      // A wrong first tap: no Next yet, the child tries again until the answer is found.
+      expect(screen.queryByTestId("activity-next")).toBeNull();
+      fireEvent.press(choice(right));
+    }
     fireEvent.press(screen.getByTestId("activity-next"));
-  }
+  });
   expect(onComplete).toHaveBeenCalledWith({ correct: 5, total: 6 });
   expect(onRoundResult.mock.calls).toEqual([
     ["q:u2-30:0", true],

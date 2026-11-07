@@ -14,12 +14,14 @@ import { useLatest } from "./shared/useLatest";
 import { ADVANCE_MS } from "./shared/useQuiz";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import type { ActivityProps } from "./types";
+import { useGuide } from "@/components/world/LessonGuide";
 
 /**
  * Tap an item, then the box it belongs in. A wrong box keeps the item in place; only an
  * item's first placement counts. The lesson ends when every item is in its box.
  */
 function Sort({ lesson, color, onComplete }: ActivityProps<"sort">) {
+  const guide = useGuide();
   const [selected, setSelected] = useState<number | null>(null);
   const [placed, setPlaced] = useState<boolean[]>(() => lesson.items.map(() => false));
   const missed = useRef<Set<number>>(new Set());
@@ -70,14 +72,16 @@ function Sort({ lesson, color, onComplete }: ActivityProps<"sort">) {
       if (lesson.items[selected].box !== box) {
         missed.current.add(selected);
         haptics.error();
+        guide.react("wrong");
         flagWrong(box);
         return;
       }
       haptics.success();
+      guide.react("right");
       setPlaced((p) => p.map((v, i) => v || i === selected));
       setSelected(null);
     },
-    [selected, lesson.items, flagWrong],
+    [selected, lesson.items, flagWrong, guide],
   );
 
   return (

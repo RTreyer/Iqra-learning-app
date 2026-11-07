@@ -1,9 +1,9 @@
 import React, { useCallback, useState } from "react";
+import { Picture } from "@/components/pictures/Picture";
 import { Animated, StyleSheet, Text, View } from "react-native";
 import { Pressable } from "@/components/demo/DemoPressable";
 import { Art } from "@/components/art/Art";
 import { Scene } from "@/components/art/scenes/Scene";
-import { UiText } from "@/components/UiText";
 import * as haptics from "@/lib/haptics";
 import { speak } from "@/lib/speech";
 import { colors, readableFill, touchTarget, withAlpha } from "@/theme/tokens";
@@ -13,6 +13,7 @@ import { useOnce } from "./shared/useOnce";
 import { useBounce } from "./shared/useQuiz";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import type { ActivityProps } from "./types";
+import { StoryProgress } from "./shared/StoryProgress";
 
 function Story({ lesson, color, onComplete }: ActivityProps<"story">) {
   const { lines } = lesson;
@@ -44,7 +45,8 @@ function Story({ lesson, color, onComplete }: ActivityProps<"story">) {
         </View>
       ) : null}
       <Text style={styles.title}>{lesson.storyTitle}</Text>
-      <UiText style={act.instruction}>اضغط على كل جملة لتسمعها 🔊</UiText>
+      {/* Each sentence heard fills a wagon; Hudhud says what to do. */}
+      <StoryProgress count={lines.length} current={heard.size} color={color} />
       <View style={act.fullWidth}>
         {lines.map((line, i) => {
           const done = heard.has(i);
@@ -68,7 +70,7 @@ function Story({ lesson, color, onComplete }: ActivityProps<"story">) {
                 {line.art ? (
                   <Art art={line.art} size={40} />
                 ) : (
-                  <Text style={styles.emoji}>{line.emoji}</Text>
+                  <Picture emoji={line.emoji} size={36} />
                 )}
                 <Text style={[styles.text, done && { color: readableFill(color) }]}>
                   {line.text}
@@ -87,9 +89,7 @@ function Story({ lesson, color, onComplete }: ActivityProps<"story">) {
           onPress={finish.fire}
           disabled={finish.done}
         />
-      ) : (
-        <UiText style={act.hint}>{`${remaining} جملة متبقية`}</UiText>
-      )}
+      ) : null}
     </View>
   );
 }
@@ -132,7 +132,6 @@ const styles = StyleSheet.create({
     gap: 10,
     minHeight: touchTarget,
   },
-  emoji: { fontSize: 22, flexShrink: 0 },
   text: { flex: 1, fontSize: 18, fontWeight: "700", color: colors.text, textAlign: "right" },
   check: { fontSize: 16, color: colors.successText },
 });

@@ -1,12 +1,14 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { act, screen } from "@testing-library/react-native";
+import { act, fireEvent, screen } from "@testing-library/react-native";
 import React from "react";
 import { StyleSheet, type StyleProp, type ViewStyle } from "react-native";
 
 import HomeScreen from "@/app/index";
 import BookScreen from "@/app/book/[bookId]";
-import GradeScreen from "@/app/grade/[gradeId]";
+import AlbumScreen from "@/app/album";
+import IntroScreen from "@/app/intro";
 import LessonScreen from "@/app/lesson/[lessonId]";
+import ParentsScreen from "@/app/parents";
 import UnitScreen from "@/app/unit/[unitId]";
 import { DEMO_IDS } from "@/content/demos";
 import { resetDemoSeenCache } from "@/hooks/useDemoSeen";
@@ -42,12 +44,15 @@ function expectAccessiblePressables(exactly: number) {
     (node: ReturnType<typeof screen.UNSAFE_root.findAll>[number]) =>
       typeof node.type !== "string" &&
       (node.type as { name?: string }).name === "Pressable" &&
-      typeof node.props.onPress === "function",
+      (typeof node.props.onPress === "function" || typeof node.props.onLongPress === "function"),
   );
   expect(pressables.length).toBe(exactly);
   for (const node of pressables) {
     const where = String(node.props.testID ?? node.props.accessibilityLabel ?? "unnamed pressable");
-    expect({ where, role: node.props.accessibilityRole }).toEqual({ where, role: "button" });
+    // Switches in the parents' corner announce themselves as switches.
+    const role =
+      node.props.accessibilityRole === "switch" ? "button" : node.props.accessibilityRole;
+    expect({ where, role }).toEqual({ where, role: "button" });
     const label = node.props.accessibilityLabel;
     expect({ where, label: typeof label === "string" && label.trim().length > 0 }).toEqual({
       where,
@@ -77,38 +82,55 @@ beforeEach(async () => {
 });
 afterEach(() => jest.useRealTimers());
 
-test("home: language switch, continue, review and grade cards", async () => {
+test("home: play, islands, tiles, Hudhud and the parents' gear", async () => {
   await seed();
   withProgress(<HomeScreen />);
   await screen.findByTestId("review-card");
-  // 2 language buttons, continue, review and the 6 grade cards.
-  expectAccessiblePressables(10);
+  // Gear, Hudhud, play, 2 islands, today's window, album and review.
+  expectAccessiblePressables(8);
 });
 
-test("grade: back button and book cards", async () => {
-  setParams({ gradeId: "1" });
-  withProgress(<GradeScreen />);
-  await screen.findAllByTestId(/^book-/);
-  // Back and the 6 grade 1 book cards.
-  expectAccessiblePressables(7);
-});
-
-test("book: back button and unit cards", async () => {
+test("book: back button, Hudhud and the unit stations", async () => {
   setParams({ bookId: "arabic-1" });
   withProgress(<BookScreen />);
   await screen.findAllByTestId(/^unit-/);
-  expectAccessiblePressables(9);
+  expectAccessiblePressables(11);
 });
 
-test("unit: back button and lesson rows, including a completed one", async () => {
+test("unit: back button, Hudhud, the lesson stops (one completed) and Hudhud's letter", async () => {
   await seed();
   setParams({ unitId: "a1" });
   withProgress(<UnitScreen />);
   await screen.findAllByTestId(/^lesson-row-/);
+  expectAccessiblePressables(9);
+});
+
+test("unit with letters: each letter is a button that says itself", async () => {
+  setParams({ unitId: "a2" });
+  withProgress(<UnitScreen />);
+  await screen.findAllByTestId(/^lesson-row-/);
+  // Back, the unit picture, 7 letters, Hudhud, 31 lessons and Hudhud's letter at the end.
+  expectAccessiblePressables(42);
+});
+
+test("album: back button, nine stickers and Hudhud", async () => {
+  withProgress(<AlbumScreen />);
+  await screen.findByTestId("sticker-qamariya");
+  expectAccessiblePressables(11);
+});
+
+test("parents: the gate, then every control behind it", async () => {
+  withProgress(<ParentsScreen />);
+  // Back and the hold-to-open gate.
+  expectAccessiblePressables(2);
+  await act(async () => {
+    fireEvent(screen.getByTestId("parents-gate"), "longPress");
+  });
+  // Back, 2 languages, voice, vibration and reset.
   expectAccessiblePressables(6);
 });
 
-test("lesson u2-2: back button, help button and the activity controls", async () => {
+test("lesson u2-2: back button, Hudhud, help button and the activity controls", async () => {
   resetDemoSeenCache(DEMO_IDS);
   setParams({ lessonId: "u2-2" });
   withProgress(<LessonScreen />);
@@ -116,7 +138,7 @@ test("lesson u2-2: back button, help button and the activity controls", async ()
   await act(async () => {
     jest.advanceTimersByTime(10000);
   });
-  expectAccessiblePressables(5);
+  expectAccessiblePressables(8);
 });
 
 test("lesson u2-2 with its worked example: the Skip button is accessible too", async () => {
@@ -128,4 +150,15 @@ test("lesson u2-2 with its worked example: the Skip button is accessible too", a
   });
   expect(screen.getByTestId("demo-skip").props.accessibilityLabel).toBe("تخطَّ");
   expect(screen.getByTestId("demo-skip").props.accessibilityRole).toBe("button");
+});
+
+test("intro: home, skip and the scene to tap on; then the two choices", async () => {
+  withProgress(<IntroScreen />);
+  // Home, skip and the scene.
+  expectAccessiblePressables(3);
+  await act(async () => {
+    fireEvent.press(screen.getByTestId("intro-skip"));
+  });
+  // Home, the scene (disabled while choosing, still labelled) and the two subjects.
+  expectAccessiblePressables(4);
 });

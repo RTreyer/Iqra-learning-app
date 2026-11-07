@@ -1,13 +1,15 @@
 import React, { useEffect, useRef, useState, type ComponentRef } from "react";
-import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
+import { Animated, Pressable, StyleSheet, View } from "react-native";
 
 import { ActivityHost } from "@/components/ActivityHost";
 import { UiText } from "@/components/UiText";
 import { useLanguage } from "@/context/LanguageContext";
 import { DEMO_END, DEMO_START, demoFor, type DemoId, type DemoStep } from "@/content/demos";
 import { estimateSpeechMs, isSpeaking, speak, stopSpeaking } from "@/lib/speech";
-import { colors, radius, touchTarget } from "@/theme/tokens";
+import { colors, radius, touchTarget, yemen } from "@/theme/tokens";
 import { useLatest } from "@/components/activities/shared/useLatest";
+import { Icon } from "@/components/world/Icon";
+import { useGuide } from "@/components/world/LessonGuide";
 import { DemoContext, createRegistry, measureNode, type Box, type DemoEntry } from "./DemoContext";
 
 /** The activity speaks its first prompt 400 ms after it mounts; wait for that to start. */
@@ -23,7 +25,7 @@ const POLL_MS = 150;
 const SILENT_MAX_MS = 8000;
 /** The hand is drawn in a box of this size; its fingertip sits at TIP. */
 const HAND = 56;
-const TIP = { x: 24, y: 4 };
+const TIP = { x: 24, y: 6 };
 
 const CANCELLED = Symbol("cancelled");
 const noop = () => {};
@@ -52,6 +54,8 @@ export function DemoPlayer({ id, color, preface, onDone }: Props) {
   const [handScale] = useState(() => new Animated.Value(1));
   const root = useRef<ComponentRef<typeof View> | null>(null);
   const done = useLatest(onDone);
+  // Hudhud tells the example: what the voice says shows in his bubble above the lesson.
+  const guide = useGuide();
   const steps = useLatest(demo.steps);
   const intro = useLatest(preface);
 
@@ -64,7 +68,11 @@ export function DemoPlayer({ id, color, preface, onDone }: Props) {
       return value;
     };
     const sleep = (ms: number) => live(new Promise<void>((r) => setTimeout(r, ms)));
-    const say = (text: string) =>
+    const say = (text: string) => {
+      guide.say(text);
+      return sayAloud(text);
+    };
+    const sayAloud = (text: string) =>
       live(
         new Promise<void>((resolve) => {
           let settled = false;
@@ -188,8 +196,9 @@ export function DemoPlayer({ id, color, preface, onDone }: Props) {
     return () => {
       alive = false;
       stopSpeaking();
+      guide.say(null);
     };
-  }, [id, registry, hand, handScale, done, steps, intro]);
+  }, [id, registry, hand, handScale, done, steps, intro, guide]);
 
   const skip = () => {
     stopSpeaking();
@@ -199,7 +208,7 @@ export function DemoPlayer({ id, color, preface, onDone }: Props) {
   return (
     <View ref={root} style={styles.root} testID="demo">
       <View style={styles.badge}>
-        <Text style={styles.badgeIcon}>👀</Text>
+        <Icon name="eye" size={20} color={yemen.inkSoft} />
         <UiText style={styles.badgeText}>مثال</UiText>
       </View>
       {mounted ? (
@@ -221,7 +230,7 @@ export function DemoPlayer({ id, color, preface, onDone }: Props) {
               { transform: [...hand.getTranslateTransform(), { scale: handScale }] },
             ]}
           >
-            <Text style={styles.handIcon}>👆</Text>
+            <Icon name="hand" size={HAND} color={yemen.clayDeep} />
           </Animated.View>
         ) : null}
         <Pressable
@@ -254,7 +263,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  badgeIcon: { fontSize: 18 },
   badgeText: { fontSize: 16, fontWeight: "800", color: colors.text },
   hand: {
     position: "absolute",
@@ -264,11 +272,6 @@ const styles = StyleSheet.create({
     height: HAND,
     alignItems: "center",
     justifyContent: "center",
-  },
-  handIcon: {
-    fontSize: 44,
-    textShadowColor: "rgba(255,255,255,0.9)",
-    textShadowRadius: 6,
   },
   skip: {
     position: "absolute",

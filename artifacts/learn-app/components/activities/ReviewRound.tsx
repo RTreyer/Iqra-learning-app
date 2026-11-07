@@ -1,21 +1,24 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Icon } from "@/components/world/Icon";
+import { Picture } from "@/components/pictures/Picture";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { UiText } from "@/components/UiText";
 import * as haptics from "@/lib/haptics";
-import { numberToArabicWord, toArabicDigits } from "@/lib/arabicNumbers";
+import { toArabicDigits } from "@/lib/arabicNumbers";
 import type { ReviewItem } from "@/lib/reviewItems";
 import { speak } from "@/lib/speech";
-import { colors, readableFill, touchTarget } from "@/theme/tokens";
+import { colors, touchTarget } from "@/theme/tokens";
 import { mathStyles } from "./math/NumberQuiz";
 import { COUNT_PROMPT, answerOf, arithmeticPrompt } from "./math/prompts";
 import { ChoiceCard, type ChoiceVariant } from "./shared/ChoiceCard";
 import { ListenButton } from "./shared/ListenButton";
 import { PRAISE } from "./shared/strings";
 import { act } from "./shared/styles";
-import { ADVANCE_MS, PROMPT_DELAY_MS, choiceState, useBounce } from "./shared/useQuiz";
+import { ADVANCE_MS, PROMPT_DELAY_MS, TRY_AGAIN, choiceState, useBounce } from "./shared/useQuiz";
 import { useLatest } from "./shared/useLatest";
 import { useShuffled } from "./shared/useShuffled";
 import { withAttemptReset } from "./shared/withAttemptReset";
+import { useGuide } from "@/components/world/LessonGuide";
+import { TargetCard } from "./shared/TargetCard";
 
 type Props = {
   item: ReviewItem;
@@ -36,8 +39,6 @@ type RoundSpec = {
   variant: ChoiceVariant;
   /** Spoken when the round opens. */
   prompt: string;
-  /** Spoken after a wrong first tap. */
-  answer: string;
 };
 
 function numberRound(options: number[], answer: number, prompt: string): RoundSpec {
@@ -46,7 +47,6 @@ function numberRound(options: number[], answer: number, prompt: string): RoundSp
     correctIndex: options.indexOf(answer),
     variant: "number",
     prompt,
-    answer: numberToArabicWord(answer),
   };
 }
 
@@ -59,7 +59,6 @@ function roundOf(item: ReviewItem): RoundSpec {
         correctIndex: item.correctIndex,
         variant: "letter",
         prompt: item.targetLetter,
-        answer: item.targetLetter,
       };
     case "word":
       return {
@@ -67,7 +66,6 @@ function roundOf(item: ReviewItem): RoundSpec {
         correctIndex: item.correctIndex,
         variant: "word",
         prompt: item.word,
-        answer: item.choices[item.correctIndex],
       };
     case "question":
       return {
@@ -75,7 +73,6 @@ function roundOf(item: ReviewItem): RoundSpec {
         correctIndex: item.correctIndex,
         variant: "picture",
         prompt: item.word,
-        answer: item.choices[item.correctIndex].word,
       };
     case "count":
       return numberRound(item.options, item.count, COUNT_PROMPT);
@@ -91,14 +88,7 @@ function roundOf(item: ReviewItem): RoundSpec {
 function Prompt({ item, color, spoken }: { item: ReviewItem; color: string; spoken: string }) {
   switch (item.kind) {
     case "letter":
-      return (
-        <View style={[styles.display, { borderColor: color }]}>
-          <UiText style={styles.displayHint}>ابحث عن الحرف</UiText>
-          <Text style={[styles.displayBig, { color: readableFill(color) }]}>
-            {item.targetLetter}
-          </Text>
-        </View>
-      );
+      return <TargetCard text={item.targetLetter} color={color} testID="review-target" />;
     case "word":
       return <ListenButton text={item.word} color={color} />;
     case "question":
@@ -112,9 +102,7 @@ function Prompt({ item, color, spoken }: { item: ReviewItem; color: string; spok
           {item.kind === "count" ? (
             <View style={mathStyles.row} testID="review-count-objects">
               {Array.from({ length: item.count }, (_, k) => (
-                <Text key={k} style={mathStyles.countEmoji}>
-                  {item.emoji}
-                </Text>
+                <Picture key={k} emoji={item.emoji} size={mathStyles.countEmoji.fontSize} />
               ))}
             </View>
           ) : null}
@@ -124,7 +112,7 @@ function Prompt({ item, color, spoken }: { item: ReviewItem; color: string; spok
             style={styles.question}
             onPress={() => speak(spoken)}
           >
-            <Text style={styles.speaker}>🔊</Text>
+            <Icon name="speaker" size={24} color="#065F46" />
             <Text style={styles.questionText}>{shown}</Text>
           </Pressable>
         </View>
@@ -133,13 +121,19 @@ function Prompt({ item, color, spoken }: { item: ReviewItem; color: string; spok
   }
 }
 
-/** One review item with the lesson quiz rules: the first tap counts and locks the round. */
+/**
+ * One review item with the lesson quiz rules: the first tap is the one recorded; a wrong tap
+ * greys its option out and the child tries again until the answer is found.
+ */
 function Round({ item, attemptKey, onFirstTap, onAdvance, color = colors.success }: Props) {
+  const guide = useGuide();
   const round = useMemo(() => roundOf(item), [item]);
   const shuffled = useShuffled(round.options, round.correctIndex, attemptKey, item.id);
   const { values, bounce } = useBounce(round.options.length);
   const [picked, setPicked] = useState<number | null>(null);
+  const [wrong, setWrong] = useState<readonly number[]>([]);
   const locked = useRef(false);
+  const tried = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const latest = useLatest({ onFirstTap, onAdvance });
 
@@ -157,23 +151,29 @@ function Round({ item, attemptKey, onFirstTap, onAdvance, color = colors.success
 
   const handlePick = useCallback(
     (idx: number) => {
-      if (locked.current) return;
-      locked.current = true;
+      if (locked.current || wrong.includes(idx)) return;
       const correct = idx === shuffled.correctIndex;
-      setPicked(idx);
-      // Report now: the child may leave before the advance delay ends.
-      latest.current.onFirstTap(correct);
-      if (correct) {
-        haptics.success();
-        speak(PRAISE);
-        bounce(idx, 1.15);
-      } else {
-        haptics.error();
-        speak(round.answer);
+      // Report the first tap now: the child may leave before the advance delay ends.
+      if (!tried.current) {
+        tried.current = true;
+        latest.current.onFirstTap(correct);
       }
+      if (!correct) {
+        haptics.error();
+        guide.react("wrong");
+        setWrong([...wrong, idx]);
+        speak(`${TRY_AGAIN}، ${round.prompt}`);
+        return;
+      }
+      locked.current = true;
+      setPicked(idx);
+      haptics.success();
+      guide.react("right");
+      speak(PRAISE);
+      bounce(idx, 1.15);
       timer.current = setTimeout(() => latest.current.onAdvance(), ADVANCE_MS);
     },
-    [shuffled.correctIndex, bounce, round.answer, latest],
+    [shuffled.correctIndex, bounce, round.prompt, latest, wrong, guide],
   );
 
   const rowStyle =
@@ -194,7 +194,7 @@ function Round({ item, attemptKey, onFirstTap, onAdvance, color = colors.success
             word={option.word}
             emoji={option.emoji}
             variant={round.variant}
-            state={choiceState(idx, picked, shuffled.correctIndex)}
+            state={choiceState(idx, picked, shuffled.correctIndex, wrong)}
             selected={picked === idx}
             locked={picked !== null}
             onPick={handlePick}
@@ -209,17 +209,6 @@ function Round({ item, attemptKey, onFirstTap, onAdvance, color = colors.success
 export const ReviewRound = withAttemptReset(Round, "ReviewRound");
 
 const styles = StyleSheet.create({
-  display: {
-    alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.9)",
-    borderRadius: 20,
-    padding: 16,
-    borderWidth: 3,
-    width: "75%",
-    gap: 2,
-  },
-  displayHint: { fontSize: 13, color: colors.muted, fontWeight: "600" },
-  displayBig: { fontSize: 72, fontWeight: "900", lineHeight: 88 },
   numberPrompt: { alignItems: "center", gap: 16, maxWidth: 300 },
   question: {
     flexDirection: "row",
@@ -231,6 +220,5 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     minHeight: touchTarget,
   },
-  speaker: { fontSize: 22 },
   questionText: { fontSize: 20, fontWeight: "600", color: "#065F46", textAlign: "center" },
 });

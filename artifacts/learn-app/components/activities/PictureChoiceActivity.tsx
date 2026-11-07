@@ -8,10 +8,10 @@ import { MathPic } from "./math/MathPic";
 import { PicCard } from "./math/PicCard";
 import { useInstruction } from "./math/useInstruction";
 import { ListenButton } from "./shared/ListenButton";
-import { ProgressDots } from "./shared/ProgressDots";
+import { StoryProgress } from "./shared/StoryProgress";
 import { EMPTY_BOX, PRAISE } from "./shared/strings";
 import { act } from "./shared/styles";
-import { ADVANCE_MS, choiceState, useBounce, useQuiz } from "./shared/useQuiz";
+import { ADVANCE_MS, TRY_AGAIN, choiceState, useBounce, useQuiz } from "./shared/useQuiz";
 import { useShuffled } from "./shared/useShuffled";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import type { ActivityProps } from "./types";
@@ -99,6 +99,8 @@ function PictureChoice({
       if (correct) {
         speak(PRAISE);
         bounce(idx, 1.15);
+      } else {
+        speak(TRY_AGAIN);
       }
     },
     [shuffled.correctIndex, pick, bounce],
@@ -106,7 +108,7 @@ function PictureChoice({
 
   return (
     <View style={act.container}>
-      <ProgressDots count={total} current={quiz.roundIndex} color={color} />
+      <StoryProgress count={total} current={quiz.roundIndex} color={color} />
       <ListenButton text={round.prompt} color={color} showText />
       {round.pattern ? <PatternRow pattern={round.pattern} /> : null}
       {round.model ? (
@@ -127,7 +129,7 @@ function PictureChoice({
             key={idx}
             index={idx}
             pics={pics}
-            state={choiceState(idx, quiz.picked, shuffled.correctIndex)}
+            state={choiceState(idx, quiz.picked, shuffled.correctIndex, quiz.wrong)}
             selected={quiz.picked === idx}
             locked={quiz.locked}
             onPick={handlePick}

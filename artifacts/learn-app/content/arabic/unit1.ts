@@ -10,6 +10,8 @@ export const unit1: Unit = {
   title: "الوحدة الأولى",
   theme: "تَمْهِيدِيَّة",
   emoji: "🌱",
+  emblem: "lawh",
+  goal: "writing",
   color: "#059669",
   badgeLabel: "تَمْهِيدِيَّة",
   lessons: [

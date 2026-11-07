@@ -31,7 +31,7 @@ Windows: after `pnpm install`, double click `Start-Browser.cmd` (browser) or `St
 
 ## Storage
 
-Progress stays on the device. No server, no accounts. AsyncStorage key `@kidlearn_progress_v1` holds a schema v2 blob (`lessons`, `items`, `activity.days`, `totalStars`). The key keeps its legacy name so old progress survives. A corrupt blob is copied to a `@kidlearn_progress_corrupt_` backup key before anything is overwritten. The UI language is stored under `iqra_ui_language`.
+Progress stays on the device. No server, no accounts. AsyncStorage key `@kidlearn_progress_v1` holds a schema v2 blob (`lessons`, `items`, `activity.days`, `totalStars`). The key keeps its legacy name so old progress survives. A corrupt blob is copied to a `@kidlearn_progress_corrupt_` backup key before anything is overwritten. The UI language is stored under `iqra_ui_language`, the parents' switches (voice, vibration), whether Hudhud's story was told and the chosen subject under `@iqra_settings_v1`.
 
 ## Content
 
@@ -49,15 +49,15 @@ Home lists grades 1 to 6 (`grades` in `content/catalog.ts`). Grade 1 shows its b
 | Principle | How the app applies it | Where in code |
 |---|---|---|
 | Score based stars | 3 stars at 100 percent, 2 at 60 percent or more, otherwise 1. Replays keep the best result. Review awards no stars | `lib/scoring.ts`, `lib/progressState.ts` |
-| First tap scoring | Only the first tap on a question counts. The round locks after it and the correct answer is shown | `components/activities/shared/useQuiz.ts` |
+| First tap scoring, then try again | Only the first tap on a question counts. A wrong option greys out and the voice asks again without giving the answer; the child tries until it is found | `components/activities/shared/useQuiz.ts` |
 | Seeded shuffle | Answer order varies per attempt but is stable inside a render, so content data stays untouched | `components/activities/shared/shuffle.ts`, `useShuffled.ts` |
 | Spaced repetition | Leitner boxes 1 to 5 with intervals of 1, 2, 4, 7 and 14 days. A correct answer promotes only when the item is due. A wrong answer resets to box 1. Due is by local day | `lib/srs.ts`, `lib/progressState.ts` |
 | Retrieval practice | Review is always active recall (pick, read, solve) | `lib/reviewItems.ts`, `app/review.tsx` |
 | Interleaving | A review session mixes item kinds (letter, word, count, calc, question) | `pickDue` in `lib/srs.ts` |
 | Error driven repetition | Wrong items repeat at the end of the same session | `app/review.tsx` |
 | Short sessions | Lessons have 3 to 6 rounds, review is capped at 10 items | `pickDue` limit in `lib/srs.ts`, content files |
-| Guided path, no locks | A continue card points to the next lesson below 3 stars. All content stays open | `lib/nextLesson.ts`, `components/ContinueCard.tsx` |
-| Streak | Consecutive local days with a lesson or review, shown as a small badge | `lib/streak.ts`, `components/StreakBadge.tsx` |
+| Story, chosen subject, guided path, no locks | Hudhud's story leads to a choice of subject; the play button opens the next lesson not yet done in that subject, an island switches it; books and units are paths with the next stop highlighted. All content stays open | `app/intro.tsx`, `content/story.ts`, `lib/nextLesson.ts`, `components/world/PathMap.tsx` |
+| Daily window, stickers | Today's qamariya fills one pane per lesson (goal 3, never punishes a missed day); a sticker of Yemen every 12 stars, never by chance | `lib/daily.ts`, `lib/stickers.ts`, `docs/SPIELWELT.md` |
 | Voice support | A banner appears when no Arabic TTS voice is installed | `hooks/useVoiceHint.ts`, `components/VoiceHintBanner.tsx` |
 
 ## Owner rule
@@ -67,6 +67,7 @@ Do not change Arabic lesson content (stories, vocabulary, quiz text, answer data
 ## Docs
 
 - [APP_OVERVIEW.md](APP_OVERVIEW.md): current state, layout, routes, behaviours, gaps, roadmap
+- [docs/SPIELWELT.md](docs/SPIELWELT.md): the child world (Hudhud, paths, qamariya, stickers, parents' corner) and its cultural choices
 - [docs/UI_PROPOSALS.md](docs/UI_PROPOSALS.md): 13 UI proposals and the tracing roadmap
 - [docs/CONTENT_REVIEW.md](docs/CONTENT_REVIEW.md): content review status
 - [docs/content/MATH_TEXTBOOK_OUTLINE.md](docs/content/MATH_TEXTBOOK_OUTLINE.md): math textbook outline

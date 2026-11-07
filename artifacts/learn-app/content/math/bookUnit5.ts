@@ -821,6 +821,8 @@ export const mathBookUnit5: Unit = {
   title: "الْوَحْدَةُ الْخَامِسَةُ",
   theme: "الأَشْكَالُ الْهَنْدَسِيَّةُ وَالْكُسُورُ",
   emoji: "🔺",
+  emblem: "shapes_window",
+  goal: "pack",
   color,
   badgeLabel: "أَشْكَالٌ",
   lessons: numberMathLessons(5, drafts),

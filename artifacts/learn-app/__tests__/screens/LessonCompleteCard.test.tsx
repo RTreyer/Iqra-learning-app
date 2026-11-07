@@ -36,7 +36,7 @@ test("celebrates the finished unit when there is no next lesson", () => {
   renderScreen(<LessonCompleteCard stars={3} onRepeat={jest.fn()} next={null} backTo={backTo} />);
   expect(screen.getAllByTestId("star-earned")).toHaveLength(3);
   expect(screen.queryByTestId("next-lesson")).toBeNull();
-  expect(screen.getByText("🎉 أتممت الوحدة!")).toBeTruthy();
+  expect(screen.getByText("أتممت الوحدة!")).toBeTruthy();
   expect(screen.getAllByRole("button")).toHaveLength(2);
   fireEvent.press(screen.getByTestId("back-to-list"));
   expect(router.back).toHaveBeenCalledTimes(1);
@@ -48,4 +48,21 @@ test("back to the list replaces with the unit when there is no history", () => {
   fireEvent.press(screen.getByTestId("back-to-list"));
   expect(router.back).not.toHaveBeenCalled();
   expect(router.replace).toHaveBeenCalledWith(backTo);
+});
+
+test("a new sticker is shown and says its name", () => {
+  const Speech = jest.requireMock("expo-speech") as { speak: jest.Mock };
+  const sticker = { id: "qamariya" as const, name: "الْقَمَرِيَّةُ" };
+  renderScreen(
+    <LessonCompleteCard
+      stars={3}
+      onRepeat={jest.fn()}
+      next={next}
+      backTo={backTo}
+      today={2}
+      sticker={sticker}
+    />,
+  );
+  fireEvent.press(screen.getByTestId("new-sticker"));
+  expect(Speech.speak).toHaveBeenLastCalledWith("الْقَمَرِيَّةُ", expect.anything());
 });

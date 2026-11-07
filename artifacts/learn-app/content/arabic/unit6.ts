@@ -252,9 +252,9 @@ const exercises: LessonDraft[] = [
   {
     section: EXERCISES,
     type: "build_word",
-    title: "قِطَارُ الْوَحْدَة",
+    title: "رِسَالَةُ الْوَحْدَة",
     subtitle: "كلمات الوحدة السادسة",
-    emoji: "🚂",
+    emoji: "✉️",
     color: "#EA580C",
     rounds: [
       train("نُقُودُ", ["نُـ", "قُو", "دُ"], ["نِـ", "قَا"], "💵"),
@@ -315,6 +315,9 @@ export const unit6: Unit = {
   letters: unit6Letters,
   theme: "مُنِيرٌ وَالْقِرَاءَةُ، صَابِرٌ وَالْبُلْبُلُ، مِصْيَدَةُ مُفِيدٍ",
   emoji: "📚",
+  emblem: "bulbul",
+  goal: "letters",
+  recipient: { to: "إِلَى صَابِرٍ وَبُلْبُلِهِ", pictures: ["👦", "🐦"] },
   color: COLOR,
   badgeLabel: "ق ص ف",
   lessons: numberLessons("u6", [...qaf, ...sad, ...fa, ...exercises]),

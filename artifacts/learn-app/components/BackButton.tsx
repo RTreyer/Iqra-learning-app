@@ -1,11 +1,11 @@
 /** BackButton: prominent back button with an inline SVG chevron. */
 
-import * as Haptics from "expo-haptics";
 import { router, type Href } from "expo-router";
 import React from "react";
 import { Pressable, StyleSheet } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import { useLanguage } from "@/context/LanguageContext";
+import * as haptics from "@/lib/haptics";
 import { shadow, touchTarget } from "@/theme/tokens";
 
 /** Goes back when there is history; otherwise (web deep link or refresh) replaces with the fallback. */
@@ -23,7 +23,7 @@ type Props = {
 export function BackButton({ fallback, onPress }: Props) {
   const { t, language } = useLanguage();
   const handlePress = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.tap();
     if (onPress) {
       onPress();
     } else {

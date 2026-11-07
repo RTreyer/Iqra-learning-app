@@ -92,7 +92,8 @@ const notCompleted: LessonStatus = { completed: false, stars: 0 };
 const ProgressContext = createContext<ProgressContextValue>({
   progress: createEmptyState(),
   hydrated: false,
-  loadSettled: false,
+  // Without a provider (isolated screens in tests) there is nothing to wait for.
+  loadSettled: true,
   completeLesson: () => {},
   getLessonProgress: () => notCompleted,
   getUnitProgress: (lessonIds) => ({ done: 0, total: lessonIds.length, stars: 0 }),

@@ -175,16 +175,67 @@ export type LessonType = LessonBody["type"];
 
 export type Lesson = LessonBase & LessonBody;
 
+/**
+ * Drawn pictures of the books and units (components/world/Emblem), from the child's Yemen and
+ * from Hudhud's story, in place of emoji.
+ */
+export type EmblemId =
+  | "book_arabic"
+  | "book_lughati"
+  | "book_math"
+  | "book_science"
+  | "lawh"
+  | "house"
+  | "caring_hands"
+  | "sand_house"
+  | "school"
+  | "bulbul"
+  | "ibriq"
+  | "butterfly"
+  | "basket"
+  | "coffee_sacks"
+  | "dates_tray"
+  | "pomegranates"
+  | "shapes_window"
+  | "hand"
+  | "camel"
+  | "seedling";
+
+/**
+ * What waits at the end of a unit's path in Hudhud's story (lib/storyProgress.ts):
+ * - writing: a blank page whose lines fill (the preparation unit, no letters yet);
+ * - letters: Hudhud's letter, its letters coming back; vowels: the same letters getting their
+ *   vowel marks back (the units that teach damma, kasra, sukun and long vowels);
+ * - the trader's market day in maths, one station per unit: sort the goods, count the sacks,
+ *   add the sacks that arrive, carry sacks to the ship, pack the goods (then the ship sails).
+ */
+export type GoalKind =
+  "writing" | "letters" | "vowels" | "sort" | "count" | "add" | "carry" | "pack";
+
+/** Who Hudhud brings a unit's finished letter to: a person from the unit's stories. */
+export type Recipient = {
+  /** "إِلَى …", fully vocalised, spoken after "سَأُوصِلُهَا" and "أَوْصَلْتُ رِسَالَتِي". */
+  to: string;
+  /** Pictures of the recipient (emoji drawn by components/pictures). */
+  pictures: string[];
+};
+
 export type Unit = {
   id: string;
   number: number;
   title: string;
   theme: string;
+  /** Fallback text picture; the app shows `emblem`. */
   emoji: string;
+  emblem: EmblemId;
   color: string;
   badgeLabel: string;
   /** Letters introduced by the unit (Arabic units 2 to 8). */
   letters?: string[];
+  /** The unit's goal in the story; by default from its subject and letters (goalKind). */
+  goal?: GoalKind;
+  /** Who gets the unit's finished letter (Arabic units with letters). */
+  recipient?: Recipient;
   lessons: Lesson[];
 };
 
@@ -193,7 +244,9 @@ export type Book = {
   subject: Subject;
   title: string;
   subtitle: string;
+  /** Fallback text picture; the app shows `emblem`. */
   emoji: string;
+  emblem: EmblemId;
   color: string;
   available: boolean;
   units: Unit[];

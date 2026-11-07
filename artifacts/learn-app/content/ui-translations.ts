@@ -3,6 +3,25 @@ export type UiLanguage = "ar" | "en";
 // Interface copy only. Lesson data, instructions, quiz answers and speech
 // deliberately stay Arabic, even when the interface is English.
 const english: Record<string, string> = {
+  "ركن الأهل": "Parents' corner",
+  "قصة هدهد": "Hudhud's story",
+  "ألبوم الملصقات": "Sticker album",
+  "قمرية اليوم": "Today's window",
+  "هذا الركن للأهل. اضغط على الزر مطوّلاً.":
+    "This corner is for parents. Press and hold the button.",
+  "اضغط مطوّلاً": "Press and hold",
+  الصف: "Grade",
+  "الصفوف ٢ إلى ٦ قريباً.": "Grades 2 to 6 are coming soon.",
+  "لغة القوائم": "Menu language",
+  الصوت: "Voice",
+  الاهتزاز: "Vibration",
+  التقدم: "Progress",
+  "سيُمسح كل التقدم: النجوم والدروس والملصقات. لا يمكن التراجع.":
+    "All progress will be deleted: stars, lessons and stickers. This cannot be undone.",
+  "نعم، امسح التقدم": "Yes, delete progress",
+  إلغاء: "Cancel",
+  "مسح التقدم": "Delete progress",
+  "تم مسح التقدم": "Progress deleted",
   أهلاً: "Hello",
   "اختَر الكتاب": "Choose a book",
   "اختَر صفّك": "Choose your grade",
@@ -68,7 +87,7 @@ const english: Record<string, string> = {
   "لقد أتممت هذا النشاط بنجاح": "You finished this activity",
   "أَحْسَنْت!": "Well done!",
   "النشاط التالي:": "Next activity:",
-  "🎉 أتممت الوحدة!": "🎉 Unit complete!",
+  "أتممت الوحدة!": "Unit complete!",
   "الْوَحْدَة الأُولَى": "Unit 1",
   "الْوَحْدَة الثَّانِيَة": "Unit 2",
   "الْوَحْدَة الثَّالِثَة": "Unit 3",
@@ -120,9 +139,6 @@ const english: Record<string, string> = {
   "اضغط على شيء في اليمين ثم ما يناسبه في اليسار":
     "Tap an item on the left, then its match on the right",
   "ابحث عن الحرف": "Find the letter",
-  "رتّب المقاطع في القطار 🚂": "Load the syllables into the train 🚂",
-  "رتّب الكلمات في القطار 🚂": "Load the words into the train 🚂",
-  "أكمل القطار بالمقطع الناقص 🚂": "Complete the train with the missing syllable 🚂",
   "اضغط للاستماع ثم اختر": "Tap to listen, then choose",
   "سلوك صحيح": "Good behavior",
   "سلوك خطأ": "Bad behavior",

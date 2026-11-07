@@ -565,6 +565,8 @@ export const mathBookUnit4: Unit = {
   title: "الْوَحْدَةُ الرَّابِعَةُ",
   theme: "الطَّرْحُ ضِمْنَ الْعَدَدِ ١٠",
   emoji: "➖",
+  emblem: "pomegranates",
+  goal: "carry",
   color,
   badgeLabel: "أَطْرَحُ",
   lessons: numberMathLessons(4, drafts),

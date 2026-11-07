@@ -45,8 +45,9 @@ test("renders the equation with Arabic digits and scores the rounds", () => {
     expect.anything(),
   );
   fireEvent.press(screen.getByRole("button", { name: "٦" }));
-  expect(speech.speak).toHaveBeenLastCalledWith("خَمْسَة", expect.anything());
-  expect(screen.getByRole("button", { name: "٥" })).toBeDisabled();
+  expect(speech.speak).toHaveBeenLastCalledWith("حَاوِلْ مَرَّةً أُخْرَى", expect.anything());
+  expect(screen.getByRole("button", { name: "٥" })).not.toBeDisabled();
+  fireEvent.press(screen.getByRole("button", { name: "٥" }));
   act(() => jest.advanceTimersByTime(900));
   expect(screen.getByText("٧ - ٤ = ؟")).toBeTruthy();
   act(() => jest.advanceTimersByTime(400));

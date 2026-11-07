@@ -1,4 +1,4 @@
-// Learning loop: continue card, Leitner review and streak across days, driven by page.clock.
+// Learning loop: play button, Leitner review and today's qamariya across days, driven by page.clock.
 import {
   completeQuizLesson,
   earnedStars,
@@ -17,10 +17,8 @@ const LETTERS = ["letter:رَ", "letter:لَا", "letter:دَا", "letter:نَ",
 
 /** Target letter shown in the current review round. */
 async function reviewTarget(page) {
-  const round = page.getByTestId("review-round");
-  return (
-    await round.getByText("ابحث عن الحرف").locator("xpath=following-sibling::*[1]").innerText()
-  ).trim();
+  const label = await page.getByTestId("review-target").getAttribute("aria-label");
+  return label.replace("🔊", "").trim();
 }
 
 test("fresh start: Continue points at Unit 1 lesson 1 and there is no Review card", async ({
@@ -28,8 +26,7 @@ test("fresh start: Continue points at Unit 1 lesson 1 and there is no Review car
 }) => {
   await gotoAndWaitReady(page, "/");
   const card = page.getByTestId("continue-card");
-  await expect(card).toContainText("تَابِعْ:");
-  await expect(card).toContainText("أُسَمِّي الصُّوَر");
+  await expect(card).toHaveAttribute("aria-label", /^تَابِعْ:.*أُسَمِّي الصُّوَر/);
   await expect(page.getByTestId("review-card")).toHaveCount(0);
   await card.click();
   await expect(page).toHaveURL(/\/lesson\/u1-1$/);
@@ -81,12 +78,18 @@ test("missed letters come back tomorrow in today's review, and leave once answer
 
   await gotoAndWaitReady(page, "/");
   await page.reload();
-  await expect(page.getByTestId("grade-1")).toBeVisible();
+  await expect(page.getByTestId("book-arabic-1")).toBeVisible();
   await expect(page.getByTestId("review-card")).toHaveCount(0);
 });
 
-test("streak badge shows 🔥 ٢ after lessons on two consecutive days", async ({ page }) => {
+test("today's qamariya fills with each lesson and starts clear the next day", async ({ page }) => {
   await page.clock.setFixedTime(DAY_1);
+  await gotoAndWaitReady(page, "/");
+  const qamariya = page.getByTestId("daily-window");
+  await expect(qamariya).toHaveAttribute(
+    "aria-label",
+    "ثَلَاثَةُ دُرُوسٍ، وَتُضِيءُ الْقَمَرِيَّةُ!",
+  );
   await gotoAndWaitReady(page, "/lesson/u2-1");
   await tapAllAndFinish(page, [
     "مَامَا تُوصِلُنِي إِلَى الْمَدْرَسَةِ",
@@ -96,9 +99,14 @@ test("streak badge shows 🔥 ٢ after lessons on two consecutive days", async (
   ]);
   expect(await earnedStars(page)).toBe(3);
   await gotoAndWaitReady(page, "/");
-  await expect(page.getByTestId("streak-badge")).toHaveCount(0);
+  await expect(qamariya).toHaveAttribute("aria-label", "دَرْسَانِ، وَتُضِيءُ الْقَمَرِيَّةُ!");
 
   await page.clock.setFixedTime(DAY_2);
+  await page.reload();
+  await expect(qamariya).toHaveAttribute(
+    "aria-label",
+    "ثَلَاثَةُ دُرُوسٍ، وَتُضِيءُ الْقَمَرِيَّةُ!",
+  );
   await gotoAndWaitReady(page, "/lesson/u2-5");
   await tapAllAndFinish(page, [
     "بَابَا يُعَلِّمُنِي",
@@ -107,11 +115,7 @@ test("streak badge shows 🔥 ٢ after lessons on two consecutive days", async (
     "نَحْنُ نَقْرَأُ",
   ]);
   expect(await earnedStars(page)).toBe(3);
-
-  await page.reload();
   await gotoAndWaitReady(page, "/");
-  const badge = page.getByTestId("streak-badge");
-  await expect(badge).toHaveText("🔥 ٢");
-  await expect(badge).toHaveAttribute("aria-label", "يَوْمَانِ مُتَتَالِيَانِ");
+  await expect(qamariya).toHaveAttribute("aria-label", "دَرْسَانِ، وَتُضِيءُ الْقَمَرِيَّةُ!");
   expect((await readProgress(page)).activity.days).toEqual(["2026-03-10", "2026-03-11"]);
 });

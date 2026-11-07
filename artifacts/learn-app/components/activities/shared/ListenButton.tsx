@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from "react";
+import { Icon } from "@/components/world/Icon";
 import { Animated, Pressable, Text } from "react-native";
 import { UiText } from "@/components/UiText";
 import { useLanguage } from "@/context/LanguageContext";
@@ -31,7 +32,7 @@ export function ListenButton({ text, color, showText }: Props) {
         style={[act.listenBtn, { backgroundColor: readableFill(color) }]}
         onPress={handlePress}
       >
-        <Text style={act.listenEmoji}>🔊</Text>
+        <Icon name="speaker" size={40} color="#FFFFFF" />
         {showText ? <Text style={act.listenBtnText}>{text}</Text> : null}
         <UiText style={act.listenHint}>اضغط للاستماع</UiText>
       </Pressable>

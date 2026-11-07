@@ -78,7 +78,7 @@ test("Catalog unit titles and lesson screen chrome translate", async () => {
   }
   assert.equal(translateUi("أَحْسَنْت!", "en"), "Well done!");
   assert.equal(translateUi("النشاط التالي:", "en"), "Next activity:");
-  assert.equal(translateUi("🎉 أتممت الوحدة!", "en"), "🎉 Unit complete!");
+  assert.equal(translateUi("أتممت الوحدة!", "en"), "Unit complete!");
   assert.equal(translateUi("العودة إلى القائمة", "en"), "Back to the list");
   assert.equal(translateUi("اختَر الكتاب", "en"), "Choose a book");
 });

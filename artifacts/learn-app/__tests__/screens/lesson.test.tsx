@@ -12,12 +12,17 @@ import { mockCanGoBack, renderScreen, setParams } from "@/test-utils/screens";
 const mockCompleteLesson = jest.fn();
 const mockRecordRoundResult = jest.fn();
 
-jest.mock("@/context/ProgressContext", () => ({
-  useProgress: () => ({
-    completeLesson: mockCompleteLesson,
-    recordRoundResult: mockRecordRoundResult,
-  }),
-}));
+jest.mock("@/context/ProgressContext", () => {
+  const progress = { version: 2, lessons: {}, items: {}, activity: { days: [] }, totalStars: 0 };
+  return {
+    useProgress: () => ({
+      progress,
+      completeLesson: mockCompleteLesson,
+      recordRoundResult: mockRecordRoundResult,
+      getLessonProgress: () => ({ completed: false, stars: 0 }),
+    }),
+  };
+});
 
 jest.mock("@/components/activities", () => {
   const { Pressable, Text } = jest.requireActual("react-native");
@@ -101,8 +106,10 @@ test("speaks the title, then the instruction, and mounts the activity once both 
   });
   renderScreen(<LessonScreen />);
   expect(order).toEqual([`speak:${lesson.title}`, `speak:${instruction}`]);
-  expect(screen.getByText(lesson.title)).toBeTruthy();
-  expect(screen.getByText(lesson.subtitle)).toBeTruthy();
+  // The header shows the lesson as a picture; its name is spoken and announced.
+  expect(screen.getByTestId("header-picture").props.accessibilityLabel).toBe(
+    `${lesson.title}، ${lesson.subtitle}`,
+  );
   expect(screen.getByText("stub:letter_pick")).toBeTruthy();
 });
 

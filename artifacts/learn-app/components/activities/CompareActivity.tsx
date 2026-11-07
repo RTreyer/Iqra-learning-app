@@ -10,10 +10,10 @@ import { CompareSymbol } from "./math/CompareSymbol";
 import { PicGroup } from "./math/MathPic";
 import { useInstruction } from "./math/useInstruction";
 import { ListenButton } from "./shared/ListenButton";
-import { ProgressDots } from "./shared/ProgressDots";
+import { StoryProgress } from "./shared/StoryProgress";
 import { PRAISE } from "./shared/strings";
 import { act } from "./shared/styles";
-import { ADVANCE_MS, choiceState, useQuiz } from "./shared/useQuiz";
+import { ADVANCE_MS, TRY_AGAIN, choiceState, useQuiz } from "./shared/useQuiz";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import type { ActivityProps } from "./types";
 
@@ -59,14 +59,14 @@ function Compare({ lesson, color, onComplete, onRoundResult }: ActivityProps<"co
     (idx: number) => {
       const correct = idx === correctIndex;
       if (!pick(idx, correct)) return;
-      if (correct) speak(PRAISE);
+      speak(correct ? PRAISE : TRY_AGAIN);
     },
     [correctIndex, pick],
   );
 
   return (
     <View style={act.container}>
-      <ProgressDots count={total} current={quiz.roundIndex} color={color} />
+      <StoryProgress count={total} current={quiz.roundIndex} color={color} />
       <ListenButton text={round.prompt} color={color} showText />
       <View style={styles.sides}>
         <View style={styles.side} testID="compare-first">
@@ -85,15 +85,16 @@ function Compare({ lesson, color, onComplete, onRoundResult }: ActivityProps<"co
       </View>
       <View style={styles.buttons}>
         {ANSWERS.map((a, idx) => {
-          const state = choiceState(idx, quiz.picked, correctIndex);
+          const state = choiceState(idx, quiz.picked, correctIndex, quiz.wrong);
+          const disabled = quiz.locked || state === "wrong";
           return (
             <Pressable
               key={a}
               testID={`compare-answer-${a}`}
               accessibilityRole="button"
               accessibilityLabel={words[a]}
-              accessibilityState={{ disabled: quiz.locked, selected: quiz.picked === idx }}
-              disabled={quiz.locked}
+              accessibilityState={{ disabled, selected: quiz.picked === idx }}
+              disabled={disabled}
               onPress={() => handlePick(idx)}
               style={[styles.button, stateStyles[state]]}
             >
@@ -154,5 +155,5 @@ const styles = StyleSheet.create({
 const stateStyles = StyleSheet.create({
   idle: { backgroundColor: colors.surface, borderColor: colors.border },
   correct: { backgroundColor: colors.successSoft, borderColor: colors.success },
-  wrong: { backgroundColor: colors.dangerSoft, borderColor: colors.danger },
+  wrong: { backgroundColor: "#EFEAE3", borderColor: "#D6CBBB", opacity: 0.6 },
 });

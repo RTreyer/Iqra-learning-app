@@ -1,6 +1,6 @@
 # UI adaptation proposals (Task 6.5)
 
-Status: proposals only. Nothing here is implemented.
+Status: proposals. Implemented since (see `docs/SPIELWELT.md`): the settings store, 5 (progress ring on the unit stations), 6 (voice and vibration switches, in the parents' corner) and 7 (parents' corner with reset).
 
 Constraints that apply to every proposal: offline only, no login, Arabic UI (English only for menus, buttons and the labels on book and unit cards; lessons and speech stay Arabic), children in Yemen, low-end Android, keep the current visual style (gradient backgrounds, big rounded cards, emoji, star badge, language switch). Touch targets stay at 48 px or more (`touchTarget` in `theme/tokens.ts`).
 

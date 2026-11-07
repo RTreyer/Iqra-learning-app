@@ -1,14 +1,13 @@
 import React, { useCallback, useEffect, useMemo } from "react";
 import { View } from "react-native";
-import { UiText } from "@/components/UiText";
 import { speak } from "@/lib/speech";
 import { PRAISE } from "./shared/strings";
 import { ChoiceCard } from "./shared/ChoiceCard";
 import { DoneButton } from "./shared/DoneButton";
 import { ListenButton } from "./shared/ListenButton";
-import { ProgressDots } from "./shared/ProgressDots";
+import { StoryProgress } from "./shared/StoryProgress";
 import { act } from "./shared/styles";
-import { PROMPT_DELAY_MS, choiceState, useBounce, useQuiz } from "./shared/useQuiz";
+import { PROMPT_DELAY_MS, TRY_AGAIN, choiceState, useBounce, useQuiz } from "./shared/useQuiz";
 import { useShuffled } from "./shared/useShuffled";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import type { ActivityProps } from "./types";
@@ -41,7 +40,7 @@ function WordRead({
         speak(PRAISE);
         bounce(idx, 1.1);
       } else {
-        speak(round.choices[round.correctIndex]);
+        speak(`${TRY_AGAIN}، ${round.word}`);
       }
     },
     [options.correctIndex, pick, bounce, round],
@@ -53,10 +52,7 @@ function WordRead({
 
   return (
     <View style={act.container}>
-      <ProgressDots count={rounds.length} current={quiz.roundIndex} color={color} />
-      <UiText
-        style={act.instruction}
-      >{`سؤال ${quiz.roundIndex + 1} من ${rounds.length}. اضغط للاستماع ثم اختر`}</UiText>
+      <StoryProgress count={rounds.length} current={quiz.roundIndex} color={color} />
       <ListenButton text={round.word} color={color} />
       <View style={act.wordChoicesCol}>
         {options.items.map((choice, idx) => (
@@ -65,7 +61,7 @@ function WordRead({
             index={idx}
             word={choice}
             variant="word"
-            state={choiceState(idx, quiz.picked, options.correctIndex)}
+            state={choiceState(idx, quiz.picked, options.correctIndex, quiz.wrong)}
             selected={quiz.picked === idx}
             locked={quiz.locked}
             onPick={handlePick}

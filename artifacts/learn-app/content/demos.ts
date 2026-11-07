@@ -213,7 +213,7 @@ export const DEMOS: { [K in LessonType]: Demo<K> } & { trace_lines: Demo<"trace"
       rounds: [{ word: "كَتَبَ", syllables: ["كَـ", "تَـ", "بَ"], extras: ["كُـ"], emoji: "✍️" }],
     },
     steps: [
-      say("أَسْمَعُ الْكَلِمَةَ، وَأَضَعُ مَقَاطِعَهَا فِي الْقِطَارِ بِالتَّرْتِيبِ."),
+      say("أَسْمَعُ الْكَلِمَةَ، وَأَكْتُبُ مَقَاطِعَهَا فِي الرِّسَالَةِ بِالتَّرْتِيبِ."),
       tapLabel("كَـ"),
       tapLabel("تَـ"),
       tapLabel("بَ"),

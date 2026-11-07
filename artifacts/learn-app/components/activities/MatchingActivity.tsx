@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
+import { Picture } from "@/components/pictures/Picture";
 import { StyleSheet, Text, View } from "react-native";
 import { Pressable } from "@/components/demo/DemoPressable";
-import { UiText } from "@/components/UiText";
 import { useLanguage } from "@/context/LanguageContext";
 import * as haptics from "@/lib/haptics";
 import { speak } from "@/lib/speech";
@@ -13,6 +13,7 @@ import { useOnce } from "./shared/useOnce";
 import { useShuffled } from "./shared/useShuffled";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import type { ActivityProps } from "./types";
+import { useGuide } from "@/components/world/LessonGuide";
 
 type State = {
   selectedLeft: number | null;
@@ -25,6 +26,7 @@ type State = {
 const INITIAL: State = { selectedLeft: null, matched: new Set(), missed: new Set() };
 
 function Matching({ lesson, color, attemptKey, onComplete }: ActivityProps<"matching">) {
+  const guide = useGuide();
   const { pairs } = lesson;
   const { language } = useLanguage();
   const [state, setState] = useState<State>(INITIAL);
@@ -46,14 +48,16 @@ function Matching({ lesson, color, attemptKey, onComplete }: ActivityProps<"matc
       if (left === null || state.matched.has(pairIdx)) return;
       if (left === pairIdx) {
         haptics.success();
+        guide.react("right");
         speak(PRAISE);
         setState((s) => ({ ...s, selectedLeft: null, matched: new Set(s.matched).add(pairIdx) }));
       } else {
         haptics.error();
+        guide.react("wrong");
         setState((s) => ({ ...s, selectedLeft: null, missed: new Set(s.missed).add(left) }));
       }
     },
-    [state],
+    [state, guide],
   );
 
   const allMatched = state.matched.size >= pairs.length;
@@ -67,7 +71,6 @@ function Matching({ lesson, color, attemptKey, onComplete }: ActivityProps<"matc
 
   return (
     <View style={act.container}>
-      <UiText style={act.instruction}>اضغط على شيء في اليمين ثم ما يناسبه في اليسار</UiText>
       {/* Mirrored in Arabic so the first column sits on the right, as the hint says. */}
       <View
         testID="match-grid"
@@ -96,7 +99,7 @@ function Matching({ lesson, color, attemptKey, onComplete }: ActivityProps<"matc
               ]}
               onPress={() => handleLeft(i)}
             >
-              {pair.left.emoji ? <Text style={styles.emoji}>{pair.left.emoji}</Text> : null}
+              {pair.left.emoji ? <Picture emoji={pair.left.emoji} size={40} /> : null}
               <Text style={[styles.word, !pair.left.emoji && styles.wordOnly]}>
                 {pair.left.word}
               </Text>
@@ -133,7 +136,7 @@ function Matching({ lesson, color, attemptKey, onComplete }: ActivityProps<"matc
               onPress={() => handleRight(pairIdx)}
             >
               {pairs[pairIdx].right.emoji ? (
-                <Text style={styles.emoji}>{pairs[pairIdx].right.emoji}</Text>
+                <Picture emoji={pairs[pairIdx].right.emoji} size={40} />
               ) : null}
               <Text style={[styles.word, !pairs[pairIdx].right.emoji && styles.wordOnly]}>
                 {pairs[pairIdx].right.word}
@@ -180,7 +183,6 @@ const styles = StyleSheet.create({
   /** Same pitch as the arrows column (68 high) when a card has no picture. */
   itemTextOnly: { minHeight: 68, justifyContent: "center" },
   itemMatched: { backgroundColor: colors.successSoft, borderColor: colors.success, borderWidth: 2 },
-  emoji: { fontSize: 30 },
   word: { fontSize: 15, fontWeight: "700", color: colors.mutedStrong, textAlign: "center" },
   /** Syllables and words without a picture are what the child reads: make them large. */
   wordOnly: { fontSize: 22, fontWeight: "800", color: colors.text, lineHeight: 34 },

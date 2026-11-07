@@ -12,10 +12,13 @@ beforeEach(() => {
 });
 afterEach(() => jest.useRealTimers());
 
-const tap = (letter: string) => fireEvent.press(screen.getByRole("button", { name: letter }));
+/** The answer card for `letter` (the target card above says it too, as "🔊 letter"). */
+const choice = (letter: string) =>
+  screen.getAllByRole("button", { name: letter }).find((n) => n.props.testID !== "letter-target")!;
+const tap = (letter: string) => fireEvent.press(choice(letter));
 const advance = () => act(() => jest.advanceTimersByTime(900));
 
-test("first tap scoring: wrong, wrong, right, right", () => {
+test("first tap scoring: wrong then found, wrong then found, right, right", () => {
   const onComplete = jest.fn();
   const onRoundResult = jest.fn();
   renderActivity(
@@ -27,12 +30,15 @@ test("first tap scoring: wrong, wrong, right, right", () => {
       onRoundResult={onRoundResult}
     />,
   );
-  expect(screen.getByText("سؤال ١ من ٤")).toBeTruthy();
+  expect(screen.getByTestId("story-progress")).toHaveProp("aria-valuenow", 1);
 
-  tap("بَ"); // target مَ
-  tap("مَ"); // locked: ignored
+  tap("بَ"); // target مَ: wrong, the round stays open
   advance();
-  tap("مَ"); // target مَا
+  expect(screen.getByTestId("story-progress")).toHaveProp("aria-valuenow", 1);
+  tap("مَ"); // found on the second try: does not count
+  advance();
+  tap("مَ"); // target مَا: wrong
+  tap("مَا"); // found
   advance();
   tap("مَ");
   advance();
@@ -50,17 +56,23 @@ test("first tap scoring: wrong, wrong, right, right", () => {
   ]);
 });
 
-test("locks the round, highlights the correct letter and speaks the prompt", () => {
+test("a wrong letter greys out, the voice asks again, and the child tries again", () => {
   renderActivity(
     <LetterPickActivity lesson={lesson} color="#7C3AED" attemptKey="a:1" onComplete={jest.fn()} />,
   );
   act(() => jest.advanceTimersByTime(400));
   expect(speech.speak).toHaveBeenCalledWith("مَ", expect.anything());
   tap("نَ");
-  expect(screen.getByRole("button", { name: "مَ" })).toBeDisabled();
-  expect(screen.getByRole("button", { name: "مَ" })).toHaveProp("accessibilityState", {
+  expect(speech.speak).toHaveBeenLastCalledWith("حَاوِلْ مَرَّةً أُخْرَى، مَ", expect.anything());
+  // The wrong letter cannot be tapped again; the answer is not revealed and stays open.
+  expect(screen.getByRole("button", { name: "نَ، خطأ" })).toBeDisabled();
+  expect(choice("مَ")).not.toBeDisabled();
+  tap("نَ");
+  expect(speech.speak).toHaveBeenCalledTimes(2);
+  tap("مَ");
+  expect(screen.getByRole("button", { name: "مَ، صحيح" })).toHaveProp("accessibilityState", {
     disabled: true,
-    selected: false,
+    selected: true,
   });
 });
 
@@ -70,12 +82,12 @@ test("resets when attemptKey changes", () => {
   );
   tap("مَ");
   advance();
-  expect(screen.getByText("سؤال ٢ من ٤")).toBeTruthy();
+  expect(screen.getByTestId("story-progress")).toHaveProp("aria-valuenow", 2);
   rerenderActivity(
     <LetterPickActivity lesson={lesson} color="#7C3AED" attemptKey="a:2" onComplete={jest.fn()} />,
   );
-  expect(screen.getByText("سؤال ١ من ٤")).toBeTruthy();
-  expect(screen.getByRole("button", { name: "مَ" })).not.toBeDisabled();
+  expect(screen.getByTestId("story-progress")).toHaveProp("aria-valuenow", 1);
+  expect(choice("مَ")).not.toBeDisabled();
 });
 
 test("uses the latest callbacks when the parent re-renders before the advance", () => {
@@ -94,17 +106,21 @@ test("uses the latest callbacks when the parent re-renders before the advance", 
   expect(latest).toHaveBeenCalledWith({ correct: 1, total: 1 });
 });
 
-test("only the tapped option is selected and revealed options announce the result", () => {
+test("options announce their result: wrong ones as they are tapped, the answer once found", () => {
   renderActivity(
     <LetterPickActivity lesson={lesson} color="#7C3AED" attemptKey="a:1" onComplete={jest.fn()} />,
   );
   tap("بَ");
-  const buttons = screen.getAllByRole("button");
-  const byLetter = (l: string) =>
-    buttons.find((b) => String(b.props.accessibilityLabel).startsWith(l))!;
-  expect(byLetter("بَ").props.accessibilityLabel).toBe("بَ، خطأ");
-  expect(byLetter("بَ").props.accessibilityState.selected).toBe(true);
-  expect(byLetter("مَ").props.accessibilityLabel).toBe("مَ، صحيح");
-  expect(byLetter("مَ").props.accessibilityState.selected).toBe(false);
-  expect(byLetter("نَ").props.accessibilityLabel).toBe("نَ");
+  const label = (l: string) =>
+    screen
+      .getAllByRole("button")
+      .map((b) => String(b.props.accessibilityLabel))
+      .find((t) => t.startsWith(l));
+  expect(label("بَ")).toBe("بَ، خطأ");
+  expect(label("مَ")).toBe("مَ");
+  expect(label("نَ")).toBe("نَ");
+  tap("مَ");
+  expect(label("مَ")).toBe("مَ، صحيح");
+  expect(label("بَ")).toBe("بَ، خطأ");
+  expect(label("نَ")).toBe("نَ");
 });

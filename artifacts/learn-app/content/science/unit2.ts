@@ -9,6 +9,7 @@ export const scienceUnit2: Unit = {
   title: "الْوَحْدَة الثَّانِيَة",
   theme: "الْحَيَوَانَات",
   emoji: "🐄",
+  emblem: "camel",
   color,
   badgeLabel: "حَيَوَانَات",
   lessons: [

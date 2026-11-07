@@ -663,6 +663,8 @@ export const mathBookUnit1: Unit = {
   title: "الْوَحْدَةُ الأُولَى",
   theme: "التَّصْنِيفُ وَالأَنْمَاطُ",
   emoji: "🧩",
+  emblem: "basket",
+  goal: "sort",
   color,
   badgeLabel: "أُصَنِّفُ",
   lessons: numberMathLessons(1, drafts),

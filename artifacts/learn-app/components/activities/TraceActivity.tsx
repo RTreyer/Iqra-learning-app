@@ -1,16 +1,16 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState, type ComponentRef } from "react";
+import { Picture } from "@/components/pictures/Picture";
 import { Animated, Platform, StyleSheet, Text, View, type LayoutChangeEvent } from "react-native";
 import { Pressable } from "@/components/demo/DemoPressable";
 import { GestureDetector, usePanGesture } from "react-native-gesture-handler";
 import { Path, Svg } from "react-native-svg";
 import { measureNode, useDemoEntry, type DemoEntry } from "@/components/demo/DemoContext";
-import { UiText } from "@/components/UiText";
 import { useLanguage } from "@/context/LanguageContext";
 import * as haptics from "@/lib/haptics";
 import { readableFill } from "@/theme/tokens";
 import { speak } from "@/lib/speech";
 import { PRAISE } from "./shared/strings";
-import { ProgressDots } from "./shared/ProgressDots";
+import { StoryProgress } from "./shared/StoryProgress";
 import { useLatest } from "./shared/useLatest";
 import { ADVANCE_MS } from "./shared/useQuiz";
 import { withAttemptReset } from "./shared/withAttemptReset";
@@ -20,6 +20,8 @@ import { addPoint, startStroke, type DrawnStroke } from "./trace/path";
 import { decodeMask, validateOnGuide, validateTracing } from "./trace/validate";
 import { TRACE_GRID, traceGuides } from "@/content/generated/traceGuides";
 import type { ActivityProps } from "./types";
+import { useGuide } from "@/components/world/LessonGuide";
+import { Icon } from "@/components/world/Icon";
 
 const ERROR_VISIBLE_MS = 3000;
 /** Distance between the points of a demo line, in pixels. */
@@ -36,6 +38,7 @@ export function guideScale(guide: string): number {
 const PLATFORM_PAD = Platform.OS === "web" ? webPad : null;
 
 function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
+  const guide = useGuide();
   const { targets } = lesson;
   const { t } = useLanguage();
   const [targetIndex, setTargetIndex] = useState(0);
@@ -173,6 +176,7 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
       setError(result.msg);
       setPadError(true);
       haptics.warning();
+      guide.react("wrong");
       speak("حاول مرة أخرى");
       shake.setValue(0);
       Animated.sequence([
@@ -190,6 +194,7 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
     setError(null);
     setPadError(false);
     haptics.success();
+    guide.react("right");
     speak(PRAISE);
     advanceTimer.current = setTimeout(() => {
       if (targetIndex + 1 >= targets.length) {
@@ -211,6 +216,7 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
     targetIndex,
     targets.length,
     completeRef,
+    guide,
   ]);
 
   const translateX = shake.interpolate({ inputRange: [0, 1], outputRange: [0, 8] });
@@ -223,7 +229,7 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
 
   return (
     <View style={trace.container}>
-      <ProgressDots count={targets.length} current={targetIndex} color={color} />
+      <StoryProgress count={targets.length} current={targetIndex} color={color} />
       {lesson.sentence ? (
         <Text testID="trace-sentence" style={trace.sentence} accessibilityLabel={lesson.sentence}>
           {lesson.sentence.split(" ").map((word, i, all) => (
@@ -244,7 +250,7 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
         </Text>
       ) : null}
       <View style={trace.header}>
-        {target.emoji ? <Text style={trace.emoji}>{target.emoji}</Text> : null}
+        {target.emoji ? <Picture emoji={target.emoji} size={44} /> : null}
         <Text style={[trace.label, { color: readableFill(color) }]}>{target.label}</Text>
       </View>
       {error ? (
@@ -321,7 +327,7 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
             style={[trace.button, trace.clear]}
             onPress={handleClear}
           >
-            <UiText style={trace.clearText}>مسح</UiText>
+            <Icon name="replay" size={28} color="#7C3AED" strokeWidth={2.6} />
           </Pressable>
           <Pressable
             testID="trace-done"
@@ -330,7 +336,7 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
             style={[trace.button, { backgroundColor: readableFill(color) }]}
             onPress={handleDone}
           >
-            <UiText style={trace.doneText}>تم</UiText>
+            <Icon name="check" size={34} color="#FFFFFF" strokeWidth={3} />
           </Pressable>
         </View>
       </View>

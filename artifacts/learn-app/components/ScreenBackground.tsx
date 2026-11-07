@@ -1,8 +1,6 @@
 /**
- * ScreenBackground: gradient backdrop with floating decorative emoji.
- *
- * Used on every screen to create a warm, inviting atmosphere.
- * Decorations are subtle (very low opacity) so they don't distract.
+ * ScreenBackground: the warm sand backdrop of the child's world, with a breath of the subject
+ * colour at the top. Drawings, not emoji, decorate the screens themselves.
  */
 
 import { LinearGradient } from "expo-linear-gradient";
@@ -33,34 +31,22 @@ type Config = {
 const HOME: Config = {
   start: { x: 0.1, y: 0 },
   end: { x: 0.9, y: 1 },
-  decos: [
-    { emoji: "⭐", size: 110, opacity: 0.12, rotate: "20deg", top: "4%", left: "2%" },
-    { emoji: "🌟", size: 80, opacity: 0.09, rotate: "-15deg", top: "16%", right: "3%" },
-    { emoji: "🌟", size: 90, opacity: 0.09, rotate: "15deg", bottom: "8%", left: "5%" },
-    { emoji: "✨", size: 65, opacity: 0.1, rotate: "-30deg", bottom: "6%", right: "8%" },
-  ],
+  // Home draws Old Sana'a instead (components/world/Skyline).
+  decos: [],
 };
 
 const READING: Config = {
-  start: { x: 0, y: 0 },
-  end: { x: 1, y: 1 },
-  decos: [
-    { emoji: "📖", size: 100, opacity: 0.1, rotate: "15deg", top: "3%", right: "2%" },
-    { emoji: "✨", size: 80, opacity: 0.1, rotate: "-20deg", top: "22%", left: "1%" },
-    { emoji: "📚", size: 110, opacity: 0.08, rotate: "10deg", top: "52%", right: "1%" },
-    { emoji: "⭐", size: 85, opacity: 0.1, rotate: "-25deg", bottom: "18%", left: "2%" },
-  ],
+  start: { x: 0.5, y: 0 },
+  end: { x: 0.5, y: 1 },
+  // No floating emoji: the world is drawn (paths, palms, Hudhud), as in the design.
+  decos: [],
 };
 
 const NUMBERS: Config = {
-  start: { x: 0.1, y: 0 },
-  end: { x: 0.9, y: 1 },
-  decos: [
-    { emoji: "⭐", size: 100, opacity: 0.1, rotate: "20deg", top: "4%", left: "2%" },
-    { emoji: "✨", size: 75, opacity: 0.09, rotate: "-15deg", top: "20%", right: "2%" },
-    { emoji: "🔢", size: 105, opacity: 0.07, rotate: "10deg", top: "52%", left: "1%" },
-    { emoji: "🌟", size: 85, opacity: 0.1, rotate: "-20deg", bottom: "18%", right: "2%" },
-  ],
+  start: { x: 0.5, y: 0 },
+  end: { x: 0.5, y: 1 },
+  // No floating emoji: the world is drawn (paths, palms, Hudhud), as in the design.
+  decos: [],
 };
 
 const SUBJECT_STYLE: Record<BgSubject, Config> = {
