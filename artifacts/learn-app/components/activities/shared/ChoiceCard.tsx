@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Picture } from "@/components/pictures/Picture";
 import { Animated, StyleSheet, Text } from "react-native";
 import { Pressable } from "@/components/demo/DemoPressable";
 import { colors, shadow, touchTarget } from "@/theme/tokens";
@@ -20,7 +21,7 @@ type Props = {
   scale?: Animated.Value;
 };
 
-const ICON: Record<ChoiceState, string | null> = { idle: null, correct: "✅", wrong: "✗" };
+const ICON: Record<ChoiceState, string | null> = { idle: null, correct: "✓", wrong: "✗" };
 /** Number cards are solid coloured, so a plain glyph keeps the feedback visible without colour. */
 const GLYPH: Record<ChoiceState, string | null> = { idle: null, correct: "✓", wrong: "✗" };
 const SPOKEN: Record<ChoiceState, string> = { idle: "", correct: "، صحيح", wrong: "، خطأ" };
@@ -51,7 +52,7 @@ export function ChoiceCard({
         onPress={() => onPick(index)}
         style={[styles.base, cardStyles[variant], (solid ? solidStates : softStates)[state]]}
       >
-        {emoji ? <Text style={styles.emoji}>{emoji}</Text> : null}
+        {emoji ? <Picture emoji={emoji} size={44} /> : null}
         <Text
           style={[
             textStyles[variant],
@@ -91,7 +92,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  emoji: { fontSize: 32 },
   textOnly: { fontSize: 32, fontWeight: "900", lineHeight: 48 },
 });
 

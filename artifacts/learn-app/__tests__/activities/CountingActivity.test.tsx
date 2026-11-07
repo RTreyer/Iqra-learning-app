@@ -40,7 +40,7 @@ test("shows Eastern Arabic digits, scores first taps and completes", () => {
       onRoundResult={onRoundResult}
     />,
   );
-  expect(screen.getAllByText("🍎")).toHaveLength(3);
+  expect(screen.getAllByTestId("picture-🍎")).toHaveLength(3);
   act(() => jest.advanceTimersByTime(400));
   expect(speech.speak).toHaveBeenLastCalledWith("كَمْ عَدَدُهَا؟", expect.anything());
   expect(screen.getByRole("button", { name: "٣" })).toBeTruthy();

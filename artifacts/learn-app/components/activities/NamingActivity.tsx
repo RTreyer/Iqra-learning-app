@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from "react";
+import { Picture } from "@/components/pictures/Picture";
 import { Animated, StyleSheet, Text, View } from "react-native";
 import { Pressable } from "@/components/demo/DemoPressable";
 import * as haptics from "@/lib/haptics";
@@ -54,7 +55,7 @@ function Naming({ lesson, color, onComplete }: ActivityProps<"naming">) {
                 ]}
                 onPress={() => handleTap(i)}
               >
-                <Text style={styles.emoji}>{item.emoji}</Text>
+                <Picture emoji={item.emoji} size={46} />
                 <Text style={[styles.word, done && { color: readableFill(color) }]}>
                   {item.word}
                 </Text>
@@ -97,6 +98,5 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     gap: 4,
   },
-  emoji: { fontSize: 34 },
   word: { fontSize: 15, fontWeight: "700", color: colors.text, textAlign: "center" },
 });

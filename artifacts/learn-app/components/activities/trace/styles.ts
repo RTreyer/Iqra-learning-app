@@ -23,7 +23,6 @@ export const trace = StyleSheet.create({
   },
   sentenceCurrent: { textDecorationLine: "underline", color: colors.text },
   sentenceLater: { color: colors.muted },
-  emoji: { fontSize: 36 },
   errorBanner: {
     flexDirection: "row",
     alignItems: "center",

@@ -7,7 +7,7 @@ import { colors, touchTarget } from "@/theme/tokens";
 import { useShake, type ChoiceState } from "../shared/ChoiceCard";
 import { PicGroup } from "./MathPic";
 
-const ICON: Record<ChoiceState, string | null> = { idle: null, correct: "✅", wrong: "✗" };
+const ICON: Record<ChoiceState, string | null> = { idle: null, correct: "✓", wrong: "✗" };
 const SPOKEN: Record<ChoiceState, string> = { idle: "", correct: "، صحيح", wrong: "، خطأ" };
 
 const COMPACT_PIC = 36;

@@ -203,7 +203,7 @@ describe("ReviewRound", () => {
     renderScreen(
       <ReviewRound item={count} attemptKey="t:1" onFirstTap={onFirstTap} onAdvance={jest.fn()} />,
     );
-    expect(screen.getAllByText("🍎")).toHaveLength(3);
+    expect(screen.getAllByTestId("picture-🍎")).toHaveLength(3);
     fireEvent.press(screen.getByRole("button", { name: "٣" }));
     expect(onFirstTap).toHaveBeenCalledWith(true);
   });

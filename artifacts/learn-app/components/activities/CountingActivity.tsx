@@ -1,5 +1,6 @@
 import React, { useCallback } from "react";
-import { Text, View } from "react-native";
+import { Picture } from "@/components/pictures/Picture";
+import { View } from "react-native";
 import { NumberQuiz, mathStyles } from "./math/NumberQuiz";
 import { COUNT_PROMPT } from "./math/prompts";
 import { withAttemptReset } from "./shared/withAttemptReset";
@@ -18,9 +19,7 @@ function Counting(props: ActivityProps<"counting">) {
     (i: number) => (
       <View style={mathStyles.row} testID="counting-objects">
         {Array.from({ length: rounds[i].count }, (_, k) => (
-          <Text key={k} style={mathStyles.countEmoji}>
-            {rounds[i].emoji}
-          </Text>
+          <Picture key={k} emoji={rounds[i].emoji} size={mathStyles.countEmoji.fontSize} />
         ))}
       </View>
     ),

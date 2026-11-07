@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from "react";
+import { Picture } from "@/components/pictures/Picture";
 import { StyleSheet, Text, View } from "react-native";
 import { Pressable } from "@/components/demo/DemoPressable";
 import { useLanguage } from "@/context/LanguageContext";
@@ -69,10 +70,12 @@ function Behavior({ lesson, color, onComplete }: ActivityProps<"behavior">) {
               result === false && styles.cardWrong,
             ]}
           >
-            <Text style={styles.emoji}>{item.emoji}</Text>
+            <Picture emoji={item.emoji} size={42} />
             <Text style={styles.text}>{item.description}</Text>
             {result !== undefined ? (
-              <Text style={styles.resultIcon}>{result ? "✅" : "❌"}</Text>
+              <Text style={[styles.resultIcon, { color: result ? colors.success : colors.danger }]}>
+                {result ? "✓" : "✗"}
+              </Text>
             ) : (
               <View style={styles.buttons}>
                 <Pressable
@@ -128,7 +131,6 @@ const styles = StyleSheet.create({
   },
   cardRight: { borderColor: colors.success, borderWidth: 2, backgroundColor: colors.successSoft },
   cardWrong: { borderColor: colors.danger, borderWidth: 2, backgroundColor: colors.dangerSoft },
-  emoji: { fontSize: 30, flexShrink: 0 },
   text: {
     flex: 1,
     fontSize: 14,
@@ -137,7 +139,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     textAlign: "right",
   },
-  resultIcon: { fontSize: 24, flexShrink: 0 },
+  resultIcon: { fontSize: 28, fontWeight: "900", flexShrink: 0 },
   buttons: { flexDirection: "row", gap: 8, flexShrink: 0 },
   round: {
     width: touchTarget,

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Picture } from "@/components/pictures/Picture";
 import { StarIcon } from "@/components/world/Icon";
 import { Animated, Easing, StyleSheet, Text, View } from "react-native";
 import { Pressable } from "@/components/demo/DemoPressable";
@@ -180,7 +181,7 @@ function LetterRound({ round, color, seed, onDone }: RoundProps) {
   return (
     <View style={styles.round}>
       <View style={styles.prompt}>
-        {round.emoji ? <Text style={styles.picture}>{round.emoji}</Text> : null}
+        {round.emoji ? <Picture emoji={round.emoji} size={72} /> : null}
         <ListenButton text={word} color={color} />
       </View>
 
@@ -281,7 +282,6 @@ function LetterRound({ round, color, seed, onDone }: RoundProps) {
 const styles = StyleSheet.create({
   round: { width: "100%", alignItems: "center", gap: 18 },
   prompt: { flexDirection: "row", alignItems: "center", gap: 16 },
-  picture: { fontSize: 56 },
   track: { width: "100%", alignItems: "center", paddingTop: 8 },
   // Hudhud's letter: a sheet of paper with gaps for the syllables, sealed in the corner.
   paper: {

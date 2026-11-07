@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from "react";
+import { Picture } from "@/components/pictures/Picture";
 import { Animated, StyleSheet, Text, View } from "react-native";
 import { Pressable } from "@/components/demo/DemoPressable";
 import { Art } from "@/components/art/Art";
@@ -69,7 +70,7 @@ function Story({ lesson, color, onComplete }: ActivityProps<"story">) {
                 {line.art ? (
                   <Art art={line.art} size={40} />
                 ) : (
-                  <Text style={styles.emoji}>{line.emoji}</Text>
+                  <Picture emoji={line.emoji} size={36} />
                 )}
                 <Text style={[styles.text, done && { color: readableFill(color) }]}>
                   {line.text}
@@ -131,7 +132,6 @@ const styles = StyleSheet.create({
     gap: 10,
     minHeight: touchTarget,
   },
-  emoji: { fontSize: 22, flexShrink: 0 },
   text: { flex: 1, fontSize: 18, fontWeight: "700", color: colors.text, textAlign: "right" },
   check: { fontSize: 16, color: colors.successText },
 });

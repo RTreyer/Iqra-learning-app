@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from "react";
+import { Picture } from "@/components/pictures/Picture";
 import { StyleSheet, Text, View } from "react-native";
 import { Pressable } from "@/components/demo/DemoPressable";
 import { useLanguage } from "@/context/LanguageContext";
@@ -98,7 +99,7 @@ function Matching({ lesson, color, attemptKey, onComplete }: ActivityProps<"matc
               ]}
               onPress={() => handleLeft(i)}
             >
-              {pair.left.emoji ? <Text style={styles.emoji}>{pair.left.emoji}</Text> : null}
+              {pair.left.emoji ? <Picture emoji={pair.left.emoji} size={40} /> : null}
               <Text style={[styles.word, !pair.left.emoji && styles.wordOnly]}>
                 {pair.left.word}
               </Text>
@@ -135,7 +136,7 @@ function Matching({ lesson, color, attemptKey, onComplete }: ActivityProps<"matc
               onPress={() => handleRight(pairIdx)}
             >
               {pairs[pairIdx].right.emoji ? (
-                <Text style={styles.emoji}>{pairs[pairIdx].right.emoji}</Text>
+                <Picture emoji={pairs[pairIdx].right.emoji} size={40} />
               ) : null}
               <Text style={[styles.word, !pairs[pairIdx].right.emoji && styles.wordOnly]}>
                 {pairs[pairIdx].right.word}
@@ -182,7 +183,6 @@ const styles = StyleSheet.create({
   /** Same pitch as the arrows column (68 high) when a card has no picture. */
   itemTextOnly: { minHeight: 68, justifyContent: "center" },
   itemMatched: { backgroundColor: colors.successSoft, borderColor: colors.success, borderWidth: 2 },
-  emoji: { fontSize: 30 },
   word: { fontSize: 15, fontWeight: "700", color: colors.mutedStrong, textAlign: "center" },
   /** Syllables and words without a picture are what the child reads: make them large. */
   wordOnly: { fontSize: 22, fontWeight: "800", color: colors.text, lineHeight: 34 },

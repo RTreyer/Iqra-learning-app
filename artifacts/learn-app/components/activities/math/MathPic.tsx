@@ -1,5 +1,6 @@
 import React, { useId } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Picture } from "@/components/pictures/Picture";
+import { StyleSheet, View } from "react-native";
 import { Circle, ClipPath, Defs, G, Line, Polygon, Rect, Svg } from "react-native-svg";
 import { MATH_COLORS, groupLabel, picLabel } from "@/content/math/picLabel";
 import type { MathPic as Pic, ShapeId } from "@/content/types";
@@ -43,7 +44,7 @@ export function MathPic({
       style={{ width: size, height: size, alignItems: "center", justifyContent: "center" }}
     >
       {"emoji" in pic ? (
-        <Text style={{ fontSize: size * 0.8 }}>{pic.emoji}</Text>
+        <Picture emoji={pic.emoji} size={size} />
       ) : (
         <Svg width={size} height={size} viewBox="0 0 100 100">
           {pic.shaded ? (

@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "@/components/world/Icon";
+import { Picture } from "@/components/pictures/Picture";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import * as haptics from "@/lib/haptics";
 import { toArabicDigits } from "@/lib/arabicNumbers";
@@ -101,9 +102,7 @@ function Prompt({ item, color, spoken }: { item: ReviewItem; color: string; spok
           {item.kind === "count" ? (
             <View style={mathStyles.row} testID="review-count-objects">
               {Array.from({ length: item.count }, (_, k) => (
-                <Text key={k} style={mathStyles.countEmoji}>
-                  {item.emoji}
-                </Text>
+                <Picture key={k} emoji={item.emoji} size={mathStyles.countEmoji.fontSize} />
               ))}
             </View>
           ) : null}

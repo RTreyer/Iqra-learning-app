@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState, type ComponentRef } from "react";
+import { Picture } from "@/components/pictures/Picture";
 import { Animated, Platform, StyleSheet, Text, View, type LayoutChangeEvent } from "react-native";
 import { Pressable } from "@/components/demo/DemoPressable";
 import { GestureDetector, usePanGesture } from "react-native-gesture-handler";
@@ -249,7 +250,7 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
         </Text>
       ) : null}
       <View style={trace.header}>
-        {target.emoji ? <Text style={trace.emoji}>{target.emoji}</Text> : null}
+        {target.emoji ? <Picture emoji={target.emoji} size={44} /> : null}
         <Text style={[trace.label, { color: readableFill(color) }]}>{target.label}</Text>
       </View>
       {error ? (
