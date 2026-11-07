@@ -13,7 +13,9 @@ import { NotFoundCard } from "@/components/NotFoundCard";
 import { ScreenBackground } from "@/components/ScreenBackground";
 import { StarBadge } from "@/components/StarBadge";
 import { UiText } from "@/components/UiText";
+import { LetterGoal } from "@/components/world/LetterGoal";
 import { lessonPicture } from "@/components/world/lessonPicture";
+import { LETTER_LINES } from "@/content/story";
 import { PathMap, type Stop } from "@/components/world/PathMap";
 import { books, getUnit, unitLessonIds } from "@/content";
 import { useLanguage } from "@/context/LanguageContext";
@@ -24,6 +26,10 @@ import { firstParam } from "@/lib/params";
 import { routes } from "@/lib/routes";
 import { speak } from "@/lib/speech";
 import { readableFill, touchTarget, yemen } from "@/theme/tokens";
+
+/** What Hudhud's letter says in a unit without letters of its own: numbers in maths. */
+const LETTER_NUMBERS = ["١", "٢", "٣", "٤", "٥"];
+const LETTER_FIRST = ["أ", "ب", "ت", "ث", "ج"];
 
 export default function UnitScreen() {
   const unitId = firstParam(useLocalSearchParams<{ unitId?: string | string[] }>().unitId);
@@ -127,6 +133,16 @@ export default function UnitScreen() {
           guide={progressReady ? unit.theme : undefined}
           onGuideY={scrollToGuide}
           pathKey={unit.id}
+          goal={{
+            done: summary.done >= summary.total,
+            node: (
+              <LetterGoal
+                symbols={unit.letters ?? (book?.subject === "math" ? LETTER_NUMBERS : LETTER_FIRST)}
+                share={summary.total ? summary.done / summary.total : 0}
+                line={summary.done >= summary.total ? LETTER_LINES.complete : LETTER_LINES.missing}
+              />
+            ),
+          }}
         />
       </ScrollView>
     </ScreenBackground>

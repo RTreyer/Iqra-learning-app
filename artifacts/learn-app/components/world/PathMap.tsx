@@ -22,6 +22,7 @@ import * as haptics from "@/lib/haptics";
 import { speak } from "@/lib/speech";
 import { readableFill, touchTarget, yemen } from "@/theme/tokens";
 import { Pulse } from "./Guide";
+import { Art } from "@/components/art/Art";
 import { Hudhud } from "./Hudhud";
 import { Icon, StarIcon } from "./Icon";
 
@@ -70,7 +71,15 @@ type Props = {
   onGuideY?: (y: number) => void;
   /** Names this path (a book or unit id), so Hudhud flies on from where he last stood on it. */
   pathKey?: string;
+  /** What waits at the end of the path (Hudhud's letter); `done` turns the way to it gold. */
+  goal?: { node: React.ReactNode; done: boolean };
 };
+
+/** Room for the goal at the end of the path. */
+const GOAL_ROW = ROW + 40;
+/** A palm every few stops, on the side of the path that is free. */
+const PALM_EVERY = 3;
+const PALM = 58;
 
 /** Where Hudhud last stood on each path this session (stop index), to fly on from there. */
 const lastStop = new Map<string, number>();
@@ -82,7 +91,7 @@ export function resetPathMemory(): void {
   lastStop.clear();
 }
 
-export function PathMap({ stops, color, onPress, guide, onGuideY, pathKey }: Props) {
+export function PathMap({ stops, color, onPress, guide, onGuideY, pathKey, goal }: Props) {
   const [measured, setMeasured] = useState(0);
   const width = measured || FALLBACK_WIDTH;
   const fill = readableFill(color);
@@ -120,9 +129,11 @@ export function PathMap({ stops, color, onPress, guide, onGuideY, pathKey }: Pro
   useEffect(() => {
     if (guideY !== null) onGuideY?.(guideY);
   }, [guideY, onGuideY]);
-  const height = stops.length * ROW + (guideAt >= 0 ? GUIDE_ROOM : 0);
-  const goldEnd =
-    current >= 0 ? current : stops.every((s) => s.state === "done") ? stops.length - 1 : -1;
+  const height = stops.length * ROW + (guideAt >= 0 ? GUIDE_ROOM : 0) + (goal ? GOAL_ROW : 0);
+  // The goal sits one step after the last stop.
+  const ends = goal ? stops.length : stops.length - 1;
+  const allDone = stops.every((s) => s.state === "done");
+  const goldEnd = current >= 0 ? current : allDone ? (goal?.done ? ends : stops.length - 1) : -1;
   const pathTo = (end: number) => {
     if (end < 1) return "";
     let d = `M${centre(0).x} ${centre(0).y}`;
@@ -139,7 +150,7 @@ export function PathMap({ stops, color, onPress, guide, onGuideY, pathKey }: Pro
       {stops.length > 0 ? (
         <Svg width={width} height={height} style={StyleSheet.absoluteFill}>
           <Path
-            d={pathTo(stops.length - 1)}
+            d={pathTo(ends)}
             stroke={yemen.pathSand}
             strokeWidth={24}
             strokeLinecap="round"
@@ -155,6 +166,28 @@ export function PathMap({ stops, color, onPress, guide, onGuideY, pathKey }: Pro
             />
           ) : null}
         </Svg>
+      ) : null}
+      {stops.map((stop, i) => {
+        const offset = OFFSETS[i % OFFSETS.length];
+        // Palms stand on the free side of the path, never where Hudhud stands.
+        if (i % PALM_EVERY !== 1 || i === guideAt) return null;
+        const { y } = centre(i);
+        // Left edge of the picture, or the right edge when the path swings right here.
+        const left = offset > 0 ? width - PALM - 6 : offset === 0 ? 16 : 6;
+        return (
+          <View
+            key={`palm-${stop.key}`}
+            pointerEvents="none"
+            style={[styles.palm, { left, top: y - PALM / 2 - 6 }]}
+          >
+            <Art art="palm" size={PALM} />
+          </View>
+        );
+      })}
+      {goal ? (
+        <View style={[styles.goal, { left: centre(ends).x - 84, top: centre(ends).y - 50 }]}>
+          {goal.node}
+        </View>
       ) : null}
       {stops.map((stop, i) => {
         const { x, y } = centre(i);
@@ -419,6 +452,8 @@ const styles = StyleSheet.create({
   },
   pressed: { opacity: 0.88, transform: [{ scale: 0.95 }] },
   guide: { position: "absolute", gap: 6, minHeight: touchTarget },
+  palm: { position: "absolute", opacity: 0.9 },
+  goal: { position: "absolute" },
   guideLeft: { alignItems: "flex-end" },
   guideRight: { alignItems: "flex-start" },
   guidePressed: { opacity: 0.85 },

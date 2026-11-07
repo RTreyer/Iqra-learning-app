@@ -10,7 +10,8 @@ Hudhud ist auf jedem Kinder-Bildschirm die eine Figur, die durch die Welt geht u
 |---|---|---|
 | Start | begrüsst, lädt zur Geschichte ein | `app/index.tsx` |
 | Geschichte | ist der Held: Briefbote, Sturm, Bitte um Hilfe | `app/intro.tsx`, `components/world/StoryScenes.tsx` |
-| Lernpfade | fliegt im Bogen vom letzten Stopp zum nächsten, landet und sagt dort seinen Satz | `components/world/PathMap.tsx` |
+| Lernpfade (mit Palmen am Wegrand) | fliegt im Bogen vom letzten Stopp zum nächsten, landet und sagt dort seinen Satz | `components/world/PathMap.tsx` |
+| Ende jeder Einheit | sein Brief, den der Sturm verweht hat: mit jeder Lektion kehren Buchstaben zurück, mit der ganzen Einheit ist er vollständig, versiegelt und leuchtet | `components/world/LetterGoal.tsx` |
 | Jede Übung | steht über der Aufgabe, seine Sprechblase zeigt die Anweisung (Antippen wiederholt sie); hüpft bei richtigen Antworten, wackelt verwundert bei falschen | `components/world/LessonGuide.tsx` |
 | Vorgemachtes Beispiel | erzählt in seiner Sprechblase, was die Hand vormacht | `components/demo/DemoPlayer.tsx` |
 | Wiederholung | bringt «die Briefe des Tages» und reagiert auf die Antworten | `app/review.tsx` |
@@ -72,5 +73,5 @@ Eine falsche Karte wackelt kurz, wird grau und lässt sich nicht nochmals antipp
 - **Soundeffekte** (sanftes Glöckchen, Vogelruf, Klatschen): brauchen Audiodateien und ein Audio-Modul.
 - **Junge / Mädchen**: Arabische Anweisungen sind heute männlich formuliert (اِضْغَطْ). Eine Einstellung in der Elternecke braucht weibliche Formen aller gesprochenen Anweisungen, geprüft von einer Muttersprachlerin oder einem Muttersprachler.
 - **Sprachprüfung**: Hudhuds Geschichte, seine Sätze, Stickernamen und die Texte der Elternecke von einer jemenitischen Lehrkraft prüfen lassen.
-- **Geschichte weiterführen**: Jede fertige Einheit als zugestellter Brief an einen Ort im Jemen (Shibam, Aden, Sokotra …), mit einem Satz Geschichte.
+- **Geschichte weiterführen**: Der vollständige Brief am Ende einer Einheit könnte an einen Ort im Jemen zugestellt werden (Shibam, Aden, Sokotra …), mit einem Satz Geschichte.
 - **Klassenwahl**: Nur Klasse 1 hat Bücher; die Elternecke zeigt die anderen als «قريباً». Sobald weitere Klassen Inhalt haben, wird die Wahl dort aktiv.

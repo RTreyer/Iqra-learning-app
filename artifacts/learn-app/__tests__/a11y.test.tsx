@@ -97,20 +97,20 @@ test("book: back button, Hudhud and the unit stations", async () => {
   expectAccessiblePressables(10);
 });
 
-test("unit: back button, Hudhud and the lesson stops, including a completed one", async () => {
+test("unit: back button, Hudhud, the lesson stops (one completed) and Hudhud's letter", async () => {
   await seed();
   setParams({ unitId: "a1" });
   withProgress(<UnitScreen />);
   await screen.findAllByTestId(/^lesson-row-/);
-  expectAccessiblePressables(7);
+  expectAccessiblePressables(8);
 });
 
 test("unit with letters: each letter is a button that says itself", async () => {
   setParams({ unitId: "a2" });
   withProgress(<UnitScreen />);
   await screen.findAllByTestId(/^lesson-row-/);
-  // Back, 7 letters, Hudhud and 31 lessons.
-  expectAccessiblePressables(40);
+  // Back, 7 letters, Hudhud, 31 lessons and Hudhud's letter at the end.
+  expectAccessiblePressables(41);
 });
 
 test("album: back button, nine stickers and Hudhud", async () => {

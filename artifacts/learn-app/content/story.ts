@@ -48,3 +48,12 @@ export const SUBJECT_LINES: Record<string, string> = {
   math: "هَيَّا إِلَى السُّوقِ نَعُدُّ!",
   science: "هَيَّا نَتَعَلَّمُ!",
 };
+
+/**
+ * Hudhud's letter at the end of every unit's path: the storm blew its letters away, each
+ * lesson done brings some back, and with the whole unit done the letter is complete.
+ */
+export const LETTER_LINES = {
+  missing: "فِي آخِرِ الطَّرِيقِ رِسَالَتِي، نُكْمِلُهَا مَعًا!",
+  complete: "اِكْتَمَلَتِ الرِّسَالَةُ! أَحْسَنْت!",
+};
