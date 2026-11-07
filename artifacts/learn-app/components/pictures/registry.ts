@@ -1,4 +1,5 @@
 import { PICTURES_HOME } from "./home";
+import { PICTURES_NATURE } from "./nature";
 import { PICTURES_PEOPLE } from "./people";
 import { PICTURES_PLACES } from "./places";
 import { PICTURES_THINGS } from "./things";
@@ -6,6 +7,7 @@ import { PICTURES_THINGS } from "./things";
 /** Every drawing, keyed by its emoji without variation selector (see pictureKey). */
 export const PICTURES: Record<string, string> = {
   ...PICTURES_HOME,
+  ...PICTURES_NATURE,
   ...PICTURES_PEOPLE,
   ...PICTURES_PLACES,
   ...PICTURES_THINGS,
