@@ -371,7 +371,6 @@ export const unit8: Unit = {
   emoji: "🦋",
   emblem: "butterfly",
   goal: "letters",
-  recipient: { to: "إِلَى جَدِّي", pictures: ["👴"] },
   color: COLOR,
   badgeLabel: "ش ط ز",
   lessons: numberLessons("u8", [...shin, ...ta, ...zay, ...exercises, ...sentence]),

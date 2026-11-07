@@ -1,208 +1,352 @@
 /**
- * Hudhud's story (app/intro.tsx). Hudhud is a day worker of Yemen: every day a new job (the
- * farmer's terraces, the fishermen's sea, the beekeeper's mountains), and in each he learns,
- * because he dreams of building a school in his village where all children learn. Today he has
- * two jobs, the child chooses one, and each has its own short chapter, told the first time:
- * - Arabic ("Read and learn"): Hudhud the postman; a storm blows the letters and their vowel
- *   marks out of his messages, and the child collects them back;
- * - maths: Hudhud helps the coffee trader of Mocha, who cannot count his beans and sacks; the
- *   ship waits for the coffee.
- * Spoken by the app's voice, fully vocalised, simple Fusha. Native speaker review pending
- * (docs/CONTENT_REVIEW.md); the lines are the first candidates for recorded audio.
+ * Hudhud's story (app/intro.tsx), told by Hudhud himself, in the spirit of a quiet journey.
+ *
+ * Hudhud lives on a roof in Sana'a. Every morning a girl, Rasha, put out a clay bowl of water
+ * for the birds, though she did not know them: "you are thirsty". One day the bowl was empty
+ * and she was gone. In the bowl she had scratched a message, and left a sidr seed. Hudhud
+ * cannot read. Two threads, one per subject:
+ * - Arabic: he follows Rasha's trail through the stories of the textbook (one station per
+ *   unit) and learns the letters; the message in the bowl, «اِسْقِ الطُّيُورَ» signed «رَشَا»,
+ *   becomes readable letter by letter (its letters come in units 2, 3, 6, 7 and 8);
+ * - maths: water is scarce; who can count can share. Each unit is a station with the seed, and
+ *   the sidr tree grows with the maths path.
+ * The end: the tree stands in a courtyard, a little girl waters it with him; Rasha is gone,
+ * her kindness stayed. Spoken by the app's voice, fully vocalised, simple Fusha. Native
+ * speaker review pending (docs/CONTENT_REVIEW.md).
  */
 
-import type { GoalKind, Recipient } from "./types";
+import type { GoalKind } from "./types";
 
 export type StorySceneId =
-  | "dawn"
-  | "jobs"
-  | "dream"
-  | "today"
+  | "roof"
+  | "girl"
+  | "why"
+  | "gone"
+  | "inscription"
   | "choose"
-  | "postman"
-  | "wind"
-  | "waiting"
-  | "market"
-  | "beans"
-  | "ship";
+  | "trail"
+  | "bowl"
+  | "seed"
+  | "share"
+  | "tree"
+  | "newgirl"
+  | "home"
+  | "station";
+
 export type StoryScene = {
   id: StorySceneId;
   line: string;
   /** The picture plays this long at least before the story moves on by itself (ms). */
   minMs?: number;
+  /** A station scene: the unit whose place it shows (STATIONS). */
+  unit?: string;
 };
 
-/**
- * Who Hudhud is and why: a day worker who does a different job in Yemen every day, and learns
- * something in each, because he dreams of building a school in his village where all children
- * learn. Today he has two jobs; the child chooses which one to help with.
- */
+/** Chapter 1: the girl, the bowl, the message Hudhud cannot read. Ends in the choice. */
 export const INTRO_STORY: readonly StoryScene[] = [
+  { id: "roof", line: "أَنَا هُدْهُدٌ. أَسْكُنُ عَلَى سَطْحٍ فِي صَنْعَاءَ.", minMs: 3600 },
   {
-    id: "dawn",
-    line: "أَنَا هُدْهُدٌ. كُلَّ صَبَاحٍ أَطِيرُ فَوْقَ الْيَمَنِ، وَأَعْمَلُ عَمَلًا جَدِيدًا.",
-    minMs: 3600,
+    id: "girl",
+    line: "كُلَّ صَبَاحٍ، كَانَتْ بِنْتٌ تَضَعُ مَاءً لِلطُّيُورِ فِي صَحْنٍ.",
+    minMs: 3200,
   },
-  // The country passes below him from job to job: let the flight finish.
+  { id: "why", line: "قُلْتُ لَهَا: أَنْتِ لَا تَعْرِفِينَنَا! قَالَتْ: لَكِنَّكُمْ عِطَاشٌ." },
+  { id: "gone", line: "وَفِي يَوْمٍ، كَانَ الصَّحْنُ فَارِغًا، وَالْبِنْتُ ذَهَبَتْ.", minMs: 3600 },
   {
-    id: "jobs",
-    line: "أُسَاعِدُ الْمُزَارِعَ فِي الْمُدَرَّجَاتِ، وَالصَّيَّادَ فِي الْبَحْرِ، وَالنَّحَّالَ فِي الْجَبَلِ.",
-    minMs: 8600,
-  },
-  {
-    id: "dream",
-    line: "وَفِي اللَّيْلِ أَحْلُمُ: أَنْ أَبْنِيَ مَدْرَسَةً فِي قَرْيَتِي، يَتَعَلَّمُ فِيهَا كُلُّ الْأَطْفَالِ.",
-    minMs: 4200,
-  },
-  {
-    id: "today",
-    line: "لِذَلِكَ أَتَعَلَّمُ فِي كُلِّ عَمَلٍ. وَالْيَوْمَ عِنْدِي عَمَلَانِ، وَأَحْتَاجُ مُسَاعَدَتَكَ!",
+    id: "inscription",
+    line: "كَتَبَتْ فِي الصَّحْنِ شَيْئًا، وَتَرَكَتْ بِذْرَةً. لَكِنِّي لَا أَعْرِفُ الْقِرَاءَةَ!",
   },
   {
     id: "choose",
-    line: "هَلْ أَكُونُ سَاعِيَ الْبَرِيدِ، أَمْ أُسَاعِدُ تَاجِرَ الْبُنِّ؟ اِخْتَرْ!",
+    line: "هَلْ تُسَاعِدُنِي؟ نَقْرَأُ رِسَالَتَهَا، أَوْ نَزْرَعُ بِذْرَتَهَا. اِخْتَرْ!",
   },
 ];
 
-/** The two jobs, told when the child first helps with them: Arabic and maths. */
-export type ChapterId = "arabic" | "math";
+/** The story's other parts: the two threads, told the first time, and the end. */
+export type ChapterId = "arabic" | "math" | "end";
 
 export const CHAPTERS: Record<ChapterId, readonly StoryScene[]> = {
-  // Read and learn: Hudhud the postman, and the storm that blows the letters away.
   arabic: [
     {
-      id: "postman",
-      line: "الْيَوْمَ أَنَا سَاعِي الْبَرِيدِ. أَحْمِلُ الرَّسَائِلَ إِلَى كُلِّ الْبُيُوتِ.",
+      id: "trail",
+      line: "سَأَتْبَعُ طَرِيقَهَا، وَفِي الطَّرِيقِ أَتَعَلَّمُ الْحُرُوفَ.",
+      minMs: 3600,
     },
-    // The storm tears out the three letters one by one: let it finish (StoryScenes).
-    {
-      id: "wind",
-      line: "هَبَّتْ عَاصِفَةٌ قَوِيَّةٌ، فَطَارَتِ الْحُرُوفُ وَحَرَكَاتُهَا مِنْ رَسَائِلِي!",
-      minMs: 5600,
-    },
-    {
-      id: "waiting",
-      line: "النَّاسُ يَنْتَظِرُونَ رَسَائِلَهُمْ. هَيَّا نَجْمَعُ الْحُرُوفَ مَعًا!",
-    },
+    { id: "bowl", line: "كُلُّ حَرْفٍ نَتَعَلَّمُهُ، يُضِيءُ فِي الصَّحْنِ!", minMs: 3600 },
   ],
-  // Maths: Hudhud helps the coffee trader of Mocha count his beans and sacks.
   math: [
+    { id: "seed", line: "الْبِذْرَةُ تَحْتَاجُ مَاءً، وَالْمَاءُ قَلِيلٌ.", minMs: 3200 },
+    { id: "share", line: "مَنْ يَعُدُّ، يَعْرِفُ كَيْفَ يَقْسِمُ الْمَاءَ. هَيَّا نَعُدُّ!", minMs: 3600 },
+  ],
+  end: [
+    { id: "tree", line: "كَبِرَتْ شَجَرَةُ السِّدْرِ، وَجَاءَتِ الطُّيُورُ إِلَيْهَا.", minMs: 3600 },
+    { id: "newgirl", line: "وَجَاءَتْ بِنْتٌ صَغِيرَةٌ، وَسَقَتِ الشَّجَرَةَ مَعِي.", minMs: 3600 },
     {
-      id: "market",
-      line: "الْيَوْمَ أُسَاعِدُ تَاجِرَ الْبُنِّ فِي سُوقِ الْمُخَا. عِنْدَهُ بُنٌّ كَثِيرٌ!",
-    },
-    {
-      id: "beans",
-      line: "لَكِنَّهُ لَا يَعْرِفُ: كَمْ حَبَّةً عِنْدَهُ؟ وَكَمْ كِيسًا؟",
+      id: "home",
+      line: "رَشَا ذَهَبَتْ، لَكِنَّ لُطْفَهَا بَقِيَ. اِسْقِ الطُّيُورَ، يَا صَدِيقِي!",
       minMs: 4000,
-    },
-    {
-      id: "ship",
-      line: "وَالسَّفِينَةُ تَنْتَظِرُ الْبُنَّ. هَيَّا نَعُدُّ مَعًا!",
     },
   ],
 };
 
-/** The job a subject belongs to, if it has one in the story. */
-export function chapterFor(subject: string | undefined): ChapterId | null {
+/** The thread a subject belongs to. */
+export function chapterFor(subject: string | undefined): "arabic" | "math" | null {
   if (subject === "arabic" || subject === "lughati") return "arabic";
   if (subject === "math") return "math";
   return null;
 }
 
+/** Rasha's message in the bowl, read at the end of the Arabic path, and her name. */
+export const MESSAGE = { words: ["اِسْقِ", "الطُّيُورَ"], name: "رَشَا" };
+
+/** Where a station is, for its picture (components/world/RashaScenes). */
+export type StationPlace =
+  | "roof"
+  | "door"
+  | "school"
+  | "beach"
+  | "road"
+  | "garden"
+  | "well"
+  | "village"
+  | "terraces"
+  | "rain"
+  | "courtyard";
+
+/**
+ * A stop on Hudhud's journey: one per unit. Told the first time the child opens the unit
+ * (`scenes`); Hudhud's line on its path is `ask`; when the unit is done, `outro`: the clue
+ * on Rasha's trail (Arabic) or what the station taught (maths).
+ */
+export type Station = {
+  place: StationPlace;
+  /** Whom Hudhud meets (an emoji drawn by components/pictures). */
+  person: string;
+  /** What there is to read or count. */
+  thing: string;
+  where: string;
+  ask: string;
+  outro: string;
+};
+
+export const STATIONS: Record<string, Station> = {
+  a1: {
+    place: "roof",
+    person: "🐦",
+    thing: "✏",
+    where: "قَبْلَ أَنْ أَقْرَأَ، أَتَعَلَّمُ الْخُطُوطَ، مِثْلَ خُطُوطِ الصَّحْنِ.",
+    ask: "هَيَّا نَرْسُمُ الْخُطُوطَ!",
+    outro: "صِرْتُ أَرْسُمُ الْخُطُوطَ! هَيَّا نَتَعَلَّمُ الْحُرُوفَ.",
+  },
+  a2: {
+    place: "door",
+    person: "🧕",
+    thing: "🚪",
+    where: "هَذَا بَيْتُ رَشَا. عَلَى الْبَابِ لَوْحَةٌ.",
+    ask: "هَيَّا نَتَعَلَّمُ الْحُرُوفَ، لِنَقْرَأَ اللَّوْحَةَ!",
+    outro: "قَرَأْنَا اللَّوْحَةَ: انْتَقَلَ أَهْلُ رَشَا إِلَى بَيْتٍ جَدِيدٍ.",
+  },
+  a3: {
+    place: "school",
+    person: "👩‍🏫",
+    thing: "📓",
+    where: "الْمُعَلِّمَةُ بَيَانُ عِنْدَهَا دَفْتَرُ رَشَا.",
+    ask: "هَيَّا نَتَعَلَّمُ الْحُرُوفَ، لِنَقْرَأَ الدَّفْتَرَ!",
+    outro: "فِي الدَّفْتَرِ، كَتَبَتْ رَشَا عَنِ الطُّيُورِ!",
+  },
+  a4: {
+    place: "beach",
+    person: "👨",
+    thing: "⛵",
+    where: "عِنْدَ الْبَحْرِ، عَلَى قَارِبِ الصَّيَّادِ اسْمٌ.",
+    ask: "هَيَّا نَتَعَلَّمُ الْحَرَكَاتِ، لِنَقْرَأَ الِاسْمَ!",
+    outro: "قَالَ الصَّيَّادُ: رَأَيْتُ هُنَا بِنْتًا مَعَهَا صَحْنٌ.",
+  },
+  a5: {
+    place: "road",
+    person: "👮",
+    thing: "🚩",
+    where: "رَجُلُ الْمُرُورِ يُشِيرُ إِلَى لَوْحَةِ الطَّرِيقِ.",
+    ask: "هَيَّا نَتَعَلَّمُ الْحَرَكَاتِ، لِنَقْرَأَ اللَّوْحَةَ!",
+    outro: "قَرَأْنَا اللَّوْحَةَ: هَذَا الطَّرِيقُ إِلَى الْجِبَالِ.",
+  },
+  a6: {
+    place: "garden",
+    person: "🐦",
+    thing: "📄",
+    where: "فِي الْحَدِيقَةِ يُغَنِّي بُلْبُلُ صَابِرٍ. عَلَى الْغُصْنِ وَرَقَةٌ.",
+    ask: "هَيَّا نَتَعَلَّمُ الْحُرُوفَ، لِنَقْرَأَ الْوَرَقَةَ!",
+    outro: "قَالَ الْبُلْبُلُ: رَشَا كَانَتْ تُطْعِمُنِي، مِثْلَكَ!",
+  },
+  a7: {
+    place: "well",
+    person: "👴",
+    thing: "💧",
+    where: "عِنْدَ الْبِئْرِ كِتَابَةٌ قَدِيمَةٌ.",
+    ask: "هَيَّا نَتَعَلَّمُ الْحُرُوفَ، لِنَقْرَأَ الْكِتَابَةَ!",
+    outro: "مِنْ هَذِهِ الْبِئْرِ، أَخَذَتْ رَشَا مَاءً لِلطُّيُورِ!",
+  },
+  a8: {
+    place: "village",
+    person: "👴",
+    thing: "✉",
+    where: "فِي الْقَرْيَةِ، عِنْدَ الْجَدِّ رِسَالَةٌ مِنْ رَشَا.",
+    ask: "هَيَّا نَتَعَلَّمُ الْحُرُوفَ، لِنَقْرَأَ الرِّسَالَةَ!",
+    outro: "رَشَا فِي بَيْتٍ جَدِيدٍ، وَهِيَ بِخَيْرٍ! الْآنَ أَرْجِعُ إِلَى الصَّحْنِ.",
+  },
+  "math-u1": {
+    place: "terraces",
+    person: "👨",
+    thing: "🌱",
+    where: "فِي الْمُدَرَّجَاتِ، عِنْدَ الْمُزَارِعِ بُذُورٌ كَثِيرَةٌ.",
+    ask: "أَيُّهَا بِذْرَةُ السِّدْرِ؟ هَيَّا نُصَنِّفُ!",
+    outro: "قَالَ الْمُزَارِعُ: نَزْرَعُ لِلْغَدِ، لَا لِلْيَوْمِ فَقَطْ.",
+  },
+  "math-u2": {
+    place: "rain",
+    person: "👨",
+    thing: "💧",
+    where: "رَجُلٌ يَعُدُّ الْمَطَرَ، وَعِنْدَهُ جِرَارٌ كَثِيرَةٌ.",
+    ask: "كَمْ جَرَّةً عِنْدَهُ؟ هَيَّا نَعُدُّ!",
+    outro: "عَدَدْنَا الْجِرَارَ، وَرَأَيْنَا الشَّجَرَةَ الْعَطْشَى. أَعْطَاهَا مَاءً!",
+  },
+  "math-u3": {
+    place: "courtyard",
+    person: "🕊",
+    thing: "💧",
+    where: "جَاءَ الْعُصْفُورُ بِقَطْرَةٍ، وَجَاءَتِ الْحَمَامَةُ بِقَطْرَةٍ.",
+    ask: "كَمْ قَطْرَةً مَعًا؟ هَيَّا نَجْمَعُ!",
+    outro: "قَطْرَةٌ وَقَطْرَةٌ، صَارَ الْمَاءُ كَافِيًا!",
+  },
+  "math-u4": {
+    place: "beach",
+    person: "👨",
+    thing: "🐟",
+    where: "الصَّيَّادُ يُعْطِي مِنْ سَمَكِهِ لِلْجِيرَانِ.",
+    ask: "كَمْ يَبْقَى مَعَهُ؟ هَيَّا نَطْرَحُ!",
+    outro: "مَنْ يُعْطِي، لَا يَصِيرُ أَفْقَرَ.",
+  },
+  "math-u5": {
+    place: "courtyard",
+    person: "🌱",
+    thing: "🔺",
+    where: "نَبْنِي حَوْلَ النَّبْتَةِ دَائِرَةً مِنَ الْحِجَارَةِ.",
+    ask: "دَائِرَةٌ، مُرَبَّعٌ، مُثَلَّثٌ: هَيَّا نَبْنِي!",
+    outro: "نِصْفُ الْمَاءِ لِلطُّيُورِ، وَنِصْفُهُ لِلشَّجَرَةِ!",
+  },
+};
+
+/** The scenes told the first time a unit is opened: where Hudhud is, and what to do. */
+export function stationScenes(unitId: string): StoryScene[] | null {
+  const station = STATIONS[unitId];
+  if (!station) return null;
+  return [
+    { id: "station", unit: unitId, line: station.where, minMs: 2400 },
+    { id: "station", unit: unitId, line: station.ask },
+  ];
+}
+
 /** What Hudhud says when the child picks or switches a subject, by book subject. */
 export const SUBJECT_LINES: Record<string, string> = {
-  arabic: "هَيَّا نَجْمَعُ الْحُرُوفَ!",
-  lughati: "هَيَّا نَجْمَعُ الْحُرُوفَ!",
-  math: "هَيَّا نُسَاعِدُ تَاجِرَ الْبُنِّ!",
+  arabic: "هَيَّا نَتْبَعُ طَرِيقَ رَشَا!",
+  lughati: "هَيَّا نَتْبَعُ طَرِيقَ رَشَا!",
+  math: "هَيَّا نَسْقِي بِذْرَةَ السِّدْرِ!",
   science: "هَيَّا نَتَعَلَّمُ!",
 };
 
 /** Hudhud's lines about a unit's goal (GoalKind, lib/storyProgress.ts). */
 type GoalLines = {
-  /** On the unit's path, beside Hudhud. */
+  /** On the unit's path, beside Hudhud, when the unit has no station. */
   path: string;
   /** Tapping the goal while it is not finished. */
   missing: string;
   /** On the finish card, when the lesson filled a place of the goal. */
   beat: string;
-  /** When the unit is finished (letters: before the delivery). */
+  /** When the unit is finished, when the unit has no station. */
   complete: string;
 };
 
 export const GOAL_LINES: Record<GoalKind, GoalLines> = {
   writing: {
-    path: "هَيَّا نَتَعَلَّمُ كِتَابَةَ الرَّسَائِلِ!",
-    missing: "نَكْتُبُ سَطْرًا بَعْدَ سَطْرٍ!",
-    beat: "كَتَبْنَا سَطْرًا جَدِيدًا!",
-    complete: "تَعَلَّمْنَا الْكِتَابَةَ! هَيَّا نَجْمَعُ الْحُرُوفَ!",
+    path: "هَيَّا نَرْسُمُ الْخُطُوطَ!",
+    missing: "نَرْسُمُ خَطًّا بَعْدَ خَطٍّ!",
+    beat: "رَسَمْنَا خَطًّا جَدِيدًا!",
+    complete: "صِرْتُ أَرْسُمُ الْخُطُوطَ!",
   },
   letters: {
-    path: "هَيَّا نَجْمَعُ حُرُوفَ رِسَالَتِي!",
-    missing: "فِي آخِرِ الطَّرِيقِ رِسَالَتِي، نُكْمِلُهَا مَعًا!",
-    beat: "رَجَعَ حَرْفٌ إِلَى رِسَالَتِي!",
-    complete: "اِكْتَمَلَتِ الرِّسَالَةُ!",
+    path: "هَيَّا نَتَعَلَّمُ الْحُرُوفَ، لِنَقْرَأَ!",
+    missing: "نَتَعَلَّمُ الْحُرُوفَ، ثُمَّ نَقْرَأُ!",
+    beat: "تَعَلَّمْنَا حَرْفًا جَدِيدًا!",
+    complete: "قَرَأْنَا!",
   },
   vowels: {
-    path: "هَيَّا نُعِيدُ إِلَى الْحُرُوفِ حَرَكَاتِهَا!",
-    missing: "حُرُوفُ رِسَالَتِي بِلَا حَرَكَاتٍ، نُعِيدُهَا مَعًا!",
-    beat: "رَجَعَتْ حَرَكَاتُ حَرْفٍ!",
-    complete: "اِكْتَمَلَتِ الرِّسَالَةُ بِحَرَكَاتِهَا!",
+    path: "هَيَّا نَتَعَلَّمُ الْحَرَكَاتِ، لِنَقْرَأَ!",
+    missing: "الْحُرُوفُ تَحْتَاجُ حَرَكَاتِهَا، لِنَقْرَأَ!",
+    beat: "تَعَلَّمْنَا حَرَكَاتِ حَرْفٍ!",
+    complete: "قَرَأْنَا!",
   },
-  sort: {
-    path: "هَيَّا نُرَتِّبُ بَضَائِعَ التَّاجِرِ!",
-    missing: "التَّاجِرُ يَنْتَظِرُ، نُرَتِّبُ بَضَائِعَهُ مَعًا!",
-    beat: "رَتَّبْنَا سَلَّةً أُخْرَى!",
-    complete: "رَتَّبْنَا كُلَّ الْبَضَائِعِ! أَحْسَنْت!",
+  seeds: {
+    path: "هَيَّا نُصَنِّفُ الْبُذُورَ!",
+    missing: "أَيُّهَا بِذْرَةُ السِّدْرِ؟ نُصَنِّفُ مَعًا!",
+    beat: "صَنَّفْنَا سَلَّةً أُخْرَى!",
+    complete: "وَجَدْنَا بِذْرَةَ السِّدْرِ!",
   },
-  count: {
-    path: "هَيَّا نَعُدُّ أَكْيَاسَ الْبُنِّ لِلتَّاجِرِ!",
-    missing: "التَّاجِرُ يَنْتَظِرُ، نَعُدُّ أَكْيَاسَهُ مَعًا!",
-    beat: "عَدَدْنَا كِيسًا آخَرَ!",
-    complete: "عَدَدْنَا كُلَّ الْأَكْيَاسِ! أَحْسَنْت!",
+  jars: {
+    path: "هَيَّا نَعُدُّ جِرَارَ الْمَاءِ!",
+    missing: "كَمْ جَرَّةً عِنْدَهُ؟ نَعُدُّ مَعًا!",
+    beat: "عَدَدْنَا جَرَّةً أُخْرَى!",
+    complete: "عَدَدْنَا كُلَّ الْجِرَارِ!",
   },
-  add: {
-    path: "وَصَلَتْ أَكْيَاسٌ جَدِيدَةٌ، هَيَّا نَجْمَعُهَا!",
-    missing: "الْجَمَلُ يَحْمِلُ أَكْيَاسًا جَدِيدَةً، نَجْمَعُهَا مَعًا!",
-    beat: "وَصَلَ كِيسٌ جَدِيدٌ!",
-    complete: "جَمَعْنَا كُلَّ الْأَكْيَاسِ الْجَدِيدَةِ! أَحْسَنْت!",
+  drops: {
+    path: "هَيَّا نَجْمَعُ الْقَطَرَاتِ!",
+    missing: "قَطْرَةٌ وَقَطْرَةٌ، نَجْمَعُ مَعًا!",
+    beat: "جَاءَتْ قَطْرَةٌ أُخْرَى!",
+    complete: "جَمَعْنَا مَاءً كَافِيًا!",
   },
-  carry: {
-    path: "هَيَّا نَحْمِلُ الْأَكْيَاسَ إِلَى السَّفِينَةِ!",
-    missing: "الْأَكْيَاسُ تَنْتَظِرُ، نَحْمِلُهَا إِلَى السَّفِينَةِ!",
-    beat: "حَمَلْنَا كِيسًا إِلَى السَّفِينَةِ!",
-    complete: "حَمَلْنَا كُلَّ الْأَكْيَاسِ إِلَى السَّفِينَةِ! أَحْسَنْت!",
+  give: {
+    path: "هَيَّا نُعْطِي مِمَّا عِنْدَنَا!",
+    missing: "كَمْ يَبْقَى إِذَا أَعْطَيْنَا؟ نَعُدُّ مَعًا!",
+    beat: "أَعْطَيْنَا سَمَكَةً لِلْجِيرَانِ!",
+    complete: "أَعْطَيْنَا، وَمَا زَالَ عِنْدَنَا!",
   },
-  pack: {
-    path: "هَيَّا نُغَلِّفُ الْبَضَائِعَ لِلسَّفَرِ!",
-    missing: "نُغَلِّفُ الْبَضَائِعَ، ثُمَّ تُبْحِرُ السَّفِينَةُ!",
-    beat: "غَلَّفْنَا طَرْدًا آخَرَ!",
-    complete: "غَلَّفْنَا كُلَّ الْبَضَائِعِ، وَأَبْحَرَتِ السَّفِينَةُ! شُكْرًا لَكَ!",
+  stones: {
+    path: "هَيَّا نَبْنِي دَائِرَةً حَوْلَ النَّبْتَةِ!",
+    missing: "حَجَرًا بَعْدَ حَجَرٍ، نَبْنِي مَعًا!",
+    beat: "وَضَعْنَا حَجَرًا آخَرَ!",
+    complete: "بَنَيْنَا الدَّائِرَةَ!",
   },
 };
 
-type StoryUnit = { recipient?: Recipient };
+/** Hudhud's line on a unit's path: what this station asks of the child. */
+export function pathLine(unitId: string, kind: GoalKind): string {
+  return STATIONS[unitId]?.ask ?? GOAL_LINES[kind].path;
+}
 
-/** Said on the finish card of the lesson that finishes a unit: a letter is also delivered. */
-export function finishLine(unit: StoryUnit, kind: GoalKind): string {
-  const { complete } = GOAL_LINES[kind];
-  return unit.recipient ? `${complete} سَأُوصِلُهَا ${unit.recipient.to}.` : complete;
+/** Said on the finish card of the lesson that finishes a unit: the clue or the lesson learnt. */
+export function finishLine(unitId: string, kind: GoalKind): string {
+  return STATIONS[unitId]?.outro ?? GOAL_LINES[kind].complete;
 }
 
 /** Said when the goal at the end of a path is tapped. */
-export function goalLine(unit: StoryUnit, kind: GoalKind, complete: boolean): string {
+export function goalLine(unitId: string, kind: GoalKind, complete: boolean): string {
   if (!complete) return GOAL_LINES[kind].missing;
-  if (unit.recipient) return `أَوْصَلْتُ رِسَالَتِي ${unit.recipient.to}. شُكْرًا لَكَ!`;
-  return GOAL_LINES[kind].complete;
+  return finishLine(unitId, kind);
 }
 
-/** A won sticker is a thank-you gift from the people Hudhud and the child help. */
-export const giftLine = (sticker: string) => `هَدِيَّةُ شُكْرٍ لَكَ: ${sticker}`;
+/** The daily bowl (BowlGoal): three lessons fill it, and the birds come to drink. */
+const LESSONS_LEFT = ["", "دَرْسٌ وَاحِدٌ", "دَرْسَانِ", "ثَلَاثَةُ دُرُوسٍ"];
+export function bowlLine(done: number, goal: number): string {
+  if (done >= goal) return "اِمْتَلَأَ الصَّحْنُ، وَشَرِبَتِ الطُّيُورُ!";
+  return `${LESSONS_LEFT[goal - done] ?? ""}، وَيَمْتَلِئُ الصَّحْنُ!`;
+}
 
-/** The end of the story in a subject: every lesson done with three stars. */
+/** A won sticker is a keepsake from Hudhud's journey. */
+export const giftLine = (sticker: string) => `تِذْكَارٌ مِنَ الرِّحْلَةِ: ${sticker}`;
+
+/** The end of a subject's thread: every lesson done with three stars. */
 export const SUBJECT_DONE: Record<string, string> = {
-  arabic: "وَصَلَتْ كُلُّ رَسَائِلِي! خُطْوَةٌ أُخْرَى نَحْوَ مَدْرَسَتِي. شُكْرًا لَكَ!",
-  lughati: "وَصَلَتْ كُلُّ رَسَائِلِي! خُطْوَةٌ أُخْرَى نَحْوَ مَدْرَسَتِي. شُكْرًا لَكَ!",
-  math: "أَبْحَرَتِ السَّفِينَةُ، وَالتَّاجِرُ سَعِيدٌ! خُطْوَةٌ أُخْرَى نَحْوَ مَدْرَسَتِي. شُكْرًا لَكَ!",
+  arabic: "قَرَأْنَا رِسَالَةَ رَشَا: اِسْقِ الطُّيُورَ! شُكْرًا لَكَ!",
+  lughati: "قَرَأْنَا رِسَالَةَ رَشَا: اِسْقِ الطُّيُورَ! شُكْرًا لَكَ!",
+  math: "كَبِرَتْ شَجَرَةُ السِّدْرِ! شُكْرًا لَكَ!",
   science: "مَا شَاءَ اللهُ! أَتْمَمْتَ كُلَّ الدُّرُوسِ",
 };

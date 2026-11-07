@@ -263,7 +263,6 @@ export const unit4: Unit = {
   emoji: "🏖️",
   emblem: "sand_house",
   goal: "vowels",
-  recipient: { to: "إِلَى أَصْدِقَائِي عَلَى الشَّاطِئِ", pictures: ["🏖"] },
   color: COLOR,
   badgeLabel: "م ب ل",
   lessons: numberLessons("u4", [...mim, ...ba, ...lam, ...exercises]),

@@ -157,16 +157,16 @@ test("today's window counts lessons finished today and says what is left", async
   const window = await screen.findByLabelText(windowLine(1));
   fireEvent.press(window);
   expect(Speech.speak).toHaveBeenLastCalledWith(
-    "دَرْسَانِ، وَتُضِيءُ الْقَمَرِيَّةُ!",
+    "دَرْسَانِ، وَيَمْتَلِئُ الصَّحْنُ!",
     expect.anything(),
   );
 });
 
-test("the window lines name what is left, and glow at three", () => {
-  expect(windowLine(0)).toBe("ثَلَاثَةُ دُرُوسٍ، وَتُضِيءُ الْقَمَرِيَّةُ!");
-  expect(windowLine(2)).toBe("دَرْسٌ وَاحِدٌ، وَتُضِيءُ الْقَمَرِيَّةُ!");
-  expect(windowLine(3)).toBe("أَضَاءَتِ الْقَمَرِيَّةُ الْيَوْمَ!");
-  expect(windowLine(5)).toBe("أَضَاءَتِ الْقَمَرِيَّةُ الْيَوْمَ!");
+test("Rasha's bowl: the lines name what is left, and the birds drink at three", () => {
+  expect(windowLine(0)).toBe("ثَلَاثَةُ دُرُوسٍ، وَيَمْتَلِئُ الصَّحْنُ!");
+  expect(windowLine(2)).toBe("دَرْسٌ وَاحِدٌ، وَيَمْتَلِئُ الصَّحْنُ!");
+  expect(windowLine(3)).toBe("اِمْتَلَأَ الصَّحْنُ، وَشَرِبَتِ الطُّيُورُ!");
+  expect(windowLine(5)).toBe("اِمْتَلَأَ الصَّحْنُ، وَشَرِبَتِ الطُّيُورُ!");
 });
 
 test("the album tile shows how many stickers the stars have earned", async () => {

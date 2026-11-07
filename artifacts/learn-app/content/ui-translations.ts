@@ -6,7 +6,7 @@ const english: Record<string, string> = {
   "ركن الأهل": "Parents' corner",
   "قصة هدهد": "Hudhud's story",
   "ألبوم الملصقات": "Sticker album",
-  "قمرية اليوم": "Today's window",
+  "صحن اليوم": "Today's bowl",
   "هذا الركن للأهل. اضغط على الزر مطوّلاً.":
     "This corner is for parents. Press and hold the button.",
   "اضغط مطوّلاً": "Press and hold",

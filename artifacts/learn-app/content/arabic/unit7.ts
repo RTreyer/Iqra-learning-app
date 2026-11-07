@@ -344,7 +344,6 @@ export const unit7: Unit = {
   emoji: "🧼",
   emblem: "ibriq",
   goal: "letters",
-  recipient: { to: "إِلَى وَسِيمٍ", pictures: ["👦", "🪥"] },
   color: COLOR,
   badgeLabel: "ح س ج",
   lessons: numberLessons("u7", [...ha, ...sin, ...jim, ...exercises, ...sentence]),

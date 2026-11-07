@@ -19,7 +19,7 @@ import { PathMap, type Stop } from "@/components/world/PathMap";
 import { StoryGoal } from "@/components/world/StoryGoal";
 import { WorldHeader } from "@/components/world/WorldHeader";
 import { books, getUnit, unitLessonIds, type Lesson, type Unit } from "@/content";
-import { GOAL_LINES, SUBJECT_LINES } from "@/content/story";
+import { SUBJECT_LINES, pathLine } from "@/content/story";
 import { useLanguage } from "@/context/LanguageContext";
 import { useProgress, type LessonStatus } from "@/context/ProgressContext";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
@@ -161,7 +161,7 @@ export default function UnitScreen() {
           guide={
             progressReady
               ? kind
-                ? GOAL_LINES[kind].path
+                ? pathLine(unit.id, kind)
                 : (SUBJECT_LINES[subject] ?? SUBJECT_LINES.arabic)
               : undefined
           }

@@ -608,7 +608,7 @@ export const mathBookUnit2: Unit = {
   theme: "الأَعْدَادُ مِنْ ٠ إِلَى ١٠",
   emoji: "🔢",
   emblem: "coffee_sacks",
-  goal: "count",
+  goal: "jars",
   color,
   badgeLabel: "أَعُدُّ",
   lessons: numberMathLessons(2, drafts),

@@ -15,13 +15,16 @@ import { goBackOr } from "@/components/BackButton";
 import { ScreenBackground } from "@/components/ScreenBackground";
 import { UiText } from "@/components/UiText";
 import { Icon } from "@/components/world/Icon";
-import { Envelope, Sack, StoryPicture } from "@/components/world/StoryScenes";
+import { BowlArt } from "@/components/world/Bowl";
+import { SidrTreeArt } from "@/components/world/SidrTree";
+import { StoryPicture } from "@/components/world/StoryScenes";
 import { books, type Book } from "@/content";
 import {
   CHAPTERS,
   INTRO_STORY,
   SUBJECT_LINES,
   chapterFor,
+  stationScenes,
   type ChapterId,
   type StoryScene,
 } from "@/content/story";
@@ -34,6 +37,9 @@ import * as haptics from "@/lib/haptics";
 import { routes } from "@/lib/routes";
 import { estimateSpeechMs, speak, stopSpeaking } from "@/lib/speech";
 import { readableFill, touchTarget, yemen } from "@/theme/tokens";
+
+/** Milliseconds now, read in effects and timers (never during render). */
+const clock = () => Date.now();
 
 /** Pause after a line before the next scene, so a child can look at the picture. */
 const LINGER_MS = 900;
@@ -76,7 +82,7 @@ function SceneStage({ scenes, index }: { scenes: readonly StoryScene[]; index: n
     <View style={styles.picture}>
       {turning ? (
         <Animated.View
-          key={scenes[leaving].id}
+          key={`${leaving}-${scenes[leaving].id}`}
           pointerEvents="none"
           style={[
             styles.layer,
@@ -89,11 +95,11 @@ function SceneStage({ scenes, index }: { scenes: readonly StoryScene[]; index: n
             },
           ]}
         >
-          <StoryPicture id={scenes[leaving].id} />
+          <StoryPicture scene={scenes[leaving]} />
         </Animated.View>
       ) : null}
       <Animated.View
-        key={scenes[current].id}
+        key={`${current}-${scenes[current].id}`}
         testID={`intro-scene-${scenes[current].id}`}
         style={[
           styles.layer,
@@ -110,7 +116,7 @@ function SceneStage({ scenes, index }: { scenes: readonly StoryScene[]; index: n
             : null,
         ]}
       >
-        <StoryPicture id={scenes[current].id} />
+        <StoryPicture scene={scenes[current]} />
       </Animated.View>
     </View>
   );
@@ -157,20 +163,18 @@ function Appear({
   );
 }
 
-/** The picture on a choice card: a message with letters, or a sack with numbers. */
+/** The picture on a choice card: Rasha's bowl with letters, or her seed with numbers. */
 function ChoicePicture({ book }: { book: Book }) {
   if (book.subject === "math")
     return (
       <View style={styles.choicePicture}>
-        <View style={styles.sackBox}>
-          <Sack x={0} size={64} />
-        </View>
+        <SidrTreeArt stage={1} size={64} />
         <Text style={styles.choiceGlyph}>١ ٢ ٣</Text>
       </View>
     );
   return (
     <View style={styles.choicePicture}>
-      <Envelope size={64} />
+      <BowlArt width={70} level={0.4} />
       <Text style={styles.choiceGlyph}>أ ب ت</Text>
     </View>
   );
@@ -178,33 +182,50 @@ function ChoicePicture({ book }: { book: Book }) {
 
 export default function IntroScreen() {
   const param = firstParam(useLocalSearchParams<{ chapter?: string | string[] }>().chapter);
-  const chapter = param === "arabic" || param === "math" ? param : null;
-  // A new chapter is a new story: start it from its first scene.
+  // A chapter of the story (the two threads, the end), or a unit's station.
+  const chapter = param && (param in CHAPTERS || stationScenes(param)) ? param : null;
+  // A new part is a new story: start it from its first scene.
   return <Story key={chapter ?? "intro"} chapter={chapter} />;
 }
 
-function Story({ chapter }: { chapter: ChapterId | null }) {
+/** The scenes of a part of the story: chapter 1, a chapter, or a station. */
+function scenesOf(part: string | null): readonly StoryScene[] {
+  if (!part) return INTRO_STORY;
+  return CHAPTERS[part as ChapterId] ?? stationScenes(part) ?? INTRO_STORY;
+}
+
+/** Where a told part leads: a thread to its book's path, a station to its unit, the end home. */
+function afterPart(part: string, bookId: string | null) {
+  if (part === "end") return routes.home();
+  if (!(part in CHAPTERS)) return routes.unit(part);
+  const chosen = books.find((book) => book.id === bookId);
+  const book =
+    chosen && chapterFor(chosen.subject) === part
+      ? chosen
+      : books.find((b) => b.available && chapterFor(b.subject) === part);
+  return book ? routes.book(book.id) : routes.home();
+}
+
+function Story({ chapter }: { chapter: string | null }) {
   const { t, language, loaded: languageLoaded } = useLanguage();
   const line = useLine();
   const { settings, update } = useSettings();
   const pad = useScreenPadding();
-  const scenes = chapter ? CHAPTERS[chapter] : INTRO_STORY;
+  const scenes = scenesOf(chapter);
   const LAST = scenes.length - 1;
   const [index, setIndex] = useState(0);
   const scene = scenes[index];
   const choosing = !chapter && index === LAST;
   const choices = books.filter((book) => book.available);
 
-  /** The chapter is told: remember it and open its path (the book the child chose, if it fits). */
+  /**
+   * The part is told: remember it, then go on. A thread opens its book's path (the book the
+   * child chose, if it fits), a station its unit's path, the end goes home.
+   */
   const finishChapter = () => {
     if (!chapter) return;
-    const chosen = books.find((book) => book.id === settings.bookId);
-    const book =
-      chosen && chapterFor(chosen.subject) === chapter
-        ? chosen
-        : books.find((b) => b.available && chapterFor(b.subject) === chapter);
     update({ chaptersSeen: [...new Set([...settings.chaptersSeen, chapter])] });
-    router.replace(book ? routes.book(book.id) : routes.home());
+    router.replace(afterPart(chapter, settings.bookId));
   };
   const finishRef = useLatest(finishChapter);
 
@@ -214,12 +235,12 @@ function Story({ chapter }: { chapter: ChapterId | null }) {
     if (!languageLoaded) return;
     let moved = false;
     let linger: ReturnType<typeof setTimeout> | undefined;
-    const shownAt = Date.now();
+    const shownAt = clock();
     const done = () => {
       if (moved || choosing) return;
       moved = true;
       // Stay at least as long as the scene's picture needs (the storm), then a short pause.
-      const wait = Math.max(LINGER_MS, (scene.minMs ?? 0) - (Date.now() - shownAt));
+      const wait = Math.max(LINGER_MS, (scene.minMs ?? 0) - (clock() - shownAt));
       linger = setTimeout(() => {
         // The last scene of a chapter opens the job's path.
         if (index === LAST) finishRef.current();
@@ -407,7 +428,6 @@ const styles = StyleSheet.create({
     boxShadow: `0 7px 0 ${yemen.clayDeep}`,
   },
   choicePicture: { alignItems: "center", gap: 4 },
-  sackBox: { width: 64, height: 64 },
   choiceGlyph: { fontSize: 30, fontWeight: "900", color: "#FFFFFF" },
   choiceCaption: { fontSize: 14, fontWeight: "700", color: "#FFFFFF" },
   pressed: { opacity: 0.88, transform: [{ scale: 0.96 }] },

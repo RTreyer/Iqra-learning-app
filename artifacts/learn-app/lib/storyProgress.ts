@@ -38,7 +38,7 @@ type GoalUnit = Pick<Unit, "letters" | "goal">;
 /** The unit's goal: as set in the content, else from its subject and letters. Null: no story. */
 export function goalKind(unit: GoalUnit, subject: string): GoalKind | null {
   if (unit.goal) return unit.goal;
-  if (subject === "math") return "count";
+  if (subject === "math") return "jars";
   if (subject === "arabic" || subject === "lughati")
     return unit.letters?.length ? "letters" : "writing";
   return null;
@@ -47,11 +47,11 @@ export function goalKind(unit: GoalUnit, subject: string): GoalKind | null {
 /** Places of a goal that are not letters: lines on the page, baskets, sacks, parcels. */
 const PLACES: Record<Exclude<GoalKind, "letters" | "vowels">, number> = {
   writing: 4,
-  sort: 3,
-  count: 5,
-  add: 5,
-  carry: 5,
-  pack: 4,
+  seeds: 3,
+  jars: 5,
+  drops: 5,
+  give: 4,
+  stones: 4,
 };
 
 /** The letters a goal is about (letters, vowels), else none. */
@@ -108,4 +108,17 @@ export function storyStep(
     fresh: fresh < 0 ? null : fresh,
     completed: after.complete && !before.complete,
   };
+}
+
+/** Every letter learnt so far across a book's units: those whose sections are all done. */
+export function learntLetters(units: Unit[], done: (lesson: Lesson) => boolean): Set<string> {
+  const learnt = new Set<string>();
+  for (const unit of units) for (const letter of collectedLetters(unit, done)) learnt.add(letter);
+  return learnt;
+}
+
+/** The sidr tree's stage on the maths path: one more for every maths unit finished (0 to 5). */
+export function treeStage(units: Unit[], done: (lesson: Lesson) => boolean): number {
+  const finished = units.filter((u) => u.lessons.length > 0 && u.lessons.every(done)).length;
+  return Math.min(5, Math.round((finished / Math.max(1, units.length)) * 5));
 }

@@ -64,11 +64,21 @@ function prepareBrowser({ demoKey, demoTypes, settingsKey }) {
     localStorage.setItem("@iqra_voice_hint_shown", "1");
     if (localStorage.getItem(demoKey) === null)
       localStorage.setItem(demoKey, JSON.stringify(demoTypes));
-    // Hudhud's story and both jobs already told, unless a test stored its own settings.
+    // Hudhud's story already told, unless a test stored its own settings.
     if (localStorage.getItem(settingsKey) === null)
       localStorage.setItem(
         settingsKey,
-        JSON.stringify({ introSeen: true, chaptersSeen: ["arabic", "math"] }),
+        JSON.stringify({
+          introSeen: true,
+          // Every part of the story already told: the threads, the end, each unit's station.
+          chaptersSeen: [
+            "arabic",
+            "math",
+            "end",
+            ...["a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8"],
+            ...["math-u1", "math-u2", "math-u3", "math-u4", "math-u5"],
+          ],
+        }),
       );
   } catch {}
 }

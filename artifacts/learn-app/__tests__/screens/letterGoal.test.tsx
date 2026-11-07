@@ -27,7 +27,7 @@ test("a unit path ends with Hudhud's letter, still missing letters while lessons
   expect(screen.getByTestId("goal-recipient")).toBeTruthy();
 });
 
-test("with every lesson done the letter is sealed and delivered", async () => {
+test("with every lesson done the clue is read: Hudhud tells what it says", async () => {
   const at = new Date().toISOString();
   const lessons = Object.fromEntries(
     getUnit("a3")!.lessons.map((l) => [l.id, { completed: true, stars: 3, completedAt: at }]),
@@ -42,7 +42,7 @@ test("with every lesson done the letter is sealed and delivered", async () => {
       <UnitScreen />
     </ProgressProvider>,
   );
-  const letter = await screen.findByLabelText(goalLine(getUnit("a3")!, "letters", true));
+  const letter = await screen.findByLabelText(goalLine("a3", "letters", true));
   expect(letter.props.accessibilityState).toMatchObject({ checked: true });
   for (const l of getUnit("a3")!.letters!) expect(screen.getAllByText(l).length).toBeGreaterThan(1);
 });
@@ -80,14 +80,15 @@ test("a vowels unit shows its letters bare, and a letter wears its mark once its
   );
 });
 
-test("a maths unit ends with its market station; only packing has the ship", () => {
+test("a maths unit ends with its station of the seed's journey", () => {
   setParams({ unitId: "math-u4" });
   renderScreen(<UnitScreen />);
-  expect(screen.getByTestId("unit-letter").props.accessibilityLabel).toBe(GOAL_LINES.carry.missing);
-  expect(screen.getByTestId("ship-docked")).toBeTruthy();
+  expect(screen.getByTestId("unit-letter").props.accessibilityLabel).toBe(GOAL_LINES.give.missing);
+  // The neighbours who get the fish.
+  expect(screen.getByTestId("goal-neighbours")).toBeTruthy();
   setParams({ unitId: "math-u2" });
   renderScreen(<UnitScreen />);
   expect(screen.getAllByTestId("unit-letter").pop()!.props.accessibilityLabel).toBe(
-    GOAL_LINES.count.missing,
+    GOAL_LINES.jars.missing,
   );
 });

@@ -3,7 +3,7 @@ import { act, fireEvent, screen } from "@testing-library/react-native";
 import React from "react";
 
 import IntroScreen from "@/app/intro";
-import { CHAPTERS, INTRO_STORY } from "@/content/story";
+import { CHAPTERS, INTRO_STORY, STATIONS } from "@/content/story";
 import { SETTINGS_KEY, SettingsProvider } from "@/context/SettingsContext";
 import { routes } from "@/lib/routes";
 import { mockCanGoBack, renderScreen, setParams } from "@/test-utils/screens";
@@ -86,19 +86,27 @@ test("skip jumps to the choice; choosing saves the subject and opens its path", 
   });
 });
 
-test("Hudhud is a day worker with a dream, and today has two jobs to choose from", () => {
-  expect(INTRO_STORY.map((s) => s.id)).toEqual(["dawn", "jobs", "dream", "today", "choose"]);
-  expect(INTRO_STORY[2].line).toContain("مَدْرَسَةً");
-  expect(CHAPTERS.arabic.map((s) => s.id)).toEqual(["postman", "wind", "waiting"]);
-  expect(CHAPTERS.math.map((s) => s.id)).toEqual(["market", "beans", "ship"]);
+test("Hudhud's story: Rasha, her bowl and the message he cannot read, then two threads", () => {
+  expect(INTRO_STORY.map((s) => s.id)).toEqual([
+    "roof",
+    "girl",
+    "why",
+    "gone",
+    "inscription",
+    "choose",
+  ]);
+  expect(INTRO_STORY[4].line).toContain("لَا أَعْرِفُ الْقِرَاءَةَ");
+  expect(CHAPTERS.arabic.map((s) => s.id)).toEqual(["trail", "bowl"]);
+  expect(CHAPTERS.math.map((s) => s.id)).toEqual(["seed", "share"]);
+  expect(CHAPTERS.end.map((s) => s.id)).toEqual(["tree", "newgirl", "home"]);
 });
 
-test("a chapter tells its job, then opens its path and is remembered", async () => {
+test("a thread tells its beginning, then opens its path and is remembered", async () => {
   setParams({ chapter: "math" });
   await AsyncStorage.setItem(SETTINGS_KEY, JSON.stringify({ introSeen: true, bookId: "math-1" }));
   renderIntro();
   await act(async () => {});
-  expect(screen.getByTestId("intro-scene-market")).toBeTruthy();
+  expect(screen.getByTestId("intro-scene-seed")).toBeTruthy();
   expect(screen.queryByTestId("choose-math-1")).toBeNull();
   for (const scene of CHAPTERS.math) {
     expect(screen.getByTestId(`intro-scene-${scene.id}`)).toBeTruthy();
@@ -112,13 +120,26 @@ test("a chapter tells its job, then opens its path and is remembered", async () 
   expect(JSON.parse((await AsyncStorage.getItem(SETTINGS_KEY))!).chaptersSeen).toEqual(["math"]);
 });
 
-test("skip in a chapter opens the job's path at once", async () => {
+test("skip in a chapter opens the thread's path at once", async () => {
   setParams({ chapter: "arabic" });
   renderIntro();
   await act(async () => {});
-  expect(screen.getByTestId("intro-scene-postman")).toBeTruthy();
+  expect(screen.getByTestId("intro-scene-trail")).toBeTruthy();
   await act(async () => {
     fireEvent.press(screen.getByTestId("intro-skip"));
   });
   expect(router.replace).toHaveBeenCalledWith(routes.book("arabic-1"));
+});
+
+test("a station tells where Hudhud is and what to read, then opens the unit", async () => {
+  setParams({ chapter: "a2" });
+  renderIntro();
+  await act(async () => {});
+  expect(screen.getByTestId("intro-scene-station")).toBeTruthy();
+  expect(spoken()).toEqual([STATIONS.a2.where]);
+  await act(async () => {
+    fireEvent.press(screen.getByTestId("intro-skip"));
+  });
+  expect(router.replace).toHaveBeenCalledWith(routes.unit("a2"));
+  expect(JSON.parse((await AsyncStorage.getItem(SETTINGS_KEY))!).chaptersSeen).toEqual(["a2"]);
 });

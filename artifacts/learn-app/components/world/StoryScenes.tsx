@@ -1,151 +1,56 @@
 /**
  * Pictures of Hudhud's story (content/story.ts), built from the app's own drawings: Hudhud,
- * Old Sana'a, the dhow, coffee and the people of the textbook. Each scene moves a little,
- * slowly, and only while it is shown.
+ * Old Sana'a, Rasha's clay bowl, the sidr tree, the people of the textbook. Each scene is a
+ * living picture that moves slowly, and only while it is shown.
  */
 
 import React, { useEffect, useState } from "react";
 import { Animated, Easing, StyleSheet, Text, View } from "react-native";
-import { Circle, Ellipse, Path, Rect, Svg } from "react-native-svg";
+import { Circle, Ellipse, Path, Polygon, Rect, Svg } from "react-native-svg";
 
 import { Art } from "@/components/art/Art";
-import type { StorySceneId } from "@/content/story";
+import { Picture } from "@/components/pictures/Picture";
+import { MESSAGE, STATIONS, type StationPlace, type StoryScene } from "@/content/story";
 import { yemen } from "@/theme/tokens";
+import { BowlArt, messageLetters } from "./Bowl";
 import { Hudhud } from "./Hudhud";
+import { SidrTreeArt } from "./SidrTree";
 import { Skyline } from "./Skyline";
 import { StickerArt } from "./StickerArt";
 import { LOOP_NATIVE } from "./motion";
-import { Beans, Dawn, Dream, Jobs, Ship, Today, Waiting } from "./DayScenes";
 
-/** A value that swings 0 → 1 → 0 forever while mounted. */
-function useSwing(duration = 1400): Animated.Value {
+/** 0 → 1 once, after a delay. */
+function useOnce(duration: number, delay = 0, easing = Easing.inOut(Easing.cubic)) {
   const [v] = useState(() => new Animated.Value(0));
   useEffect(() => {
-    const loop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(v, {
-          toValue: 1,
-          duration,
-          easing: Easing.inOut(Easing.quad),
-          useNativeDriver: LOOP_NATIVE,
-        }),
-        Animated.timing(v, {
-          toValue: 0,
-          duration,
-          easing: Easing.inOut(Easing.quad),
-          useNativeDriver: LOOP_NATIVE,
-        }),
-      ]),
-    );
-    loop.start();
-    return () => loop.stop();
-  }, [v, duration]);
+    const anim = Animated.timing(v, { toValue: 1, duration, delay, easing, useNativeDriver: true });
+    anim.start();
+    return () => anim.stop();
+  }, [v, duration, delay, easing]);
   return v;
 }
 
-function Envelope({ size = 34, letter }: { size?: number; letter?: string }) {
-  return (
-    <View style={{ width: size, height: size * 0.7 }}>
-      <Svg width={size} height={size * 0.7} viewBox="0 0 34 24">
-        <Rect
-          x={1}
-          y={1}
-          width={32}
-          height={22}
-          rx={3}
-          fill="#FFFFFF"
-          stroke="#B9A58E"
-          strokeWidth={2}
-        />
-        <Path d="M1 3l16 11L33 3" stroke="#B9A58E" strokeWidth={2} fill="none" />
-        <Circle cx={17} cy={15} r={3} fill={yemen.red} />
-      </Svg>
-      {letter ? <Text style={styles.envelopeLetter}>{letter}</Text> : null}
-    </View>
-  );
-}
-
-/** The postman chapter: Hudhud flies over Sana'a, his mail bag strapped across his chest. */
-function Postman() {
-  // A slow glide back and forth, a lighter bob on top of it, and a slight bank into the turn.
-  const glide = useSwing(2600);
-  const bob = useSwing(650);
-  return (
-    <View style={styles.scene}>
-      <View style={styles.sky} />
-      <Cloud left={30} top={34} />
-      <Cloud left={250} top={70} small />
-      <Animated.View
-        style={[
-          styles.flying,
-          {
-            transform: [
-              { translateX: glide.interpolate({ inputRange: [0, 1], outputRange: [46, -46] }) },
-              { translateY: bob.interpolate({ inputRange: [0, 1], outputRange: [4, -8] }) },
-              { rotate: glide.interpolate({ inputRange: [0, 1], outputRange: ["4deg", "-4deg"] }) },
-            ],
-          },
-        ]}
-      >
-        <Hudhud size={140} hop={false} flap bag={3} />
-      </Animated.View>
-      <View style={styles.ground}>
-        <Skyline />
-      </View>
-    </View>
-  );
-}
-
-function Cloud({ left, top, small }: { left: number; top: number; small?: boolean }) {
-  const w = small ? 60 : 84;
-  return (
-    <Svg
-      width={w}
-      height={w * 0.45}
-      viewBox="0 0 84 38"
-      style={{ position: "absolute", left, top }}
-    >
-      <Path
-        d="M14 34 Q2 34 4 24 Q6 14 18 16 Q22 4 36 6 Q48 0 56 12 Q72 8 76 22 Q84 34 70 34 Z"
-        fill="#FFFFFF"
-        opacity={0.9}
-      />
-    </Svg>
-  );
-}
-
-/** Letters that fly out of each of the three letters (envelopes) the storm tears from the bag. */
-const LETTER_GROUPS = [
-  ["أ", "ب", "ت"],
-  ["م", "ر", "ن"],
-  ["د", "ل", "س"],
-];
-const TILE_COLOURS = [yemen.red, yemen.blue, yemen.green, yemen.goldDeep];
-/** Hudhud's size in the storm scene. */
-const STORM_BIRD = 140;
-/** The front edge of the bag's mouth, where the storm catches each letter (px in the bird box). */
-const BAG_AT = { x: 44, y: 92 };
-/** When the storm tears out each letter, after the scene opens; then the bag stays empty. */
-const TEAR_AT_MS = [900, 1800, 2700];
-/** One envelope's flight. */
-const ENVELOPE_MS = 2300;
-/** Share of the flight after which the envelope bursts open and its letters fly on. */
-const BURST = 0.4;
-
-/** A value that runs 0 → 1 over and over (no way back), after an initial delay. */
-function useRun(duration: number, delay = 0): Animated.Value {
+/** 0 → 1 → 0 forever, after a delay. */
+function useSwing(duration: number, delay = 0) {
   const [v] = useState(() => new Animated.Value(0));
   useEffect(() => {
-    // The loop starts after the delay; a loop nested in a sequence would not repeat.
     let loop: Animated.CompositeAnimation | undefined;
     const start = setTimeout(() => {
       loop = Animated.loop(
-        Animated.timing(v, {
-          toValue: 1,
-          duration,
-          easing: Easing.linear,
-          useNativeDriver: LOOP_NATIVE,
-        }),
+        Animated.sequence([
+          Animated.timing(v, {
+            toValue: 1,
+            duration,
+            easing: Easing.inOut(Easing.quad),
+            useNativeDriver: LOOP_NATIVE,
+          }),
+          Animated.timing(v, {
+            toValue: 0,
+            duration,
+            easing: Easing.inOut(Easing.quad),
+            useNativeDriver: LOOP_NATIVE,
+          }),
+        ]),
       );
       loop.start();
     }, delay);
@@ -157,474 +62,799 @@ function useRun(duration: number, delay = 0): Animated.Value {
   return v;
 }
 
-/**
- * One envelope torn out of the bag by the storm, once. Hudhud looks left and the bag hangs at
- * his front, so the envelope slides out of the front of the bag, passes low under his beak, and
- * only then is flung up, spinning, away from him: it never crosses the bird. In the air it
- * bursts open and its letters whirl away as paper cards.
- */
-function TornLetter({ index }: { index: number }) {
-  const [v] = useState(() => new Animated.Value(0));
-  useEffect(() => {
-    const anim = Animated.sequence([
-      Animated.delay(TEAR_AT_MS[index]),
-      Animated.timing(v, {
-        toValue: 1,
-        duration: ENVELOPE_MS,
-        easing: Easing.linear,
-        useNativeDriver: LOOP_NATIVE,
-      }),
-    ]);
-    anim.start();
-    return () => anim.stop();
-  }, [v, index]);
+const lerp = (v: Animated.Value, from: number, to: number) =>
+  v.interpolate({ inputRange: [0, 1], outputRange: [from, to] });
 
-  // Out under the beak first (low and forward), then flung up and away to where it bursts.
-  const clear = { x: -58, y: 8 };
-  const ex = -118 - index * 12;
-  const ey = -70 + index * 20;
-  const at = (via: number, end: number) =>
-    v.interpolate({
-      inputRange: [0, 0.14, BURST, 1],
-      outputRange: [0, via, end, end],
-      extrapolate: "clamp",
-    });
-
+/** The rooftop wall the bowl stands on, with the city behind. */
+function Rooftop({ dusk = false }: { dusk?: boolean }) {
   return (
     <>
+      <View style={[styles.fill, { backgroundColor: dusk ? "#E7B98C" : "#F9E3BF" }]} />
+      <View style={styles.city}>
+        <Skyline />
+      </View>
+      <View style={styles.wall} />
+    </>
+  );
+}
+
+/** Morning over Sana'a: the night lifts, the sun rises, Hudhud wakes on his roof. */
+function Roof() {
+  const morning = useOnce(3200);
+  const sun = useOnce(3600, 200, Easing.out(Easing.cubic));
+  const rays = useSwing(2400, 1500);
+  const wake = useOnce(700, 2200, Easing.out(Easing.back(2)));
+  return (
+    <View style={styles.scene}>
+      <View style={[styles.fill, { backgroundColor: "#F9D9A6" }]} />
+      <Animated.View
+        style={[styles.fill, { backgroundColor: "#2B3A63", opacity: lerp(morning, 1, 0) }]}
+      />
       <Animated.View
         style={[
-          styles.blownEnvelope,
+          styles.sun,
+          { transform: [{ translateY: lerp(sun, 150, 0) }, { scale: lerp(rays, 1, 1.06) }] },
+        ]}
+      >
+        <Svg width={120} height={120} viewBox="0 0 130 130">
+          {Array.from({ length: 12 }, (_, i) => (
+            <Rect
+              key={i}
+              x={62}
+              y={4}
+              width={6}
+              height={20}
+              rx={3}
+              fill="#F4C14B"
+              opacity={0.7}
+              transform={`rotate(${i * 30} 65 65)`}
+            />
+          ))}
+          <Circle cx={65} cy={65} r={34} fill="#F6B73C" />
+          <Circle cx={65} cy={65} r={26} fill="#FBD46E" />
+        </Svg>
+      </Animated.View>
+      <View style={styles.city}>
+        <Skyline />
+      </View>
+      <Animated.View
+        style={[
+          styles.roofBird,
+          { transform: [{ translateY: lerp(wake, 10, 0) }, { scale: lerp(wake, 0.92, 1) }] },
+        ]}
+      >
+        <Hudhud size={112} pose="cheer" />
+      </Animated.View>
+    </View>
+  );
+}
+
+/** Every morning Rasha puts water out for the birds; Hudhud comes and drinks. */
+function Girl() {
+  const come = useOnce(1400, 900, Easing.out(Easing.quad));
+  const sip = useSwing(500, 2400);
+  const shimmer = useSwing(900);
+  return (
+    <View style={styles.scene}>
+      <Rooftop />
+      <View style={styles.girl}>
+        <Art art="girl" size={130} />
+      </View>
+      <Animated.View style={[styles.bowlOnWall, { opacity: lerp(shimmer, 0.92, 1) }]}>
+        <BowlArt width={96} level={1} />
+      </Animated.View>
+      <Animated.View
+        style={[
+          styles.drinker,
           {
-            left: BAG_AT.x - 17,
-            top: BAG_AT.y - 12,
-            opacity: v.interpolate({
-              inputRange: [0, 0.05, BURST - 0.04, BURST + 0.04, 1],
-              outputRange: [0, 1, 1, 0, 0],
-            }),
             transform: [
-              { translateX: at(clear.x, ex) },
-              { translateY: at(clear.y, ey) },
+              { translateX: lerp(come, 140, 0) },
+              { translateY: lerp(sip, 0, 8) },
+              { rotate: sip.interpolate({ inputRange: [0, 1], outputRange: ["0deg", "-10deg"] }) },
+            ],
+          },
+        ]}
+      >
+        <Hudhud size={86} hop={false} />
+      </Animated.View>
+    </View>
+  );
+}
+
+/** "You don't know us!" "But you are thirsty." A small heart rises between them. */
+function Why() {
+  const heart = useSwing(1200);
+  return (
+    <View style={styles.scene}>
+      <Rooftop />
+      <View style={styles.girl}>
+        <Art art="girl" size={130} />
+      </View>
+      <View style={styles.bowlOnWall}>
+        <BowlArt width={96} level={0.8} />
+      </View>
+      <Animated.View
+        style={[
+          styles.heart,
+          {
+            opacity: lerp(heart, 0.5, 1),
+            transform: [{ translateY: lerp(heart, 6, -10) }, { scale: lerp(heart, 0.9, 1.1) }],
+          },
+        ]}
+      >
+        <Picture emoji="❤" size={40} />
+      </Animated.View>
+      <View style={[styles.drinker, styles.facing]}>
+        <Hudhud size={90} hop={false} />
+      </View>
+    </View>
+  );
+}
+
+/** One morning the bowl is empty and she is gone: the door shut, Hudhud waits alone. */
+function Gone() {
+  const dim = useOnce(3600, 400);
+  const look = useSwing(1600, 800);
+  return (
+    <View style={styles.scene}>
+      <Rooftop dusk />
+      <View style={styles.door}>
+        <Art art="door" size={110} />
+      </View>
+      <View style={styles.bowlOnWall}>
+        <BowlArt width={96} level={0} />
+      </View>
+      <Animated.View
+        style={[
+          styles.drinker,
+          {
+            transform: [
+              { rotate: look.interpolate({ inputRange: [0, 1], outputRange: ["-4deg", "4deg"] }) },
+            ],
+          },
+        ]}
+      >
+        <Hudhud size={86} hop={false} />
+      </Animated.View>
+      <Animated.View
+        style={[styles.fill, { backgroundColor: "#3B2A40", opacity: lerp(dim, 0, 0.35) }]}
+      />
+    </View>
+  );
+}
+
+/** The message scratched into the bowl, which Hudhud cannot read, and the seed she left. */
+function Inscription() {
+  const puzzle = useSwing(700);
+  const glint = useSwing(1100, 400);
+  const letters = [...MESSAGE.words, MESSAGE.name].flatMap((w) => messageLetters(w));
+  return (
+    <View style={styles.scene}>
+      <View style={[styles.fill, { backgroundColor: "#F3DCC7" }]} />
+      <View style={styles.bigBowl}>
+        <BowlArt width={250} level={0} />
+        <View style={styles.scratches}>
+          {letters.map((l, i) => (
+            <Text key={i} style={styles.scratch}>
+              {l}
+            </Text>
+          ))}
+        </View>
+        <Animated.View
+          style={[
+            styles.seed,
+            { opacity: lerp(glint, 0.75, 1), transform: [{ scale: lerp(glint, 1, 1.15) }] },
+          ]}
+        >
+          <Svg width={22} height={16} viewBox="0 0 22 16">
+            <Ellipse cx={11} cy={8} rx={10} ry={7} fill="#8E5A36" />
+            <Path d="M4 8 Q11 3 18 8" stroke="#5E3220" strokeWidth={1.5} fill="none" />
+          </Svg>
+        </Animated.View>
+      </View>
+      <View style={styles.inscriptionBird}>
+        <Hudhud size={90} hop={false} />
+        <Animated.View style={{ transform: [{ translateY: lerp(puzzle, 0, -6) }] }}>
+          <Picture emoji="❓" size={36} />
+        </Animated.View>
+      </View>
+    </View>
+  );
+}
+
+/** The choice: Hudhud with the bowl and the seed (the choices are buttons on the screen). */
+function Choose() {
+  return (
+    <View style={[styles.scene, styles.chooseScene]}>
+      <View style={styles.chooseRow}>
+        <BowlArt width={90} level={0} />
+        <Hudhud size={130} />
+        <SidrTreeArt stage={0} size={80} />
+      </View>
+    </View>
+  );
+}
+
+/** Hudhud sets out on Rasha's trail: the way over the mountains draws itself, dot by dot. */
+function Trail() {
+  // One clock for the whole trail: dot i appears at its share of it.
+  const draw = useOnce(3000, 400, Easing.linear);
+  const fly = useOnce(3400, 300, Easing.inOut(Easing.quad));
+  return (
+    <View style={styles.scene}>
+      <View style={[styles.fill, { backgroundColor: "#E7F0FA" }]} />
+      <Svg width="100%" height={300} viewBox="0 0 360 300" style={StyleSheet.absoluteFill}>
+        <Polygon points="0,300 70,150 140,300" fill="#B48A50" />
+        <Polygon points="100,300 200,120 300,300" fill="#8E5A36" />
+        <Polygon points="230,300 310,170 380,300" fill="#A47148" />
+        <Polygon points="186,146 200,120 214,146" fill="#F7F0E1" />
+      </Svg>
+      {Array.from({ length: TRAIL_DOTS }, (_, i) => (
+        <Animated.View
+          key={i}
+          style={[
+            styles.trailDot,
+            {
+              right: 30 + i * 34,
+              top: 210 - Math.sin(i / 2) * 60,
+              opacity: draw.interpolate({
+                inputRange: [i / TRAIL_DOTS, (i + 1) / TRAIL_DOTS],
+                outputRange: [0, 1],
+                extrapolate: "clamp",
+              }),
+            },
+          ]}
+        />
+      ))}
+      <Animated.View
+        style={[
+          styles.trailBird,
+          { transform: [{ translateX: lerp(fly, 0, -230) }, { translateY: lerp(fly, 0, -40) }] },
+        ]}
+      >
+        <Hudhud size={80} flap hop={false} />
+      </Animated.View>
+    </View>
+  );
+}
+
+const TRAIL_DOTS = 9;
+
+/** The bowl's message: the letters light up one after another, as the child will learn them. */
+function BowlScene() {
+  const letters = [...MESSAGE.words, MESSAGE.name].flatMap((w) => messageLetters(w));
+  // One clock: letter i lights up at its share of it.
+  const light = useOnce(letters.length * 260 + 400, 500, Easing.linear);
+  return (
+    <View style={styles.scene}>
+      <View style={[styles.fill, { backgroundColor: "#F3DCC7" }]} />
+      <View style={styles.bigBowl}>
+        <BowlArt width={250} level={0.4} />
+        <View style={styles.scratches}>
+          {letters.map((l, i) => (
+            <View key={i}>
+              <Text style={styles.scratch}>{l}</Text>
+              <Animated.Text
+                style={[
+                  styles.scratch,
+                  styles.glowLetter,
+                  {
+                    opacity: light.interpolate({
+                      inputRange: [i / letters.length, (i + 1) / letters.length],
+                      outputRange: [0, 1],
+                      extrapolate: "clamp",
+                    }),
+                  },
+                ]}
+              >
+                {l}
+              </Animated.Text>
+            </View>
+          ))}
+        </View>
+      </View>
+      <View style={styles.inscriptionBird}>
+        <Hudhud size={90} pose="cheer" />
+      </View>
+    </View>
+  );
+}
+
+/** The seed in dry earth, and only a few drops of water. */
+function Seed() {
+  const drop = useSwing(900);
+  return (
+    <View style={styles.scene}>
+      <View style={[styles.fill, { backgroundColor: "#F6E2C2" }]} />
+      <Svg width="100%" height={300} viewBox="0 0 360 300" style={StyleSheet.absoluteFill}>
+        <Rect x={0} y={190} width={360} height={110} fill="#C9A16B" />
+        <Path
+          d="M40 230 l30 10 l20 -14 M150 260 l26 -12 l18 16 M250 228 l30 14 l26 -10"
+          stroke="#8E6A4A"
+          strokeWidth={3}
+          fill="none"
+        />
+      </Svg>
+      <View style={styles.seedSoil}>
+        <SidrTreeArt stage={0} size={110} />
+      </View>
+      <Animated.View
+        style={[
+          styles.fallingDrop,
+          { opacity: lerp(drop, 1, 0.2), transform: [{ translateY: lerp(drop, -20, 70) }] },
+        ]}
+      >
+        <Picture emoji="💧" size={30} />
+      </Animated.View>
+      <View style={styles.seedBird}>
+        <Hudhud size={96} hop={false} />
+      </View>
+    </View>
+  );
+}
+
+/** Who counts can share: the jar pours, half for the birds' bowl, half for the seedling. */
+function Share() {
+  const pour = useSwing(1300);
+  const n1 = useOnce(400, 1200);
+  const n2 = useOnce(400, 2000);
+  return (
+    <View style={styles.scene}>
+      <View style={[styles.fill, { backgroundColor: "#EEF6E8" }]} />
+      <View style={styles.ground} />
+      <Animated.View
+        style={[
+          styles.jar,
+          {
+            transform: [
+              { rotate: pour.interpolate({ inputRange: [0, 1], outputRange: ["0deg", "-30deg"] }) },
+            ],
+          },
+        ]}
+      >
+        <Svg width={80} height={80} viewBox="0 0 40 40">
+          <Path
+            d="M14 6 H26 V10 Q34 16 32 28 Q30 37 20 37 Q10 37 8 28 Q6 16 14 10 Z"
+            fill={yemen.clay}
+            stroke={yemen.clayDeep}
+            strokeWidth={2}
+          />
+        </Svg>
+      </Animated.View>
+      <View style={styles.shareRow}>
+        <View style={styles.shareSide}>
+          <Animated.Text style={[styles.shareNum, { opacity: n1 }]}>١</Animated.Text>
+          <BowlArt width={90} level={0.5} />
+        </View>
+        <View style={styles.shareSide}>
+          <Animated.Text style={[styles.shareNum, { opacity: n2 }]}>٢</Animated.Text>
+          <SidrTreeArt stage={1} size={90} />
+        </View>
+      </View>
+      <View style={styles.shareBird}>
+        <Hudhud size={84} />
+      </View>
+    </View>
+  );
+}
+
+/** The sidr tree stands in the courtyard, and the birds come to it. */
+function Tree() {
+  const sway = useSwing(2200);
+  const birds = useSwing(1400, 600);
+  return (
+    <View style={styles.scene}>
+      <View style={[styles.fill, { backgroundColor: "#E7F0FA" }]} />
+      <View style={styles.ground} />
+      <Animated.View
+        style={[
+          styles.bigTree,
+          {
+            transform: [
               {
-                rotate: v.interpolate({
-                  inputRange: [0, 0.14, BURST],
-                  outputRange: ["0deg", "-10deg", `${index % 2 ? 300 : -320}deg`],
-                  extrapolate: "clamp",
-                }),
-              },
-              {
-                scale: v.interpolate({
-                  inputRange: [0, 0.14, BURST],
-                  outputRange: [0.5, 0.9, 1.15],
-                  extrapolate: "clamp",
+                rotate: sway.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ["-1.5deg", "1.5deg"],
                 }),
               },
             ],
           },
         ]}
       >
-        <Envelope size={34} />
+        <SidrTreeArt stage={5} size={230} />
       </Animated.View>
-      {LETTER_GROUPS[index].map((letter, j) => {
-        // Each card whirls: out, a loop with the gust, and away.
-        const dx = -34 - j * 22 + index * 8;
-        const dy = -30 + j * 32;
-        const swirl = j % 2 ? 26 : -26;
-        return (
-          <Animated.View
-            key={letter}
-            style={[
-              styles.tile,
-              {
-                left: BAG_AT.x - 18,
-                top: BAG_AT.y - 20,
-                opacity: v.interpolate({
-                  inputRange: [0, BURST - 0.02, BURST + 0.04, 0.88, 1],
-                  outputRange: [0, 0, 1, 1, 0],
-                }),
-                transform: [
-                  {
-                    translateX: v.interpolate({
-                      inputRange: [0, BURST, 0.6, 0.8, 1],
-                      outputRange: [ex, ex, ex + dx * 0.4, ex + dx * 0.7 + swirl, ex + dx],
-                    }),
-                  },
-                  {
-                    translateY: v.interpolate({
-                      inputRange: [0, BURST, 0.6, 0.8, 1],
-                      outputRange: [ey, ey, ey + dy * 0.5 - 22, ey + dy * 0.6 + 14, ey + dy],
-                    }),
-                  },
-                  {
-                    rotate: v.interpolate({
-                      inputRange: [0, BURST, 1],
-                      outputRange: ["0deg", "0deg", `${(j % 2 ? 1 : -1) * (200 + j * 80)}deg`],
-                    }),
-                  },
-                  {
-                    scale: v.interpolate({
-                      inputRange: [0, BURST, BURST + 0.1, 1],
-                      outputRange: [0.3, 0.3, 1, 0.9],
-                    }),
-                  },
-                ],
-              },
-            ]}
-          >
-            <Text style={[styles.tileLetter, { color: TILE_COLOURS[(index + j) % 4] }]}>
-              {letter}
-            </Text>
-          </Animated.View>
-        );
-      })}
-    </>
+      <Animated.View
+        style={[styles.treeBirds, { transform: [{ translateY: lerp(birds, 0, -10) }] }]}
+      >
+        <Picture emoji="🐦" size={34} />
+        <Picture emoji="🕊" size={34} />
+      </Animated.View>
+      <View style={styles.treeBowl}>
+        <BowlArt width={80} level={1} />
+      </View>
+    </View>
   );
 }
 
-/** A streak of blown sand racing across the picture, again and again. */
-function SandStreak({ top, width, ms, delay, opacity }: StreakProps) {
-  const run = useRun(ms, delay);
+/** A little girl comes and waters the tree with Hudhud. */
+function NewGirl() {
+  const pour = useSwing(1100);
   return (
-    <Animated.View
-      style={[
-        styles.streak,
-        {
-          top,
-          width,
-          opacity,
-          transform: [
-            {
-              translateX: run.interpolate({ inputRange: [0, 1], outputRange: [420, -width - 40] }),
-            },
-          ],
-        },
-      ]}
-    />
+    <View style={styles.scene}>
+      <View style={[styles.fill, { backgroundColor: "#F9E3BF" }]} />
+      <View style={styles.ground} />
+      <View style={styles.midTree}>
+        <SidrTreeArt stage={5} size={200} />
+      </View>
+      <View style={styles.smallGirl}>
+        <Art art="girl" size={100} />
+      </View>
+      <Animated.View
+        style={[
+          styles.pourDrop,
+          { opacity: lerp(pour, 1, 0.2), transform: [{ translateY: lerp(pour, 0, 40) }] },
+        ]}
+      >
+        <Picture emoji="💧" size={24} />
+      </Animated.View>
+      <View style={styles.branchBird}>
+        <Hudhud size={70} hop={false} />
+      </View>
+    </View>
   );
 }
-type StreakProps = { top: number; width: number; ms: number; delay: number; opacity: number };
 
-/** A grain of sand tumbling across with the gusts. */
-function Grain({ top, size, ms, delay, wobble }: GrainProps) {
-  const run = useRun(ms, delay);
+/** Rasha's kindness stayed: Hudhud flies over the mountains, and always comes back. */
+function Home() {
+  const fly = useSwing(2600);
   return (
-    <Animated.View
-      style={[
-        styles.grain,
-        {
-          top,
-          width: size,
-          height: size,
-          borderRadius: size / 2,
-          transform: [
-            { translateX: run.interpolate({ inputRange: [0, 1], outputRange: [400, -30] }) },
-            {
-              translateY: run.interpolate({
-                inputRange: [0, 0.25, 0.5, 0.75, 1],
-                outputRange: [0, -wobble, 0, wobble, 0],
-              }),
-            },
-          ],
-        },
-      ]}
-    />
+    <View style={styles.scene}>
+      <View style={[styles.fill, { backgroundColor: "#F7C98B" }]} />
+      <View style={styles.sunset} />
+      <View style={styles.city}>
+        <Skyline />
+      </View>
+      <View style={styles.homeTree}>
+        <SidrTreeArt stage={5} size={120} />
+      </View>
+      <Animated.View
+        style={[
+          styles.homeBird,
+          { transform: [{ translateX: lerp(fly, -120, 60) }, { translateY: lerp(fly, -20, 10) }] },
+        ]}
+      >
+        <Hudhud size={80} flap hop={false} />
+      </Animated.View>
+    </View>
   );
 }
-type GrainProps = { top: number; size: number; ms: number; delay: number; wobble: number };
 
-/** A dark cloud rolling across the sky. */
-function StormCloud({
-  top,
-  width,
-  ms,
-  delay,
-}: {
-  top: number;
-  width: number;
-  ms: number;
-  delay: number;
-}) {
-  const run = useRun(ms, delay);
+const PLACE_SKY: Record<StationPlace, string> = {
+  roof: "#F9E3BF",
+  door: "#F9E3BF",
+  school: "#E7F0FA",
+  beach: "#E7F0FA",
+  road: "#F6E9D4",
+  garden: "#EEF6E8",
+  well: "#F6E9D4",
+  village: "#E7F0FA",
+  terraces: "#E7F0FA",
+  rain: "#D9E4EE",
+  courtyard: "#F6E2C2",
+};
+
+/** The ground of a station: the city, the sea, the mountains, a garden. */
+function PlaceGround({ place }: { place: StationPlace }) {
+  switch (place) {
+    case "roof":
+    case "door":
+      return (
+        <>
+          <View style={styles.city}>
+            <Skyline />
+          </View>
+          {place === "door" ? (
+            <View style={styles.stationArt}>
+              <Art art="door" size={110} />
+            </View>
+          ) : null}
+        </>
+      );
+    case "school":
+      return (
+        <>
+          <View style={styles.ground} />
+          <View style={styles.stationArt}>
+            <Art art="school" size={150} />
+          </View>
+        </>
+      );
+    case "beach":
+      return (
+        <>
+          <View style={styles.sea} />
+          <View style={styles.sand} />
+          <View style={styles.boat}>
+            <StickerArt id="dhow" size={110} />
+          </View>
+        </>
+      );
+    case "road":
+      return (
+        <Svg width="100%" height={300} viewBox="0 0 360 300" style={StyleSheet.absoluteFill}>
+          <Polygon points="0,300 90,170 180,300" fill="#B48A50" />
+          <Polygon points="160,300 260,150 360,300" fill="#8E5A36" />
+          <Path d="M120 300 L170 200 L190 200 L250 300 Z" fill="#9C8B7A" />
+          <Path d="M180 210 V230 M182 245 V270 M185 282 V300" stroke="#F7F0E1" strokeWidth={4} />
+        </Svg>
+      );
+    case "garden":
+    case "courtyard":
+      return (
+        <>
+          <View style={[styles.ground, place === "courtyard" && { backgroundColor: "#C9A16B" }]} />
+          <View style={styles.gardenTree}>
+            {place === "garden" ? (
+              <Art art="palm" size={140} />
+            ) : (
+              <SidrTreeArt stage={1} size={110} />
+            )}
+          </View>
+        </>
+      );
+    case "well":
+      return (
+        <>
+          <View style={styles.ground} />
+          <Svg width={130} height={110} viewBox="0 0 130 110" style={styles.stationArt}>
+            <Rect
+              x={20}
+              y={50}
+              width={90}
+              height={56}
+              rx={6}
+              fill="#B9A58E"
+              stroke="#6E5B48"
+              strokeWidth={3}
+            />
+            <Path d="M20 64 H110 M20 80 H110 M20 96 H110" stroke="#9C8B7A" strokeWidth={2} />
+            <Path d="M28 50 V12 H102 V50" stroke="#8E5A36" strokeWidth={6} fill="none" />
+            <Path d="M65 12 V40" stroke="#5E3220" strokeWidth={2} />
+          </Svg>
+        </>
+      );
+    case "village":
+    case "terraces":
+      return (
+        <Svg width="100%" height={300} viewBox="0 0 360 300" style={StyleSheet.absoluteFill}>
+          <Path d="M0 300 L0 160 Q90 90 180 130 Q270 80 360 150 L360 300 Z" fill="#B48A50" />
+          {[0, 1, 2, 3].map((i) => (
+            <Path
+              key={i}
+              d={`M0 ${300 - i * 30} H360 V${276 - i * 30} H0 Z`}
+              fill={i % 2 ? "#5BA05F" : "#3F8A4E"}
+            />
+          ))}
+          {place === "village"
+            ? [60, 110, 250].map((x, i) => (
+                <Rect key={i} x={x} y={130 - (i % 2) * 14} width={30} height={46} fill="#A55B34" />
+              ))
+            : null}
+        </Svg>
+      );
+    case "rain":
+      return (
+        <>
+          <View style={styles.ground} />
+          <RainDrops />
+        </>
+      );
+  }
+}
+
+function RainDrops() {
+  const fall = useSwing(800);
   return (
-    <Animated.View
-      style={[
-        styles.stormCloud,
-        {
-          top,
-          transform: [
-            {
-              translateX: run.interpolate({ inputRange: [0, 1], outputRange: [400, -width - 20] }),
-            },
-          ],
-        },
-      ]}
-    >
-      <Svg width={width} height={width * 0.45} viewBox="0 0 84 38">
-        <Path
-          d="M14 34 Q2 34 4 24 Q6 14 18 16 Q22 4 36 6 Q48 0 56 12 Q72 8 76 22 Q84 34 70 34 Z"
-          fill="#6F6A73"
-          opacity={0.85}
-        />
-      </Svg>
+    <Animated.View style={[styles.rain, { transform: [{ translateY: lerp(fall, -10, 20) }] }]}>
+      {Array.from({ length: 8 }, (_, i) => (
+        <View key={i} style={[styles.rainDrop, { left: 20 + i * 42, top: (i % 3) * 30 }]} />
+      ))}
     </Animated.View>
   );
 }
 
-// Fixed, varied paths so the storm looks wild but plays the same every time.
-const STREAKS: StreakProps[] = Array.from({ length: 11 }, (_, i) => ({
-  top: 30 + ((i * 53) % 230),
-  width: 60 + ((i * 37) % 90),
-  ms: 700 + ((i * 131) % 600),
-  delay: (i * 97) % 700,
-  opacity: 0.35 + ((i * 17) % 40) / 100,
-}));
-const GRAINS: GrainProps[] = Array.from({ length: 22 }, (_, i) => ({
-  top: 20 + ((i * 71) % 250),
-  size: 3 + (i % 4),
-  ms: 900 + ((i * 113) % 700),
-  delay: (i * 61) % 900,
-  wobble: 6 + ((i * 7) % 14),
-}));
-
 /**
- * Scene 2: a sandstorm. Dark clouds roll in, sand races across, Hudhud fights the gusts with
- * beating wings, and the storm tears his three letters from the bag one by one, until the bag
- * is empty. No lightning and no thunder: exciting, not frightening.
+ * A stop on Hudhud's journey (STATIONS): the place, the person he meets, and the thing to read
+ * or count, which glows gently, with Hudhud beside it.
  */
-function Storm() {
-  const [left, setLeft] = useState(3);
-  useEffect(() => {
-    const timers = TEAR_AT_MS.map((ms, i) => setTimeout(() => setLeft(2 - i), ms));
-    return () => timers.forEach(clearTimeout);
-  }, []);
-
-  // Hudhud is shaken by the gusts and pushed back, then fights his way forward again.
-  const shake = useRun(520);
-  const push = useSwing(900);
-  const haze = useSwing(1100);
-  return (
-    <View style={[styles.scene, styles.stormSky]}>
-      <Animated.View
-        style={[
-          styles.haze,
-          { opacity: haze.interpolate({ inputRange: [0, 1], outputRange: [0.15, 0.45] }) },
-        ]}
-      />
-      <StormCloud top={-6} width={150} ms={5200} delay={0} />
-      <StormCloud top={22} width={110} ms={3900} delay={1300} />
-      <StormCloud top={-14} width={130} ms={4600} delay={2600} />
-      {STREAKS.map((p, i) => (
-        <SandStreak key={`s${i}`} {...p} />
-      ))}
-      <View style={styles.stormBird}>
-        <Animated.View
-          style={{
-            transform: [
-              { translateX: push.interpolate({ inputRange: [0, 1], outputRange: [-4, 18] }) },
-              {
-                rotate: shake.interpolate({
-                  inputRange: [0, 0.2, 0.4, 0.6, 0.8, 1],
-                  outputRange: ["-10deg", "7deg", "-6deg", "10deg", "-4deg", "-10deg"],
-                }),
-              },
-              {
-                translateY: shake.interpolate({
-                  inputRange: [0, 0.25, 0.5, 0.75, 1],
-                  outputRange: [0, -6, 2, -4, 0],
-                }),
-              },
-            ],
-          }}
-        >
-          <Hudhud size={STORM_BIRD} hop={false} flap bag={left} />
-        </Animated.View>
-        {LETTER_GROUPS.map((_, i) => (
-          <TornLetter key={i} index={i} />
-        ))}
-      </View>
-      {GRAINS.map((p, i) => (
-        <Grain key={`g${i}`} {...p} />
-      ))}
-    </View>
-  );
-}
-
-function Sack({ x, size = 70 }: { x: number; size?: number }) {
-  return (
-    <Svg
-      width={size}
-      height={size}
-      viewBox="0 0 70 70"
-      style={{ position: "absolute", left: x, bottom: 0 }}
-    >
-      <Path
-        d="M14 18 Q35 8 56 18 L62 62 Q35 70 8 62 Z"
-        fill="#B58A5A"
-        stroke="#7A5530"
-        strokeWidth={2}
-      />
-      <Path d="M18 18 Q35 26 52 18" stroke="#7A5530" strokeWidth={3} fill="none" />
-      <Ellipse cx={30} cy={44} rx={4} ry={5.5} fill="#5E3220" />
-      <Ellipse cx={41} cy={48} rx={4} ry={5.5} fill="#5E3220" />
-      <Ellipse cx={36} cy={36} rx={4} ry={5.5} fill="#5E3220" />
-    </Svg>
-  );
-}
-
-/** The coffee chapter: the market of Mocha, sacks of coffee, a dhow, and nobody can count. */
-function Market() {
-  const swing = useSwing(900);
+function Station({ unit }: { unit?: string }) {
+  const station = STATIONS[unit ?? ""];
+  const glow = useSwing(1000);
+  const bob = useSwing(700);
+  if (!station) return <View style={styles.scene} />;
   return (
     <View style={styles.scene}>
-      <View style={[styles.sky, { backgroundColor: "#FDF1DC" }]} />
-      <View style={styles.sea} />
-      <View style={styles.dhow}>
-        <StickerArt id="dhow" size={110} />
+      <View style={[styles.fill, { backgroundColor: PLACE_SKY[station.place] }]} />
+      <PlaceGround place={station.place} />
+      <View style={styles.person}>
+        <Picture emoji={station.person} size={86} />
       </View>
-      <View style={styles.sacks}>
-        <Sack x={0} />
-        <Sack x={56} size={78} />
-        <Sack x={120} />
-        <Sack x={30} size={58} />
-      </View>
-      {["؟", "؟", "؟"].map((q, i) => (
-        <Animated.Text
-          key={i}
-          style={[
-            styles.question,
-            { left: 40 + i * 52 },
-            {
-              transform: [
-                {
-                  translateY: swing.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [0, i % 2 ? -14 : 14],
-                  }),
-                },
-              ],
-            },
-          ]}
-        >
-          {q}
-        </Animated.Text>
-      ))}
-      <View style={styles.marketBird}>
-        <Hudhud size={96} />
-      </View>
+      <Animated.View style={[styles.thing, { transform: [{ scale: lerp(glow, 1, 1.12) }] }]}>
+        <View style={styles.thingHalo} />
+        <Picture emoji={station.thing} size={52} />
+      </Animated.View>
+      <Animated.View
+        style={[styles.stationBird, { transform: [{ translateY: lerp(bob, 0, -6) }] }]}
+      >
+        <Hudhud size={92} hop={false} />
+      </Animated.View>
     </View>
   );
 }
 
-/** The choice: Hudhud between the two jobs (the choices are buttons on the screen). */
-function Choose() {
-  return (
-    <View style={[styles.scene, styles.chooseScene]}>
-      <Hudhud size={140} />
-    </View>
-  );
-}
-
-const SCENES: Record<StorySceneId, () => React.ReactElement> = {
-  dawn: Dawn,
-  jobs: Jobs,
-  dream: Dream,
-  today: Today,
+const SCENES: Record<StoryScene["id"], (props: { unit?: string }) => React.ReactElement> = {
+  roof: Roof,
+  girl: Girl,
+  why: Why,
+  gone: Gone,
+  inscription: Inscription,
   choose: Choose,
-  postman: Postman,
-  wind: Storm,
-  waiting: Waiting,
-  market: Market,
-  beans: Beans,
-  ship: Ship,
+  trail: Trail,
+  bowl: BowlScene,
+  seed: Seed,
+  share: Share,
+  tree: Tree,
+  newgirl: NewGirl,
+  home: Home,
+  station: Station,
 };
 
-export function StoryPicture({ id }: { id: StorySceneId }) {
-  const Scene = SCENES[id];
-  return <Scene />;
+export function StoryPicture({ scene }: { scene: StoryScene }) {
+  const Scene = SCENES[scene.id];
+  return <Scene unit={scene.unit} />;
 }
 
-export { Envelope, Sack };
-
 const styles = StyleSheet.create({
-  scene: {
-    width: "100%",
-    height: 300,
-    borderRadius: 28,
-    overflow: "hidden",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  sky: { position: "absolute", top: 0, right: 0, bottom: 0, left: 0, backgroundColor: "#E7F0FA" },
-  ground: { position: "absolute", bottom: 0, left: 0, right: 0, alignItems: "center" },
-  flying: { position: "absolute", top: 30, alignItems: "center" },
-  envelopeLetter: {
+  scene: { width: "100%", height: 300, borderRadius: 28, overflow: "hidden" },
+  fill: { position: "absolute", top: 0, right: 0, bottom: 0, left: 0 },
+  city: { position: "absolute", bottom: 0, left: 0, right: 0, alignItems: "center" },
+  wall: {
     position: "absolute",
-    top: -2,
-    width: "100%",
-    textAlign: "center",
-    fontSize: 14,
-    fontWeight: "900",
-    color: yemen.ink,
-  },
-  // Hudhud on the right, so the letters have room to fly forward (left) away from him.
-  stormBird: {
-    width: STORM_BIRD,
-    height: (STORM_BIRD * 130) / 140,
-    marginLeft: 120,
-    marginTop: 70,
-  },
-  stormSky: { backgroundColor: "#D6BF94" },
-  haze: {
-    position: "absolute",
-    top: 0,
+    left: 0,
     right: 0,
     bottom: 0,
-    left: 0,
-    backgroundColor: "#7E6A50",
+    height: 70,
+    backgroundColor: "#C98A5B",
   },
-  stormCloud: { position: "absolute", left: 0 },
-  streak: {
+  sun: { position: "absolute", top: 26, left: 40 },
+  roofBird: { position: "absolute", right: 46, bottom: 92 },
+  girl: { position: "absolute", left: 20, bottom: 50 },
+  bowlOnWall: { position: "absolute", left: 140, bottom: 62 },
+  drinker: { position: "absolute", left: 210, bottom: 84 },
+  facing: { left: 220 },
+  heart: { position: "absolute", left: 160, top: 50 },
+  door: { position: "absolute", left: 24, bottom: 62 },
+  bigBowl: { position: "absolute", top: 70, left: 0, right: 0, alignItems: "center" },
+  scratches: {
     position: "absolute",
-    left: 0,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: "#FFF4DD",
-  },
-  grain: { position: "absolute", left: 0, backgroundColor: "#8A6A3E" },
-  blownEnvelope: { position: "absolute" },
-  tile: {
-    position: "absolute",
-    width: 36,
-    height: 40,
-    borderRadius: 8,
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1.5,
-    borderColor: "#D9CBB5",
-    alignItems: "center",
+    top: 22,
+    flexDirection: "row-reverse",
+    flexWrap: "wrap",
+    width: 200,
     justifyContent: "center",
+    gap: 6,
   },
-  tileLetter: { fontSize: 24, fontWeight: "900", lineHeight: 34 },
+  scratch: { fontSize: 22, fontWeight: "900", color: "#D9B79F", lineHeight: 30 },
+  glowLetter: {
+    position: "absolute",
+    color: "#FFF1C2",
+    textShadowColor: "#F4C14B",
+    textShadowRadius: 8,
+  },
+  seed: { position: "absolute", top: 96 },
+  inscriptionBird: { position: "absolute", top: 4, right: 12, alignItems: "center" },
+  chooseScene: { backgroundColor: "transparent", alignItems: "center", justifyContent: "center" },
+  chooseRow: { flexDirection: "row", alignItems: "flex-end", gap: 8 },
+  trailDot: {
+    position: "absolute",
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: yemen.clay,
+  },
+  trailBird: { position: "absolute", right: 10, top: 150 },
+  ground: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 70,
+    backgroundColor: "#8FB27A",
+  },
+  seedSoil: { position: "absolute", left: 0, right: 0, bottom: 60, alignItems: "center" },
+  fallingDrop: { position: "absolute", left: 160, top: 40 },
+  seedBird: { position: "absolute", right: 20, top: 30 },
+  jar: { position: "absolute", top: 20, left: 140 },
+  shareRow: {
+    position: "absolute",
+    bottom: 40,
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "flex-end",
+  },
+  shareSide: { alignItems: "center" },
+  shareNum: { fontSize: 30, fontWeight: "900", color: yemen.blue },
+  shareBird: { position: "absolute", right: 8, top: 8 },
+  bigTree: { position: "absolute", left: 0, right: 0, bottom: 30, alignItems: "center" },
+  treeBirds: {
+    position: "absolute",
+    top: 40,
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 60,
+  },
+  treeBowl: { position: "absolute", left: 30, bottom: 30 },
+  midTree: { position: "absolute", right: 20, bottom: 40 },
+  smallGirl: { position: "absolute", left: 40, bottom: 40 },
+  pourDrop: { position: "absolute", left: 150, bottom: 110 },
+  branchBird: { position: "absolute", right: 70, top: 60 },
+  sunset: {
+    position: "absolute",
+    left: 30,
+    top: 50,
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    backgroundColor: "#F6A53C",
+  },
+  homeTree: { position: "absolute", right: 30, bottom: 50 },
+  homeBird: { position: "absolute", left: 140, top: 50 },
+  stationArt: { position: "absolute", left: 20, bottom: 50 },
   sea: {
     position: "absolute",
     left: 0,
     right: 0,
-    bottom: 0,
+    bottom: 60,
     height: 90,
-    backgroundColor: "#9CC3E6",
+    backgroundColor: "#4F8FD6",
   },
-  dhow: { position: "absolute", right: 18, bottom: 34 },
-  sacks: { position: "absolute", left: 20, bottom: 10, width: 200, height: 90 },
-  question: {
+  sand: {
     position: "absolute",
-    top: 70,
-    fontSize: 42,
-    fontWeight: "900",
-    color: yemen.clay,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 64,
+    backgroundColor: "#E8C690",
   },
-  marketBird: { position: "absolute", top: 18, right: 120 },
-  waitHouse: { position: "absolute", left: 10, bottom: 0 },
-  waitPeople: { position: "absolute", left: 120, bottom: 6, flexDirection: "row" },
-  waitBird: { position: "absolute", right: 14, top: 30 },
-  waitShip: { position: "absolute", right: 10, bottom: 4 },
-  chooseScene: { backgroundColor: "transparent" },
+  boat: { position: "absolute", left: 30, bottom: 100 },
+  gardenTree: { position: "absolute", left: 20, bottom: 40 },
+  rain: { position: "absolute", top: 0, left: 0, right: 0, height: 120 },
+  rainDrop: {
+    position: "absolute",
+    width: 4,
+    height: 16,
+    borderRadius: 2,
+    backgroundColor: "#4F8FD6",
+  },
+  person: { position: "absolute", left: 150, bottom: 40 },
+  thing: {
+    position: "absolute",
+    left: 170,
+    top: 30,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  thingHalo: {
+    position: "absolute",
+    width: 74,
+    height: 74,
+    borderRadius: 37,
+    backgroundColor: "#FFF1C2",
+    opacity: 0.8,
+  },
+  stationBird: { position: "absolute", right: 18, bottom: 70 },
 });

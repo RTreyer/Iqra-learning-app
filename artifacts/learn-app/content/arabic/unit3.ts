@@ -251,7 +251,6 @@ export const unit3: Unit = {
   emoji: "🤝",
   emblem: "caring_hands",
   goal: "letters",
-  recipient: { to: "إِلَى الْمُعَلِّمَةِ بَيَانَ", pictures: ["👩‍🏫"] },
   color: COLOR,
   badgeLabel: "ي و أ",
   lessons: numberLessons("u3", [...ya, ...waw, ...alif, ...exercises]),

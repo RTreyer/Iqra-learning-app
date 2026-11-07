@@ -14,7 +14,12 @@ import { EmblemDisc } from "@/components/world/Emblem";
 import { PathMap, type Stop } from "@/components/world/PathMap";
 import { WorldHeader } from "@/components/world/WorldHeader";
 import { getBook, unitLessonIds } from "@/content";
-import { SUBJECT_LINES } from "@/content/story";
+import { SUBJECT_DONE, SUBJECT_LINES, chapterFor, stationScenes } from "@/content/story";
+import type { Lesson } from "@/content/types";
+import { useSettings } from "@/context/SettingsContext";
+import { learntLetters, treeStage } from "@/lib/storyProgress";
+import { BowlMessage } from "@/components/world/Bowl";
+import { SidrTreeGoal } from "@/components/world/SidrTree";
 import { useLanguage } from "@/context/LanguageContext";
 import { useProgress } from "@/context/ProgressContext";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
@@ -24,7 +29,8 @@ import { yemen } from "@/theme/tokens";
 
 export default function BookScreen() {
   const bookId = firstParam(useLocalSearchParams<{ bookId?: string | string[] }>().bookId);
-  const { progress, hydrated, loadSettled, getUnitProgress } = useProgress();
+  const { progress, hydrated, loadSettled, getUnitProgress, getLessonProgress } = useProgress();
+  const { settings } = useSettings();
   const progressReady = hydrated || loadSettled;
   const { t, digits } = useLanguage();
   const pad = useScreenPadding();
@@ -43,6 +49,30 @@ export default function BookScreen() {
     progress: getUnitProgress(unitLessonIds(unit)),
   }));
   const currentIndex = units.findIndex(({ progress: p }) => p.done < p.total);
+  const isDone = (lesson: Lesson) => getLessonProgress(lesson.id).completed;
+  // At the end of the way, the heart of each thread: Rasha's bowl, whose message lights up
+  // with every letter learnt, or the sidr tree, growing with every maths unit.
+  const thread = chapterFor(book.subject);
+  const goal =
+    thread === "arabic"
+      ? {
+          done: units.every(({ progress: p }) => p.done >= p.total),
+          node: <BowlMessage learnt={learntLetters(book.units, isDone)} />,
+        }
+      : thread === "math"
+        ? (() => {
+            const stage = treeStage(book.units, isDone);
+            return {
+              done: stage >= 5,
+              node: (
+                <SidrTreeGoal
+                  stage={stage}
+                  line={stage >= 5 ? SUBJECT_DONE.math : SUBJECT_LINES.math}
+                />
+              ),
+            };
+          })()
+        : undefined;
   const stops: Stop[] = units.map(({ unit, progress: p }, i) => ({
     key: unit.id,
     testID: `unit-${unit.id}`,
@@ -89,11 +119,19 @@ export default function BookScreen() {
         <PathMap
           stops={stops}
           color={book.color}
-          onPress={(unitId) => router.push(routes.unit(unitId))}
+          // The first time a unit opens, Hudhud tells its station on his journey.
+          onPress={(unitId) =>
+            router.push(
+              stationScenes(unitId) && !settings.chaptersSeen.includes(unitId)
+                ? routes.intro(unitId)
+                : routes.unit(unitId),
+            )
+          }
           // Hudhud appears once the stored progress is known, so he flies to the right stop.
           guide={progressReady ? (SUBJECT_LINES[book.subject] ?? SUBJECT_LINES.arabic) : undefined}
           onGuideY={scrollToGuide}
           pathKey={book.id}
+          goal={goal}
         />
       </ScrollView>
     </ScreenBackground>

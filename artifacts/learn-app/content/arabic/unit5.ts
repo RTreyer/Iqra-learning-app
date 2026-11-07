@@ -360,7 +360,6 @@ export const unit5: Unit = {
   emoji: "🏫",
   emblem: "school",
   goal: "vowels",
-  recipient: { to: "إِلَى رَجُلِ الْمُرُورِ", pictures: ["👮"] },
   color: COLOR,
   badgeLabel: "ن ر د ت",
   lessons: numberLessons("u5", [...nun, ...ra, ...dal, ...ta, ...exercises]),

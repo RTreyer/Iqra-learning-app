@@ -1,6 +1,7 @@
 /**
  * Home: one big play button that opens the next lesson, the subjects as picture islands,
- * today's qamariya window, the sticker album and, when due, today's review. Hudhud speaks;
+ * today's bowl (Rasha's, filled by the day's lessons), the sticker album and, when due,
+ * today's review. Hudhud speaks;
  * nothing here needs reading. Grade, language and sound live in the parents' corner.
  */
 
@@ -15,11 +16,11 @@ import { EmblemDisc } from "@/components/world/Emblem";
 import { Guide, Pulse } from "@/components/world/Guide";
 import { AlbumArt } from "@/components/world/AlbumArt";
 import { Icon } from "@/components/world/Icon";
-import { QamariyaGoal } from "@/components/world/QamariyaGoal";
+import { BowlGoal } from "@/components/world/Bowl";
 import { Skyline } from "@/components/world/Skyline";
 import { StickerArt } from "@/components/world/StickerArt";
 import { books, unitLessonIds, type Book } from "@/content";
-import { SUBJECT_DONE, chapterFor } from "@/content/story";
+import { SUBJECT_DONE, bowlLine, chapterFor } from "@/content/story";
 import { useLanguage } from "@/context/LanguageContext";
 import { useProgress } from "@/context/ProgressContext";
 import { useSettings } from "@/context/SettingsContext";
@@ -36,12 +37,9 @@ import { readableFill, shadow, yemen } from "@/theme/tokens";
 const GREETING = "بِسْمِ اللهِ! هَيَّا نَتَعَلَّمُ";
 /** Before the story has been told: the play button starts it. */
 const STORY_INVITE = "اِضْغَطْ عَلَى الزِّرِّ، وَاسْمَعْ قِصَّتِي!";
-const LESSONS_LEFT = ["", "دَرْسٌ وَاحِدٌ", "دَرْسَانِ", "ثَلَاثَةُ دُرُوسٍ"];
-
-/** What Hudhud says about today's window. */
+/** What Hudhud says about today's bowl. */
 export function windowLine(done: number): string {
-  if (done >= DAILY_GOAL) return "أَضَاءَتِ الْقَمَرِيَّةُ الْيَوْمَ!";
-  return `${LESSONS_LEFT[DAILY_GOAL - done]}، وَتُضِيءُ الْقَمَرِيَّةُ!`;
+  return bowlLine(done, DAILY_GOAL);
 }
 
 /** The subject on the play button: the first letter or number the child meets there. */
@@ -59,6 +57,15 @@ export default function HomeScreen() {
     books.find((book) => book.available && book.id === settings.bookId) ??
     books.find((book) => book.available);
   const next = useMemo(() => nextLesson(progress, books, current?.id), [progress, current?.id]);
+  // Every lesson of every subject done: the end of the story is told, once.
+  const storyEnds =
+    settings.introSeen &&
+    !settings.chaptersSeen.includes("end") &&
+    books
+      .filter((book) => book.available)
+      .every((book) =>
+        book.units.every((unit) => unit.lessons.every((l) => progress.lessons[l.id]?.completed)),
+      );
   const story = !settings.introSeen;
   const today = useMemo(() => lessonsToday(progress), [progress]);
   const dueCount = getDueItemIds().length;
@@ -138,7 +145,8 @@ export default function HomeScreen() {
               }
               onPress={tap(() => {
                 if (!loaded) return;
-                if (story || !next) router.push(routes.intro());
+                if (storyEnds) router.push(routes.intro("end"));
+                else if (story || !next) router.push(routes.intro());
                 else router.push(routes.lesson(next.lesson.id));
               })}
               style={({ pressed }) => [styles.play, pressed && styles.pressed]}
@@ -205,7 +213,7 @@ export default function HomeScreen() {
             onPress={tap(() => speak(windowLine(today)))}
             style={({ pressed }) => [styles.tile, pressed && styles.pressed]}
           >
-            <QamariyaGoal filled={today} width={104} />
+            <BowlGoal filled={today} goal={DAILY_GOAL} width={104} />
           </Pressable>
           <Pressable
             testID="album-button"

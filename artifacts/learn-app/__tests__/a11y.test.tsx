@@ -90,11 +90,11 @@ test("home: play, islands, tiles, Hudhud and the parents' gear", async () => {
   expectAccessiblePressables(8);
 });
 
-test("book: back button, Hudhud and the unit stations", async () => {
+test("book: back button, Hudhud, the unit stations and Rasha's bowl", async () => {
   setParams({ bookId: "arabic-1" });
   withProgress(<BookScreen />);
   await screen.findAllByTestId(/^unit-/);
-  expectAccessiblePressables(11);
+  expectAccessiblePressables(12);
 });
 
 test("unit: back button, Hudhud, the lesson stops (one completed) and Hudhud's letter", async () => {
