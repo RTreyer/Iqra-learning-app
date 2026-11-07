@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Animated, Easing, Pressable, StyleSheet, Text, View } from "react-native";
+import { Animated, Easing, StyleSheet, Text, View } from "react-native";
+import { Pressable } from "@/components/demo/DemoPressable";
 import { Circle, Path, Rect, Svg } from "react-native-svg";
 import { UiText } from "@/components/UiText";
 import type { BuildWordRound } from "@/content/types";

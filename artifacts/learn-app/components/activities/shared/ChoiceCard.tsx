@@ -1,5 +1,6 @@
 import React from "react";
-import { Animated, Pressable, StyleSheet, Text } from "react-native";
+import { Animated, StyleSheet, Text } from "react-native";
+import { Pressable } from "@/components/demo/DemoPressable";
 import { colors, shadow, touchTarget } from "@/theme/tokens";
 
 export type ChoiceState = "idle" | "correct" | "wrong";

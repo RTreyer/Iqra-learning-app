@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from "react";
-import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
+import { Animated, StyleSheet, Text, View } from "react-native";
+import { Pressable } from "@/components/demo/DemoPressable";
 import { UiText } from "@/components/UiText";
 import * as haptics from "@/lib/haptics";
 import { speak } from "@/lib/speech";
@@ -38,6 +39,7 @@ function Naming({ lesson, color, onComplete }: ActivityProps<"naming">) {
           return (
             <Animated.View key={i} style={{ transform: [{ scale: values[i] }] }}>
               <Pressable
+                testID={`naming-item-${i}`}
                 accessibilityRole="button"
                 accessibilityLabel={item.word}
                 accessibilityState={{ selected: done }}

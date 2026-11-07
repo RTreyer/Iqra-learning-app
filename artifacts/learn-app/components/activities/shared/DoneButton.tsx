@@ -1,5 +1,6 @@
 import React from "react";
-import { Pressable, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
+import { Pressable } from "@/components/demo/DemoPressable";
 import { UiText } from "@/components/UiText";
 import { useLanguage } from "@/context/LanguageContext";
 import { colors, readableFill, touchTarget } from "@/theme/tokens";

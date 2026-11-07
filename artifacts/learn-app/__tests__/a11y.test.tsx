@@ -8,6 +8,8 @@ import BookScreen from "@/app/book/[bookId]";
 import GradeScreen from "@/app/grade/[gradeId]";
 import LessonScreen from "@/app/lesson/[lessonId]";
 import UnitScreen from "@/app/unit/[unitId]";
+import { DEMOS } from "@/content/demos";
+import { resetDemoSeenCache } from "@/hooks/useDemoSeen";
 import { ProgressProvider } from "@/context/ProgressContext";
 import { allItems } from "@/lib/reviewItems";
 import { mockCanGoBack, renderScreen, setParams } from "@/test-utils/screens";
@@ -106,7 +108,8 @@ test("unit: back button and lesson rows, including a completed one", async () =>
   expectAccessiblePressables(6);
 });
 
-test("lesson u2-2: back button, instruction button and the activity controls", async () => {
+test("lesson u2-2: back button, help button and the activity controls", async () => {
+  resetDemoSeenCache(Object.keys(DEMOS));
   setParams({ lessonId: "u2-2" });
   withProgress(<LessonScreen />);
   // Past the fallbacks of the spoken title and instruction.
@@ -114,4 +117,15 @@ test("lesson u2-2: back button, instruction button and the activity controls", a
     jest.advanceTimersByTime(10000);
   });
   expectAccessiblePressables(5);
+});
+
+test("lesson u2-2 with its worked example: the Skip button is accessible too", async () => {
+  resetDemoSeenCache([]);
+  setParams({ lessonId: "u2-2" });
+  withProgress(<LessonScreen />);
+  await act(async () => {
+    jest.advanceTimersByTime(10000);
+  });
+  expect(screen.getByTestId("demo-skip").props.accessibilityLabel).toBe("تخطَّ");
+  expect(screen.getByTestId("demo-skip").props.accessibilityRole).toBe("button");
 });
