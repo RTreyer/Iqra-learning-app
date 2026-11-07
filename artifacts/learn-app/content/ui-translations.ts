@@ -22,6 +22,9 @@ const english: Record<string, string> = {
   إلغاء: "Cancel",
   "مسح التقدم": "Delete progress",
   "تم مسح التقدم": "Progress deleted",
+  "شاهد القصة من جديد": "Watch the story again",
+  "تبدأ القصة من جديد: الفصل الأول والفصول وكل محطة. التقدم والنجوم والملصقات تبقى.":
+    "The story starts again: chapter 1, the chapters and every station. Progress, stars and stickers stay.",
   أهلاً: "Hello",
   "اختَر الكتاب": "Choose a book",
   "اختَر صفّك": "Choose your grade",

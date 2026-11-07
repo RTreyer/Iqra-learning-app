@@ -126,8 +126,8 @@ test("parents: the gate, then every control behind it", async () => {
   await act(async () => {
     fireEvent(screen.getByTestId("parents-gate"), "longPress");
   });
-  // Back, 2 languages, voice, vibration and reset.
-  expectAccessiblePressables(6);
+  // Back, 2 languages, voice, vibration, the story again, and reset.
+  expectAccessiblePressables(7);
 });
 
 test("lesson u2-2: back button, Hudhud, help button and the activity controls", async () => {

@@ -84,7 +84,7 @@ Zwischen den Szenen blättert die Geschichte wie ein arabisches Buch um. Die Sze
 | Übung | Fortschritt als Reihe von Briefen, die in Hudhuds Posttasche fliegen (Mathe: Kaffeesäcke bis zum Schiff), statt «سؤال ١ من ٤». | `components/activities/shared/StoryProgress.tsx` |
 | Geschafft | Sterne springen einzeln auf, kurzes Konfetti in den Qamariya-Farben, Hudhud jubelt, Rashas Schale des Tages, ein neuer Sticker. Drei Bildknöpfe: Karte, weiter, nochmal. | `components/LessonCompleteCard.tsx` |
 | Album | Neun Sticker mit Motiven aus dem Jemen; jeder sagt seinen Namen. Ein Balken zeigt den Weg zum nächsten. | `app/album.tsx`, `lib/stickers.ts` |
-| Elternecke | Hinter einer Halten-Sperre (1,5 s): Klasse, Menüsprache, Stimme, Vibration, Fortschritt, Zurücksetzen mit zweiter Bestätigung. | `app/parents.tsx`, `context/SettingsContext.tsx` |
+| Elternecke | Hinter einer Halten-Sperre (1,5 s): Klasse, Menüsprache, Stimme, Vibration, «Geschichte neu anschauen» (setzt nur den Erzählstand zurück: Kapitel 1, die Kapitel und alle Stationen werden wieder erzählt; Fortschritt, Sterne und Sticker bleiben), Fortschritt, Zurücksetzen mit zweiter Bestätigung. | `app/parents.tsx`, `context/SettingsContext.tsx` |
 
 Hudhud spricht mit der Stimme der App; die Sprechblase zeigt nur, was gesagt wird. Antippen von Hudhud wiederholt den Satz.
 

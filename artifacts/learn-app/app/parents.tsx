@@ -1,8 +1,10 @@
 /**
  * Parents' corner, behind a press-and-hold gate a young child does not open by chance:
- * grade, menu language, voice and vibration, progress at a glance, and resetting progress.
+ * grade, menu language, voice and vibration, watching Hudhud's story again, progress at a
+ * glance, and resetting progress.
  */
 
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Animated, Easing, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
@@ -173,6 +175,33 @@ export default function ParentsScreen() {
             />
           </View>
 
+          {/* Hudhud's story from the start: chapter 1, the chapters, every station. */}
+          <View style={styles.card}>
+            <UiText style={[styles.cardTitle, align]}>قصة هدهد</UiText>
+            <UiText style={[styles.note, align]}>
+              تبدأ القصة من جديد: الفصل الأول والفصول وكل محطة. التقدم والنجوم والملصقات تبقى.
+            </UiText>
+            <Pressable
+              testID="story-restart"
+              accessibilityRole="button"
+              accessibilityLabel={t("شاهد القصة من جديد")}
+              onPress={() => {
+                update({ introSeen: false, chaptersSeen: [] });
+                // Home: the play button now tells the story.
+                router.replace(routes.home());
+              }}
+              style={({ pressed }) => [
+                styles.button,
+                styles.storyButton,
+                row,
+                pressed && styles.pressed,
+              ]}
+            >
+              <Icon name="book" size={22} color="#FFFFFF" />
+              <UiText style={styles.buttonText}>شاهد القصة من جديد</UiText>
+            </Pressable>
+          </View>
+
           <View style={styles.card}>
             <UiText style={[styles.cardTitle, align]}>التقدم</UiText>
             {books
@@ -328,4 +357,6 @@ const styles = StyleSheet.create({
     borderColor: yemen.red,
   },
   resetText: { color: yemen.red, fontSize: 15, fontWeight: "700" },
+  storyButton: { flex: 0, backgroundColor: yemen.clay, gap: 8 },
+  pressed: { opacity: 0.88, transform: [{ scale: 0.97 }] },
 });
