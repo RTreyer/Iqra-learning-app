@@ -81,6 +81,22 @@ const THOUGHT_DOTS: [number, number, number][] = [
   [188, 124, 16],
 ];
 
+/**
+ * Counting the sacks: the sack row's place and spacing, so Hudhud can walk from one sack to
+ * the next (his head over each in turn), and the timing of the walk.
+ */
+const SACK = 54;
+const SACK_ROW_LEFT = 100;
+const SACK_STEP = 50;
+/** The centre of sack i, counted from the right (the row reads right to left). */
+const sackCentre = (i: number) => SACK_ROW_LEFT + 4 * SACK_STEP + SACK / 2 - i * SACK_STEP;
+/** From his box's left edge to his head (his beak points left). */
+const BIRD_HEAD = 30;
+const COUNT_FROM = 800;
+const COUNT_MS = 3600;
+/** He reaches the last sack at this share of the clock, then stops and cheers. */
+const WALK_END = 0.92;
+
 /** Eastern Arabic numerals, for counting in the pictures. */
 const NUMBERS = ["١", "٢", "٣", "٤", "٥"];
 
@@ -1121,12 +1137,20 @@ function Trader() {
 }
 
 /**
- * Who can count can help: Hudhud counts the trader's sacks, a number over each in turn; far
- * off, the ship in Mocha waits on the sea.
+ * Who can count can help: Hudhud walks along the trader's sacks, behind them, his head over
+ * their tops; as he reaches each sack its number lights up on it. Then he cheers. Far off, the
+ * ship waits on the sea.
  */
 function Sacks() {
-  const count = useOnce(3000, 600, Easing.linear);
+  // One clock for the walk and the counting: he reaches sack i at its share of the walk.
+  const count = useOnce(COUNT_MS, COUNT_FROM, Easing.linear);
   const sail = useSwing(2400);
+  const [done, setDone] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setDone(true), COUNT_FROM + COUNT_MS * WALK_END);
+    return () => clearTimeout(t);
+  }, []);
+  const reach = (i: number) => (i / (NUMBERS.length - 1)) * WALK_END;
   return (
     <View style={styles.scene}>
       <View style={[styles.fill, { backgroundColor: "#F6E2C2" }]} />
@@ -1138,28 +1162,50 @@ function Sacks() {
       <View style={styles.trader}>
         <Picture emoji="👨" size={90} />
       </View>
+      {/* Behind the sacks: only his head and back show over them. */}
+      <Animated.View
+        style={[
+          styles.countBird,
+          {
+            transform: [
+              {
+                translateX: at(
+                  count,
+                  [0, WALK_END],
+                  [sackCentre(0) - BIRD_HEAD, sackCentre(NUMBERS.length - 1) - BIRD_HEAD],
+                ),
+              },
+            ],
+          },
+        ]}
+      >
+        <Hudhud size={84} walk={!done} hop={done} pose={done ? "cheer" : "stand"} />
+      </Animated.View>
       <View style={styles.sackLine}>
         {NUMBERS.map((n, i) => (
           <View key={n} style={styles.countedSack}>
-            <Animated.Text
+            <Picture emoji="🫘" size={SACK} />
+            <Animated.View
               style={[
-                styles.sackNumber,
+                styles.sackBadge,
                 {
-                  opacity: at(count, [i / 5, (i + 0.6) / 5], [0, 1]),
+                  opacity: at(count, [Math.max(0, reach(i) - 0.03), reach(i) + 0.03], [0, 1]),
                   transform: [
-                    { scale: at(count, [i / 5, (i + 0.4) / 5, (i + 0.8) / 5], [0.4, 1.3, 1]) },
+                    {
+                      scale: at(
+                        count,
+                        [reach(i), reach(i) + 0.03, reach(i) + 0.07],
+                        [0.4, 1.35, 1],
+                      ),
+                    },
                   ],
                 },
               ]}
             >
-              {n}
-            </Animated.Text>
-            <Picture emoji="🫘" size={46} />
+              <Text style={styles.sackNumber}>{n}</Text>
+            </Animated.View>
           </View>
         ))}
-      </View>
-      <View style={styles.countBird}>
-        <Hudhud size={84} pose="cheer" />
       </View>
     </View>
   );
@@ -1685,15 +1731,28 @@ const styles = StyleSheet.create({
   farShip: { position: "absolute", right: 40, top: 70 },
   sackLine: {
     position: "absolute",
-    left: 92,
-    right: 88,
+    left: SACK_ROW_LEFT,
+    width: 4 * SACK_STEP + SACK,
     bottom: 40,
     flexDirection: "row-reverse",
+    justifyContent: "space-between",
+  },
+  countedSack: { width: SACK, alignItems: "center" },
+  // The number on the sack, as he reaches it.
+  sackBadge: {
+    position: "absolute",
+    top: 20,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 2,
+    borderColor: yemen.blue,
+    alignItems: "center",
     justifyContent: "center",
   },
-  countedSack: { alignItems: "center", marginHorizontal: -3 },
-  sackNumber: { fontSize: 26, fontWeight: "900", color: yemen.blue, lineHeight: 34 },
-  countBird: { position: "absolute", right: 8, bottom: 44 },
+  sackNumber: { fontSize: 15, fontWeight: "900", color: yemen.blue, lineHeight: 20 },
+  countBird: { position: "absolute", left: 0, bottom: 56 },
   wayStrip: {
     position: "absolute",
     bottom: 40,
