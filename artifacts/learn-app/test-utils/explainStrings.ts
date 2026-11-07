@@ -129,6 +129,9 @@ export function collectExplainStrings(): { lines: string[]; gloss: string[] } {
   strings(story.SUBJECT_LINES, lines);
   strings(story.GOAL_LINES, lines);
   strings(story.SUBJECT_DONE, lines);
+  // The map of Yemen at the end of chapter 1: the names of the places, who waits there.
+  strings(story.HOME_PLACE, lines);
+  strings(story.MAP_PLACES, lines);
   strings(ACTIVITY_INSTRUCTIONS, lines);
   for (const sticker of STICKERS) {
     lines.add(sticker.name);

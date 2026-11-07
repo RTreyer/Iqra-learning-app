@@ -196,6 +196,10 @@ export const EN_LINES: Record<string, string> = {
   "أَنْمَاطُ الأَعْدَادِ": "Number patterns",
   "أَهْدَتِ الْبِنْتُ وُرُودًا. كَمِ الْبَاقِي؟":
     "The girl gave away some roses. How many are left?",
+  "أَوَّلُ رِسَالَةٍ أُوصِلُهَا! عَلَى الْبَابِ اسْمٌ.":
+    "The first letter I deliver! There is a name on the door.",
+  "أَوْصَلْنَا الرِّسَالَةَ! قَالَتِ الْأُمُّ: سَمِعْتُ عَنْ بِنْتٍ تَسْقِي الطُّيُورَ.":
+    "We delivered the letter! The mother said: I heard about a girl who gives the birds water.",
   "أَيُّ إِشَارَةٍ بَيْنَ أَرْبَعَةٍ وَأَرْبَعَةٍ؟": "Which sign goes between four and four?",
   "أَيُّ إِشَارَةٍ بَيْنَ اثْنَيْنِ وَخَمْسَةٍ؟": "Which sign goes between two and five?",
   "أَيُّ إِشَارَةٍ بَيْنَ تِسْعَةٍ وَخَمْسَةٍ؟": "Which sign goes between nine and five?",
@@ -423,10 +427,12 @@ export const EN_LINES: Record<string, string> = {
   "الْمَشْطُوبُ ذَهَبَ. فِي أَيِّ صُورَةٍ الْبَاقِي ثَلَاثَةٌ؟":
     "The crossed-out ones are gone. In which picture are three left?",
   "الْمُجَسَّمَاتُ: أَسْمَعُ الاسْمَ وَأَخْتَارُ": "3D shapes: I hear the name and choose",
+  الْمُخَا: "Mocha",
   "الْمُسْتَطِيلَاتُ صَفْرَاءُ، وَالْمُثَلَّثَاتُ خَضْرَاءُ، وَالدَّوَائِرُ حَمْرَاءُ":
     "The rectangles are yellow, the triangles are green, and the circles are red",
   "الْمُعَلِّمَةُ بَيَانُ": "Teacher Bayan",
   "الْمُعَلِّمَةُ بَيَانُ عِنْدَهَا دَفْتَرُ رَشَا.": "Teacher Bayan has Rasha's notebook.",
+  الْمُكَلَّا: "Mukalla",
   الْمِقْلَمَةُ: "The pencil case",
   "الْوُرُودُ أَكْثَرُ أَمْ أَقَلُّ أَمْ تُسَاوِي النَّحْلَ؟":
     "Are there more roses than bees, fewer, or the same number?",
@@ -480,6 +486,7 @@ export const EN_LINES: Record<string, string> = {
   "تعذّر حفظ اللغة المختارة.": "Could not save the chosen language.",
   "تلال  ،  بيت  ،  نبات  ،  نبتة  ،  وردة": "Hills, house, plants, a little plant, rose",
   تَاجٌ: "Crown",
+  "تَاجِرُ الْبُنِّ": "the coffee trader",
   "تَتَبَّعِ الشَّكْلَ بِإِصْبَعِكَ، ثُمَّ اضْغَطْ تَمَّ.":
     "Trace the shape with your finger, then tap Done.",
   "تَحْتَ الصَّحْنِ وَرَقَةٌ مِنْ رَشَا. كُلُّ حَرْفٍ نَتَعَلَّمُهُ يُضِيءُ!":
@@ -528,8 +535,8 @@ export const EN_LINES: Record<string, string> = {
   "ج: جَارُ الْمَسْجِدِ": "ج: The mosque's neighbour",
   "جبران  ،  مسجد  ،  يحج  ،  تاج": "Jubran, mosque, he goes on Hajj, crown",
   "جَارُ الْمَسْجِدِ": "The mosque's neighbour",
-  "جَمَعْنَا الْأَكْيَاسَ، وَنَزَلْنَا إِلَى تِهَامَةَ.":
-    "We added up the sacks, and went down to Tihama.",
+  "جَمَعْنَا الْأَكْيَاسَ، وَكُلُّهَا الْآنَ فِي الْمَخْزَنِ.":
+    "We added up the sacks, and now they are all in the storehouse.",
   "جَمَعْنَا كُلَّ الْأَكْيَاسِ!": "We added up all the sacks!",
   "جُزْءٌ مِنْ أَرْبَعَةِ أَجْزَاءٍ مُتَسَاوِيَةٍ": "One part of four equal parts",
   "جُزْءٌ مِنْ جُزْأَيْنِ مُتَسَاوِيَيْنِ": "One part of two equal parts",
@@ -609,9 +616,8 @@ export const EN_LINES: Record<string, string> = {
   "زِيَارَةُ جَدِّي": "Visiting Grandpa",
   "س: أَسْنَانُ وَسِيمٍ": "س: Wasim's teeth",
   "سرور  ،  تحسن  ،  تحرس  ،  سوس": "Joy, she does well, she guards, tooth decay",
-  "سَأَتْبَعُ طَرِيقَهَا، وَفِي الطَّرِيقِ أَتَعَلَّمُ الْحُرُوفَ.":
-    "I will follow her trail, and learn the letters on the way.",
   "سَارَةُ هِيَ الرَّابِعَةُ. أَيْنَ سَارَةُ؟": "Sara is fourth. Where is Sara?",
+  "سَاعِي الْبَرِيدِ": "the postman",
   سَبْعَة: "Seven",
   "سَبْعَةَ عَشَر": "Seventeen",
   "سَقَطَ تُفَّاحٌ عَلَى الأَرْضِ. كَمِ الْبَاقِي عَلَى الشَّجَرَةِ؟":
@@ -644,6 +650,7 @@ export const EN_LINES: Record<string, string> = {
     "We sorted the cherries! The trader said: the red ones are ripe.",
   "صَنَّفْنَا سَلَّةً أُخْرَى!": "We sorted another basket!",
   "صَنَّفْنَا كُلَّ الْحَبَّاتِ!": "We sorted all the cherries!",
+  صَنْعَاءُ: "Sana'a",
   "صِرْتُ أَرْسُمُ الْخُطُوطَ!": "Now I can draw lines!",
   "صِرْتُ أَرْسُمُ الْخُطُوطَ! هَيَّا نَتَعَلَّمُ الْحُرُوفَ.":
     "Now I can draw lines! Let's learn the letters.",
@@ -665,8 +672,6 @@ export const EN_LINES: Record<string, string> = {
   "عَسَلُ السِّدْرِ": "Sidr honey",
   عَشَرَة: "Ten",
   "عَشَرَةُ حَيَوَانَاتٍ": "Ten animals",
-  "عَلَى الطَّرِيقِ إِلَى الْبَحْرِ، يَحْمِلُ الْجَمَلُ أَكْيَاسًا جَدِيدَةً.":
-    "On the road to the sea, the camel carries new sacks.",
   عَنَاصِر: "items",
   "عُنْصُر وَاحِد": "one item",
   عُنْصُرًا: "items",
@@ -674,6 +679,8 @@ export const EN_LINES: Record<string, string> = {
   عِشْرُون: "Twenty",
   "عِنْدَ الْبَحْرِ، عَلَى قَارِبِ الصَّيَّادِ اسْمٌ.":
     "By the sea, there is a name on the fisherman's boat.",
+  "عِنْدَ الْبَحْرِ، يُعْطِي التَّاجِرُ مِنْ بُنِّهِ لِلْجِيرَانِ.":
+    "By the sea, the trader gives some of his coffee to the neighbours.",
   "عِنْدَ الْبِئْرِ كِتَابَةٌ قَدِيمَةٌ.": "At the well there is old writing.",
   ـ: "ـ",
   "ف: مِصْيَدَةُ مُفِيدٍ": "ف: Mufid's trap",
@@ -694,25 +701,23 @@ export const EN_LINES: Record<string, string> = {
     "In the morning the bowl stayed empty. I waited and waited, but Rasha did not come.",
   "فِي الصَّيْفِ، كَانَ الْجَوُّ حَارًّا، وَلَمْ أَجِدْ مَاءً. كُنْتُ عَطْشَانَ جِدًّا.":
     "In the summer it was hot, and I found no water. I was so thirsty.",
-  "فِي الطَّرِيقِ، أَحْتَاجُ أَنْ أَقْرَأَ، وَأَنْ أَعُدَّ. هَلْ تُسَاعِدُنِي؟ اِخْتَرْ!":
-    "On the way I need to read and to count. Will you help me? Choose!",
   "فِي الْحَدِيقَةِ": "In the garden",
   "فِي الْحَدِيقَةِ يُغَنِّي بُلْبُلُ صَابِرٍ. عَلَى الْغُصْنِ وَرَقَةٌ.":
     "In the garden, Saber's bulbul sings. There is a note on the branch.",
   "فِي الْقَرْيَةِ، عِنْدَ الْجَدِّ رِسَالَةٌ مِنْ رَشَا.":
     "In the village, the grandfather has a message from Rasha.",
-  "فِي الْقَرْيَةِ، يُعْطِي التَّاجِرُ مِنْ بُنِّهِ لِلْجِيرَانِ.":
-    "In the village, the trader gives some of his coffee to the neighbours.",
-  "فِي جِبَالِ حَرَازٍ، وَجَدْتُ تَاجِرَ بُنٍّ حَزِينًا. ذَهَبَ مَنْ كَانَ يُسَاعِدُهُ.":
-    "In the Haraz mountains I found a sad coffee trader. The one who helped him has gone.",
+  "فِي الْمُخَا، عِنْدَ الْبَحْرِ، وَجَدْتُ تَاجِرَ بُنٍّ حَزِينًا. ذَهَبَ مَنْ كَانَ يُسَاعِدُهُ.":
+    "In Mocha, by the sea, I found a sad coffee trader. The one who helped him has gone.",
+  "فِي الْمُكَلَّا، قَالَ سَاعِي الْبَرِيدِ الْعَجُوزُ: اِعْمَلْ مَعِي، وَاسْأَلْ عَنْ رَشَا فِي كُلِّ بَيْتٍ!":
+    "In Mukalla, the old postman said: work with me, and ask about Rasha at every house!",
   "فِي سَاحَةِ الْمَدْرَسَةِ ذَهَبَ وَلَدٌ وَبِنْتٌ. كَمِ الْبَاقِي؟":
     "In the schoolyard, a boy and a girl left. How many are left?",
+  "فِي سُوقِ الْمُخَا، جَاءَ الْمُزَارِعُونَ بِحَبَّاتِ الْبُنِّ مِنَ الْجِبَالِ.":
+    "In the market of Mocha, the farmers brought coffee cherries from the mountains.",
   "فِي صَبَاحٍ، جَاءَتْ بِنْتٌ، وَصَبَّتْ مَاءً فِي صَحْنٍ.":
     "One morning a girl came and poured water into a bowl.",
   "فِي مَخْزَنِ التَّاجِرِ، أَكْيَاسُ الْبُنِّ كَثِيرَةٌ.":
     "In the trader's storehouse there are many sacks of coffee.",
-  "فِي مُدَرَّجَاتِ حَرَازٍ، يَقْطِفُ التَّاجِرُ حَبَّاتِ الْبُنِّ.":
-    "On the terraces of Haraz, the trader picks coffee cherries.",
   "فِي مِينَاءِ الْمُخَا، السَّفِينَةُ تَنْتَظِرُ الْبُنَّ.":
     "In the port of Mocha, the ship waits for the coffee.",
   "ق ص ف مع الحركات": "ق ص ف with vowel marks",
@@ -726,8 +731,6 @@ export const EN_LINES: Record<string, string> = {
     "The bulbul said: Rasha used to feed me, just like you!",
   "قَبْلَ أَنْ أَقْرَأَ، أَتَعَلَّمُ الْخُطُوطَ، مِثْلَ خُطُوطِ رَشَا.":
     "Before I can read, I learn lines, like Rasha's lines.",
-  "قَرَأْنَا اللَّوْحَةَ: انْتَقَلَ أَهْلُ رَشَا إِلَى بَيْتٍ جَدِيدٍ.":
-    "We read the sign: Rasha's family moved to a new home.",
   "قَرَأْنَا اللَّوْحَةَ: هَذَا الطَّرِيقُ إِلَى الْجِبَالِ.":
     "We read the sign: this road goes to the mountains.",
   "قَرَأْنَا رِسَالَةَ رَشَا: اِسْقِ الطُّيُورَ! شُكْرًا لَكَ!":
@@ -763,14 +766,12 @@ export const EN_LINES: Record<string, string> = {
     "How many are left if we give some away? Let's count together!",
   "كَمْ يَبْقَى مَعَهُ؟ هَيَّا نَطْرَحُ!": "How many does he have left? Let's take away!",
   "كُرَةٌ أَمْ أُسْطُوَانَةٌ؟": "A sphere or a cylinder?",
-  "كُلُّ حَرْفٍ نَتَعَلَّمُهُ، يُضِيءُ فِي الْوَرَقَةِ!":
-    "Every letter we learn lights up on the note!",
   "كِيسٌ وَكِيسٌ: كَمْ مَعًا؟ هَيَّا نَجْمَعُ!": "A sack and a sack: how many together? Let's add!",
   "ل: اللَّبَنُ": "ل: Milk",
   "ل: الْبَقَرَةُ": "ل: The cow",
   "لينا  ،  ليل  ،  بلبل  ،  دلال": "Lina, night, nightingale, Dalal",
-  "لَا يَعْرِفُ كَمْ كِيسًا عِنْدَهُ، وَالسَّفِينَةُ فِي الْمُخَا لَا تَنْتَظِرُ. رَشَا سَاعَدَتْنَا، فَهَيَّا نُسَاعِدُهُ!":
-    "He does not know how many sacks he has, and the ship in Mocha will not wait. Rasha helped us, so let's help him!",
+  "لَا يَعْرِفُ كَمْ كِيسًا عِنْدَهُ، وَالسَّفِينَةُ لَا تَنْتَظِرُ. رَشَا سَاعَدَتْنَا، فَهَيَّا نُسَاعِدُهُ!":
+    "He does not know how many sacks he has, and the ship will not wait. Rasha helped us, so let's help him!",
   "لَا يُوجَدُ صَوْتٌ عَرَبِيٌّ عَلَى هٰذَا الْجِهَاز. اطلُب مِن شَخْصٍ بَالِغٍ تَثْبِيت صَوْت عَرَبِيّ مِن إِعْدَادَات تَحْوِيل النَّصّ إِلَى كَلَام.":
     "There is no Arabic voice on this device. Ask an adult to install an Arabic voice in the text-to-speech settings.",
   لَبِيبٌ: "Labib",
@@ -778,6 +779,8 @@ export const EN_LINES: Record<string, string> = {
   "لَمْ يَطِرْ أَيُّ بَالُونٍ. كَمِ الْبَاقِي؟": "No balloon flew away. How many are left?",
   "لَهُ الشَّكْلُ نَفْسُهُ": "It has the same shape",
   لَيْلٌ: "Night",
+  "لِأُوصِلَ الرَّسَائِلَ، أَتَعَلَّمُ الْحُرُوفَ. وَكُلُّ حَرْفٍ يُضِيءُ فِي وَرَقَتِهَا!":
+    "To deliver the letters, I learn the letters of the alphabet. And every letter lights up on her note!",
   "لِلْبِنْتِ حَقِيبَةٌ، وَلِلْوَلَدِ حَقِيبَةٌ. كَمْ حَقِيبَةً مَعَهُمَا؟":
     "The girl has a bag, and the boy has a bag. How many bags do they have together?",
   "لِنَتَسَابَقْ فِي الْحَلِّ": "Let's race to solve it",
@@ -835,6 +838,8 @@ export const EN_LINES: Record<string, string> = {
   "مِصْيَدَةُ مُفِيدٍ": "Mufid's trap",
   مِقَصٌّ: "Scissors",
   "مِنَ الْبِدَايَةِ إِلَى النِّهَايَةِ": "From start to finish",
+  "مِنَ الْجِبَالِ إِلَى الْمُخَا، يَحْمِلُ الْجَمَلُ أَكْيَاسًا جَدِيدَةً.":
+    "From the mountains to Mocha, the camel carries new sacks.",
   "مِنْ هَذِهِ الْبِئْرِ، أَخَذَتْ رَشَا مَاءً لِلطُّيُورِ!":
     "From this well, Rasha took water for the birds!",
   "ن ر د ت مع الحركات": "ن ر د ت with vowel marks",
@@ -858,9 +863,9 @@ export const EN_LINES: Record<string, string> = {
   نَوْمٌ: "Sleep",
   نُقُودٌ: "Money",
   "نِصْفٌ أَمْ رُبْعٌ؟": "Half or quarter?",
-  "هَذَا بَيْتُ رَشَا. عَلَى الْبَابِ لَوْحَةٌ.":
-    "This is Rasha's house. There is a sign on the door.",
   "هَذَا نَمَطٌ. مَا التَّالِي؟": "This is a pattern. What comes next?",
+  "هَذَا هُوَ الْيَمَنُ. أَيْنَ أَبْحَثُ أَوَّلًا؟ اِخْتَرْ مَكَانًا!":
+    "This is Yemen. Where shall I search first? Choose a place!",
   "هَذِهِ رَسَائِلُ الْيَوْمِ! اِسْمَعْ، وَاخْتَرِ الصَّوَابَ.":
     "Here are today's messages! Listen and choose the right one.",
   "هَلِ الْجُزْءُ الْمُلَوَّنُ رُبْعُ الشَّكْلِ؟ نَعَمْ أَمْ لَا؟":
@@ -878,8 +883,8 @@ export const EN_LINES: Record<string, string> = {
     "Let's learn the letters, so we can read the notebook!",
   "هَيَّا نَتَعَلَّمُ الْحُرُوفَ، لِنَقْرَأَ الرِّسَالَةَ!":
     "Let's learn the letters, so we can read the message!",
-  "هَيَّا نَتَعَلَّمُ الْحُرُوفَ، لِنَقْرَأَ اللَّوْحَةَ!":
-    "Let's learn the letters, so we can read the sign!",
+  "هَيَّا نَتَعَلَّمُ الْحُرُوفَ، لِنَقْرَأَ الِاسْمَ!":
+    "Let's learn the letters, so we can read the name!",
   "هَيَّا نَتَعَلَّمُ الْحُرُوفَ، لِنَقْرَأَ الْكِتَابَةَ!":
     "Let's learn the letters, so we can read the writing!",
   "هَيَّا نَتَعَلَّمُ الْحُرُوفَ، لِنَقْرَأَ الْوَرَقَةَ!":
@@ -904,6 +909,7 @@ export const EN_LINES: Record<string, string> = {
   وَسَطَ: "Middle",
   "وَصَلَ كِيسٌ جَدِيدٌ!": "A new sack has arrived!",
   وَصْفٌ: "Description",
+  "وَضَعْتُ وَرَقَتَهَا فِي حَقِيبَتِي، وَطِرْتُ!": "I put her note in my bag, and flew off!",
   "وَعَلَى سَطْحِي، بِنْتٌ صَغِيرَةٌ تَمْلَأُ صَحْنَ رَشَا.":
     "And on my roof, a little girl fills Rasha's bowl.",
   "وَهٰذَا سُلُوكٌ خَاطِئٌ، أَضْغَطُ عَلَامَةَ الْخَطَأِ.":

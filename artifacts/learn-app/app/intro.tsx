@@ -15,14 +15,13 @@ import { goBackOr } from "@/components/BackButton";
 import { ScreenBackground } from "@/components/ScreenBackground";
 import { UiText } from "@/components/UiText";
 import { Icon } from "@/components/world/Icon";
-import { Picture } from "@/components/pictures/Picture";
-import { INK, Note } from "@/components/world/Bowl";
 import { StoryPicture } from "@/components/world/StoryScenes";
+import { YemenMap } from "@/components/world/YemenMap";
 import { books, type Book } from "@/content";
 import {
   CHAPTERS,
   INTRO_STORY,
-  SUBJECT_LINES,
+  MAP_PLACES,
   chapterFor,
   stationScenes,
   type ChapterId,
@@ -36,7 +35,7 @@ import { useScreenPadding } from "@/hooks/useScreenPadding";
 import * as haptics from "@/lib/haptics";
 import { routes } from "@/lib/routes";
 import { estimateSpeechMs, speak, stopSpeaking } from "@/lib/speech";
-import { readableFill, touchTarget, yemen } from "@/theme/tokens";
+import { touchTarget, yemen } from "@/theme/tokens";
 
 /** Milliseconds now, read in effects and timers (never during render). */
 const clock = () => Date.now();
@@ -160,25 +159,6 @@ function Appear({
     >
       {children}
     </Animated.View>
-  );
-}
-
-/** The picture on a choice card: Rasha's note with letters, or a coffee sack with numbers. */
-function ChoicePicture({ book }: { book: Book }) {
-  if (book.subject === "math")
-    return (
-      <View style={styles.choicePicture}>
-        <Picture emoji="🫘" size={64} />
-        <Text style={styles.choiceGlyph}>١ ٢ ٣</Text>
-      </View>
-    );
-  return (
-    // Rasha's note: reading it is the Arabic thread.
-    <View style={styles.choicePicture}>
-      <Note width={84}>
-        <Text style={[styles.choiceGlyph, styles.noteGlyph]}>أ ب ت</Text>
-      </Note>
-    </View>
   );
 }
 
@@ -309,57 +289,46 @@ function Story({ chapter }: { chapter: string | null }) {
         )}
       </View>
 
-      <Pressable
-        testID="intro-next"
-        accessibilityRole="button"
-        accessibilityLabel={line(scene.line)}
-        disabled={choosing}
-        onPress={next}
-        style={styles.stage}
-      >
-        <SceneStage scenes={scenes} index={index} />
-        {/* A new line appears as the new scene comes in. */}
-        <Appear key={scene.id} delay={TURN_MS / 3} style={styles.bubble}>
-          <View style={styles.speaker}>
-            <Icon name="speaker" size={22} color={yemen.clay} />
-          </View>
-          <Text style={styles.line}>{line(scene.line)}</Text>
-        </Appear>
-      </Pressable>
-
-      {choosing ? (
-        <Appear
-          delay={TURN_MS}
-          rise={40}
-          style={[
-            styles.choices,
-            {
-              flexDirection: language === "en" ? "row" : "row-reverse",
-              paddingBottom: pad.bottom + 16,
-            },
-          ]}
+      <View style={styles.stageWrap}>
+        <Pressable
+          testID="intro-next"
+          accessibilityRole="button"
+          accessibilityLabel={line(scene.line)}
+          disabled={choosing}
+          onPress={next}
+          style={styles.stage}
         >
-          {choices.map((book) => (
-            <Pressable
-              key={book.id}
-              testID={`choose-${book.id}`}
-              accessibilityRole="button"
-              accessibilityLabel={`${t(book.title)}، ${SUBJECT_LINES[book.subject] ?? ""}`}
-              onPress={() => choose(book)}
-              style={({ pressed }) => [
-                styles.choice,
-                { backgroundColor: readableFill(book.color) },
-                pressed && styles.pressed,
-              ]}
-            >
-              <ChoicePicture book={book} />
-              <UiText style={styles.choiceCaption} numberOfLines={1}>
-                {book.title}
-              </UiText>
-            </Pressable>
-          ))}
-        </Appear>
-      ) : null}
+          <SceneStage scenes={scenes} index={index} />
+          {/* A new line appears as the new scene comes in. */}
+          <Appear key={scene.id} delay={TURN_MS / 3} style={styles.bubble}>
+            <View style={styles.speaker}>
+              <Icon name="speaker" size={22} color={yemen.clay} />
+            </View>
+            <Text style={styles.line}>{line(scene.line)}</Text>
+          </Appear>
+        </Pressable>
+        {/* The choice: the places on the map of Yemen, over the map picture. */}
+        {choosing ? (
+          <View style={styles.mapPins} pointerEvents="box-none">
+            <YemenMap
+              only
+              pins={choices.flatMap((book) => {
+                const thread = chapterFor(book.subject);
+                if (!thread) return [];
+                const place = MAP_PLACES[thread];
+                return [
+                  {
+                    thread,
+                    testID: `choose-${book.id}`,
+                    accessibilityLabel: `${line(place.name)}: ${line(place.what)}، ${t(book.title)}`,
+                    onPress: () => choose(book),
+                  },
+                ];
+              })}
+            />
+          </View>
+        ) : null}
+      </View>
     </ScreenBackground>
   );
 }
@@ -418,20 +387,7 @@ const styles = StyleSheet.create({
     writingDirection: "rtl",
     lineHeight: 34,
   },
-  choices: { paddingHorizontal: 16, gap: 14 },
-  choice: {
-    flex: 1,
-    minHeight: 150,
-    borderRadius: 28,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-    paddingVertical: 12,
-    boxShadow: `0 7px 0 ${yemen.clayDeep}`,
-  },
-  choicePicture: { alignItems: "center", gap: 4 },
-  choiceGlyph: { fontSize: 30, fontWeight: "900", color: "#FFFFFF" },
-  noteGlyph: { fontSize: 22, lineHeight: 32, color: INK },
-  choiceCaption: { fontSize: 14, fontWeight: "700", color: "#FFFFFF" },
-  pressed: { opacity: 0.88, transform: [{ scale: 0.96 }] },
+  stageWrap: { flex: 1 },
+  // Over the picture (styles.picture, inside the stage's padding): the map's places.
+  mapPins: { position: "absolute", top: 0, left: 16, right: 16, height: 300 },
 });

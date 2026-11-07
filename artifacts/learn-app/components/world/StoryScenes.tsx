@@ -27,6 +27,7 @@ import {
   WiltedPlantArt,
 } from "./StoryArt";
 import { DhowArt } from "./Voyage";
+import { YemenMap } from "./YemenMap";
 import { Skyline } from "./Skyline";
 import { StickerArt } from "./StickerArt";
 import { LOOP_NATIVE } from "./motion";
@@ -756,66 +757,6 @@ function Turn() {
   );
 }
 
-/** The choice: Hudhud between the note to read and a coffee sack to count (the choices are buttons). */
-function Choose() {
-  return (
-    <View style={[styles.scene, styles.chooseScene]}>
-      <View style={styles.chooseRow}>
-        <Note width={112} style={styles.heldNote}>
-          <NoteLetters readable={() => false} size={12} />
-        </Note>
-        <Hudhud size={130} />
-        <Picture emoji="🫘" size={80} />
-      </View>
-    </View>
-  );
-}
-
-/** Hudhud sets out on Rasha's trail: the way over the mountains draws itself, dot by dot. */
-function Trail() {
-  // One clock for the whole trail: dot i appears at its share of it.
-  const draw = useOnce(3000, 400, Easing.linear);
-  const fly = useOnce(3400, 300, Easing.inOut(Easing.quad));
-  return (
-    <View style={styles.scene}>
-      <View style={[styles.fill, { backgroundColor: "#E7F0FA" }]} />
-      <Svg width="100%" height={300} viewBox="0 0 360 300" style={StyleSheet.absoluteFill}>
-        <Polygon points="0,300 70,150 140,300" fill="#B48A50" />
-        <Polygon points="100,300 200,120 300,300" fill="#8E5A36" />
-        <Polygon points="230,300 310,170 380,300" fill="#A47148" />
-        <Polygon points="186,146 200,120 214,146" fill="#F7F0E1" />
-      </Svg>
-      {Array.from({ length: TRAIL_DOTS }, (_, i) => (
-        <Animated.View
-          key={i}
-          style={[
-            styles.trailDot,
-            {
-              right: 30 + i * 34,
-              top: 210 - Math.sin(i / 2) * 60,
-              opacity: draw.interpolate({
-                inputRange: [i / TRAIL_DOTS, (i + 1) / TRAIL_DOTS],
-                outputRange: [0, 1],
-                extrapolate: "clamp",
-              }),
-            },
-          ]}
-        />
-      ))}
-      <Animated.View
-        style={[
-          styles.trailBird,
-          { transform: [{ translateX: lerp(fly, 0, -230) }, { translateY: lerp(fly, 0, -40) }] },
-        ]}
-      >
-        <Hudhud size={80} flap hop={false} />
-      </Animated.View>
-    </View>
-  );
-}
-
-const TRAIL_DOTS = 9;
-
 /** Rasha's note, unfolded: every letter we learn lights up on it, one after another. */
 function BowlScene() {
   const words = [...MESSAGE.words, MESSAGE.name].map((w) => messageLetters(w));
@@ -868,6 +809,178 @@ function BowlScene() {
   );
 }
 
+/**
+ * He folds her note into his bag and flies off: the note slips into the bag, then Hudhud beats
+ * his wings and rises over Sana'a, smaller and smaller. The empty bowl stays on the roof.
+ */
+function FlyOff() {
+  const tuck = useOnce(1000, 700);
+  const fly = useOnce(2600, 2000, Easing.in(Easing.quad));
+  return (
+    <View style={styles.scene}>
+      <Rooftop />
+      <View style={styles.bowlOnWall}>
+        <BowlArt width={96} level={0} />
+      </View>
+      <Animated.View
+        style={[
+          styles.flyNote,
+          {
+            opacity: at(tuck, [0, 0.85, 1], [1, 1, 0]),
+            transform: [
+              { translateX: lerp(tuck, 0, 70) },
+              { translateY: lerp(tuck, 0, 4) },
+              { scale: lerp(tuck, 1, 0.3) },
+              { rotate: at(tuck, [0, 1], ["-6deg", "24deg"]) },
+            ],
+          },
+        ]}
+      >
+        <Note width={62}>
+          <NoteLetters readable={() => false} size={7} />
+        </Note>
+      </Animated.View>
+      <Animated.View
+        style={[
+          styles.drinker,
+          {
+            transform: [
+              { translateX: lerp(fly, 0, -250) },
+              { translateY: lerp(fly, 0, -200) },
+              { scale: lerp(fly, 1, 0.4) },
+            ],
+          },
+        ]}
+      >
+        <Animated.View style={{ opacity: at(tuck, [0, 0.9, 1], [1, 1, 0]) }}>
+          <Hudhud size={86} bag={0} hop={false} />
+        </Animated.View>
+        <Animated.View
+          style={[StyleSheet.absoluteFill, { opacity: at(tuck, [0, 0.9, 1], [0, 0, 1]) }]}
+        >
+          <Animated.View style={[StyleSheet.absoluteFill, { opacity: at(fly, [0, 0.04], [1, 0]) }]}>
+            <Hudhud size={86} bag={1} hop={false} />
+          </Animated.View>
+          <Animated.View style={[StyleSheet.absoluteFill, { opacity: at(fly, [0, 0.04], [0, 1]) }]}>
+            <Hudhud size={86} bag={1} flap hop={false} />
+          </Animated.View>
+        </Animated.View>
+      </Animated.View>
+    </View>
+  );
+}
+
+/** The map of Yemen: home in Sana'a, and the places to fly to (the choice is made on it). */
+function MapScene() {
+  return (
+    <View style={styles.scene}>
+      <YemenMap pins={[{ thread: "arabic" }, { thread: "math" }]} />
+    </View>
+  );
+}
+
+/**
+ * Mukalla on the Arabian Sea: white houses at the foot of brown mountains, the sea in front,
+ * a quay to stand on (fills the scene).
+ */
+function Mukalla() {
+  return (
+    <Svg width="100%" height={300} viewBox="0 0 360 300" style={StyleSheet.absoluteFill}>
+      <Path
+        d="M0 180 L36 112 L84 150 L138 76 L196 132 L246 88 L302 126 L360 98 L360 230 L0 230 Z"
+        fill="#9C6B45"
+      />
+      <Path d="M138 76 L150 96 L128 100 Z M246 88 L258 104 L236 106 Z" fill="#B88A60" />
+      {[
+        [10, 170, 46, 60],
+        [60, 182, 40, 48],
+        [104, 160, 50, 70],
+        [160, 176, 44, 54],
+        [208, 166, 52, 64],
+        [264, 180, 40, 50],
+        [308, 168, 52, 62],
+      ].map(([x, y, w, h]) => (
+        <G key={x}>
+          <Rect
+            x={x}
+            y={y}
+            width={w}
+            height={h}
+            fill="#FBF7EE"
+            stroke="#D9CDB8"
+            strokeWidth={1.5}
+          />
+          <Rect x={x + 8} y={y + 10} width={7} height={10} rx={2} fill="#5E7E9C" />
+          <Rect x={x + w - 15} y={y + 10} width={7} height={10} rx={2} fill="#5E7E9C" />
+          <Rect x={x + 8} y={y + 28} width={7} height={10} rx={2} fill="#5E7E9C" />
+        </G>
+      ))}
+      <Rect x={0} y={228} width={360} height={30} fill="#4F8FD6" />
+      <Path
+        d="M20 240 q8 -5 16 0 t16 0 M150 246 q8 -5 16 0 t16 0 M270 238 q8 -5 16 0 t16 0"
+        stroke="#FFFFFF"
+        strokeWidth={2}
+        fill="none"
+        opacity={0.7}
+      />
+      <Rect x={0} y={256} width={360} height={44} fill="#D9C7A8" />
+      {/* The post box at the post office. */}
+      <G transform="translate(176 206)">
+        <Rect x={0} y={0} width={22} height={34} rx={5} fill="#C8402F" />
+        <Rect x={4} y={8} width={14} height={4} rx={2} fill="#5E1A12" />
+        <Rect x={8} y={34} width={6} height={18} fill="#5E3220" />
+      </G>
+    </Svg>
+  );
+}
+
+/**
+ * In Mukalla the old postman gives Hudhud work: letters fly into his bag, one after another,
+ * to be delivered, and at every door he can ask about Rasha.
+ */
+function Post() {
+  const letters = useOnce(2400, 700, Easing.inOut(Easing.quad));
+  const nod = useSwing(900, 300);
+  return (
+    <View style={styles.scene}>
+      <View style={[styles.fill, { backgroundColor: "#E7F0FA" }]} />
+      <Mukalla />
+      <Animated.View
+        style={[styles.postman, { transform: [{ rotate: at(nod, [0, 1], ["-2deg", "2deg"]) }] }]}
+      >
+        <Picture emoji="👴" size={96} />
+      </Animated.View>
+      {[0, 1, 2].map((i) => (
+        <Animated.View
+          key={i}
+          style={[
+            styles.flyingLetter,
+            {
+              opacity: at(letters, [i / 3, i / 3 + 0.05, (i + 0.9) / 3, (i + 1) / 3], [0, 1, 1, 0]),
+              transform: [
+                { translateX: at(letters, [i / 3, (i + 1) / 3], [0, 170]) },
+                { translateY: at(letters, [i / 3, (i + 0.5) / 3, (i + 1) / 3], [0, -50, 10]) },
+              ],
+            },
+          ]}
+        >
+          <Picture emoji="✉" size={34} />
+        </Animated.View>
+      ))}
+      <View style={styles.postBird}>
+        <Animated.View style={{ opacity: at(letters, [0, 0.95, 1], [1, 1, 0]) }}>
+          <Hudhud size={88} bag={1} hop={false} />
+        </Animated.View>
+        <Animated.View
+          style={[StyleSheet.absoluteFill, { opacity: at(letters, [0, 0.95, 1], [0, 0, 1]) }]}
+        >
+          <Hudhud size={88} bag={3} hop={false} />
+        </Animated.View>
+      </View>
+    </View>
+  );
+}
+
 /** The coffee terraces of Haraz, with a village of tower houses on the ridge (fills the scene). */
 function Terraces({ village = false }: { village?: boolean }) {
   return (
@@ -902,8 +1015,8 @@ function Terraces({ village = false }: { village?: boolean }) {
 }
 
 /**
- * In the Haraz mountains: the coffee trader sits by his sacks and does not know how many there
- * are; his helper has gone. Hudhud flies in and lands beside him.
+ * In Mocha by the Red Sea: the coffee trader sits by his sacks on the quay and does not know
+ * how many there are; his helper has gone, and his ship waits. Hudhud flies in beside him.
  */
 function Trader() {
   const land = useOnce(1600, 500, Easing.out(Easing.quad));
@@ -911,7 +1024,11 @@ function Trader() {
   return (
     <View style={styles.scene}>
       <View style={[styles.fill, { backgroundColor: "#E7F0FA" }]} />
-      <Terraces village />
+      <View style={styles.sea} />
+      <View style={[styles.sand, styles.quay]} />
+      <View style={styles.boat}>
+        <DhowArt stage={0} size={120} />
+      </View>
       <View style={styles.trader}>
         <Picture emoji="👨" size={96} />
       </View>
@@ -1122,7 +1239,7 @@ function Home() {
 }
 
 const PLACE_SKY: Record<StationPlace, string> = {
-  roof: "#F9E3BF",
+  post: "#E7F0FA",
   door: "#F9E3BF",
   school: "#E7F0FA",
   beach: "#E7F0FA",
@@ -1138,18 +1255,16 @@ const PLACE_SKY: Record<StationPlace, string> = {
 /** The ground of a station: the city, the sea, the mountains, a garden. */
 function PlaceGround({ place }: { place: StationPlace }) {
   switch (place) {
-    case "roof":
+    case "post":
+      return <Mukalla />;
     case "door":
+      // A door in Mukalla, on Hudhud's first round as the postman.
       return (
         <>
-          <View style={styles.city}>
-            <Skyline />
+          <Mukalla />
+          <View style={styles.stationArt}>
+            <Art art="door" size={110} />
           </View>
-          {place === "door" ? (
-            <View style={styles.stationArt}>
-              <Art art="door" size={110} />
-            </View>
-          ) : null}
         </>
       );
     case "school":
@@ -1280,8 +1395,9 @@ const SCENES: Record<StoryScene["id"], (props: { unit?: string }) => React.React
   gone: Gone,
   inscription: Inscription,
   turn: Turn,
-  choose: Choose,
-  trail: Trail,
+  flyoff: FlyOff,
+  map: MapScene,
+  post: Post,
   bowl: BowlScene,
   trader: Trader,
   sacks: Sacks,
@@ -1436,17 +1552,6 @@ const styles = StyleSheet.create({
     textShadowRadius: 8,
   },
   noteBird: { position: "absolute", right: 14, bottom: 18 },
-  chooseScene: { backgroundColor: "transparent", alignItems: "center", justifyContent: "center" },
-  heldNote: { flexShrink: 0, marginBottom: 24, transform: [{ rotate: "5deg" }] },
-  chooseRow: { flexDirection: "row", alignItems: "flex-end", gap: 8 },
-  trailDot: {
-    position: "absolute",
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: yemen.clay,
-  },
-  trailBird: { position: "absolute", right: 10, top: 150 },
   ground: {
     position: "absolute",
     left: 0,
@@ -1508,6 +1613,10 @@ const styles = StyleSheet.create({
   wayBird: { position: "absolute", right: 18, bottom: 22 },
   flyingHome: { position: "absolute", left: "38%", top: 40 },
   newGirlBird: { left: 236 },
+  flyNote: { position: "absolute", left: 150, bottom: 104 },
+  postman: { position: "absolute", left: 16, bottom: 18 },
+  flyingLetter: { position: "absolute", left: 90, bottom: 110 },
+  postBird: { position: "absolute", right: 20, bottom: 20 },
   // Mocha's stone quay, wide enough for the trader to stand on.
   quay: { height: 96, backgroundColor: "#B9A58E" },
   stationArt: { position: "absolute", left: 20, bottom: 50 },

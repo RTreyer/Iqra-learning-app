@@ -32,8 +32,9 @@ export type StorySceneId =
   | "gone"
   | "inscription"
   | "turn"
-  | "choose"
-  | "trail"
+  | "flyoff"
+  | "map"
+  | "post"
   | "bowl"
   | "trader"
   | "sacks"
@@ -99,8 +100,14 @@ export const INTRO_STORY: readonly StoryScene[] = [
     minMs: 3600,
   },
   {
-    id: "choose",
-    line: "فِي الطَّرِيقِ، أَحْتَاجُ أَنْ أَقْرَأَ، وَأَنْ أَعُدَّ. هَلْ تُسَاعِدُنِي؟ اِخْتَرْ!",
+    id: "flyoff",
+    line: "وَضَعْتُ وَرَقَتَهَا فِي حَقِيبَتِي، وَطِرْتُ!",
+    minMs: 4400,
+  },
+  // The choice: the places on the map are the buttons (components/world/YemenMap).
+  {
+    id: "map",
+    line: "هَذَا هُوَ الْيَمَنُ. أَيْنَ أَبْحَثُ أَوَّلًا؟ اِخْتَرْ مَكَانًا!",
   },
 ];
 
@@ -110,21 +117,25 @@ export type ChapterId = "arabic" | "math" | "end";
 export const CHAPTERS: Record<ChapterId, readonly StoryScene[]> = {
   arabic: [
     {
-      id: "trail",
-      line: "سَأَتْبَعُ طَرِيقَهَا، وَفِي الطَّرِيقِ أَتَعَلَّمُ الْحُرُوفَ.",
+      id: "post",
+      line: "فِي الْمُكَلَّا، قَالَ سَاعِي الْبَرِيدِ الْعَجُوزُ: اِعْمَلْ مَعِي، وَاسْأَلْ عَنْ رَشَا فِي كُلِّ بَيْتٍ!",
+      minMs: 4000,
+    },
+    {
+      id: "bowl",
+      line: "لِأُوصِلَ الرَّسَائِلَ، أَتَعَلَّمُ الْحُرُوفَ. وَكُلُّ حَرْفٍ يُضِيءُ فِي وَرَقَتِهَا!",
       minMs: 3600,
     },
-    { id: "bowl", line: "كُلُّ حَرْفٍ نَتَعَلَّمُهُ، يُضِيءُ فِي الْوَرَقَةِ!", minMs: 3600 },
   ],
   math: [
     {
       id: "trader",
-      line: "فِي جِبَالِ حَرَازٍ، وَجَدْتُ تَاجِرَ بُنٍّ حَزِينًا. ذَهَبَ مَنْ كَانَ يُسَاعِدُهُ.",
+      line: "فِي الْمُخَا، عِنْدَ الْبَحْرِ، وَجَدْتُ تَاجِرَ بُنٍّ حَزِينًا. ذَهَبَ مَنْ كَانَ يُسَاعِدُهُ.",
       minMs: 4000,
     },
     {
       id: "sacks",
-      line: "لَا يَعْرِفُ كَمْ كِيسًا عِنْدَهُ، وَالسَّفِينَةُ فِي الْمُخَا لَا تَنْتَظِرُ. رَشَا سَاعَدَتْنَا، فَهَيَّا نُسَاعِدُهُ!",
+      line: "لَا يَعْرِفُ كَمْ كِيسًا عِنْدَهُ، وَالسَّفِينَةُ لَا تَنْتَظِرُ. رَشَا سَاعَدَتْنَا، فَهَيَّا نُسَاعِدُهُ!",
       minMs: 4400,
     },
   ],
@@ -148,18 +159,60 @@ export const CHAPTERS: Record<ChapterId, readonly StoryScene[]> = {
 };
 
 /** The thread a subject belongs to. */
-export function chapterFor(subject: string | undefined): "arabic" | "math" | null {
+export function chapterFor(subject: string | undefined): Thread | null {
   if (subject === "arabic" || subject === "lughati") return "arabic";
   if (subject === "math") return "math";
   return null;
 }
+
+/** A thread of the story: reading (Arabic) or counting (maths). */
+export type Thread = "arabic" | "math";
+
+/** A place on the map of Yemen (components/world/YemenMap). */
+export type MapPlace = {
+  name: string;
+  /** Who waits there for Hudhud. */
+  what: string;
+  lon: number;
+  lat: number;
+  /** The picture on its badge (components/pictures). */
+  picture: string;
+  color: string;
+};
+
+/** Hudhud's home: his roof in Sana'a, with Rasha's bowl. */
+export const HOME_PLACE = { name: "صَنْعَاءُ", lon: 44.2, lat: 15.35 };
+
+/**
+ * Where Hudhud can fly at the end of chapter 1, one place per thread: Mukalla on the Arabian
+ * Sea, where he works as the postman and asks about Rasha at every door (reading), and Mocha,
+ * the old coffee port on the Red Sea, where the coffee trader needs him (counting).
+ */
+export const MAP_PLACES: Record<Thread, MapPlace> = {
+  arabic: {
+    name: "الْمُكَلَّا",
+    what: "سَاعِي الْبَرِيدِ",
+    lon: 49.12,
+    lat: 14.54,
+    picture: "✉",
+    color: "#1F5FA8",
+  },
+  math: {
+    name: "الْمُخَا",
+    what: "تَاجِرُ الْبُنِّ",
+    lon: 43.25,
+    lat: 13.32,
+    picture: "🫘",
+    color: "#6D3FC4",
+  },
+};
 
 /** Rasha's message in the bowl, read at the end of the Arabic path, and her name. */
 export const MESSAGE = { words: ["اِسْقِ", "الطُّيُورَ"], name: "رَشَا" };
 
 /** Where a station is, for its picture (components/world/RashaScenes). */
 export type StationPlace =
-  | "roof"
+  | "post"
   | "door"
   | "school"
   | "beach"
@@ -189,8 +242,8 @@ export type Station = {
 
 export const STATIONS: Record<string, Station> = {
   a1: {
-    place: "roof",
-    person: "🐦",
+    place: "post",
+    person: "👴",
     thing: "✏",
     where: "قَبْلَ أَنْ أَقْرَأَ، أَتَعَلَّمُ الْخُطُوطَ، مِثْلَ خُطُوطِ رَشَا.",
     ask: "هَيَّا نَرْسُمُ الْخُطُوطَ!",
@@ -199,10 +252,10 @@ export const STATIONS: Record<string, Station> = {
   a2: {
     place: "door",
     person: "🧕",
-    thing: "🚪",
-    where: "هَذَا بَيْتُ رَشَا. عَلَى الْبَابِ لَوْحَةٌ.",
-    ask: "هَيَّا نَتَعَلَّمُ الْحُرُوفَ، لِنَقْرَأَ اللَّوْحَةَ!",
-    outro: "قَرَأْنَا اللَّوْحَةَ: انْتَقَلَ أَهْلُ رَشَا إِلَى بَيْتٍ جَدِيدٍ.",
+    thing: "✉",
+    where: "أَوَّلُ رِسَالَةٍ أُوصِلُهَا! عَلَى الْبَابِ اسْمٌ.",
+    ask: "هَيَّا نَتَعَلَّمُ الْحُرُوفَ، لِنَقْرَأَ الِاسْمَ!",
+    outro: "أَوْصَلْنَا الرِّسَالَةَ! قَالَتِ الْأُمُّ: سَمِعْتُ عَنْ بِنْتٍ تَسْقِي الطُّيُورَ.",
   },
   a3: {
     place: "school",
@@ -253,10 +306,10 @@ export const STATIONS: Record<string, Station> = {
     outro: "رَشَا فِي بَيْتٍ جَدِيدٍ، وَهِيَ بِخَيْرٍ! الْآنَ أَرْجِعُ إِلَى الصَّحْنِ.",
   },
   "math-u1": {
-    place: "terraces",
+    place: "market",
     person: "👨",
     thing: "🍒",
-    where: "فِي مُدَرَّجَاتِ حَرَازٍ، يَقْطِفُ التَّاجِرُ حَبَّاتِ الْبُنِّ.",
+    where: "فِي سُوقِ الْمُخَا، جَاءَ الْمُزَارِعُونَ بِحَبَّاتِ الْبُنِّ مِنَ الْجِبَالِ.",
     ask: "الْحَمْرَاءُ هُنَا، وَالْخَضْرَاءُ هُنَاكَ. هَيَّا نُصَنِّفُ!",
     outro: "صَنَّفْنَا الْحَبَّاتِ! قَالَ التَّاجِرُ: الْحَمْرَاءُ نَاضِجَةٌ.",
   },
@@ -272,15 +325,15 @@ export const STATIONS: Record<string, Station> = {
     place: "road",
     person: "🐪",
     thing: "🫘",
-    where: "عَلَى الطَّرِيقِ إِلَى الْبَحْرِ، يَحْمِلُ الْجَمَلُ أَكْيَاسًا جَدِيدَةً.",
+    where: "مِنَ الْجِبَالِ إِلَى الْمُخَا، يَحْمِلُ الْجَمَلُ أَكْيَاسًا جَدِيدَةً.",
     ask: "كِيسٌ وَكِيسٌ: كَمْ مَعًا؟ هَيَّا نَجْمَعُ!",
-    outro: "جَمَعْنَا الْأَكْيَاسَ، وَنَزَلْنَا إِلَى تِهَامَةَ.",
+    outro: "جَمَعْنَا الْأَكْيَاسَ، وَكُلُّهَا الْآنَ فِي الْمَخْزَنِ.",
   },
   "math-u4": {
-    place: "village",
+    place: "beach",
     person: "👨",
     thing: "☕",
-    where: "فِي الْقَرْيَةِ، يُعْطِي التَّاجِرُ مِنْ بُنِّهِ لِلْجِيرَانِ.",
+    where: "عِنْدَ الْبَحْرِ، يُعْطِي التَّاجِرُ مِنْ بُنِّهِ لِلْجِيرَانِ.",
     ask: "كَمْ يَبْقَى مَعَهُ؟ هَيَّا نَطْرَحُ!",
     outro: "قَالَ التَّاجِرُ: مَنْ يُعْطِي، لَا يَصِيرُ أَفْقَرَ.",
   },

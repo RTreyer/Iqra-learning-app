@@ -41,7 +41,14 @@ export function BowlArt({ width = 120, level = 0 }: { width?: number; level?: nu
       {fill > 0 ? (
         <>
           <Ellipse cx={50} cy={surfaceY} rx={surfaceRx} ry={6} fill={WATER} />
-          <Ellipse cx={42} cy={surfaceY - 1.5} rx={surfaceRx / 3} ry={1.6} fill="#FFFFFF" opacity={0.5} />
+          <Ellipse
+            cx={42}
+            cy={surfaceY - 1.5}
+            rx={surfaceRx / 3}
+            ry={1.6}
+            fill="#FFFFFF"
+            opacity={0.5}
+          />
         </>
       ) : null}
       <Path d="M6 22 Q50 34 94 22" stroke={CLAY_DARK} strokeWidth={2} fill="none" />
@@ -168,7 +175,11 @@ export function BowlMessage({
         haptics.tap();
         speak(line);
       }}
-      style={({ pressed }) => [styles.message, compact && styles.compact, pressed && styles.pressed]}
+      style={({ pressed }) => [
+        styles.message,
+        compact && styles.compact,
+        pressed && styles.pressed,
+      ]}
     >
       {all ? <View style={styles.glow} /> : null}
       <View style={styles.onTop}>

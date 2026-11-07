@@ -3,7 +3,7 @@ import { act, fireEvent, screen } from "@testing-library/react-native";
 import React from "react";
 
 import IntroScreen from "@/app/intro";
-import { CHAPTERS, INTRO_STORY, STATIONS } from "@/content/story";
+import { CHAPTERS, INTRO_STORY, MAP_PLACES, STATIONS } from "@/content/story";
 import { SETTINGS_KEY, SettingsProvider } from "@/context/SettingsContext";
 import { routes } from "@/lib/routes";
 import { mockCanGoBack, renderScreen, setParams } from "@/test-utils/screens";
@@ -55,7 +55,7 @@ test("tells the story scene by scene with the voice, then waits on the choice", 
   // The last scene does not move on by itself: the child chooses.
   finish();
   act(() => jest.advanceTimersByTime(20000));
-  expect(screen.getByTestId("intro-scene-choose")).toBeTruthy();
+  expect(screen.getByTestId("intro-scene-map")).toBeTruthy();
   expect(screen.getByTestId("choose-arabic-1")).toBeTruthy();
   expect(screen.getByTestId("choose-math-1")).toBeTruthy();
 });
@@ -73,7 +73,7 @@ test("skip jumps to the choice; choosing saves the subject and opens its path", 
   renderIntro();
   await act(async () => {});
   fireEvent.press(screen.getByTestId("intro-skip"));
-  expect(screen.getByTestId("intro-scene-choose")).toBeTruthy();
+  expect(screen.getByTestId("intro-scene-map")).toBeTruthy();
   expect(screen.queryByTestId("intro-skip")).toBeNull();
   await act(async () => {
     fireEvent.press(screen.getByTestId("choose-math-1"));
@@ -98,7 +98,8 @@ test("Hudhud's story: Rasha, her bowl and the note he cannot read, then two thre
     "gone",
     "inscription",
     "turn",
-    "choose",
+    "flyoff",
+    "map",
   ]);
   const line = (id: string) => INTRO_STORY.find((s) => s.id === id)!.line;
   expect(line("inscription")).toContain("لَا أَعْرِفُ الْقِرَاءَةَ");
@@ -109,10 +110,17 @@ test("Hudhud's story: Rasha, her bowl and the note he cannot read, then two thre
   for (const scene of [...INTRO_STORY, ...CHAPTERS.math, ...CHAPTERS.end])
     expect(scene.line).not.toMatch(/بِذْر|السِّدْر/);
   expect(CHAPTERS.math[0].line).toContain("تَاجِرَ بُنٍّ");
+  // He takes her note with him in his bag and flies off; then the map of Yemen.
+  expect(line("flyoff")).toContain("حَقِيبَتِي");
+  // Where he can fly: the postman's town on the Arabian Sea, the coffee port on the Red Sea.
+  expect(MAP_PLACES.arabic.name).toBe("الْمُكَلَّا");
+  expect(MAP_PLACES.math.name).toBe("الْمُخَا");
+  expect(CHAPTERS.arabic[0].line).toContain(MAP_PLACES.arabic.name);
+  expect(CHAPTERS.math[0].line).toContain(MAP_PLACES.math.name);
   // Every picture with a slow animation plays long enough to be seen.
   for (const id of ["thirst", "girl", "days", "leave", "gone"])
     expect(INTRO_STORY.find((s) => s.id === id)!.minMs).toBeGreaterThanOrEqual(3800);
-  expect(CHAPTERS.arabic.map((s) => s.id)).toEqual(["trail", "bowl"]);
+  expect(CHAPTERS.arabic.map((s) => s.id)).toEqual(["post", "bowl"]);
   expect(CHAPTERS.math.map((s) => s.id)).toEqual(["trader", "sacks"]);
   expect(CHAPTERS.end.map((s) => s.id)).toEqual(["return", "newgirl", "home"]);
 });
@@ -140,7 +148,7 @@ test("skip in a chapter opens the thread's path at once", async () => {
   setParams({ chapter: "arabic" });
   renderIntro();
   await act(async () => {});
-  expect(screen.getByTestId("intro-scene-trail")).toBeTruthy();
+  expect(screen.getByTestId("intro-scene-post")).toBeTruthy();
   await act(async () => {
     fireEvent.press(screen.getByTestId("intro-skip"));
   });

@@ -129,7 +129,7 @@ test.describe("navigation", () => {
     await page.getByTestId("continue-card").click();
     await expect(page).toHaveURL(/\/intro$/);
     // The voice tells each scene and the story moves on by itself (speech ends at once here).
-    await expect(page.getByTestId("intro-scene-choose")).toBeVisible({ timeout: 90000 });
+    await expect(page.getByTestId("intro-scene-map")).toBeVisible({ timeout: 90000 });
     const told = await page.evaluate(() => window.__spoken);
     // Rasha's bowl: a message Hudhud cannot read yet.
     expect(told.some((line) => line.includes("لَا أَعْرِفُ الْقِرَاءَةَ"))).toBe(true);
