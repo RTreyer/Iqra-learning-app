@@ -63,28 +63,29 @@ function Envelope({ size = 34, letter }: { size?: number; letter?: string }) {
   );
 }
 
-/** Scene 1: Hudhud, the postman, flies over Sana'a with his bag of messages. */
+/** Scene 1: Hudhud, the postman, flies over Sana'a, his mail bag strapped across his chest. */
 function Postman() {
-  const swing = useSwing(1600);
+  // A slow glide back and forth, a lighter bob on top of it, and a slight bank into the turn.
+  const glide = useSwing(2600);
+  const bob = useSwing(650);
   return (
     <View style={styles.scene}>
       <View style={styles.sky} />
+      <Cloud left={30} top={34} />
+      <Cloud left={250} top={70} small />
       <Animated.View
         style={[
           styles.flying,
           {
             transform: [
-              { translateX: swing.interpolate({ inputRange: [0, 1], outputRange: [30, -30] }) },
-              { translateY: swing.interpolate({ inputRange: [0, 1], outputRange: [0, -14] }) },
+              { translateX: glide.interpolate({ inputRange: [0, 1], outputRange: [46, -46] }) },
+              { translateY: bob.interpolate({ inputRange: [0, 1], outputRange: [4, -8] }) },
+              { rotate: glide.interpolate({ inputRange: [0, 1], outputRange: ["4deg", "-4deg"] }) },
             ],
           },
         ]}
       >
-        <Hudhud size={130} hop={false} />
-        <View style={styles.bag}>
-          <Envelope size={30} />
-          <Envelope size={30} />
-        </View>
+        <Hudhud size={140} hop={false} flap bag="closed" />
       </Animated.View>
       <View style={styles.ground}>
         <Skyline />
@@ -93,93 +94,150 @@ function Postman() {
   );
 }
 
-const FLYING = ["أ", "ب", "ت", "م", "ر", "ن", "د", "ل"];
+function Cloud({ left, top, small }: { left: number; top: number; small?: boolean }) {
+  const w = small ? 60 : 84;
+  return (
+    <Svg
+      width={w}
+      height={w * 0.45}
+      viewBox="0 0 84 38"
+      style={{ position: "absolute", left, top }}
+    >
+      <Path
+        d="M14 34 Q2 34 4 24 Q6 14 18 16 Q22 4 36 6 Q48 0 56 12 Q72 8 76 22 Q84 34 70 34 Z"
+        fill="#FFFFFF"
+        opacity={0.9}
+      />
+    </Svg>
+  );
+}
 
-/** One letter blown out of a message, round and round. */
+const FLYING = ["أ", "ب", "ت", "م", "ر", "ن", "د", "ل"];
+const TILE_COLOURS = [yemen.red, yemen.blue, yemen.green, yemen.goldDeep];
+/** Hudhud's size in the wind scene, and where his bag sits in that picture (px from top left). */
+const WIND_BIRD = 140;
+const BAG_AT = { x: (63 / 140) * WIND_BIRD, y: (86 / 130) * ((WIND_BIRD * 130) / 140) };
+
+/**
+ * One letter pulled out of the bag by the wind: it rises from the bag, tumbles away with the
+ * gust (to the right and up, each on its own path) and fades, again and again.
+ */
 function FlyingLetter({ letter, index }: { letter: string; index: number }) {
   const [v] = useState(() => new Animated.Value(0));
   useEffect(() => {
     const loop = Animated.loop(
-      Animated.timing(v, {
-        toValue: 1,
-        duration: 2600,
-        delay: index * 180,
-        easing: Easing.out(Easing.quad),
-        useNativeDriver: true,
-      }),
+      Animated.sequence([
+        Animated.delay(index * 260),
+        Animated.timing(v, {
+          toValue: 1,
+          duration: 2200,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+        Animated.timing(v, { toValue: 0, duration: 0, useNativeDriver: true }),
+        Animated.delay((FLYING.length - index) * 260),
+      ]),
     );
     loop.start();
     return () => loop.stop();
   }, [v, index]);
-  const angle = (index / FLYING.length) * Math.PI * 2;
-  const dx = Math.cos(angle) * 130;
-  const dy = Math.sin(angle) * 110 - 40;
+  const dx = 70 + (index % 4) * 34;
+  const dy = -40 - ((index * 37) % 90);
+  const wobble = index % 2 ? 18 : -18;
   return (
-    <Animated.Text
+    <Animated.View
       style={[
-        styles.letter,
+        styles.tile,
         {
-          color: [yemen.red, yemen.blue, yemen.green, yemen.goldDeep][index % 4],
-          opacity: v.interpolate({ inputRange: [0, 0.15, 0.8, 1], outputRange: [0, 1, 1, 0] }),
+          left: BAG_AT.x - 18,
+          top: BAG_AT.y - 30,
+          opacity: v.interpolate({ inputRange: [0, 0.06, 0.8, 1], outputRange: [0, 1, 1, 0] }),
           transform: [
-            { translateX: v.interpolate({ inputRange: [0, 1], outputRange: [0, dx] }) },
-            { translateY: v.interpolate({ inputRange: [0, 1], outputRange: [0, dy] }) },
-            { rotate: v.interpolate({ inputRange: [0, 1], outputRange: ["0deg", "300deg"] }) },
+            {
+              translateX: v.interpolate({
+                inputRange: [0, 0.5, 1],
+                outputRange: [0, dx * 0.45 + wobble, dx],
+              }),
+            },
+            {
+              translateY: v.interpolate({
+                inputRange: [0, 0.3, 1],
+                outputRange: [0, dy * 0.5, dy],
+              }),
+            },
+            {
+              rotate: v.interpolate({
+                inputRange: [0, 1],
+                outputRange: ["0deg", `${(index % 2 ? 1 : -1) * (25 + index * 5)}deg`],
+              }),
+            },
+            { scale: v.interpolate({ inputRange: [0, 0.2, 1], outputRange: [0.5, 1, 1] }) },
           ],
         },
       ]}
     >
-      {letter}
-    </Animated.Text>
+      <Text style={[styles.tileLetter, { color: TILE_COLOURS[index % TILE_COLOURS.length] }]}>
+        {letter}
+      </Text>
+    </Animated.View>
   );
 }
 
-/** Scene 2: a gust of wind blows the letters out of the messages. */
+/** Scene 2: a gust of wind pulls the letters out of Hudhud's bag. */
 function Wind() {
-  const swing = useSwing(500);
+  const sway = useSwing(420);
+  const gust = useSwing(1200);
   return (
     <View style={styles.scene}>
       <View style={styles.sky} />
-      <Svg width={300} height={160} viewBox="0 0 300 160" style={styles.wind}>
-        <Path
-          d="M10 50 Q90 10 160 50 T290 40"
-          stroke="#C9D8EA"
-          strokeWidth={8}
-          fill="none"
-          strokeLinecap="round"
-        />
-        <Path
-          d="M20 100 Q110 70 180 105 T290 95"
-          stroke="#D8E4F1"
-          strokeWidth={6}
-          fill="none"
-          strokeLinecap="round"
-        />
-        <Path
-          d="M40 140 Q120 120 200 140"
-          stroke="#C9D8EA"
-          strokeWidth={5}
-          fill="none"
-          strokeLinecap="round"
-        />
-      </Svg>
-      <View style={styles.centre}>
-        {FLYING.map((letter, i) => (
-          <FlyingLetter key={letter} letter={letter} index={i} />
-        ))}
+      <Animated.View
+        style={[
+          styles.wind,
+          {
+            transform: [
+              { translateX: gust.interpolate({ inputRange: [0, 1], outputRange: [-20, 20] }) },
+            ],
+          },
+        ]}
+      >
+        <Svg width={300} height={160} viewBox="0 0 300 160">
+          <Path
+            d="M10 50 Q90 10 160 50 T290 40"
+            stroke="#C9D8EA"
+            strokeWidth={8}
+            fill="none"
+            strokeLinecap="round"
+          />
+          <Path
+            d="M20 100 Q110 70 180 105 T290 95"
+            stroke="#D8E4F1"
+            strokeWidth={6}
+            fill="none"
+            strokeLinecap="round"
+          />
+          <Path
+            d="M40 140 Q120 120 200 140"
+            stroke="#C9D8EA"
+            strokeWidth={5}
+            fill="none"
+            strokeLinecap="round"
+          />
+        </Svg>
+      </Animated.View>
+      <View style={styles.windBird}>
         <Animated.View
           style={{
             transform: [
-              { rotate: swing.interpolate({ inputRange: [0, 1], outputRange: ["-8deg", "8deg"] }) },
+              { rotate: sway.interpolate({ inputRange: [0, 1], outputRange: ["-6deg", "7deg"] }) },
+              { translateX: sway.interpolate({ inputRange: [0, 1], outputRange: [-3, 4] }) },
             ],
           }}
         >
-          <Hudhud size={120} hop={false} />
+          <Hudhud size={WIND_BIRD} hop={false} flap bag="open" />
         </Animated.View>
-        <View style={styles.openEnvelopes}>
-          <Envelope size={40} />
-          <Envelope size={40} />
-        </View>
+        {FLYING.map((letter, i) => (
+          <FlyingLetter key={letter} letter={letter} index={i} />
+        ))}
       </View>
     </View>
   );
@@ -245,7 +303,7 @@ function Market() {
         </Animated.Text>
       ))}
       <View style={styles.marketBird}>
-        <Hudhud size={96} />
+        <Hudhud size={96} bag="closed" />
       </View>
     </View>
   );
@@ -267,7 +325,7 @@ function Waiting() {
         <StickerArt id="dhow" size={84} />
       </View>
       <View style={styles.waitBird}>
-        <Hudhud size={110} pose="cheer" />
+        <Hudhud size={110} pose="cheer" bag="closed" />
       </View>
     </View>
   );
@@ -277,7 +335,7 @@ function Waiting() {
 function Choose() {
   return (
     <View style={[styles.scene, styles.chooseScene]}>
-      <Hudhud size={140} />
+      <Hudhud size={140} bag="closed" />
     </View>
   );
 }
@@ -309,7 +367,6 @@ const styles = StyleSheet.create({
   sky: { position: "absolute", top: 0, right: 0, bottom: 0, left: 0, backgroundColor: "#E7F0FA" },
   ground: { position: "absolute", bottom: 0, left: 0, right: 0, alignItems: "center" },
   flying: { position: "absolute", top: 30, alignItems: "center" },
-  bag: { position: "absolute", bottom: 4, left: 50, flexDirection: "row", gap: 2 },
   envelopeLetter: {
     position: "absolute",
     top: -2,
@@ -320,9 +377,19 @@ const styles = StyleSheet.create({
     color: yemen.ink,
   },
   wind: { position: "absolute", top: 20 },
-  centre: { alignItems: "center", justifyContent: "center" },
-  letter: { position: "absolute", fontSize: 34, fontWeight: "900" },
-  openEnvelopes: { flexDirection: "row", gap: 8, marginTop: -6 },
+  windBird: { width: WIND_BIRD, height: (WIND_BIRD * 130) / 140, marginLeft: -60, marginTop: 40 },
+  tile: {
+    position: "absolute",
+    width: 36,
+    height: 40,
+    borderRadius: 8,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1.5,
+    borderColor: "#D9CBB5",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  tileLetter: { fontSize: 24, fontWeight: "900", lineHeight: 34 },
   sea: {
     position: "absolute",
     left: 0,
