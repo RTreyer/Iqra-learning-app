@@ -3,7 +3,7 @@
  * child hears it. Tapping Hudhud or the bubble says it again.
  */
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useLine } from "@/components/Gloss";
 import {
   Animated,
@@ -15,6 +15,7 @@ import {
   type StyleProp,
   type ViewStyle,
 } from "react-native";
+import { useIsFocused } from "expo-router";
 
 import { speak } from "@/lib/speech";
 import * as haptics from "@/lib/haptics";
@@ -46,11 +47,18 @@ export function Guide({
   style,
 }: Props) {
   const line = useLine();
+  // A screen under a pushed lesson stays mounted: it waits, so it never cuts off the lesson's
+  // voice, and says a line it has not said yet once it is back in front.
+  const focused = useIsFocused();
+  const said = useRef<string | null>(null);
   useEffect(() => {
-    if (!speakOnMount) return;
-    const timer = setTimeout(() => speak(text), 300);
+    if (!speakOnMount || !focused || said.current === text) return;
+    const timer = setTimeout(() => {
+      said.current = text;
+      speak(text);
+    }, 300);
     return () => clearTimeout(timer);
-  }, [speakOnMount, text]);
+  }, [speakOnMount, text, focused]);
 
   const say = () => {
     haptics.tap();

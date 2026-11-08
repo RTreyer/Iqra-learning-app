@@ -36,6 +36,7 @@ jest.mock("expo-router", () => {
       mockReact.useEffect(() => {
         cb();
       }, [cb]),
+    useIsFocused: () => true,
     Link: ({ children }: { children?: mockReact.ReactNode }) => children ?? null,
   };
 });

@@ -6,7 +6,7 @@
  * for parents.
  */
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useLine } from "@/components/Gloss";
 import {
   Animated,
@@ -18,6 +18,7 @@ import {
   type LayoutChangeEvent,
 } from "react-native";
 import { Circle, Path, Svg } from "react-native-svg";
+import { useIsFocused } from "expo-router";
 
 import * as haptics from "@/lib/haptics";
 import { speak } from "@/lib/speech";
@@ -373,11 +374,22 @@ function PathGuide({
     anim.start(() => setFlying(false));
     return () => anim.stop();
   }, [flight, start]);
+  // The path stays mounted under a pushed lesson: he waits until it is in front again, so he
+  // never cuts off the lesson's voice, and then says the line he has not said yet.
+  const focused = useIsFocused();
+  const said = useRef<string | null>(null);
   useEffect(() => {
+    if (!focused || said.current === text) return;
     // He speaks once he has landed.
-    const timer = setTimeout(() => speak(text), (start ? FLIGHT_MS : 0) + 300);
+    const timer = setTimeout(
+      () => {
+        said.current = text;
+        speak(text);
+      },
+      (start ? FLIGHT_MS : 0) + 300,
+    );
     return () => clearTimeout(timer);
-  }, [text, start]);
+  }, [text, start, focused]);
   const travel = start
     ? [
         {
