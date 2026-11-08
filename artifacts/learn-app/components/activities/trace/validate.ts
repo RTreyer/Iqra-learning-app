@@ -1,6 +1,7 @@
 /**
  * Tracing validation, moved from the legacy writing screen with the same rules.
- * All four checks must pass:
+ * Without a guide (the lines of unit 1), all four checks must pass; with an Arabic guide only
+ * check 1, then checks 5 to 8 below (on the letter, measured against the letter):
  *  1. Stroke count: at least `strokeCount` distinct strokes.
  *  2. Path length: total distance drawn is at least 50 % of the shorter pad side.
  *  3. Bounding box: width at least 20 % of the pad width OR height at least 15 % of the pad height.
@@ -19,6 +20,12 @@ export function validateTracing(
   strokes: Stroke[],
   pad: PadSize,
   strokeCount = 1,
+  /**
+   * With an Arabic guide, checks 2 to 4 are left to validateOnGuide, which measures the drawing
+   * against the letter itself: a small letter such as د, traced exactly along its line, is far
+   * shorter than half the pad and would otherwise always be refused as "too small".
+   */
+  guided = false,
 ): ValidationResult {
   const { width: padW, height: padH } = pad;
   // An unmeasured or collapsed pad cannot be judged; never accept it.
@@ -40,6 +47,7 @@ export function validateTracing(
   }
 
   const all: Point[] = strokes.flat();
+  if (guided) return all.length < 3 ? { valid: false, msg: TOO_SMALL } : { valid: true };
   if (all.length < 10) return { valid: false, msg: TOO_SMALL };
 
   // 2: total path length, summed per stroke.
@@ -88,6 +96,7 @@ export function validateTracing(
 //  7. Whole letter: at least ALONG of the letter's centre line was passed, and at least
 //     BRANCH_PASSED of each of its branches (stem, bar, hook). A thick letter is half covered
 //     by a line through part of it, so check 6 alone lets a skipped hook pass.
+//  8. Size: the drawing is at least LONG_ENOUGH as long as the letter's centre line.
 
 /** Share of drawn points that must lie on the letter. */
 export const ON_LETTER = 0.9;
@@ -99,6 +108,8 @@ export const COVERED = 0.5;
 export const ALONG = 0.9;
 /** Share of each branch of the centre line the drawing must pass. */
 export const BRANCH_PASSED = 0.5;
+/** The drawing must be at least this long, as a share of the letter's centre line. */
+export const LONG_ENOUGH = 0.6;
 /** Shorter branches (in cells) are thinning noise at thick corners and are not checked. */
 const MIN_BRANCH = 4;
 /** Finger tolerance in mask cells (a cell is 2 % of the pad). */
@@ -186,6 +197,10 @@ export function validateOnGuide(
     });
   }
   if (points.length === 0) return { valid: false, msg: COVER_MORE(word) };
+  // Size, against the letter (not the pad): points lie half a cell apart, so the drawing's
+  // length in cells is half the number of points; the centre line has one point per cell.
+  if (spine.length > 0 && points.length / 2 < spine.length * LONG_ENOUGH)
+    return { valid: false, msg: TOO_SMALL };
 
   const onLetter = points.filter(isNear).length;
   if (onLetter / points.length < ON_LETTER) return { valid: false, msg: ON_THE_LETTER(word) };

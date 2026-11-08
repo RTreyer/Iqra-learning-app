@@ -165,7 +165,8 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
     if (locked.current) return;
     const points = strokes.map((s) => s.points);
     const pad = { width: padSize, height: padSize };
-    let result = validateTracing(points, pad, target.strokeCount ?? 1);
+    // With a letter to trace, its size is judged against the letter, not the pad.
+    let result = validateTracing(points, pad, target.strokeCount ?? 1, Boolean(shape));
     // Arabic guides: the drawing must also lie on the letter and cover half of it.
     if (result.valid && shape)
       result = validateOnGuide(

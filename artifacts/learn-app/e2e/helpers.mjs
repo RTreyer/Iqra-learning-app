@@ -292,6 +292,76 @@ export async function traceGuide(page, guide) {
   }
 }
 
+/**
+ * The letter's centre line as strokes of grid cells, the way a child follows it with a finger:
+ * from its right end (Arabic runs right to left), one stroke per connected part, lifting the
+ * finger at a jump (the same walk as strokesAlongGuide in test-utils/trace.ts).
+ */
+function centreLine(guide) {
+  const { spine, grid } = decodeMask(traceGuides[guide].mask, TRACE_GRID);
+  const left = spine.map((i) => ({ r: Math.floor(i / grid), c: i % grid }));
+  const touching = (p) =>
+    left.filter((q) => q !== p && Math.max(Math.abs(q.r - p.r), Math.abs(q.c - p.c)) === 1).length;
+  const strokes = [];
+  while (left.length) {
+    const start = left.reduce((a, b) =>
+      touching(b) < touching(a) || (touching(b) === touching(a) && b.c > a.c) ? b : a,
+    );
+    left.splice(left.indexOf(start), 1);
+    const stroke = [start];
+    let current = start;
+    for (;;) {
+      let best = -1;
+      let bestDistance = Infinity;
+      left.forEach((q, k) => {
+        const d = (q.r - current.r) ** 2 + (q.c - current.c) ** 2;
+        if (d < bestDistance) {
+          bestDistance = d;
+          best = k;
+        }
+      });
+      if (best < 0 || bestDistance > 8) break;
+      current = left.splice(best, 1)[0];
+      stroke.push(current);
+    }
+    strokes.push(stroke);
+  }
+  return { strokes, grid };
+}
+
+/**
+ * Follows a guide along its centre line, as a child does: with the mouse, or with a finger
+ * (touch events; the page needs `hasTouch`).
+ */
+export async function traceAlong(page, guide, { finger = false } = {}) {
+  const pad = page.getByTestId("trace-pad");
+  await expect(pad).toBeVisible();
+  const box = await pad.boundingBox();
+  const { strokes, grid } = centreLine(guide);
+  const at = (p) => ({
+    x: box.x + ((p.c + 0.5) * box.width) / grid,
+    y: box.y + ((p.r + 0.5) * box.height) / grid,
+  });
+  const cdp = finger ? await page.context().newCDPSession(page) : null;
+  for (const stroke of strokes) {
+    if (cdp) {
+      await cdp.send("Input.dispatchTouchEvent", {
+        type: "touchStart",
+        touchPoints: [at(stroke[0])],
+      });
+      for (const p of stroke.slice(1))
+        await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [at(p)] });
+      await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+    } else {
+      await page.mouse.move(at(stroke[0]).x, at(stroke[0]).y);
+      await page.mouse.down();
+      for (const p of stroke.slice(1)) await page.mouse.move(at(p).x, at(p).y, { steps: 2 });
+      await page.mouse.up();
+    }
+  }
+  await cdp?.detach();
+}
+
 /** The stored progress blob, or null before the first write. */
 export async function readProgress(page) {
   return page.evaluate((key) => {

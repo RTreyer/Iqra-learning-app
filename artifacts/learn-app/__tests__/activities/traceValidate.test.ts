@@ -7,7 +7,7 @@ import {
   type Stroke,
 } from "@/components/activities/trace/validate";
 import { TRACE_GRID, traceGuides } from "@/content/generated/traceGuides";
-import { strokesOnGuide } from "@/test-utils/trace";
+import { strokesAlongGuide, strokesOnGuide } from "@/test-utils/trace";
 
 const PAD = { width: 300, height: 300 };
 
@@ -168,6 +168,37 @@ describe("validateOnGuide", () => {
       msg: "اُكتب فوق الكلمة المرسومة ✏️",
     });
     expect(validateOnGuide(strokesOnGuide("بيت"), PAD, shape("بيت"), true).valid).toBe(true);
+  });
+});
+
+describe("a child tracing along the letter", () => {
+  const shape = (guide: string) => decodeMask(traceGuides[guide].mask, TRACE_GRID);
+  /** The whole check the trace activity makes for a letter with a guide. */
+  const judge = (strokes: Stroke[], guide: string) => {
+    const first = validateTracing(strokes, PAD, 1, true);
+    return first.valid ? validateOnGuide(strokes, PAD, shape(guide)) : first;
+  };
+
+  it("accepts every letter and word followed along its line, exactly or with a shaky finger", () => {
+    for (const wobble of [0, 1]) {
+      const refused = Object.keys(traceGuides).filter(
+        (guide) => !judge(strokesAlongGuide(guide, 300, wobble), guide).valid,
+      );
+      expect(refused).toEqual([]);
+    }
+  });
+
+  it("judges the size against the letter, not the pad: a small د traced exactly passes", () => {
+    const strokes = strokesAlongGuide("د");
+    // Against the pad (the old rule) the exact trace of this small letter is "too small".
+    expect(validateTracing(strokes, PAD).valid).toBe(false);
+    expect(judge(strokes, "د")).toEqual({ valid: true });
+  });
+
+  it("still refuses a tiny stroke on the letter, and half of it", () => {
+    const along = strokesAlongGuide("ـل").flat();
+    expect(judge([along.slice(0, 4)], "ـل").valid).toBe(false);
+    expect(judge([along.slice(0, Math.floor(along.length * 0.3))], "ـل").valid).toBe(false);
   });
 });
 

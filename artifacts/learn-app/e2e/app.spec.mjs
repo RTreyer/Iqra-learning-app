@@ -4,6 +4,7 @@
 import fs from "node:fs";
 import { createRequire } from "node:module";
 
+import { getLesson } from "../content/index.ts";
 import { mathBookUnit5 } from "../content/math/bookUnit5.ts";
 
 import {
@@ -28,6 +29,7 @@ import {
   numberFillAnswerButton,
   pictureChoiceAnswer,
   test,
+  traceAlong,
   traceDiagonal,
   traceGuide,
 } from "./helpers.mjs";
@@ -263,6 +265,34 @@ test.describe("activities", () => {
     expect(await earnedStars(page)).toBe(3);
     await expect(page.getByTestId("next-lesson")).toBeVisible();
   });
+
+  // A child follows the letter's line, it does not colour the letter in. Small letters such as
+  // د were once refused as "too small" however exactly they were traced.
+  for (const finger of [false, true]) {
+    test.describe(() => {
+      if (finger)
+        test.use({ hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } });
+      test(`trace: following the letter's line with ${finger ? "a finger" : "the mouse"} is accepted`, async ({
+        page,
+      }) => {
+        for (const lesson of ["u2-24", "u2-8"]) {
+          await gotoAndWaitReady(page, `/lesson/${lesson}`);
+          let previous = null;
+          for (const { guide, label } of getLesson(lesson).lesson.targets) {
+            // Accepted, the pad moves on to the next letter; refused, it stays on the last one.
+            await expect(
+              page.getByTestId("trace-pad"),
+              previous ? `«${previous}» was refused` : undefined,
+            ).toHaveAttribute("aria-label", label);
+            await traceAlong(page, guide, { finger });
+            await page.getByTestId("trace-done").click();
+            previous = guide;
+          }
+          await expect(page.getByTestId("next-lesson"), `«${previous}» was refused`).toBeVisible();
+        }
+      });
+    });
+  }
 
   test("math counting lesson completes with 3 stars", async ({ page }) => {
     expect(await completeQuizLesson(page, "math-u2-1", 6)).toBe(3);
