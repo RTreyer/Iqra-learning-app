@@ -4,7 +4,7 @@
  * - `BowlGoal`: the daily ritual on the home screen and the finish card: every lesson of the day
  *   fills it a little; with three, it is full and the birds come to drink (no streak, no loss);
  * - `Note`: the sheet of paper Rasha tucked under the bowl, folded once;
- * - `BowlMessage`: the bowl with her note clamped under it, «اِسْقِ الطُّيُورَ» and her name.
+ * - `BowlMessage`: the bowl with her note clamped under it, «اِمْلَأِ الصَّحْنَ لِي» and her name.
  *   Each letter lights up once the child has learnt it; the rest stays pale.
  */
 

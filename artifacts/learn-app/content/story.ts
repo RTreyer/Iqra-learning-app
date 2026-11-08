@@ -14,12 +14,12 @@
  *   not by explaining the world but by letting him discover it: Hudhud learns to read, to carry
  *   the letters and to read Rasha's note. Every unit is a delivery and teaches a wisdom
  *   (not every tear is sad; not all we carry is ours; words reach where people no longer can;
- *   it is enough that a letter arrives; do you only sing when someone listens?). At the end a
- *   letter comes from Rasha, and the postman gives him a small empty bag: room for many
- *   stories. The note under the bowl, «اِسْقِ الطُّيُورَ» signed «رَشَا», becomes readable
- *   letter by letter (its letters come in units 2, 3, 6, 7 and 8);
- * - maths: in the Haraz mountains he meets a coffee trader whose helper has gone; he cannot
- *   count his sacks, and the ship in Mocha will not wait. Hudhud helps as Rasha helped him:
+ *   it is enough that a letter arrives; do you only sing when someone listens?). All along he
+ *   learns the letters of Rasha's note under the bowl, «اِمْلَأِ الصَّحْنَ لِي» («fill the bowl
+ *   for me») signed «رَشَا»: it becomes readable letter by letter (its letters come in units 2,
+ *   3, 6, 7 and 8; the last, the ش of her name, in unit 8), and at the end he reads it;
+ * - maths: in Mocha by the Red Sea he meets a coffee trader whose helper has gone; he cannot
+ *   count his sacks, and the ship will not wait. Hudhud helps as Rasha helped him:
  *   sort the ripe cherries, count the sacks, add what the camel brings, give to the neighbours,
  *   load the ship. When it sails, the trader puts out a bowl of water for the birds.
  * The end: on his way home Hudhud sees bowls of water for the birds everywhere, and on his roof
@@ -186,7 +186,7 @@ export const CHAPTERS: Record<ChapterId, readonly StoryScene[]> = {
     },
     {
       id: "home",
-      line: "رَشَا ذَهَبَتْ، لَكِنَّ لُطْفَهَا بَقِيَ. اِسْقِ الطُّيُورَ، يَا صَدِيقِي!",
+      line: "رَشَا ذَهَبَتْ، لَكِنَّ لُطْفَهَا بَقِيَ. اِمْلَأِ الصَّحْنَ، يَا صَدِيقِي!",
       minMs: 4000,
     },
   ],
@@ -264,7 +264,7 @@ export const MAP_PLACES: Record<PlaceId, MapPlace> = {
 export const SOON_LINE = "جَزِيرَةُ سُقُطْرَى! سَأَطِيرُ إِلَيْهَا قَرِيبًا.";
 
 /** Rasha's message in the bowl, read at the end of the Arabic path, and her name. */
-export const MESSAGE = { words: ["اِسْقِ", "الطُّيُورَ"], name: "رَشَا" };
+export const MESSAGE = { words: ["اِمْلَأِ", "الصَّحْنَ", "لِي"], name: "رَشَا" };
 
 /** Where a station is, for its picture (components/world/RashaScenes). */
 export type StationPlace =
@@ -372,12 +372,12 @@ export const STATIONS: Record<string, Station> = {
     place: "post",
     person: "👴",
     feels: "happy",
-    thing: "✉",
-    where: "فِي حَقِيبَةِ سَاعِي الْبَرِيدِ رِسَالَةٌ جَدِيدَةٌ… مِنْ رَشَا!",
-    ask: "هَيَّا نَتَعَلَّمُ الْحُرُوفَ، لِنَقْرَأَ الرِّسَالَةَ!",
-    outro:
-      "رَشَا بِخَيْرٍ فِي بَيْتٍ جَدِيدٍ! وَأَعْطَانِي سَاعِي الْبَرِيدِ حَقِيبَةً فَارِغَةً، لِقِصَصٍ كَثِيرَةٍ.",
+    thing: "📄",
+    where: "بَقِيَ حَرْفٌ مِنِ اسْمِهَا، ثُمَّ أَقْرَأُ وَرَقَةَ رَشَا!",
+    ask: "هَيَّا نَتَعَلَّمُ آخِرَ الْحُرُوفِ!",
+    outro: "تَعَلَّمْنَا آخِرَ الْحُرُوفِ! الْآنَ نَقْرَأُ وَرَقَةَ رَشَا.",
   },
+
   "math-u1": {
     place: "market",
     person: "👨",
@@ -532,8 +532,8 @@ export const giftLine = (sticker: string) => `تِذْكَارٌ مِنَ الر
 
 /** The end of a subject's thread: every lesson done with three stars. */
 export const SUBJECT_DONE: Record<string, string> = {
-  arabic: "قَرَأْنَا رِسَالَةَ رَشَا: اِسْقِ الطُّيُورَ! شُكْرًا لَكَ!",
-  lughati: "قَرَأْنَا رِسَالَةَ رَشَا: اِسْقِ الطُّيُورَ! شُكْرًا لَكَ!",
+  arabic: "قَرَأْنَا وَرَقَةَ رَشَا: اِمْلَأِ الصَّحْنَ لِي! شُكْرًا لَكَ!",
+  lughati: "قَرَأْنَا وَرَقَةَ رَشَا: اِمْلَأِ الصَّحْنَ لِي! شُكْرًا لَكَ!",
   math: "أَبْحَرَتِ السَّفِينَةُ، وَالتَّاجِرُ سَعِيدٌ! شُكْرًا لَكَ!",
   science: "مَا شَاءَ اللهُ! أَتْمَمْتَ كُلَّ الدُّرُوسِ",
 };

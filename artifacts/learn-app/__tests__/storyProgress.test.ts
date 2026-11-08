@@ -145,9 +145,8 @@ test("every unit is a station on Hudhud's journey, and ends with its clue or les
       expect(goalLine(unit.id, kind, true)).toBe(station.outro);
       expect(goalLine(unit.id, kind, false)).toBe(GOAL_LINES[kind].missing);
     }
-  // The last letter comes from Rasha: she is well; and the postman gives Hudhud an empty bag.
-  expect(STATIONS.a8.outro).toContain("بِخَيْرٍ");
-  expect(STATIONS.a8.outro).toContain("حَقِيبَةً فَارِغَةً");
+  // The last unit brings the last letters: then Hudhud reads Rasha's note.
+  expect(STATIONS.a8.outro).toContain("وَرَقَةَ رَشَا");
   // The postman's central wisdom: words reach where people cannot.
   expect(Object.values(STATIONS).some((s) => s.outro.includes("الْكَلِمَاتُ تَصِلُ"))).toBe(true);
   // The trader's ship sails, and he passes Rasha's kindness on: water for the birds.
@@ -164,6 +163,14 @@ test("Rasha's message becomes readable only with the letters of the whole book",
   const unit2 = new Set(getUnit("a2")!.lessons.map((l) => l.id));
   const after2 = learntLetters(arabic.units, (l) => unit2.has(l.id));
   expect([...letters].some((l) => l !== "ا" && !after2.has(l))).toBe(true);
+  // Not before the last unit: the ش of her name comes in unit 8.
+  const before8 = new Set(
+    arabic.units.filter((u) => u.id !== "a8").flatMap((u) => u.lessons.map((l) => l.id)),
+  );
+  const almost = learntLetters(arabic.units, (l) => before8.has(l.id));
+  expect([...letters].filter((l) => l !== "ا" && !almost.has(l))).toEqual(["ش"]);
+  // «Fill the bowl for me», signed Rasha.
+  expect(MESSAGE.words.join(" ")).toBe("اِمْلَأِ الصَّحْنَ لِي");
 });
 
 test("one more sack goes on the ship with every maths unit finished; with all it sails", () => {
