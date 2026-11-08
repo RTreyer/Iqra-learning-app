@@ -135,7 +135,7 @@ export function YemenMap({
   };
   const home = at(HOME_PLACE);
   // A place in Sana'a itself (the postman's alley) takes the home's spot: no separate marker,
-  // no way to fly there; Rasha's bowl stands beside it.
+  // no way to fly there.
   const atHome = (place: PlaceId) =>
     MAP_PLACES[place].lon === HOME_PLACE.lon && MAP_PLACES[place].lat === HOME_PLACE.lat;
   const homeIsPlace = pins.some(({ place }) => atHome(place));
@@ -215,11 +215,8 @@ export function YemenMap({
             })}
           </Svg>
           {/* Home: Rasha's bowl on the roof in Sana'a, and Hudhud, her note under his wing. */}
-          {homeIsPlace ? (
-            <View style={[styles.home, { left: home.left - 52, top: home.top + 8 }]}>
-              <BowlArt width={34} level={0} />
-            </View>
-          ) : (
+          {/* When a place is in Sana'a itself, its badge marks home; else Rasha's bowl does. */}
+          {homeIsPlace ? null : (
             <View style={[styles.home, { left: home.left - 28, top: home.top - 16 }]}>
               <BowlArt width={40} level={0} />
               <Text style={styles.homeName}>{line(HOME_PLACE.name)}</Text>
