@@ -605,8 +605,8 @@ export const EN_LINES: Record<string, string> = {
   "رَجُلُ الْمُرُورِ": "The traffic policeman",
   "رَسَمْنَا خَطًّا جَدِيدًا!": "We drew a new line!",
   رَشَا: "Rasha",
-  "رَشَا ذَهَبَتْ، لَكِنَّ لُطْفَهَا بَقِيَ. اِمْلَأِ الصَّحْنَ، يَا صَدِيقِي!":
-    "Rasha is gone, but her kindness stayed. Fill the bowl, my friend!",
+  "رَشَا ذَهَبَتْ، لَكِنَّ كَلِمَاتِهَا وَصَلَتْ، وَلُطْفَهَا بَقِيَ.":
+    "Rasha is gone, but her words arrived, and her kindness stayed.",
   "رَشَا سَقَتْنَا حِينَ كُنَّا عِطَاشًا. الْآنَ جَاءَ دَوْرِي: سَأَبْحَثُ عَنْهَا!":
     "Rasha gave us water when we were thirsty. Now it is my turn: I will look for her!",
   "رَشِيدَةُ وَالْفَرَاشَاتُ": "Rashida and the butterflies",
@@ -718,6 +718,8 @@ export const EN_LINES: Record<string, string> = {
     "In the garden a bulbul sings alone. And we have a letter, and we do not know whom it is for.",
   "فِي الْمُخَا، عِنْدَ الْبَحْرِ، وَجَدْتُ تَاجِرَ بُنٍّ حَزِينًا. ذَهَبَ مَنْ كَانَ يُسَاعِدُهُ.":
     "In Mocha, by the sea, I found a sad coffee trader. The one who helped him has gone.",
+  "فِي بَيْتِ رَشَا تَسْكُنُ الْآنَ بِنْتٌ صَغِيرَةٌ. حَمَلْتُ إِلَيْهَا الْوَرَقَةَ.":
+    "A little girl lives in Rasha's house now. I carried the note to her.",
   "فِي زُقَاقٍ قَدِيمٍ فِي صَنْعَاءَ، رَأَيْتُ رَجُلًا عَجُوزًا يَحْمِلُ حَقِيبَةً كَبِيرَةً.":
     "In an old alley in Sana'a, I saw an old man carrying a big bag.",
   "فِي سَاحَةِ الْمَدْرَسَةِ ذَهَبَ وَلَدٌ وَبِنْتٌ. كَمِ الْبَاقِي؟":
@@ -739,6 +741,9 @@ export const EN_LINES: Record<string, string> = {
     "The postman said: do you only sing when someone listens?",
   "قَالَ: تَعَالَ مَعِي، وَتَعَلَّمِ الْقِرَاءَةَ. سَتَقْرَأُ الْأَسْمَاءَ، وَوَرَقَةَ رَشَا!":
     "He said: come with me, and learn to read. You will read the names, and Rasha's note!",
+  "قَرَأَتِ الْوَرَقَةَ، وَمَلَأَتِ الصَّحْنَ!": "She read the note, and filled the bowl!",
+  "قَرَأْتُ وَرَقَةَ رَشَا: اِمْلَأِ الصَّحْنَ لِي. لَكِنِّي طَائِرٌ، لَا أَسْتَطِيعُ!":
+    "I read Rasha's note: Fill the bowl for me. But I am a bird, I cannot!",
   "قَرَأْنَا وَرَقَةَ رَشَا: اِمْلَأِ الصَّحْنَ لِي! شُكْرًا لَكَ!":
     "We read Rasha's note: Fill the bowl for me! Thank you!",
   "قَرَأْنَا!": "We read it!",
@@ -925,8 +930,6 @@ export const EN_LINES: Record<string, string> = {
   وَصْفٌ: "Description",
   "وَضَعْتُ وَرَقَتَهَا تَحْتَ جَنَاحِي، وَخَرَجْتُ أَبْحَثُ عَنْهَا!":
     "I tucked her note under my wing and went out to look for her!",
-  "وَعَلَى سَطْحِي، بِنْتٌ صَغِيرَةٌ تَمْلَأُ صَحْنَ رَشَا.":
-    "And on my roof, a little girl fills Rasha's bowl.",
   "وَهٰذَا سُلُوكٌ خَاطِئٌ، أَضْغَطُ عَلَامَةَ الْخَطَأِ.":
     "And this is the wrong behaviour, so I tap the cross.",
   "ي و أ مع الحركات": "ي و أ with vowel marks",

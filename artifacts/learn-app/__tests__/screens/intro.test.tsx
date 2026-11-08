@@ -131,7 +131,17 @@ test("Hudhud's story: Rasha, her bowl and the note he cannot read, then two thre
     "bowl",
   ]);
   expect(CHAPTERS.math.map((s) => s.id)).toEqual(["trader", "sacks"]);
-  expect(CHAPTERS.end.map((s) => s.id)).toEqual(["return", "newgirl", "home"]);
+  expect(CHAPTERS.end.map((s) => s.id)).toEqual([
+    "return",
+    "readnote",
+    "deliver",
+    "newgirl",
+    "home",
+  ]);
+  // The end: he reads her note at last, cannot do what it asks, and carries it to the girl.
+  const end = (id: string) => CHAPTERS.end.find((s) => s.id === id)!.line;
+  expect(end("readnote")).toContain("اِمْلَأِ الصَّحْنَ لِي");
+  expect(end("deliver")).toContain("حَمَلْتُ إِلَيْهَا الْوَرَقَةَ");
 });
 
 test("a thread tells its beginning, then opens its path and is remembered", async () => {

@@ -1479,6 +1479,95 @@ function Return() {
   );
 }
 
+/** Reading her note, he marvels; then he sees he cannot do what it asks. */
+const READNOTE_ACTS = [[2700, "sad"]] as const;
+/** He flies in with the note and lands; she marvels at the bird, reads, and beams. */
+const DELIVER_ACTS = [
+  [1900, "stand"],
+  [3600, "cheer"],
+] as const;
+const DELIVER_MOOD = [
+  [1700, "wonder"],
+  [3300, "happy"],
+] as const;
+
+/**
+ * At last he reads Rasha's note, every letter in ink: «fill the bowl for me». He marvels,
+ * then hangs his head: a bird cannot fill a bowl.
+ */
+function ReadNote() {
+  const glow = useSwing(1100, 400);
+  const act = useTimeline<"wonder" | "sad">("wonder", READNOTE_ACTS);
+  return (
+    <View style={styles.scene}>
+      <Rooftop dusk />
+      <View style={styles.bowlOnWall}>
+        <BowlArt width={96} level={0} />
+      </View>
+      <Animated.View style={[styles.readNote, { transform: [{ scale: lerp(glow, 1, 1.03) }] }]}>
+        {/* Read at last: the words joined, as she wrote them. */}
+        <Note width={210} style={styles.unfolded}>
+          <Text style={styles.readWords}>{MESSAGE.words.join(" ")}</Text>
+          <Text style={styles.readName}>{MESSAGE.name}</Text>
+        </Note>
+      </Animated.View>
+      <View style={styles.drinker}>
+        <Hudhud size={86} hop={false} pose={act} />
+      </View>
+    </View>
+  );
+}
+
+/**
+ * So he carries her words to someone who can: he flies to Rasha's old house, where a little girl
+ * lives now, and hands her the note. She marvels at the bird, reads, and beams.
+ */
+function Deliver() {
+  const fly = useOnce(1600, 300, Easing.out(Easing.quad));
+  const hand = useOnce(700, 1900, Easing.inOut(Easing.quad));
+  const act = useTimeline<Act>("fly", DELIVER_ACTS);
+  const mood = useTimeline<RashaMood>("smile", DELIVER_MOOD);
+  const inFlight = { translateX: lerp(fly, 200, 0) };
+  return (
+    <View style={styles.scene}>
+      <SanaaAlley />
+      <View style={styles.oldHouseDoor}>
+        <Art art="door" size={100} />
+      </View>
+      <View style={styles.newGirlAtDoor}>
+        <Rasha size={112} dress="#2E8BC0" mood={mood} />
+      </View>
+      <Animated.View
+        style={[styles.deliverBird, { transform: [inFlight, { translateY: lerp(fly, -130, 0) }] }]}
+      >
+        <Hudhud
+          size={74}
+          hop={act === "cheer"}
+          flap={act === "fly"}
+          pose={act === "cheer" ? "cheer" : "stand"}
+        />
+      </Animated.View>
+      {/* The note: in his beak as he flies, then into her hands. */}
+      <Animated.View
+        style={[
+          styles.carriedNote,
+          {
+            transform: [
+              { translateX: Animated.add(lerp(fly, 200, 0), lerp(hand, 0, -78)) },
+              { translateY: Animated.add(lerp(fly, -130, 0), lerp(hand, 0, 14)) },
+              { rotate: at(hand, [0, 1], ["-10deg", "4deg"]) },
+            ],
+          },
+        ]}
+      >
+        <Note width={46}>
+          <NoteLetters readable={() => true} size={5} />
+        </Note>
+      </Animated.View>
+    </View>
+  );
+}
+
 /** On Hudhud's roof a little girl, new in the house, fills Rasha's bowl; he drinks. */
 function NewGirl() {
   // She walks onto the roof with her jug, then pours.
@@ -1794,6 +1883,8 @@ const SCENES: Record<
   trader: Trader,
   sacks: Sacks,
   return: Return,
+  readnote: ReadNote,
+  deliver: Deliver,
   newgirl: NewGirl,
   home: Home,
   station: Station,
@@ -2094,6 +2185,13 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
   togetherBird: { marginLeft: -6, marginBottom: 6 },
+  readNote: { position: "absolute", top: 18, left: 0, right: 0, alignItems: "center" },
+  readWords: { fontSize: 28, fontWeight: "900", color: INK, lineHeight: 42 },
+  readName: { fontSize: 20, fontWeight: "800", color: INK, lineHeight: 30 },
+  oldHouseDoor: { position: "absolute", left: 24, bottom: 52 },
+  newGirlAtDoor: { position: "absolute", left: 104, bottom: 32 },
+  deliverBird: { position: "absolute", left: 196, bottom: 36 },
+  carriedNote: { position: "absolute", left: 186, bottom: 50 },
   flyNote: { position: "absolute", left: 150, bottom: 104 },
   postman: { position: "absolute", left: 16, bottom: 18 },
   flyingLetter: { position: "absolute", left: 90, bottom: 110 },

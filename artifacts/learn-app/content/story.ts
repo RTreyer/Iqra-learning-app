@@ -22,8 +22,11 @@
  *   count his sacks, and the ship will not wait. Hudhud helps as Rasha helped him:
  *   sort the ripe cherries, count the sacks, add what the camel brings, give to the neighbours,
  *   load the ship. When it sails, the trader puts out a bowl of water for the birds.
- * The end: on his way home Hudhud sees bowls of water for the birds everywhere, and on his roof
- * a little girl fills Rasha's bowl. Rasha is gone, her kindness stayed. Spoken by the app's
+ * The end: on his way home Hudhud sees bowls of water for the birds everywhere. He reads Rasha's
+ * note at last, «fill the bowl for me», and cannot do it: a bird cannot fill a bowl. So, as the
+ * postman taught him, he carries her words to someone who can: the little girl who now lives in
+ * Rasha's house. She reads the note and fills the bowl. Rasha is gone, but her words arrived and
+ * her kindness stayed. Spoken by the app's
  * voice, fully vocalised, simple Fusha. Native speaker review pending (docs/CONTENT_REVIEW.md).
  */
 
@@ -52,6 +55,8 @@ export type StorySceneId =
   | "trader"
   | "sacks"
   | "return"
+  | "readnote"
+  | "deliver"
   | "newgirl"
   | "home"
   | "station";
@@ -179,14 +184,26 @@ export const CHAPTERS: Record<ChapterId, readonly StoryScene[]> = {
       line: "رَجَعْتُ إِلَى صَنْعَاءَ. وَفِي الطَّرِيقِ، رَأَيْتُ صُحُونَ مَاءٍ لِلطُّيُورِ فِي كُلِّ مَكَانٍ!",
       minMs: 4400,
     },
+    // At last he reads her note, and cannot do what it asks: a bird cannot fill a bowl.
+    {
+      id: "readnote",
+      line: "قَرَأْتُ وَرَقَةَ رَشَا: اِمْلَأِ الصَّحْنَ لِي. لَكِنِّي طَائِرٌ، لَا أَسْتَطِيعُ!",
+      minMs: 4600,
+    },
+    // So he carries her words, as the postman taught him, to someone who can.
+    {
+      id: "deliver",
+      line: "فِي بَيْتِ رَشَا تَسْكُنُ الْآنَ بِنْتٌ صَغِيرَةٌ. حَمَلْتُ إِلَيْهَا الْوَرَقَةَ.",
+      minMs: 4600,
+    },
     {
       id: "newgirl",
-      line: "وَعَلَى سَطْحِي، بِنْتٌ صَغِيرَةٌ تَمْلَأُ صَحْنَ رَشَا.",
-      minMs: 3600,
+      line: "قَرَأَتِ الْوَرَقَةَ، وَمَلَأَتِ الصَّحْنَ!",
+      minMs: 4400,
     },
     {
       id: "home",
-      line: "رَشَا ذَهَبَتْ، لَكِنَّ لُطْفَهَا بَقِيَ. اِمْلَأِ الصَّحْنَ، يَا صَدِيقِي!",
+      line: "رَشَا ذَهَبَتْ، لَكِنَّ كَلِمَاتِهَا وَصَلَتْ، وَلُطْفَهَا بَقِيَ.",
       minMs: 4000,
     },
   ],
