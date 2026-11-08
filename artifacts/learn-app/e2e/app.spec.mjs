@@ -1,5 +1,5 @@
 // End to end suite for the routes: /, /book/[bookId], /unit/[unitId], /lesson/[lessonId], /album, /parents.
-// Runs with: pnpm test:e2e (expo export, then playwright test; playwright.config.ts serves dist/ on 8787).
+// Runs with: pnpm test:e2e (expo export, then playwright test; playwright.config.ts serves dist/ on E2E_PORT, default 8787).
 // Every test starts from a fresh browser context; the page fixture fails a test on any console error.
 import fs from "node:fs";
 import { createRequire } from "node:module";
@@ -473,7 +473,11 @@ test.describe("accessibility", () => {
   let axePath = null;
   try {
     axePath = require.resolve("axe-core/axe.min.js");
-  } catch {}
+  } catch {
+    // CI must run the check, not skip it unnoticed.
+    if (process.env.CI)
+      throw new Error("axe-core is not installed; the accessibility test cannot run");
+  }
 
   test("axe: no serious or critical color contrast violations on home, book, unit, lesson, album, intro", async ({
     page,
@@ -485,7 +489,8 @@ test.describe("accessibility", () => {
       await gotoAndWaitReady(page, path);
       if (path.startsWith("/lesson/"))
         await expect(page.getByTestId("story-progress")).toHaveAttribute("aria-valuenow", "1");
-      await page.addScriptTag({ content: axeSource });
+      // An inline script tag would be blocked by the Content-Security-Policy; evaluate is not.
+      await page.evaluate(axeSource);
       const violations = await page.evaluate(async () => {
         // axe's own matcher drops text it takes for an icon ligature, and its canvas check flags
         // shaped Arabic as one, so nearly all Arabic text would be skipped. Match visible,
