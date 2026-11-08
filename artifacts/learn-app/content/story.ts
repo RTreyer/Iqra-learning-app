@@ -95,7 +95,8 @@ export const INTRO_STORY: readonly StoryScene[] = [
   {
     id: "days",
     line: "اِسْمُهَا رَشَا. كُلَّ صَبَاحٍ، كُنْتُ أَنْتَظِرُهَا، وَكَانَتْ تَأْتِي.",
-    minMs: 6000,
+    // Two whole days: she comes, waves, fills the bowl, goes; night; again.
+    minMs: 7200,
   },
   {
     id: "leave",

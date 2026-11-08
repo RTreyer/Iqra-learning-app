@@ -154,6 +154,9 @@ const NEWGIRL_MOOD = [
   [3600, "happy"],
 ] as const;
 
+/** One day on the roof, from morning to night (the days scene). */
+const DAY_MS = 3400;
+
 /** Hudhud's thought bubbles in the resolve scene: left, top and size, from his head upwards. */
 const THOUGHT_DOTS: [number, number, number][] = [
   [212, 150, 10],
@@ -572,8 +575,19 @@ function Why() {
  * comes with water; Hudhud waits for her on the wall.
  */
 function Days() {
-  const day = useLoop(2800, 300);
-  const visit = at(day, [0, 0.14, 0.22, 0.58, 0.66, 1], [0, 0, 1, 1, 0, 0]);
+  const day = useLoop(DAY_MS, 300);
+  // Each morning she walks in from the side, stays and waves while the bowl fills, and walks
+  // off again before evening. Her steps follow the day's clock.
+  const visit = at(day, [0, 0.1, 0.24, 0.56, 0.7, 1], [-150, -150, 0, 0, -150, -150]);
+  const [phase, setPhase] = useState<"away" | "walk" | "stand">("away");
+  useEffect(() => {
+    const id = day.addListener(({ value }) => {
+      const next =
+        value < 0.1 || value >= 0.7 ? "away" : value < 0.24 || value >= 0.56 ? "walk" : "stand";
+      setPhase((current) => (current === next ? current : next));
+    });
+    return () => day.removeListener(id);
+  }, [day]);
   return (
     <View style={styles.scene}>
       <Rooftop
@@ -593,8 +607,13 @@ function Days() {
           </Animated.View>
         }
       />
-      <Animated.View style={[styles.rasha, { opacity: visit }]}>
-        <Rasha size={140} pose="wave" mood="happy" />
+      <Animated.View style={[styles.rasha, { transform: [{ translateX: visit }] }]}>
+        <Rasha
+          size={140}
+          pose={phase === "stand" ? "wave" : "stand"}
+          walking={phase === "walk"}
+          mood="happy"
+        />
       </Animated.View>
       <View style={styles.bowlOnWall}>
         <BowlArt width={96} level={0} />
