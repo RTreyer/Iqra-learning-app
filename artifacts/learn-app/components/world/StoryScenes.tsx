@@ -504,6 +504,7 @@ function Drink() {
         style={[
           styles.sparrow,
           {
+            opacity: at(sparrow, [0, 0.05], [0, 1]),
             transform: [
               { translateX: lerp(sparrow, -60, 0) },
               { translateY: at(sparrow, [0, 1], [-120, 0]) },
@@ -518,6 +519,7 @@ function Drink() {
         style={[
           styles.dove,
           {
+            opacity: at(dove, [0, 0.05], [0, 1]),
             transform: [
               { translateX: lerp(dove, 70, 0) },
               { translateY: at(dove, [0, 1], [-140, 0]) },
@@ -804,7 +806,7 @@ function Inscription() {
     return () => clearTimeout(t);
   }, []);
   const out = {
-    transform: [{ translateY: lerp(pull, 0, 124) }, { translateX: lerp(pull, 0, 24) }],
+    transform: [{ translateY: lerp(pull, 0, 108) }, { translateX: lerp(pull, 0, 24) }],
   };
   return (
     <View style={styles.scene}>
@@ -824,7 +826,7 @@ function Inscription() {
           ]}
         >
           <Note width={150}>
-            <NoteLetters readable={() => false} size={18} />
+            <NoteLetters readable={() => false} size={14} />
           </Note>
         </Animated.View>
         <View style={styles.bowlOver}>
@@ -1167,8 +1169,13 @@ function Ask() {
         style={[
           styles.askLetter,
           {
-            opacity: at(out, [0, 0.2], [0, 1]),
-            transform: [{ translateY: lerp(out, 40, 0) }, { scale: lerp(glow, 1, 1.08) }],
+            opacity: at(out, [0, 0.25], [0, 1]),
+            transform: [
+              { translateX: lerp(out, -60, 0) },
+              { translateY: lerp(out, 60, 0) },
+              { scale: at(out, [0, 1], [0.5, 1]) },
+              { rotate: at(glow, [0, 1], ["-4deg", "4deg"]) },
+            ],
           },
         ]}
       >
@@ -1194,6 +1201,8 @@ function Ask() {
  */
 function Bread() {
   const give = useOnce(1200, 400, Easing.inOut(Easing.quad));
+  // Pecked up: the bread gets smaller and is gone.
+  const eaten = useOnce(500, 2200, Easing.in(Easing.quad));
   const peck = useSwing(260, 1700);
   const heart = useOnce(900, 2600, Easing.out(Easing.back(1.6)));
   const act = useTimeline<Act>("wonder", BREAD_ACTS);
@@ -1207,10 +1216,11 @@ function Bread() {
         style={[
           styles.breadPiece,
           {
-            opacity: at(give, [0, 0.1, 1], [0, 1, 1]),
+            opacity: Animated.multiply(at(give, [0, 0.1, 1], [0, 1, 1]), lerp(eaten, 1, 0)),
             transform: [
               { translateX: lerp(give, 0, 120) },
-              { translateY: at(give, [0, 0.5, 1], [0, -30, 20]) },
+              { translateY: at(give, [0, 0.5, 1], [0, -30, 67]) },
+              { scale: lerp(eaten, 1, 0.3) },
             ],
           },
         ]}
@@ -2153,7 +2163,7 @@ const styles = StyleSheet.create({
   wayBird: { position: "absolute", right: 18, bottom: 22 },
   flyingHome: { position: "absolute", left: "38%", top: 40 },
   newGirlBird: { left: 236 },
-  postBox: { position: "absolute", right: 70, bottom: 54 },
+  postBox: { position: "absolute", left: 14, bottom: 54 },
   alleyDoor: { position: "absolute", left: 16, bottom: 52 },
   alleyPostman: { position: "absolute", left: 100, bottom: 30 },
   watcher: { position: "absolute", right: 16, bottom: 36 },
@@ -2167,8 +2177,8 @@ const styles = StyleSheet.create({
   askPostman: { position: "absolute", left: 30, bottom: 28 },
   askLetter: {
     position: "absolute",
-    left: 120,
-    top: 70,
+    left: 104,
+    top: 138,
     alignItems: "center",
     justifyContent: "center",
   },
