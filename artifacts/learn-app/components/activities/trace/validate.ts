@@ -1,7 +1,8 @@
 /**
  * Tracing validation, moved from the legacy writing screen with the same rules.
- * Without a guide (the lines of unit 1), all four checks must pass; with an Arabic guide only
- * check 1, then checks 5 to 8 below (on the letter, measured against the letter):
+ * Without a generated guide, all four checks must pass; with one (every letter, word and line
+ * drawing of the books) only check 1, then checks 5 to 8 below (on the letter, measured against
+ * the letter):
  *  1. Stroke count: at least `strokeCount` distinct strokes.
  *  2. Path length: total distance drawn is at least 50 % of the shorter pad side.
  *  3. Bounding box: width at least 20 % of the pad width OR height at least 15 % of the pad height.
@@ -21,7 +22,7 @@ export function validateTracing(
   pad: PadSize,
   strokeCount = 1,
   /**
-   * With an Arabic guide, checks 2 to 4 are left to validateOnGuide, which measures the drawing
+   * With a generated guide, checks 2 to 4 are left to validateOnGuide, which measures the drawing
    * against the letter itself: a small letter such as د, traced exactly along its line, is far
    * shorter than half the pad and would otherwise always be refused as "too small".
    */

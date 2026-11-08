@@ -195,6 +195,28 @@ describe("a child tracing along the letter", () => {
     expect(judge(strokes, "د")).toEqual({ valid: true });
   });
 
+  it("checks the line drawings of unit 1 like letters: followed they pass, another line does not", () => {
+    const line = (x0: number, y0: number, x1: number, y1: number): Stroke[] => [
+      Array.from({ length: 30 }, (_, k) => ({
+        x: x0 + ((x1 - x0) * k) / 29,
+        y: y0 + ((y1 - y0) * k) / 29,
+      })),
+    ];
+    const across = line(255, 45, 45, 255);
+    const level = line(240, 150, 60, 150);
+    const upright = line(150, 54, 150, 246);
+    for (const guide of ["ـــ", "|", "/", "◯", "〰"]) {
+      expect(judge(strokesAlongGuide(guide), guide).valid).toBe(true);
+      expect(judge(across, guide).valid).toBe(false);
+      const half = strokesAlongGuide(guide).flat();
+      expect(judge([half.slice(0, Math.floor(half.length * 0.4))], guide).valid).toBe(false);
+    }
+    expect(judge(level, "ـــ").valid).toBe(true);
+    expect(judge(upright, "|").valid).toBe(true);
+    for (const guide of ["|", "/", "◯", "〰"]) expect(judge(level, guide).valid).toBe(false);
+    for (const guide of ["ـــ", "/", "◯", "〰"]) expect(judge(upright, guide).valid).toBe(false);
+  });
+
   it("still refuses a tiny stroke on the letter, and half of it", () => {
     const along = strokesAlongGuide("ـل").flat();
     expect(judge([along.slice(0, 4)], "ـل").valid).toBe(false);

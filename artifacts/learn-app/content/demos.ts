@@ -198,8 +198,8 @@ export const DEMOS: { [K in LessonType]: Demo<K> } & { trace_lines: Demo<"trace"
       {
         trace: { testID: "trace-pad" },
         path: [
-          { x: 0.78, y: 0.535 },
-          { x: 0.22, y: 0.535 },
+          { x: 0.78, y: 0.5 },
+          { x: 0.22, y: 0.5 },
         ],
       },
       say("ثُمَّ أَضْغَطُ تَمَّ."),

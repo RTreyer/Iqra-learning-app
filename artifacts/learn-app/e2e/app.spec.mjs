@@ -285,7 +285,12 @@ test.describe("activities", () => {
               previous ? `«${previous}» was refused` : undefined,
             ).toHaveAttribute("aria-label", label);
             await traceAlong(page, guide, { finger });
-            await page.getByTestId("trace-done").click();
+            const done = page.getByTestId("trace-done");
+            if (finger) {
+              // The finger travels from the pad to the button, and taps it.
+              await page.waitForTimeout(200);
+              await done.tap();
+            } else await done.click();
             previous = guide;
           }
           await expect(page.getByTestId("next-lesson"), `«${previous}» was refused`).toBeVisible();

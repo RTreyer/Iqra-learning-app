@@ -1,6 +1,10 @@
-// Builds content/generated/traceGuides.ts: for every Arabic trace guide in the catalog, the
-// outline the child traces over (an SVG path in a 100 × 100 box) and a coarse mask of where
-// the letters are, used to check that the child wrote on the letter (trace/validate.ts).
+// Builds content/generated/traceGuides.ts: for every trace guide in the catalog, the outline
+// the child traces over (an SVG path in a 100 × 100 box) and a coarse mask of where the letters
+// are, used to check that the child wrote on the letter (trace/validate.ts).
+//
+// The line drawings of unit 1 (a straight line, a circle, a wave) are no letters: they are drawn
+// here from their centre lines (LINE_SHAPES), large and as thick as a letter's stroke, and then
+// checked like letters.
 //
 // The guide is shaped with HarfBuzz (joined Arabic forms) in Noto Naskh Arabic Bold
 // (scripts/fonts, SIL Open Font License 1.1), so what the child sees is exactly what is checked,
@@ -187,16 +191,133 @@ function buildGuide(font, text, letterScale) {
   return { d, mask: Buffer.from(bits).toString("base64") };
 }
 
+/** Thickness of a drawn line, in box units: about the stroke of a letter. */
+const LINE_WIDTH = 9;
+const circlePoints = (cx, cy, r, n = 64) =>
+  Array.from({ length: n }, (_, k) => {
+    // From the top, anticlockwise on screen, as a circle is begun in Arabic handwriting.
+    const a = -Math.PI / 2 - (2 * Math.PI * k) / n;
+    return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+  });
+const wavePoints = (x0, x1, cy, amplitude, waves, n = 64) =>
+  Array.from({ length: n + 1 }, (_, k) => {
+    const t = k / n;
+    return [x0 + (x1 - x0) * t, cy - amplitude * Math.sin(2 * Math.PI * waves * t)];
+  });
+
+/**
+ * The line drawings of unit 1 and of the line tracing example (content/demos.ts): centre lines
+ * in the box, in the direction the child is asked to draw (Arabic runs from the right), and
+ * whether the line closes on itself.
+ */
+const LINE_SHAPES = {
+  ـــ: {
+    points: [
+      [78, 50],
+      [22, 50],
+    ],
+  },
+  "—": {
+    points: [
+      [78, 50],
+      [22, 50],
+    ],
+  },
+  "|": {
+    points: [
+      [50, 18],
+      [50, 82],
+    ],
+  },
+  "/": {
+    points: [
+      [68, 18],
+      [32, 82],
+    ],
+  },
+  "◯": { points: circlePoints(50, 50, 30), closed: true },
+  "〰": { points: wavePoints(80, 20, 50, 11, 2) },
+};
+
+/** Distance from (x, y) to the segment a–b. */
+function toSegment(x, y, [ax, ay], [bx, by]) {
+  const dx = bx - ax;
+  const dy = by - ay;
+  const t = Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / (dx * dx + dy * dy || 1)));
+  return Math.hypot(x - ax - t * dx, y - ay - t * dy);
+}
+
+/** A thick line along `points`: its outline (with round ends) and the cells it covers. */
+function buildLine({ points, closed = false }) {
+  const half = LINE_WIDTH / 2;
+  const segments = points.map((p, k) => [p, points[k + 1] ?? (closed ? points[0] : null)]);
+  const open = segments.filter(([, b]) => b);
+  /** The centre line pushed sideways by `side` × half the width (normals averaged at the joints). */
+  const offset = (side) =>
+    points.map((p, k) => {
+      const prev = points[k - 1] ?? (closed ? points.at(-1) : null);
+      const next = points[k + 1] ?? (closed ? points[0] : null);
+      const normal = ([ax, ay], [bx, by]) => {
+        const len = Math.hypot(bx - ax, by - ay);
+        return [-(by - ay) / len, (bx - ax) / len];
+      };
+      const ns = [prev && normal(prev, p), next && normal(p, next)].filter(Boolean);
+      const nx = ns.reduce((s, n) => s + n[0], 0) / ns.length;
+      const ny = ns.reduce((s, n) => s + n[1], 0) / ns.length;
+      const len = Math.hypot(nx, ny);
+      return [p[0] + (side * half * nx) / len, p[1] + (side * half * ny) / len];
+    });
+  const path = (pts) => "M" + pts.map(([x, y]) => `${round(x)} ${round(y)}`).join("L") + "Z";
+  let d;
+  if (closed) {
+    // A ring: the outer edge, then the inner edge the other way round (nonzero fill).
+    d = path(offset(1)) + path(offset(-1).reverse());
+  } else {
+    // Along one side, round the end, back along the other side, round the start.
+    const cap = (p, from) =>
+      Array.from({ length: 9 }, (_, k) => {
+        const a = from + (Math.PI * (k + 1)) / 10;
+        return [p[0] + half * Math.cos(a), p[1] + half * Math.sin(a)];
+      });
+    const left = offset(1);
+    const right = offset(-1);
+    const angle = ([ax, ay], [bx, by]) => Math.atan2(by - ay, bx - ax);
+    const end = points.at(-1);
+    const start = points[0];
+    d = path([
+      ...left,
+      ...cap(end, angle(points.at(-2), end) + Math.PI / 2),
+      ...right.reverse(),
+      ...cap(start, angle(points[1], start) + Math.PI / 2),
+    ]);
+  }
+  const cell = BOX / GRID;
+  const bits = new Uint8Array(Math.ceil((GRID * GRID) / 8));
+  for (let row = 0; row < GRID; row++) {
+    for (let col = 0; col < GRID; col++) {
+      const x = (col + 0.5) * cell;
+      const y = (row + 0.5) * cell;
+      if (!open.some(([a, b]) => toSegment(x, y, a, b) <= half)) continue;
+      const i = row * GRID + col;
+      bits[i >> 3] |= 1 << (i & 7);
+    }
+  }
+  return { d, mask: Buffer.from(bits).toString("base64") };
+}
+
 const guides = new Set();
+const lines = new Set();
+const collect = (guide) => {
+  if (guide in LINE_SHAPES) lines.add(guide);
+  else if (ARABIC.test(guide)) guides.add(guide);
+};
 for (const book of books)
   for (const unit of book.units)
     for (const lesson of unit.lessons)
-      if (lesson.type === "trace")
-        for (const target of lesson.targets)
-          if (ARABIC.test(target.guide)) guides.add(target.guide);
-// The worked example traces a letter of its own (content/demos.ts).
-for (const target of DEMOS.trace.lesson.targets)
-  if (ARABIC.test(target.guide)) guides.add(target.guide);
+      if (lesson.type === "trace") for (const target of lesson.targets) collect(target.guide);
+// The worked examples trace a letter and a line of their own (content/demos.ts).
+for (const target of [...DEMOS.trace.lesson.targets, ...DEMOS.trace_lines.lesson.targets])
+  collect(target.guide);
 
 /**
  * Arabic-Indic digits (٠ to ٩). At letter size they would be about a third of the box, too
@@ -211,9 +332,13 @@ const letterScale = Math.min(
     .filter((text) => !DIGITS.test(text) && letterCount(text) === 1)
     .map((text) => measure(font, text).fit),
 );
-const entries = [...guides]
-  .sort()
-  .map((text) => [text, buildGuide(font, text, DIGITS.test(text) ? Infinity : letterScale)]);
+const entries = [
+  ...[...guides].map((text) => [
+    text,
+    buildGuide(font, text, DIGITS.test(text) ? Infinity : letterScale),
+  ]),
+  ...[...lines].map((text) => [text, buildLine(LINE_SHAPES[text])]),
+].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
 const body = entries
   .map(
     ([text, { d, mask }]) =>
@@ -222,8 +347,9 @@ const body = entries
   .join("\n");
 
 const source = `// Generated by scripts/build-trace-guides.mjs. Do not edit by hand.
-// Outlines from Noto Naskh Arabic Bold (SIL Open Font License 1.1, scripts/fonts/OFL.txt),
-// shaped with HarfBuzz. \`d\` is an SVG path in a 100 × 100 box; \`mask\` marks the cells of a
+// Letter outlines from Noto Naskh Arabic Bold (SIL Open Font License 1.1, scripts/fonts/OFL.txt),
+// shaped with HarfBuzz; the line drawings of unit 1 drawn from their centre lines.
+// \`d\` is an SVG path in a 100 × 100 box; \`mask\` marks the cells of a
 // ${GRID} × ${GRID} grid over the same box that lie on the letters (base64, row-major bits).
 
 export const TRACE_GRID = ${GRID};
