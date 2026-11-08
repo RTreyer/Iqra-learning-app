@@ -48,12 +48,45 @@ const TURN_MS = 700;
 /** How far a scene glides while it comes in or goes (px). */
 const GLIDE = 40;
 
+/** The scenes are drawn for a picture this size, the picture of a 390 px wide phone. */
+const PICTURE_W = 358;
+const PICTURE_H = 300;
+/** The spoken line's bubble before it is measured: three lines. */
+const BUBBLE_H = 126;
+/** Room kept under the picture besides the bubble: the gap above it and a little air. */
+const LINE_GAP = 22;
+
+/**
+ * How the picture fits the screen: drawn at its own size (or wider, on a wider screen) and
+ * scaled down as a whole where the screen is narrower or, held sideways, too low for the
+ * picture and the line, so nothing is cut off at the edge and the line stays in sight.
+ */
+type PictureFit = { scale: number; width: number | undefined; height: number };
+function pictureFit(room: { width: number; height: number } | null, bubble: number): PictureFit {
+  if (!room) return { scale: 1, width: undefined, height: PICTURE_H };
+  // The stage's padding on both sides.
+  const frame = room.width - 32;
+  const scale = Math.max(
+    0.5,
+    Math.min(1, frame / PICTURE_W, (room.height - bubble - LINE_GAP) / PICTURE_H),
+  );
+  return { scale, width: frame / scale, height: PICTURE_H * scale };
+}
+
 /**
  * The scene pictures with page-turn transitions: the old scene stays alive (its animation
  * keeps playing) while it fades and glides out to the right, and the new one fades and glides
  * in from the left, the way pages of an Arabic book turn.
  */
-function SceneStage({ scenes, index }: { scenes: readonly StoryScene[]; index: number }) {
+function SceneStage({
+  scenes,
+  index,
+  fit,
+}: {
+  scenes: readonly StoryScene[];
+  index: number;
+  fit: PictureFit;
+}) {
   const [current, setCurrent] = useState(index);
   const [leaving, setLeaving] = useState<number | null>(null);
   const [turn] = useState(() => new Animated.Value(1));
@@ -78,8 +111,26 @@ function SceneStage({ scenes, index }: { scenes: readonly StoryScene[]; index: n
   }, [current, turn]);
 
   const turning = leaving !== null;
+  /** The picture at its drawn size, scaled to fit; the map fits itself in. */
+  const fitted = (scene: StoryScene) =>
+    scene.id === "map" ? (
+      <View style={{ width: "100%", height: fit.height }}>
+        <StoryPicture scene={scene} />
+      </View>
+    ) : (
+      <View
+        style={{
+          width: fit.width ?? "100%",
+          height: PICTURE_H,
+          transformOrigin: "0% 0%",
+          transform: [{ scale: fit.scale }],
+        }}
+      >
+        <StoryPicture scene={scene} />
+      </View>
+    );
   return (
-    <View style={styles.picture}>
+    <View style={[styles.picture, { height: fit.height }]}>
       {turning ? (
         <Animated.View
           key={`${leaving}-${scenes[leaving].id}`}
@@ -95,7 +146,7 @@ function SceneStage({ scenes, index }: { scenes: readonly StoryScene[]; index: n
             },
           ]}
         >
-          <StoryPicture scene={scenes[leaving]} />
+          {fitted(scenes[leaving])}
         </Animated.View>
       ) : null}
       <Animated.View
@@ -116,7 +167,7 @@ function SceneStage({ scenes, index }: { scenes: readonly StoryScene[]; index: n
             : null,
         ]}
       >
-        <StoryPicture scene={scenes[current]} />
+        {fitted(scenes[current])}
       </Animated.View>
     </View>
   );
@@ -128,11 +179,13 @@ function Appear({
   delay = 0,
   rise = 10,
   style,
+  onLayout,
 }: {
   children: React.ReactNode;
   delay?: number;
   rise?: number;
   style?: React.ComponentProps<typeof View>["style"];
+  onLayout?: React.ComponentProps<typeof View>["onLayout"];
 }) {
   const [v] = useState(() => new Animated.Value(0));
   useEffect(() => {
@@ -148,6 +201,7 @@ function Appear({
   }, [v, delay]);
   return (
     <Animated.View
+      onLayout={onLayout}
       style={[
         style,
         {
@@ -203,6 +257,9 @@ function Story({ chapter }: { chapter: string | null }) {
   const talking = languageLoaded && toldLine !== scene.line;
   const choosing = !chapter && index === LAST;
   const choices = books.filter((book) => book.available);
+  const [room, setRoom] = useState<{ width: number; height: number } | null>(null);
+  const [bubble, setBubble] = useState(BUBBLE_H);
+  const fit = pictureFit(room, bubble);
 
   /**
    * The part is told: remember it, then go on. A thread opens its book's path (the book the
@@ -294,7 +351,13 @@ function Story({ chapter }: { chapter: string | null }) {
         )}
       </View>
 
-      <View style={styles.stageWrap}>
+      <View
+        style={styles.stageWrap}
+        onLayout={(e) => {
+          const { width, height } = e.nativeEvent.layout;
+          if (width !== room?.width || height !== room?.height) setRoom({ width, height });
+        }}
+      >
         <Pressable
           testID="intro-next"
           accessibilityRole="button"
@@ -304,10 +367,15 @@ function Story({ chapter }: { chapter: string | null }) {
           style={styles.stage}
         >
           <HudhudTalking.Provider value={talking}>
-            <SceneStage scenes={scenes} index={index} />
+            <SceneStage scenes={scenes} index={index} fit={fit} />
           </HudhudTalking.Provider>
           {/* A new line appears as the new scene comes in. */}
-          <Appear key={scene.id} delay={TURN_MS / 3} style={styles.bubble}>
+          <Appear
+            key={scene.id}
+            delay={TURN_MS / 3}
+            style={styles.bubble}
+            onLayout={(e) => setBubble(Math.round(e.nativeEvent.layout.height))}
+          >
             <View style={styles.speaker}>
               <Icon name="speaker" size={22} color={yemen.clay} />
             </View>
@@ -316,7 +384,7 @@ function Story({ chapter }: { chapter: string | null }) {
         </Pressable>
         {/* The choice: the places on the map of Yemen, over the map picture. */}
         {choosing ? (
-          <View style={styles.mapPins} pointerEvents="box-none">
+          <View style={[styles.mapPins, { height: fit.height }]} pointerEvents="box-none">
             <YemenMap
               only
               pins={choices.flatMap((book) => {
@@ -372,7 +440,7 @@ const styles = StyleSheet.create({
   },
   skipText: { fontSize: 15, fontWeight: "700", color: yemen.inkSoft },
   stage: { flex: 1, minHeight: touchTarget, paddingHorizontal: 16, gap: 14 },
-  picture: { width: "100%", height: 300 },
+  picture: { width: "100%", height: PICTURE_H },
   layer: { position: "absolute", top: 0, right: 0, bottom: 0, left: 0 },
   bubble: {
     backgroundColor: "#FFFFFF",
@@ -396,5 +464,5 @@ const styles = StyleSheet.create({
   },
   stageWrap: { flex: 1 },
   // Over the picture (styles.picture, inside the stage's padding): the map's places.
-  mapPins: { position: "absolute", top: 0, left: 16, right: 16, height: 300 },
+  mapPins: { position: "absolute", top: 0, left: 16, right: 16, height: PICTURE_H },
 });

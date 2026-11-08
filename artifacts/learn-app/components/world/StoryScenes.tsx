@@ -1035,10 +1035,13 @@ function FlyOff() {
   );
 }
 
-/** The map of Yemen: home in Sana'a, and the places to fly to (the choice is made on it). */
+/**
+ * The map of Yemen: home in Sana'a, and the places to fly to (the choice is made on it). It fills
+ * the picture whatever its size, the map fitting itself in (YemenMap), so it is never scaled.
+ */
 function MapScene() {
   return (
-    <View style={styles.scene}>
+    <View style={[styles.scene, styles.fillHeight]}>
       <YemenMap pins={[{ place: "arabic" }, { place: "math" }, { place: "socotra" }]} />
     </View>
   );
@@ -1954,6 +1957,7 @@ const styles = StyleSheet.create({
   lens: { width: "100%", height: 300 },
   scene: { width: "100%", height: 300, borderRadius: 28, overflow: "hidden" },
   fill: { position: "absolute", top: 0, right: 0, bottom: 0, left: 0 },
+  fillHeight: { height: "100%" },
   city: { position: "absolute", bottom: 0, left: 0, right: 0, alignItems: "center" },
   wall: {
     position: "absolute",

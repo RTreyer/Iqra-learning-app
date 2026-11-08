@@ -404,6 +404,41 @@ test.describe("worked example", () => {
   });
 });
 
+// The story pictures are drawn for a 390 px wide phone: on a smaller one, or held sideways, the
+// picture shrinks as a whole, so nothing is cut off at its edge and the spoken line stays in sight.
+test.describe("story on small and sideways phones", () => {
+  for (const viewport of [
+    { width: 320, height: 568 },
+    { width: 740, height: 360 },
+  ]) {
+    test.describe(() => {
+      test.use({ viewport, hasTouch: true, isMobile: true });
+      test(`${viewport.width} × ${viewport.height}: the picture fits and the line is in sight`, async ({
+        page,
+      }) => {
+        await gotoAndWaitReady(page, "/intro?chapter=math");
+        const scene = page.locator("[data-testid^='intro-scene-']");
+        await expect(scene).toHaveCount(1);
+        const stage = await page.getByTestId("intro-next").boundingBox();
+        // The drawn picture (scaled) inside the scene layer.
+        const picture = await scene.locator(":scope > div").first().boundingBox();
+        expect(picture.x).toBeGreaterThanOrEqual(stage.x + 15);
+        expect(picture.x + picture.width).toBeLessThanOrEqual(stage.x + stage.width - 15);
+        expect(picture.height).toBeLessThanOrEqual(301);
+        // Laid out as wide as the scenes are drawn (358 px) or wider, and only then scaled down.
+        const drawn = await scene
+          .locator(":scope > div")
+          .first()
+          .evaluate((e) => e.offsetWidth);
+        expect(drawn).toBeGreaterThanOrEqual(358);
+        const line = page.getByTestId("intro-next").getByText(/تَاجِرَ بُنٍّ/);
+        const box = await line.boundingBox();
+        expect(box.y + box.height).toBeLessThanOrEqual(viewport.height);
+      });
+    });
+  }
+});
+
 test.describe("language", () => {
   test("English explains the app: Hudhud and titles in English, the reading stays Arabic with its meaning", async ({
     page,
