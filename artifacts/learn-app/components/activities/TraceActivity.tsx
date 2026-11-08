@@ -1,4 +1,12 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState, type ComponentRef } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+  type ComponentRef,
+} from "react";
 import { useLine } from "@/components/Gloss";
 import { Picture } from "@/components/pictures/Picture";
 import { Animated, Platform, StyleSheet, Text, View, type LayoutChangeEvent } from "react-native";
@@ -15,7 +23,7 @@ import { StoryProgress } from "./shared/StoryProgress";
 import { useLatest } from "./shared/useLatest";
 import { ADVANCE_MS } from "./shared/useQuiz";
 import { withAttemptReset } from "./shared/withAttemptReset";
-import { PAD_FALLBACK, PAD_MAX, trace, webPad } from "./trace/styles";
+import { CONTROLS_FALLBACK, PAD_FALLBACK, PAD_GAP, PAD_MAX, trace, webPad } from "./trace/styles";
 import { densify, guidePath } from "./trace/guidePath";
 import { addPoint, startStroke, type DrawnStroke } from "./trace/path";
 import { decodeMask, validateOnGuide, validateTracing } from "./trace/validate";
@@ -25,6 +33,8 @@ import { useGuide } from "@/components/world/LessonGuide";
 import { Icon } from "@/components/world/Icon";
 
 const ERROR_VISIBLE_MS = 3000;
+/** Smallest pad, however short the screen. */
+const PAD_MIN = 120;
 /** Distance between the points of a demo line, in pixels. */
 const DEMO_STEP = 6;
 
@@ -38,6 +48,38 @@ export function guideScale(guide: string): number {
 }
 const PLATFORM_PAD = Platform.OS === "web" ? webPad : null;
 
+type LiveStrokeHandle = { set: (d: string) => void };
+
+/**
+ * The stroke under the finger, in its own layer: a finger move redraws only this, not the
+ * guide, the finished strokes or the rest of the screen.
+ */
+function LiveStroke({
+  ref,
+  color,
+  size,
+}: {
+  ref: React.Ref<LiveStrokeHandle>;
+  color: string;
+  size: number;
+}) {
+  const [d, setD] = useState("");
+  useImperativeHandle(ref, () => ({ set: setD }), []);
+  if (!d) return null;
+  return (
+    <Svg style={StyleSheet.absoluteFill} width={size} height={size}>
+      <Path
+        d={d}
+        stroke={color}
+        strokeWidth={10}
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
+
 function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
   const line = useLine();
   const guide = useGuide();
@@ -45,16 +87,20 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
   const { t } = useLanguage();
   const [targetIndex, setTargetIndex] = useState(0);
   const [strokes, setStrokes] = useState<DrawnStroke[]>([]);
-  const [livePath, setLivePath] = useState("");
+  const live = useRef<LiveStrokeHandle | null>(null);
+  const setLivePath = useCallback((d: string) => live.current?.set(d), []);
   const [error, setError] = useState<string | null>(null);
   const [padError, setPadError] = useState(false);
   const [passed, setPassed] = useState(false);
   const [padSize, setPadSize] = useState(PAD_FALLBACK);
   const [shake] = useState(() => new Animated.Value(0));
-  /** Stroke being drawn; mutated per pointer move, flushed to `livePath` once per frame. */
+  /** Stroke being drawn; mutated per pointer move, flushed to the live layer once per frame. */
   const current = useRef<DrawnStroke | null>(null);
   /** Strokes are only accepted once the pad has been measured, since validation depends on its size. */
   const measuredSize = useRef<number | null>(null);
+  /** Room for the pad and the buttons below it, and the buttons' height, as last measured. */
+  const room = useRef<{ width: number; height: number } | null>(null);
+  const controlsHeight = useRef(CONTROLS_FALLBACK);
   const completeRef = useLatest(onComplete);
   const frame = useRef<number | null>(null);
   const locked = useRef(false);
@@ -101,7 +147,7 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
         setStrokes([stroke]);
       },
     }),
-    [shape, padSize],
+    [shape, padSize, setLivePath],
   );
   useDemoEntry(demoEntry);
 
@@ -119,6 +165,8 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
     shouldCancelWhenOutside: false,
     runOnJS: true,
     testID: "trace-pad",
+    // One finger draws; a second one (a palm, another child) must not jump the stroke.
+    maxPointers: 1,
     onBegin: (e) => {
       if (locked.current || measuredSize.current === null) return;
       if (!Number.isFinite(e.x) || !Number.isFinite(e.y)) return;
@@ -139,8 +187,14 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
     },
   });
 
-  const handleLayout = useCallback((e: LayoutChangeEvent) => {
-    const next = Math.min(PAD_MAX, Math.floor(e.nativeEvent.layout.width));
+  /** Sizes the pad to the room: as wide as it can be, but never pushing the buttons off screen. */
+  const fit = useCallback(() => {
+    if (!room.current) return;
+    const { width, height } = room.current;
+    // Without a height (not laid out yet) only the width counts; a pad stays big enough to draw on.
+    const tall =
+      height > 0 ? Math.max(PAD_MIN, height - controlsHeight.current - PAD_GAP) : Infinity;
+    const next = Math.floor(Math.min(PAD_MAX, width, tall));
     if (!(next > 0) || next === measuredSize.current) return;
     // Strokes drawn at another size would be judged against the wrong pad: start over.
     const resized = measuredSize.current !== null;
@@ -151,7 +205,26 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
       setLivePath("");
       setStrokes([]);
     }
-  }, []);
+  }, [setLivePath]);
+
+  const handleLayout = useCallback(
+    (e: LayoutChangeEvent) => {
+      const { width, height } = e.nativeEvent.layout;
+      room.current = { width, height };
+      fit();
+    },
+    [fit],
+  );
+
+  const handleControlsLayout = useCallback(
+    (e: LayoutChangeEvent) => {
+      const { height } = e.nativeEvent.layout;
+      if (!(height > 0) || height === controlsHeight.current) return;
+      controlsHeight.current = height;
+      fit();
+    },
+    [fit],
+  );
 
   const handleClear = useCallback(() => {
     if (locked.current) return;
@@ -189,7 +262,10 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
         Animated.timing(shake, { toValue: 0, duration: 150, useNativeDriver: true }),
       ]).start();
       if (errorTimer.current) clearTimeout(errorTimer.current);
-      errorTimer.current = setTimeout(() => setError(null), ERROR_VISIBLE_MS);
+      errorTimer.current = setTimeout(() => {
+        setError(null);
+        setPadError(false);
+      }, ERROR_VISIBLE_MS);
       return;
     }
     locked.current = true;
@@ -224,11 +300,53 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
 
   const translateX = shake.interpolate({ inputRange: [0, 1], outputRange: [0, 8] });
   const padDims = { width: padSize, height: padSize };
-  const guideFont = {
-    color,
-    fontSize: Math.round(padSize * guideScale(target.guide)),
-    lineHeight: Math.round(padSize * 0.75),
-  };
+  // Memoised: they stay as they are while the finger moves.
+  const guideArt = useMemo(
+    () =>
+      shape ? (
+        <Svg
+          testID="trace-guide"
+          style={StyleSheet.absoluteFill}
+          width={padSize}
+          height={padSize}
+          viewBox="0 0 100 100"
+        >
+          <Path d={shape.d} fill={color} opacity={0.18} />
+        </Svg>
+      ) : (
+        <Text
+          style={[
+            trace.guide,
+            {
+              color,
+              fontSize: Math.round(padSize * guideScale(target.guide)),
+              lineHeight: Math.round(padSize * 0.75),
+            },
+          ]}
+        >
+          {target.guide}
+        </Text>
+      ),
+    [shape, padSize, color, target.guide],
+  );
+  const drawn = useMemo(
+    () => (
+      <Svg style={StyleSheet.absoluteFill} width={padSize} height={padSize}>
+        {strokes.map((s, i) => (
+          <Path
+            key={i}
+            d={s.d}
+            stroke={color}
+            strokeWidth={10}
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        ))}
+      </Svg>
+    ),
+    [strokes, padSize, color],
+  );
 
   return (
     <View style={trace.container}>
@@ -256,16 +374,6 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
         {target.emoji ? <Picture emoji={target.emoji} size={44} /> : null}
         <Text style={[trace.label, { color: readableFill(color) }]}>{line(target.label)}</Text>
       </View>
-      {error ? (
-        <Animated.View
-          style={[trace.errorBanner, { transform: [{ translateX }] }]}
-          accessibilityLiveRegion="polite"
-        >
-          <Text testID="trace-error" style={trace.errorText}>
-            {error}
-          </Text>
-        </Animated.View>
-      ) : null}
       <View testID="trace-measure" style={trace.measure} onLayout={handleLayout}>
         <GestureDetector gesture={gesture}>
           <View
@@ -276,53 +384,22 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
             accessibilityLabel={line(target.label)}
             accessibilityHint={t("ارسم بإصبعك")}
             collapsable={false}
-            style={[
-              trace.pad,
-              padDims,
-              padError && trace.padError,
-              passed && trace.padPassed,
-              PLATFORM_PAD,
-            ]}
+            style={[trace.pad, padDims, padError && trace.padError, PLATFORM_PAD]}
           >
-            {shape ? (
-              <Svg
-                testID="trace-guide"
-                style={StyleSheet.absoluteFill}
-                width={padSize}
-                height={padSize}
-                viewBox="0 0 100 100"
-              >
-                <Path d={shape.d} fill={color} opacity={0.18} />
-              </Svg>
-            ) : (
-              <Text style={[trace.guide, guideFont]}>{target.guide}</Text>
-            )}
-            <Svg style={StyleSheet.absoluteFill} width={padSize} height={padSize}>
-              {strokes.map((s, i) => (
-                <Path
-                  key={i}
-                  d={s.d}
-                  stroke={color}
-                  strokeWidth={10}
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              ))}
-              {livePath ? (
-                <Path
-                  d={livePath}
-                  stroke={color}
-                  strokeWidth={10}
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              ) : null}
-            </Svg>
+            {guideArt}
+            {drawn}
+            <LiveStroke ref={live} color={color} size={padSize} />
+            <View
+              pointerEvents="none"
+              style={[
+                trace.padBorder,
+                padError && trace.padBorderError,
+                passed && trace.padBorderPassed,
+              ]}
+            />
           </View>
         </GestureDetector>
-        <View style={trace.controls}>
+        <View testID="trace-controls" style={trace.controls} onLayout={handleControlsLayout}>
           <Pressable
             testID="trace-clear"
             accessibilityRole="button"
@@ -342,6 +419,19 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
             <Icon name="check" size={34} color="#FFFFFF" strokeWidth={3} />
           </Pressable>
         </View>
+        {error ? (
+          // Over the pad, so the pad keeps its size (and the drawing) while it shows.
+          <View style={trace.errorOverlay} pointerEvents="none">
+            <Animated.View
+              style={[trace.errorBanner, { transform: [{ translateX }] }]}
+              accessibilityLiveRegion="polite"
+            >
+              <Text testID="trace-error" style={trace.errorText}>
+                {error}
+              </Text>
+            </Animated.View>
+          </View>
+        ) : null}
       </View>
     </View>
   );

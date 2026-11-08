@@ -162,6 +162,54 @@ export default function LessonScreen() {
     completeAttempt(earned);
   };
 
+  // The completion card scrolls on every lesson, a trace lesson's too.
+  const drawing = lesson.type === "trace" && !completed;
+  const body = completed ? (
+    <LessonCompleteCard
+      stars={stars}
+      onRepeat={restartAttempt}
+      next={next}
+      backTo={routes.unit(unit.id)}
+      today={today}
+      sticker={sticker}
+      story={
+        story ? (
+          <StoryGoal
+            unit={unit}
+            kind={story.kind}
+            state={story.step}
+            fresh={story.step.completed ? null : story.step.fresh}
+            compact
+            testID="lesson-story"
+          />
+        ) : null
+      }
+    />
+  ) : (
+    <>
+      {showDemo ? (
+        <DemoPlayer
+          key={`${lessonId}-${replay?.run ?? 0}`}
+          id={demoIdFor(lesson)}
+          color={unit.color}
+          preface={replaying ? instruction : undefined}
+          onDone={finishDemo}
+        />
+      ) : null}
+      {showActivity ? (
+        <View style={showDemo ? styles.hidden : drawing ? styles.fill : styles.activity}>
+          <ActivityHost
+            lesson={lesson}
+            color={unit.color}
+            attemptKey={activityKey}
+            onComplete={onComplete}
+            onRoundResult={recordRoundResult}
+          />
+        </View>
+      ) : null}
+    </>
+  );
+
   return (
     <ScreenBackground
       subject={book.subject}
@@ -187,59 +235,21 @@ export default function LessonScreen() {
       )}
       <GuideProvider api={guide.api}>
         <StorySymbolContext.Provider value={book.subject === "math" ? "sack" : "letter"}>
-          <ScrollView
-            key={activityKey}
-            scrollEnabled={lesson.type !== "trace"}
-            contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-          >
-            {completed ? (
-              <LessonCompleteCard
-                stars={stars}
-                onRepeat={restartAttempt}
-                next={next}
-                backTo={routes.unit(unit.id)}
-                today={today}
-                sticker={sticker}
-                story={
-                  story ? (
-                    <StoryGoal
-                      unit={unit}
-                      kind={story.kind}
-                      state={story.step}
-                      fresh={story.step.completed ? null : story.step.fresh}
-                      compact
-                      testID="lesson-story"
-                    />
-                  ) : null
-                }
-              />
-            ) : (
-              <>
-                {showDemo ? (
-                  <DemoPlayer
-                    key={`${lessonId}-${replay?.run ?? 0}`}
-                    id={demoIdFor(lesson)}
-                    color={unit.color}
-                    preface={replaying ? instruction : undefined}
-                    onDone={finishDemo}
-                  />
-                ) : null}
-                {showActivity ? (
-                  <View style={showDemo ? styles.hidden : styles.activity}>
-                    <ActivityHost
-                      lesson={lesson}
-                      color={unit.color}
-                      attemptKey={activityKey}
-                      onComplete={onComplete}
-                      onRoundResult={recordRoundResult}
-                    />
-                  </View>
-                ) : null}
-              </>
-            )}
-          </ScrollView>
+          {drawing ? (
+            // Tracing: the pad sizes itself to the screen and a drag draws, so nothing scrolls.
+            <View key={activityKey} style={styles.fixed}>
+              {body}
+            </View>
+          ) : (
+            <ScrollView
+              key={activityKey}
+              contentContainerStyle={styles.scrollContent}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+            >
+              {body}
+            </ScrollView>
+          )}
         </StorySymbolContext.Provider>
       </GuideProvider>
     </ScreenBackground>
@@ -249,6 +259,8 @@ export default function LessonScreen() {
 const styles = StyleSheet.create({
   screen: { flex: 1 },
   scrollContent: { flexGrow: 1, paddingBottom: 24 },
+  fixed: { flex: 1, paddingBottom: 24 },
+  fill: { flex: 1 },
   activity: { flexGrow: 1 },
   hidden: { display: "none" },
 });
