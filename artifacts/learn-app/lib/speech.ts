@@ -90,7 +90,9 @@ export async function isSpeaking(): Promise<boolean> {
   }
 }
 
+/** Stops speech; a multi part line ends here (its caller still gets onDone) instead of going on. */
 export function stopSpeaking(): void {
+  generation++;
   try {
     Speech.stop();
   } catch {}

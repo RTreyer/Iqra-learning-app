@@ -191,6 +191,8 @@ export default function HomeScreen() {
                     ),
                     // Choosing a place makes it the subject the play button continues in.
                     onPress: () => {
+                      // Wait for the stored settings: chaptersSeen decides where it goes.
+                      if (!loaded) return;
                       update({ bookId: book.id });
                       // The first time the child helps there, Hudhud tells it first.
                       router.push(

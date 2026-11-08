@@ -69,10 +69,17 @@ function kindOf(id: string): string {
  * calc, q), as produced by lib/reviewItems.ts.
  * Kinds are interleaved: each pick takes the first remaining id whose kind
  * differs from the previous one, falling back to the first remaining id.
+ * With `known`, stored ids it lacks (items since removed from the content) are skipped,
+ * so they take no session slot and are not counted.
  */
-export function pickDue(items: Record<string, ItemState>, now: Date, limit = 10): string[] {
+export function pickDue(
+  items: Record<string, ItemState>,
+  now: Date,
+  limit = 10,
+  known?: { has(id: string): boolean },
+): string[] {
   const remaining = Object.entries(items)
-    .filter(([, state]) => isDue(state, now))
+    .filter(([id, state]) => (!known || known.has(id)) && isDue(state, now))
     .sort(
       ([idA, a], [idB, b]) =>
         dueTime(a) - dueTime(b) || a.box - b.box || (idA < idB ? -1 : idA > idB ? 1 : 0),

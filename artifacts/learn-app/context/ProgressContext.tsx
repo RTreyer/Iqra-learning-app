@@ -38,6 +38,7 @@ import {
   type UnitProgress,
 } from "@/lib/progressState";
 import { todayKey } from "@/lib/dates";
+import { allItems } from "@/lib/reviewItems";
 import { pickDue } from "@/lib/srs";
 
 export type {
@@ -285,7 +286,7 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
       const day = todayKey(now);
       let ids = dueCache.byDay.get(day);
       if (!ids) {
-        ids = pickDue(dueCache.items, now);
+        ids = pickDue(dueCache.items, now, 10, allItems());
         dueCache.byDay.set(day, ids);
       }
       return ids;

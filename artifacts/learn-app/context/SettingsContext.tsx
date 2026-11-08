@@ -76,18 +76,26 @@ export function parseSettings(raw: string | null): Settings {
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [loaded, setLoaded] = useState(false);
-  const changed = useRef(false);
+  // Switches flipped before storage answered: applied on top of the stored settings once read.
+  const pending = useRef<Partial<Settings>[] | null>([]);
 
   useEffect(() => {
     let alive = true;
     AsyncStorage.getItem(SETTINGS_KEY)
+      .catch(() => null)
       .then((raw) => {
-        // A switch flipped before storage answered wins over the stored value.
-        if (alive && !changed.current) setSettings(parseSettings(raw));
-      })
-      .catch(() => {})
-      .finally(() => {
-        if (alive) setLoaded(true);
+        if (!alive) return;
+        const patches = pending.current ?? [];
+        pending.current = null;
+        const next = patches.reduce<Settings>(
+          (acc, patch) => ({ ...acc, ...patch }),
+          parseSettings(raw),
+        );
+        setSettings(next);
+        if (patches.length > 0) {
+          AsyncStorage.setItem(SETTINGS_KEY, JSON.stringify(next)).catch(() => {});
+        }
+        setLoaded(true);
       });
     return () => {
       alive = false;
@@ -100,7 +108,12 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   }, [settings]);
 
   const update = useCallback((patch: Partial<Settings>) => {
-    changed.current = true;
+    if (pending.current) {
+      // Not read yet: show the change now, store it once merged with what was stored.
+      pending.current.push(patch);
+      setSettings((current) => ({ ...current, ...patch }));
+      return;
+    }
     setSettings((current) => {
       const next = { ...current, ...patch };
       AsyncStorage.setItem(SETTINGS_KEY, JSON.stringify(next)).catch(() => {});

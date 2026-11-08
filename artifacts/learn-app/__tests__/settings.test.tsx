@@ -83,3 +83,28 @@ test("stored settings are read at start", async () => {
   expect(Haptics.impactAsync).not.toHaveBeenCalled();
   await act(async () => api!.update({ haptics: true }));
 });
+
+test("a switch flipped before the stored settings load keeps the stored values", async () => {
+  await AsyncStorage.setItem(
+    SETTINGS_KEY,
+    JSON.stringify({ haptics: false, introSeen: true, bookId: "math-1" }),
+  );
+  render(
+    <SettingsProvider>
+      <Probe />
+    </SettingsProvider>,
+  );
+  expect(api!.loaded).toBe(false);
+  act(() => api!.update({ sound: false }));
+  await act(async () => {});
+  const merged = {
+    ...DEFAULT_SETTINGS,
+    sound: false,
+    haptics: false,
+    introSeen: true,
+    bookId: "math-1",
+  };
+  expect(api!.loaded).toBe(true);
+  expect(api!.settings).toEqual(merged);
+  expect(JSON.parse((await AsyncStorage.getItem(SETTINGS_KEY))!)).toEqual(merged);
+});
