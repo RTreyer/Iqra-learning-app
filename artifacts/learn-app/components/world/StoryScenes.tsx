@@ -124,6 +124,11 @@ const NEWGIRL_ACTS = [
 /** At a station he walks in, then stares at the thing there to read or count. */
 const STATION_ACTS = [[1500, "wonder"]] as const;
 
+/** At a station the person walks in to meet Hudhud, then stands. */
+const MEET_WALK = [[1300, false]] as const;
+/** The old postman steps up to Hudhud. */
+const POST_WALK = [[800, false]] as const;
+
 /** The trader as Hudhud counts his sacks: worried, amazed, then happy. */
 const SACKS_MOOD = [
   [1800, "wonder"],
@@ -1087,6 +1092,9 @@ function Mukalla() {
 function Post() {
   const letters = useOnce(2400, 700, Easing.inOut(Easing.quad));
   const nod = useSwing(900, 300);
+  // The old postman steps up to Hudhud, then hands him the letters.
+  const steps = useOnce(800, 0, Easing.linear);
+  const postWalk = useTimeline<boolean>(true, POST_WALK);
   return (
     <View style={styles.scene}>
       <View style={[styles.fill, { backgroundColor: "#E7F0FA" }]} />
@@ -1094,7 +1102,9 @@ function Post() {
       <Animated.View
         style={[styles.postman, { transform: [{ rotate: at(nod, [0, 1], ["-2deg", "2deg"]) }] }]}
       >
-        <Person emoji="👴" size={96} mood="happy" />
+        <Animated.View style={{ transform: [{ translateX: lerp(steps, -50, 0) }] }}>
+          <Person emoji="👴" size={84} full walk={postWalk} mood="happy" />
+        </Animated.View>
       </Animated.View>
       {[0, 1, 2].map((i) => (
         <Animated.View
@@ -1179,7 +1189,7 @@ function Trader() {
         <DhowArt stage={0} size={120} />
       </View>
       <View style={styles.trader}>
-        <Person emoji="👨" size={96} mood="sad" />
+        <Person emoji="👨" size={84} full mood="sad" />
       </View>
       <View style={styles.sackPile}>
         <View style={styles.sackRow}>
@@ -1254,7 +1264,7 @@ function Sacks() {
       </Animated.View>
       <View style={[styles.ground, { backgroundColor: "#C9A16B" }]} />
       <View style={styles.trader}>
-        <Person emoji="👨" size={90} mood={traderMood} />
+        <Person emoji="👨" size={80} full mood={traderMood} />
       </View>
       {/* Behind the sacks: only his head and back show over them. */}
       <Animated.View
@@ -1571,19 +1581,29 @@ function Station({ unit, line }: { unit?: string; line?: string }) {
   const bob = useSwing(700);
   const act = useTimeline<Act>("walk", STATION_ACTS);
   const enter = useOnce(1300, 200, Easing.linear);
+  // The person comes from the other side, to meet him.
+  const meet = useOnce(1200, 100, Easing.linear);
+  const meeting = useTimeline<boolean>(true, MEET_WALK);
   if (!station) return <View style={styles.scene} />;
   const asking = line === station.ask;
   return (
     <View style={styles.scene}>
       <View style={[styles.fill, { backgroundColor: PLACE_SKY[station.place] }]} />
       <PlaceGround place={station.place} />
-      <View style={styles.person}>
+      <Animated.View
+        style={[
+          styles.person,
+          asking ? null : { transform: [{ translateX: lerp(meet, -120, 0) }] },
+        ]}
+      >
         <Person
           emoji={station.person}
-          size={86}
+          size={80}
+          full
+          walk={!asking && meeting}
           mood={asking ? "happy" : (station.feels ?? "smile")}
         />
-      </View>
+      </Animated.View>
       <Animated.View style={[styles.thing, { transform: [{ scale: lerp(glow, 1, 1.12) }] }]}>
         <View style={styles.thingHalo} />
         <Picture emoji={station.thing} size={52} />

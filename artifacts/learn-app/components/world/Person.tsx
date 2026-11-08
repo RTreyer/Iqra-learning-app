@@ -6,7 +6,10 @@
  *   eyes, raised brows, a round mouth) or sad (brows up in the middle, the mouth turned down).
  *   The people pictures share one face (two eyes, one smiling mouth), which is redrawn here;
  * - open eyes blink now and then;
- * - the body speaks too: breathing, a happy bounce, a start of surprise, a sad slump.
+ * - the body speaks too: breathing, a happy bounce, a start of surprise, a sad slump;
+ * - with `full`, the picture (a bust) gets a long robe in the colour of the clothes and two
+ *   feet, so the person stands; walking, the feet step in turn, the robe sways, the upper body
+ *   bobs and rocks.
  * Pictures without that face (the camel, the birds) keep it and only move.
  */
 
@@ -73,14 +76,25 @@ export function faceFor(xml: string, mood: Mood): Face {
   return { xml: out, eyes };
 }
 
+/** A standing figure is this much taller than wide: the bust, then the robe and the feet. */
+const FULL = 1.45;
+const ROBE = "M14 96 Q12 120 18 140 Q50 146 82 140 Q88 120 86 96 Z";
+
 export function Person({
   emoji,
   mood = "smile",
   size = 86,
+  full = false,
+  walk = false,
 }: {
   emoji: string;
   mood?: Mood;
+  /** The width of the figure. */
   size?: number;
+  /** The whole figure, standing on its feet (a bust otherwise). */
+  full?: boolean;
+  /** Walks: steps, sways and bobs (with `full`; a bust only bobs and rocks). */
+  walk?: boolean;
 }) {
   const base = PICTURES[pictureKey(emoji)];
   const face = useMemo(() => (base ? faceFor(base, mood) : null), [base, mood]);
@@ -88,7 +102,8 @@ export function Person({
   const blink = useCycle(open && (face?.eyes.length ?? 0) === 2, 4300, 700);
   const lid = key(blink, [0, 0.9, 0.93, 0.97, 1], [0, 0, 1, 0, 0]);
   const breath = useCycle(mood !== "happy", mood === "sad" ? 3600 : 2600);
-  const bounce = useCycle(mood === "happy", 820);
+  const bounce = useCycle(mood === "happy" && !walk, 820);
+  const step = useCycle(walk, 620);
   // A start of surprise: a quick jump back, once, when the person begins to wonder.
   const [start] = useState(() => new Animated.Value(0));
   useEffect(() => {
@@ -105,8 +120,12 @@ export function Person({
   }, [mood, start]);
   if (!face) return <View style={{ width: size, height: size }} />;
   const s = size / 100;
-  const body =
-    mood === "happy"
+  const body = walk
+    ? [
+        { translateY: key(step, [0, 0.25, 0.5, 0.75, 1], [0, -3.5, 0, -3.5, 0]) },
+        { rotate: key(step, [0, 0.5, 1], ["-2deg", "2deg", "-2deg"]) },
+      ]
+    : mood === "happy"
       ? [
           { translateY: key(bounce, [0, 0.3, 0.6, 1], [0, -5, 0, 0]) },
           { scaleY: key(bounce, [0, 0.6, 0.7, 0.8, 1], [1, 1, 0.95, 1, 1]) },
@@ -123,10 +142,8 @@ export function Person({
               { scaleY: key(breath, [0, 0.5, 1], [0.97, 0.985, 0.97]) },
             ]
           : [{ scaleY: key(breath, [0, 0.5, 1], [1, 1.02, 1]) }];
-  return (
+  const bust = (
     <Animated.View
-      testID={`person-${pictureKey(emoji)}`}
-      accessibilityLabel={mood}
       style={{ width: size, height: size, transformOrigin: "50% 100%", transform: body }}
     >
       <SvgXml
@@ -153,5 +170,54 @@ export function Person({
           ))
         : null}
     </Animated.View>
+  );
+  // Only people (with the shared face) get a robe; animals stay as they are.
+  if (!full || face.eyes.length < 2)
+    return (
+      <View testID={`person-${pictureKey(emoji)}`} accessibilityLabel={mood}>
+        {bust}
+      </View>
+    );
+  // Standing: robe and feet under the bust; the robe takes the colour of the clothes.
+  const cloth = face.xml.match(/fill="(#[0-9A-Fa-f]{6})"/)?.[1] ?? "#8E5A36";
+  const height = size * FULL;
+  const layer = { position: "absolute" as const, left: 0, top: 0, width: size, height };
+  const lower = (inner: string) => (
+    <SvgXml
+      xml={`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 ${100 * FULL}">${inner}</svg>`}
+      width={size}
+      height={height}
+    />
+  );
+  const foot = (lift: number[]) => ({
+    transform: [{ translateY: key(step, [0, 0.25, 0.5, 0.75, 1], lift) }],
+  });
+  return (
+    <View
+      testID={`person-${pictureKey(emoji)}`}
+      accessibilityLabel={mood}
+      style={{ width: size, height }}
+    >
+      <Animated.View style={[layer, walk ? foot([0, -5, 0, 0, 0]) : null]}>
+        {lower(`<ellipse cx="38" cy="142" rx="8" ry="4" fill="#4A2C20"/>`)}
+      </Animated.View>
+      <Animated.View style={[layer, walk ? foot([0, 0, 0, -5, 0]) : null]}>
+        {lower(`<ellipse cx="62" cy="142" rx="8" ry="4" fill="#4A2C20"/>`)}
+      </Animated.View>
+      <Animated.View
+        style={[
+          layer,
+          { transformOrigin: "50% 66%" },
+          walk
+            ? { transform: [{ rotate: key(step, [0, 0.5, 1], ["-2.5deg", "2.5deg", "-2.5deg"]) }] }
+            : null,
+        ]}
+      >
+        {lower(
+          `<path d="${ROBE}" fill="${cloth}"/><path d="M18 134 Q50 140 82 134" stroke="#000000" stroke-opacity="0.15" stroke-width="3" fill="none"/>`,
+        )}
+      </Animated.View>
+      <View style={{ position: "absolute", left: 0, top: 0 }}>{bust}</View>
+    </View>
   );
 }
