@@ -10,7 +10,13 @@ import { Circle, G, Path, Polygon, Rect, Svg } from "react-native-svg";
 
 import { Art } from "@/components/art/Art";
 import { Picture } from "@/components/pictures/Picture";
-import { MESSAGE, STATIONS, type StationPlace, type StoryScene } from "@/content/story";
+import {
+  MESSAGE,
+  STATIONS,
+  type PersonMood,
+  type StationPlace,
+  type StoryScene,
+} from "@/content/story";
 import { yemen } from "@/theme/tokens";
 import { BowlArt, INK, Note, NoteLetters, messageLetters } from "./Bowl";
 import { Hudhud } from "./Hudhud";
@@ -29,6 +35,7 @@ import {
 } from "./StoryArt";
 import { DhowArt } from "./Voyage";
 import { YemenMap } from "./YemenMap";
+import { Person } from "./Person";
 import { Skyline } from "./Skyline";
 import { StickerArt } from "./StickerArt";
 import { LOOP_NATIVE } from "./motion";
@@ -116,6 +123,12 @@ const NEWGIRL_ACTS = [
 ] as const;
 /** At a station he walks in, then stares at the thing there to read or count. */
 const STATION_ACTS = [[1500, "wonder"]] as const;
+
+/** The trader as Hudhud counts his sacks: worried, amazed, then happy. */
+const SACKS_MOOD = [
+  [1800, "wonder"],
+  [4100, "happy"],
+] as const;
 
 /** Rasha is glad once the water is in the bowl; a hoopoe walks up: astonished, then beaming. */
 const GIRL_MOOD = [
@@ -1081,7 +1094,7 @@ function Post() {
       <Animated.View
         style={[styles.postman, { transform: [{ rotate: at(nod, [0, 1], ["-2deg", "2deg"]) }] }]}
       >
-        <Picture emoji="👴" size={96} />
+        <Person emoji="👴" size={96} mood="happy" />
       </Animated.View>
       {[0, 1, 2].map((i) => (
         <Animated.View
@@ -1166,7 +1179,7 @@ function Trader() {
         <DhowArt stage={0} size={120} />
       </View>
       <View style={styles.trader}>
-        <Picture emoji="👨" size={96} />
+        <Person emoji="👨" size={96} mood="sad" />
       </View>
       <View style={styles.sackPile}>
         <View style={styles.sackRow}>
@@ -1225,6 +1238,8 @@ function Sacks() {
   const count = useOnce(COUNT_MS, COUNT_FROM, Easing.linear);
   const sail = useSwing(2400);
   const [done, setDone] = useState(false);
+  // The trader: worried, then amazed as the numbers light up, then happy.
+  const traderMood = useTimeline<PersonMood>("sad", SACKS_MOOD);
   useEffect(() => {
     const t = setTimeout(() => setDone(true), COUNT_FROM + COUNT_MS * WALK_END);
     return () => clearTimeout(t);
@@ -1239,7 +1254,7 @@ function Sacks() {
       </Animated.View>
       <View style={[styles.ground, { backgroundColor: "#C9A16B" }]} />
       <View style={styles.trader}>
-        <Picture emoji="👨" size={90} />
+        <Person emoji="👨" size={90} mood={traderMood} />
       </View>
       {/* Behind the sacks: only his head and back show over them. */}
       <Animated.View
@@ -1563,7 +1578,11 @@ function Station({ unit, line }: { unit?: string; line?: string }) {
       <View style={[styles.fill, { backgroundColor: PLACE_SKY[station.place] }]} />
       <PlaceGround place={station.place} />
       <View style={styles.person}>
-        <Picture emoji={station.person} size={86} />
+        <Person
+          emoji={station.person}
+          size={86}
+          mood={asking ? "happy" : (station.feels ?? "smile")}
+        />
       </View>
       <Animated.View style={[styles.thing, { transform: [{ scale: lerp(glow, 1, 1.12) }] }]}>
         <View style={styles.thingHalo} />

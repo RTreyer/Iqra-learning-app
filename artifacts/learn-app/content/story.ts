@@ -252,10 +252,18 @@ export type StationPlace =
  * (`scenes`); Hudhud's line on its path is `ask`; when the unit is done, `outro`: the clue
  * on Rasha's trail (Arabic) or what the station taught (maths).
  */
+/** How a person of the story looks (components/world/Person). */
+export type PersonMood = "smile" | "happy" | "wonder" | "sad";
+
 export type Station = {
   place: StationPlace;
   /** Whom Hudhud meets (an emoji drawn by components/pictures). */
   person: string;
+  /**
+   * How they look when Hudhud arrives (smiling if not given); when he asks the child to help,
+   * they are glad.
+   */
+  feels?: PersonMood;
   /** What there is to read or count. */
   thing: string;
   where: string;
@@ -275,6 +283,7 @@ export const STATIONS: Record<string, Station> = {
   a2: {
     place: "door",
     person: "🧕",
+    feels: "wonder",
     thing: "✉",
     where: "أَوَّلُ رِسَالَةٍ أُوصِلُهَا! عَلَى الْبَابِ اسْمٌ.",
     ask: "هَيَّا نَتَعَلَّمُ الْحُرُوفَ، لِنَقْرَأَ الِاسْمَ!",
@@ -291,6 +300,7 @@ export const STATIONS: Record<string, Station> = {
   a4: {
     place: "beach",
     person: "👨",
+    feels: "wonder",
     thing: "⛵",
     where: "عِنْدَ الْبَحْرِ، عَلَى قَارِبِ الصَّيَّادِ اسْمٌ.",
     ask: "هَيَّا نَتَعَلَّمُ الْحَرَكَاتِ، لِنَقْرَأَ الِاسْمَ!",
@@ -315,6 +325,7 @@ export const STATIONS: Record<string, Station> = {
   a7: {
     place: "well",
     person: "👴",
+    feels: "wonder",
     thing: "💧",
     where: "عِنْدَ الْبِئْرِ كِتَابَةٌ قَدِيمَةٌ.",
     ask: "هَيَّا نَتَعَلَّمُ الْحُرُوفَ، لِنَقْرَأَ الْكِتَابَةَ!",
@@ -323,6 +334,7 @@ export const STATIONS: Record<string, Station> = {
   a8: {
     place: "village",
     person: "👴",
+    feels: "happy",
     thing: "✉",
     where: "فِي الْقَرْيَةِ، عِنْدَ الْجَدِّ رِسَالَةٌ مِنْ رَشَا.",
     ask: "هَيَّا نَتَعَلَّمُ الْحُرُوفَ، لِنَقْرَأَ الرِّسَالَةَ!",
@@ -339,6 +351,7 @@ export const STATIONS: Record<string, Station> = {
   "math-u2": {
     place: "market",
     person: "👨",
+    feels: "sad",
     thing: "🫘",
     where: "فِي مَخْزَنِ التَّاجِرِ، أَكْيَاسُ الْبُنِّ كَثِيرَةٌ.",
     ask: "كَمْ كِيسًا عِنْدَهُ؟ هَيَّا نَعُدُّ!",
@@ -355,6 +368,7 @@ export const STATIONS: Record<string, Station> = {
   "math-u4": {
     place: "beach",
     person: "👨",
+    feels: "happy",
     thing: "☕",
     where: "عِنْدَ الْبَحْرِ، يُعْطِي التَّاجِرُ مِنْ بُنِّهِ لِلْجِيرَانِ.",
     ask: "كَمْ يَبْقَى مَعَهُ؟ هَيَّا نَطْرَحُ!",
@@ -363,6 +377,7 @@ export const STATIONS: Record<string, Station> = {
   "math-u5": {
     place: "port",
     person: "👨",
+    feels: "wonder",
     thing: "⛵",
     where: "فِي مِينَاءِ الْمُخَا، السَّفِينَةُ تَنْتَظِرُ الْبُنَّ.",
     ask: "مُرَبَّعٌ، دَائِرَةٌ، مُثَلَّثٌ: هَيَّا نُحَمِّلُ السَّفِينَةَ!",
