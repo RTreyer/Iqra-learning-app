@@ -31,7 +31,7 @@ const DEMO_STEP = 6;
 /** Two letters or more (يد، بيت): a word, for the wording of hints. */
 const isWord = (guide: string) => guide.replace(/[ً-ْـ\s]/g, "").length > 1;
 
-/** Text guides only (the Unit 1 line drawings): a letter fills the pad, a word shrinks to fit. */
+/** Text guides only (a guide without a generated outline): a letter fills the pad, a word shrinks to fit. */
 export function guideScale(guide: string): number {
   const letters = guide.replace(/[ً-ْـ\s]/g, "").length;
   return letters <= 2 ? 0.55 : Math.max(0.2, 1.1 / letters);
@@ -61,7 +61,7 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
   const errorTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const target = targets[targetIndex];
-  /** Outline and mask of an Arabic guide; the Unit 1 line drawings have none. */
+  /** Outline and mask of the guide (letters, words and the line drawings of unit 1). */
   const shape = traceGuides[target.guide];
 
   useEffect(
