@@ -443,8 +443,9 @@ export const STATIONS: Record<string, Station> = {
 
 /** The scenes told the first time a unit is opened: where Hudhud is, and what to do. */
 export function stationScenes(unitId: string): StoryScene[] | null {
+  // Own names only: "constructor" or "__proto__" in a link is no station.
+  if (!Object.hasOwn(STATIONS, unitId)) return null;
   const station = STATIONS[unitId];
-  if (!station) return null;
   return [
     { id: "station", unit: unitId, line: station.where, minMs: 2400 },
     { id: "station", unit: unitId, line: station.ask },

@@ -220,7 +220,7 @@ function Appear({
 export default function IntroScreen() {
   const param = firstParam(useLocalSearchParams<{ chapter?: string | string[] }>().chapter);
   // A chapter of the story (the two threads, the end), or a unit's station.
-  const chapter = param && (param in CHAPTERS || stationScenes(param)) ? param : null;
+  const chapter = param && (Object.hasOwn(CHAPTERS, param) || stationScenes(param)) ? param : null;
   // A new part is a new story: start it from its first scene.
   return <Story key={chapter ?? "intro"} chapter={chapter} />;
 }
@@ -228,13 +228,14 @@ export default function IntroScreen() {
 /** The scenes of a part of the story: chapter 1, a chapter, or a station. */
 function scenesOf(part: string | null): readonly StoryScene[] {
   if (!part) return INTRO_STORY;
-  return CHAPTERS[part as ChapterId] ?? stationScenes(part) ?? INTRO_STORY;
+  if (Object.hasOwn(CHAPTERS, part)) return CHAPTERS[part as ChapterId];
+  return stationScenes(part) ?? INTRO_STORY;
 }
 
 /** Where a told part leads: a thread to its book's path, a station to its unit, the end home. */
 function afterPart(part: string, bookId: string | null) {
   if (part === "end") return routes.home();
-  if (!(part in CHAPTERS)) return routes.unit(part);
+  if (!Object.hasOwn(CHAPTERS, part)) return routes.unit(part);
   const chosen = books.find((book) => book.id === bookId);
   const book =
     chosen && chapterFor(chosen.subject) === part
