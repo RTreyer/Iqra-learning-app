@@ -6,6 +6,7 @@ import HomeScreen, { windowLine } from "@/app/index";
 import { getLesson } from "@/content";
 import { ProgressProvider } from "@/context/ProgressContext";
 import { SETTINGS_KEY, SettingsProvider } from "@/context/SettingsContext";
+import { SOON_LINE } from "@/content/story";
 import { routes } from "@/lib/routes";
 import { allItems } from "@/lib/reviewItems";
 import { renderScreen } from "@/test-utils/screens";
@@ -41,8 +42,11 @@ function renderHome() {
 }
 
 /** After the story: the child chose `bookId` (or nothing yet). */
-async function storyTold(bookId: string | null = null) {
-  await AsyncStorage.setItem(SETTINGS_KEY, JSON.stringify({ introSeen: true, bookId }));
+async function storyTold(bookId: string | null = null, chaptersSeen = ["arabic", "math"]) {
+  await AsyncStorage.setItem(
+    SETTINGS_KEY,
+    JSON.stringify({ introSeen: true, bookId, chaptersSeen }),
+  );
 }
 
 beforeEach(async () => {
@@ -108,6 +112,20 @@ test("an island switches the subject: play then continues there", async () => {
   expect(JSON.parse((await AsyncStorage.getItem(SETTINGS_KEY))!).bookId).toBe("arabic-1");
 });
 
+test("the first time on an island, Hudhud tells that job before its path opens", async () => {
+  await storyTold("arabic-1", ["arabic"]);
+  renderHome();
+  await screen.findByTestId("intro-button");
+  await act(async () => {
+    fireEvent.press(screen.getByTestId("book-math-1"));
+  });
+  expect(router.push).toHaveBeenCalledWith(routes.intro("math"));
+  await act(async () => {
+    fireEvent.press(screen.getByTestId("book-arabic-1"));
+  });
+  expect(router.push).toHaveBeenCalledWith(routes.book("arabic-1"));
+});
+
 test("two due items show the review tile, which opens the review", async () => {
   await seed(2);
   renderHome();
@@ -140,16 +158,16 @@ test("today's window counts lessons finished today and says what is left", async
   const window = await screen.findByLabelText(windowLine(1));
   fireEvent.press(window);
   expect(Speech.speak).toHaveBeenLastCalledWith(
-    "دَرْسَانِ، وَتُضِيءُ الْقَمَرِيَّةُ!",
+    "دَرْسَانِ، وَيَمْتَلِئُ الصَّحْنُ!",
     expect.anything(),
   );
 });
 
-test("the window lines name what is left, and glow at three", () => {
-  expect(windowLine(0)).toBe("ثَلَاثَةُ دُرُوسٍ، وَتُضِيءُ الْقَمَرِيَّةُ!");
-  expect(windowLine(2)).toBe("دَرْسٌ وَاحِدٌ، وَتُضِيءُ الْقَمَرِيَّةُ!");
-  expect(windowLine(3)).toBe("أَضَاءَتِ الْقَمَرِيَّةُ الْيَوْمَ!");
-  expect(windowLine(5)).toBe("أَضَاءَتِ الْقَمَرِيَّةُ الْيَوْمَ!");
+test("Rasha's bowl: the lines name what is left, and the birds drink at three", () => {
+  expect(windowLine(0)).toBe("ثَلَاثَةُ دُرُوسٍ، وَيَمْتَلِئُ الصَّحْنُ!");
+  expect(windowLine(2)).toBe("دَرْسٌ وَاحِدٌ، وَيَمْتَلِئُ الصَّحْنُ!");
+  expect(windowLine(3)).toBe("اِمْتَلَأَ الصَّحْنُ، وَشَرِبَتِ الطُّيُورُ!");
+  expect(windowLine(5)).toBe("اِمْتَلَأَ الصَّحْنُ، وَشَرِبَتِ الطُّيُورُ!");
 });
 
 test("the album tile shows how many stickers the stars have earned", async () => {
@@ -165,4 +183,19 @@ test("the album tile shows how many stickers the stars have earned", async () =>
   // 27 stars: two stickers at 12 stars each.
   await screen.findByText("٢٧");
   expect(screen.getByTestId("album-button")).toHaveTextContent("٢");
+});
+
+test("the subjects are places on the map of Yemen; Socotra is still to come", async () => {
+  await seed(0);
+  renderHome();
+  await screen.findByTestId("book-arabic-1");
+  // Reading with the postman in Sana'a, counting in Mocha: each place shows its book's title.
+  expect(screen.getByTestId("book-arabic-1")).toHaveTextContent(/صَنْعَاءُ/);
+  expect(screen.getByTestId("book-math-1")).toHaveTextContent(/الْمُخَا/);
+  // Socotra is on the map but not open yet: tapping it, Hudhud says it comes soon.
+  const socotra = screen.getByTestId("place-socotra");
+  expect(socotra.props.accessibilityState).toMatchObject({ disabled: true });
+  fireEvent.press(socotra);
+  expect(Speech.speak).toHaveBeenLastCalledWith(SOON_LINE, expect.anything());
+  expect(router.push).not.toHaveBeenCalled();
 });

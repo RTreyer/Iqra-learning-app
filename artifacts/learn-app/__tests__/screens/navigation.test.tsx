@@ -6,6 +6,7 @@ import UnitScreen from "@/app/unit/[unitId]";
 import { books, getUnit } from "@/content";
 import { resetPathMemory } from "@/components/world/PathMap";
 import { routes } from "@/lib/routes";
+import { STATIONS } from "@/content/story";
 import { mockCanGoBack, renderScreen, setParams } from "@/test-utils/screens";
 
 const { router } = jest.requireMock("expo-router") as {
@@ -24,10 +25,11 @@ test("home shows one island per available book and opens it; no grade cards", ()
   expect(screen.getAllByTestId(/^book-/)).toHaveLength(available.length);
   expect(screen.queryByTestId(/^grade-/)).toBeNull();
   expect(screen.queryByTestId("language-en")).toBeNull();
+  // The first time, Hudhud tells the job first (the chapter opens the path when it ends).
   fireEvent.press(screen.getByTestId("book-arabic-1"));
-  expect(router.push).toHaveBeenCalledWith(routes.book("arabic-1"));
+  expect(router.push).toHaveBeenCalledWith(routes.intro("arabic"));
   fireEvent.press(screen.getByTestId("book-math-1"));
-  expect(router.push).toHaveBeenCalledWith(routes.book("math-1"));
+  expect(router.push).toHaveBeenCalledWith(routes.intro("math"));
 });
 
 test("home opens the album and the parents' corner", () => {
@@ -46,8 +48,9 @@ test("book screen shows the units as stations with their progress", () => {
   expect(a2.props.accessibilityLabel).toMatch(/٠ \/ ٣١/);
   // Units 2 and 8 both have 31 lessons.
   expect(screen.getAllByText("٠ / ٣١")).toHaveLength(2);
+  // The first time, Hudhud tells the station of his journey before the unit's path opens.
   fireEvent.press(a2);
-  expect(router.push).toHaveBeenCalledWith(routes.unit("a2"));
+  expect(router.push).toHaveBeenCalledWith(routes.intro("a2"));
 });
 
 test("book screen shows not found for an unknown id", () => {
@@ -98,8 +101,8 @@ test("Hudhud stands beside the next stop of a path, once, and says its line", ()
   setParams({ unitId: "a2" });
   renderScreen(<UnitScreen />);
   expect(screen.getAllByTestId("guide")).toHaveLength(1);
-  // In the story: collecting the letters of his letter.
-  const line = "هَيَّا نَجْمَعُ حُرُوفَ رِسَالَتِي!";
+  // In the story: what this station asks (Rasha's door sign).
+  const line = STATIONS.a2.ask;
   expect(screen.getByTestId("guide").props.accessibilityLabel).toBe(line);
   // On a first visit he flies in from the stop before; he speaks once he has landed.
   jest.advanceTimersByTime(2000);

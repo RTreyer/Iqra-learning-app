@@ -50,8 +50,8 @@ const PLACES: Record<Exclude<GoalKind, "letters" | "vowels">, number> = {
   sort: 3,
   count: 5,
   add: 5,
-  carry: 5,
-  pack: 4,
+  give: 4,
+  ship: 4,
 };
 
 /** The letters a goal is about (letters, vowels), else none. */
@@ -108,4 +108,20 @@ export function storyStep(
     fresh: fresh < 0 ? null : fresh,
     completed: after.complete && !before.complete,
   };
+}
+
+/** Every letter learnt so far across a book's units: those whose sections are all done. */
+export function learntLetters(units: Unit[], done: (lesson: Lesson) => boolean): Set<string> {
+  const learnt = new Set<string>();
+  for (const unit of units) for (const letter of collectedLetters(unit, done)) learnt.add(letter);
+  return learnt;
+}
+
+/**
+ * How far the coffee has come on the maths path: one more sack on the ship for every maths
+ * unit finished (0 to 5); at 5 it sails.
+ */
+export function voyageStage(units: Unit[], done: (lesson: Lesson) => boolean): number {
+  const finished = units.filter((u) => u.lessons.length > 0 && u.lessons.every(done)).length;
+  return Math.min(5, Math.round((finished / Math.max(1, units.length)) * 5));
 }

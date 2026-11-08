@@ -143,7 +143,7 @@ export default function LessonScreen() {
     const beat =
       kind && step
         ? step.completed
-          ? finishLine(unit, kind)
+          ? finishLine(unit.id, kind)
           : step.fresh !== null
             ? GOAL_LINES[kind].beat
             : ""

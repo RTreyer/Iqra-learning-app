@@ -1,13 +1,25 @@
 import { books, getUnit } from "@/content";
-import { GOAL_LINES, SUBJECT_DONE, finishLine, goalLine } from "@/content/story";
+import {
+  GOAL_LINES,
+  MESSAGE,
+  STATIONS,
+  SUBJECT_DONE,
+  finishLine,
+  goalLine,
+  pathLine,
+  stationScenes,
+} from "@/content/story";
+import { messageLetters } from "@/components/world/Bowl";
 import type { Lesson, Unit } from "@/content/types";
 import {
   collectedLetters,
   goalKind,
   goalState,
+  learntLetters,
   sectionLetter,
   storyStep,
   symbolsBack,
+  voyageStage,
 } from "@/lib/storyProgress";
 
 const none = () => false;
@@ -49,16 +61,14 @@ test("every unit has its goal: writing, letters, vowels, then one market station
     "letters",
     "letters",
   ]);
-  // A market day: each station once, and only the last one ends with the ship sailing.
+  // The coffee trader's journey, Haraz to Mocha: each maths station once.
   expect(math.units.map((u) => goalKind(u, "math"))).toEqual([
     "sort",
     "count",
     "add",
-    "carry",
-    "pack",
+    "give",
+    "ship",
   ]);
-  const sails = Object.entries(GOAL_LINES).filter(([, l]) => l.complete.includes("أَبْحَرَتِ"));
-  expect(sails.map(([kind]) => kind)).toEqual(["pack"]);
   expect(goalKind({}, "science")).toBeNull();
 });
 
@@ -123,25 +133,55 @@ test("the preparation unit writes lines on a page, the last with the last lesson
   });
 });
 
-test("each Arabic letter is delivered to someone from its unit's stories", () => {
-  for (const unit of books.find((b) => b.id === "arabic-1")!.units) {
-    const kind = goalKind(unit, "arabic")!;
-    if (kind === "writing") {
-      expect(unit.recipient).toBeUndefined();
-      expect(finishLine(unit, kind)).toBe(GOAL_LINES.writing.complete);
-      continue;
+test("every unit is a station on Hudhud's journey, and ends with its clue or lesson", () => {
+  for (const book of books.filter((b) => b.available))
+    for (const unit of book.units) {
+      const kind = goalKind(unit, book.subject)!;
+      const station = STATIONS[unit.id];
+      expect(station).toBeDefined();
+      expect(stationScenes(unit.id)!.map((s) => s.line)).toEqual([station.where, station.ask]);
+      expect(pathLine(unit.id, kind)).toBe(station.ask);
+      expect(finishLine(unit.id, kind)).toBe(station.outro);
+      expect(goalLine(unit.id, kind, true)).toBe(station.outro);
+      expect(goalLine(unit.id, kind, false)).toBe(GOAL_LINES[kind].missing);
     }
-    expect(unit.recipient?.to).toMatch(/^إِلَى /);
-    expect(unit.recipient?.pictures.length).toBeGreaterThan(0);
-    expect(finishLine(unit, kind)).toBe(
-      `${GOAL_LINES[kind].complete} سَأُوصِلُهَا ${unit.recipient!.to}.`,
-    );
-    expect(goalLine(unit, kind, true)).toContain(unit.recipient!.to);
-    expect(goalLine(unit, kind, false)).toBe(GOAL_LINES[kind].missing);
-  }
+  // The last unit brings the last letters: then Hudhud reads Rasha's note.
+  expect(STATIONS.a8.outro).toContain("وَرَقَةَ رَشَا");
+  // The postman's central wisdom: words reach where people cannot.
+  expect(Object.values(STATIONS).some((s) => s.outro.includes("الْكَلِمَاتُ تَصِلُ"))).toBe(true);
+  // The trader's ship sails, and he passes Rasha's kindness on: water for the birds.
+  expect(STATIONS["math-u5"].outro).toContain("صَحْنَ مَاءٍ لِلطُّيُورِ");
 });
 
-test("the story ends by subject: letters delivered, the ship gone", () => {
-  expect(SUBJECT_DONE.arabic).toContain("رَسَائِلِي");
+test("Rasha's message becomes readable only with the letters of the whole book", () => {
+  const arabic = books.find((b) => b.id === "arabic-1")!;
+  const letters = new Set([...MESSAGE.words, MESSAGE.name].flatMap(messageLetters));
+  const taught = learntLetters(arabic.units, () => true);
+  for (const letter of letters) if (letter !== "ا") expect(taught.has(letter)).toBe(true);
+  // At the start none of them is learnt yet; unit 2 alone does not make it readable.
+  expect(learntLetters(arabic.units, () => false).size).toBe(0);
+  const unit2 = new Set(getUnit("a2")!.lessons.map((l) => l.id));
+  const after2 = learntLetters(arabic.units, (l) => unit2.has(l.id));
+  expect([...letters].some((l) => l !== "ا" && !after2.has(l))).toBe(true);
+  // Not before the last unit: the ش of her name comes in unit 8.
+  const before8 = new Set(
+    arabic.units.filter((u) => u.id !== "a8").flatMap((u) => u.lessons.map((l) => l.id)),
+  );
+  const almost = learntLetters(arabic.units, (l) => before8.has(l.id));
+  expect([...letters].filter((l) => l !== "ا" && !almost.has(l))).toEqual(["ش"]);
+  // «Fill the bowl for me», signed Rasha.
+  expect(MESSAGE.words.join(" ")).toBe("اِمْلَأِ الصَّحْنَ لِي");
+});
+
+test("one more sack goes on the ship with every maths unit finished; with all it sails", () => {
+  const math = books.find((b) => b.id === "math-1")!;
+  expect(voyageStage(math.units, () => false)).toBe(0);
+  expect(voyageStage(math.units, () => true)).toBe(5);
+  const first = new Set(math.units[0].lessons.map((l) => l.id));
+  expect(voyageStage(math.units, (l) => first.has(l.id))).toBe(1);
+});
+
+test("the story ends by thread: the message read, the ship sailed", () => {
+  expect(SUBJECT_DONE.arabic).toContain("رَشَا");
   expect(SUBJECT_DONE.math).toContain("السَّفِينَةُ");
 });

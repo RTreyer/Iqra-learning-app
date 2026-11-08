@@ -11,7 +11,7 @@ Hudhud ist auf jedem Kinder-Bildschirm die eine Figur, die durch die Welt geht u
 | Start | begrüsst, lädt zur Geschichte ein | `app/index.tsx` |
 | Geschichte | ist der Held: Briefbote, Sturm, Bitte um Hilfe | `app/intro.tsx`, `components/world/StoryScenes.tsx` |
 | Lernpfade (mit Palmen am Wegrand) | fliegt im Bogen vom letzten Stopp zum nächsten, landet und sagt dort seinen Satz | `components/world/PathMap.tsx` |
-| Ende jeder Einheit | Arabisch: sein Brief, den der Sturm verweht hat; mit jeder Lektion kehren Buchstaben zurück, mit der ganzen Einheit ist er vollständig, versiegelt und leuchtet. Mathe: die Kaffeesäcke des Händlers in Mokka, einer nach dem anderen gezählt, bis das Schiff ablegt | `components/world/StoryGoal.tsx` |
+| Ende jeder Einheit | Arabisch: der Hinweis der Station auf Rashas Spur (Türschild, Heft, Bootsname, Brief); mit jedem fertigen Abschnitt kann Hudhud einen Buchstaben mehr lesen, mit der ganzen Einheit ist er gelesen und leuchtet. Mathe: eine Station der Kaffee-Reise des Händlers (Kirschen sortieren, Säcke zählen, Säcke dazuzählen, verschenken, Schiff beladen) | `components/world/StoryGoal.tsx` |
 | Nach jeder Lektion | zeigt auf dem Abschluss den Brief bzw. die Säcke; was die Lektion zurückgebracht hat, leuchtet, und er sagt es («رَجَعَ حَرْفٌ إِلَى رِسَالَتِي!» / «عَدَدْنَا كِيسًا آخَرَ!») | `lib/storyProgress.ts`, `app/lesson/[lessonId].tsx` |
 | Jede Übung | steht über der Aufgabe, seine Sprechblase zeigt die Anweisung (Antippen wiederholt sie); hüpft bei richtigen Antworten, wackelt verwundert bei falschen | `components/world/LessonGuide.tsx` |
 | Vorgemachtes Beispiel | erzählt in seiner Sprechblase, was die Hand vormacht | `components/demo/DemoPlayer.tsx` |
@@ -57,77 +57,41 @@ Pro Bildschirm gibt es nur einen Hudhud. Die Elternecke hat keinen; sie ist für
 
 ## Hudhuds Geschichte
 
-Beim ersten Tipp auf Play erzählt Hudhud seine Geschichte (`content/story.ts`, `app/intro.tsx`), fünf Szenen mit Stimme, jede mit einem bewegten Bild:
+Im Geist einer stillen Reise (wie «Der kleine Prinz», ohne dessen Figuren) und mit der heutigen Lage im Jemen nur angedeutet: Vertreibung, Wassermangel, Gemeinschaft, Hoffnung. Keine Kriegsbilder, keine Schuldigen. Hudhud erzählt selbst (`content/story.ts`, `app/intro.tsx`, Bilder in `components/world/StoryScenes.tsx`, `Bowl.tsx`, `StoryArt.tsx`, `Voyage.tsx`).
 
-1. Hudhud ist der Briefbote des Jemen und bringt die Briefe zu allen Häusern. Er fliegt mit Flügelschlag über Sanaa, eine lederne Brieftasche umgeschnallt, aus der die Briefe hervorschauen.
-2. Ein Sandsturm zieht auf: dunkle Wolken, Sandschleier und Sandkörner jagen durchs Bild, Hudhud kämpft mit schlagenden Flügeln gegen die Böen. Der Sturm reisst die drei Briefe nacheinander vorne aus der Tasche, unter dem Schnabel hindurch und vor Hudhud hoch (nie über ihn hinweg); in der Luft platzt jeder Brief auf, und seine Buchstaben wirbeln als Papierkärtchen davon. Danach ist die Tasche leer und bleibt es in den folgenden Szenen. Die Szene dauert mindestens 5,6 Sekunden, damit der Sturm fertig spielt.
-3. Auf dem Markt von Mokka weiss der Händler nicht, wie viele Säcke Kaffee er hat.
-4. Die Menschen warten, das Schiff wartet: «Ich brauche deine Hilfe!»
-5. «Hilfst du mir? Wir sammeln Buchstaben oder zählen auf dem Markt. Wähle!»
+**Kapitel 1** (beim ersten Tipp auf Play, 12 lebende Bilder): Hudhud wohnt auf einem Dach in Sanaa. Im heissen Sommer findet er kein Wasser: die Erde ist rissig, der Krug leer, die Hitze flimmert. Eines Morgens kommt ein Mädchen aufs Dach und giesst Wasser in eine Tonschale; Hudhud trinkt, Spatz und Taube kommen dazu. «Du kennst uns doch gar nicht!» – «Aber ihr habt Durst.» Sie heisst Rasha; Tag für Tag (Sonne, Nacht, Sonne) wartet er auf sie, und sie kommt. Dann ein trauriger Tag: Ihre Familie lädt ihre Sachen auf einen Pick-up und zieht weit weg; Rasha winkt von der Ladefläche, Hudhud fliegt ein Stück hinterher. Am nächsten Morgen bleibt die Schale leer; er wartet, bis es Nacht wird. Unter die Schale hat sie einen Zettel geklemmt. Hudhud zieht ihn mit dem Schnabel hervor und kann ihn nicht lesen. «Rasha hat uns Wasser gegeben, als wir Durst hatten. Jetzt bin ich dran: Ich suche sie!» Er steckt ihren Zettel unter seinen Flügel und macht sich auf (eine Tasche bekommt er erst vom Postboten). Dann erscheint die Karte des Jemen: Sanaa mit Rashas Schale als Zuhause, gestrichelte Flugwege und die Orte, je einer pro Faden: Sanaa selbst (der alte Postbote, Lesen) und Mokka am Roten Meer (der Kaffeehändler, Mathe). Sokotra ist als Ort für ein späteres Fach eingezeichnet und mit «قَرِيبًا» (bald) markiert. Dieselbe Karte ist danach auf dem Startbildschirm die Fachwahl. «Wo suche ich zuerst? Wähle einen Ort!» Das Kind tippt auf einen Ort; das ist die Wahl des Fachs (`components/world/YemenMap.tsx`, `MAP_PLACES` in `content/story.ts`). Wie beim kleinen Prinzen trifft Hudhud an jedem Ort Figuren: den alten Postboten, die Lehrerin, den Fischer, den Händler. Die Bilder sind animiert wie ein Zeichentrick: Hudhud besteht aus beweglichen Teilen (Kopf nickt und neigt sich, das Auge blinzelt, der Schnabel bewegt sich, solange die Stimme erzählt, beim Hüpfen staucht und streckt er sich; er geht mit abwechselnden Schritten, wippendem Körper und vorruckendem Kopf, und er kann staunen: aufgestellte, gefächerte Haube, grosse Augen, hochgezogene Braue, offener Schnabel – wenn Rasha Wasser eingiesst, wenn er den Zettel findet, im Postamt), Rasha besteht ebenfalls aus Teilen: Sie atmet, blinzelt, neigt freundlich den Kopf, geht mit abwechselnden Schritten unter dem Kleid, schwingenden Armen und schwingendem Kleid und kann lächeln, strahlen (lachende Augen, offenes Lächeln), staunen (runde Augen, hochgezogene Brauen, kleiner runder Mund: wenn ein Wiedehopf an ihre Schale kommt, wenn Spatz und Taube landen) oder traurig sein, die Menschen der Geschichte (alter Postbote, Mutter, Lehrerin, Fischer, Polizist, Grossvater, Kaffeehändler) zeigen Gefühle: Ihr Gesicht wird je nach Stimmung neu gezeichnet (lächeln, strahlen, staunen, traurig; `components/world/Person.tsx`, Stimmung pro Station in `STATIONS[…].feels`), sie blinzeln, atmen, wippen vor Freude, zucken beim Staunen zurück und sinken bei Traurigkeit zusammen; in der Geschichte stehen sie als ganze Figur (unter dem Brustbild ein langes Gewand in der Farbe ihrer Kleidung und zwei Füsse) und gehen mit abwechselnden Schritten, schwingendem Gewand und wippendem, schaukelndem Oberkörper: an jeder Station kommt die Person Hudhud von der anderen Seite entgegen, der alte Postbote tritt auf ihn zu; beim «Hilfst du?» jeder Station strahlen sie, der Händler ist erst besorgt, staunt beim Zählen und freut sich am Ende, die Kamera fährt langsam heran, und die Berge ziehen langsamer vorbei als die Häuser (Tiefe). Jedes Bild läuft mindestens so lange, bis seine Bewegung zu Ende ist; «Überspringen» führt direkt zur Wahl.
 
-Zwischen den Szenen blättert die Geschichte wie ein arabisches Buch um: Die alte Szene spielt weiter, während sie ausblendet und nach rechts gleitet, die neue gleitet von links herein; der gesprochene Satz und am Ende die Fachwahl erscheinen sanft. Die Szenen gehen weiter, sobald die Stimme fertig ist; Antippen geht sofort weiter, «تخطَّ» springt zur Wahl. Die Wahl legt das Fach fest (Briefe = Arabisch, Markt = Mathe) und öffnet dessen Lernpfad. Hudhud ist ein ausgedachter Bote; Figuren aus dem Koran werden nicht dargestellt. Die fünf Sätze sind einfaches Hocharabisch und die ersten Kandidaten für Aufnahmen.
+**Zwei Fäden, je ein Fach**:
 
-### Die Geschichte in den Lernpfaden
+- **Arabisch: Der alte Postbote.** In einer alten Gasse von Sanaa trifft Hudhud einen alten, etwas sonderbaren Mann mit einer grossen Ledertasche, die mehr Flicken als Leder hat. Er klopft an Türen; manche Menschen lächeln, manche weinen. «Was ist in deiner Tasche?» – «Briefe. Worte, die reisen.» Er teilt sein Brot mit dem Vogel: «Brot ist für den Hunger des Bauches, Briefe für den Hunger des Herzens.» – «Komm mit, und lerne lesen. Du wirst die Namen lesen, und Rashas Zettel!» Der Postbote ist Hudhuds Lehrer: Er erklärt ihm nicht die Welt, er lässt ihn entdecken. Jede Einheit ist eine Zustellung mit einer Weisheit: der Brief an Mutter Amina von ihrem fernen Sohn («Nicht jede Träne ist Traurigkeit»), der Brief an die Lehrerin, den Hudhud öffnen möchte («Nicht alles, was wir tragen, gehört uns»), der Brief an den Fischer von seinem fernen Bruder («Worte erreichen, wohin Menschen nicht mehr gelangen»), der erste Brief, den Hudhud allein über die Berge von Haraz trägt («Es genügt, dass er angekommen ist»), der Brief ohne Empfänger beim singenden Bulbul («Singst du nur, wenn jemand zuhört?»), die alte Schrift am Brunnen («Jemand hat sie vor Jahren geschrieben, und sie spricht noch zu uns»), und zuletzt die letzten Buchstaben (Einheit 8): «Nur noch ein Buchstabe ihres Namens, dann lese ich Rashas Zettel!» Denn darum geht es im ganzen Faden: Hudhud lernt die Buchstaben, um Rashas Zettel am Schluss lesen zu können. Auf dem Zettel unter der Schale steht «اِمْلَأِ الصَّحْنَ لِي» («Füll die Schale für mich») mit ihrem Namen; er wird Buchstabe für Buchstabe lesbar (Einheiten 2, 3, 6, 7 und 8; das ش ihres Namens kommt erst in Einheit 8); auf der Buchseite steht die Schale auf dem Zettel, gelernte Buchstaben in Tinte.
+- **Mathe: Wer zählen kann, kann helfen.** In Mokka, dem alten Kaffeehafen am Roten Meer, trifft Hudhud einen traurigen Kaffeehändler: Sein Helfer ist fort, er weiss nicht, wie viele Säcke er hat, und das Schiff in Mokka wartet nicht. «Rasha hat uns geholfen, also helfen wir ihm!» Jede Mathe-Einheit ist eine Station in Mokka: auf dem Markt die roten (reifen) von den grünen Kaffeekirschen sortieren, die die Bauern aus den Bergen bringen, im Lager die Säcke zählen («Der Händler lächelt zum ersten Mal»), die Säcke des Kamels dazuzählen, am Meer Kaffee an die Nachbarn verschenken und sehen, was bleibt («Wer gibt, wird nicht ärmer»), im Hafen von Mokka Pakete in allen Formen aufs Schiff laden. Wenn das Schiff ablegt, stellt der Händler eine Schale Wasser für die Vögel auf: Rashas Freundlichkeit geht weiter. Am Ende des Pfads liegt die Dau am Kai, mit jeder fertigen Einheit kommt ein Sack an Bord, mit allen fünf setzt sie Segel.
 
-Jede Einheit hat ein Ziel am Ende ihres Pfads (`GoalKind` in `content/types.ts`, Logik in `lib/storyProgress.ts`, Sätze in `GOAL_LINES` in `content/story.ts`). Die Buchstaben-Leiste oben, das Ziel am Pfadende und die Abschlusskarte lesen denselben Zustand und widersprechen sich nie.
+**Stationen** (`STATIONS`): Beim ersten Öffnen einer Einheit erzählt Hudhud, wo er ist und was zu lesen oder zu zählen ist; sein Satz auf dem Pfad ist diese Aufgabe, und die Abschlusskarte der Einheit sagt den Hinweis oder die Lehre. Das Ziel am Pfadende zeigt, wer den Hinweis hat.
 
-| Einheit | Ziel | Was sich füllt |
-|---|---|---|
-| A1 Vorbereitung | Hudhud lehrt das Schreiben: eine leere Briefseite | eine Zeile Schrift pro Viertel der Lektionen, die letzte mit der letzten Lektion; am Ende seine Schilfrohrfeder |
-| A2, A3, A6, A7, A8 | Hudhuds Brief | ein Buchstabe kehrt zurück, sobald alle Lektionen seines Abschnitts fertig sind; die Übungen am Ende versiegeln den Brief |
-| A4, A5 (Vokalzeichen) | derselbe Brief, die Buchstaben ohne «Kleider» | die Buchstaben (schon aus A2 bekannt) stehen blass da und bekommen ihr Vokalzeichen zurück, wenn ihr Abschnitt fertig ist; auch die Leiste zeigt dann «مُ» |
-| M1 Sortieren | Markttag, Station 1 | drei Körbe (Honig, Rosinen, Kaffee) werden gefüllt |
-| M2 Zahlen | Station 2 | die Säcke ١ bis ٥ werden gezählt |
-| M3 Addieren | Station 3 | das Kamel bringt Säcke, sie kommen dazu (+) |
-| M4 Subtrahieren | Station 4 | Säcke gehen vom Kai weg aufs wartende Schiff |
-| M5 Formen | Station 5 | die Waren werden verpackt (Quader, Zylinder, Würfel, Kugel); erst dann legt das Schiff ab, einmal, am Ende des Buchs |
+**Die tägliche Schale** ersetzt die Qamariya: Jede Lektion des Tages füllt Rashas Schale ein wenig, mit drei ist sie voll, und die Vögel trinken. Hudhud wartet jeden Morgen, wie Rasha auf ihn gewartet hat. An einem Tag ohne Lektion geht nichts verloren.
 
-Der Sturm im Intro bläst deshalb «die Buchstaben und ihre Vokalzeichen» aus den Briefen.
+**Ende** (wenn alle Lektionen beider Fächer fertig sind, einmal): Hudhud fliegt heim nach Sanaa und sieht unterwegs überall Schalen mit Wasser für die Vögel. Dann liest er endlich Rashas Zettel: «اِمْلَأِ الصَّحْنَ لِي» – «Füll die Schale für mich». Er staunt, und dann lässt er den Kopf hängen: «Aber ich bin ein Vogel, ich kann das nicht!» Also tut er, was er beim Postboten gelernt hat: Worte erreichen, wohin Menschen nicht mehr gelangen. Er bringt den Zettel zu dem kleinen Mädchen, das jetzt in Rashas Haus wohnt. Sie staunt über den Vogel, liest den Zettel, strahlt, und füllt die Schale. «Rasha ist fort, aber ihre Worte sind angekommen, und ihre Freundlichkeit ist geblieben.» Sticker sind Andenken von der Reise.
 
-**Zustellung**: Jeder fertige Brief geht an eine Person aus den Geschichten der Einheit; ihr Bild steht unter dem Brief, blass auf dem Weg, mit Goldrand, wenn er zugestellt ist. Die Abschlusskarte der letzten Lektion sagt «اِكْتَمَلَتِ الرِّسَالَةُ! سَأُوصِلُهَا …», das Ziel danach «أَوْصَلْتُ رِسَالَتِي … شُكْرًا لَكَ!».
-
-| Einheit | Empfänger |
-|---|---|
-| A2 | إِلَى مَامَا وَبَابَا |
-| A3 | إِلَى الْمُعَلِّمَةِ بَيَانَ |
-| A4 | إِلَى أَصْدِقَائِي عَلَى الشَّاطِئِ |
-| A5 | إِلَى رَجُلِ الْمُرُورِ |
-| A6 | إِلَى صَابِرٍ وَبُلْبُلِهِ |
-| A7 | إِلَى وَسِيمٍ |
-| A8 | إِلَى جَدِّي |
-
-**Ende der Geschichte**: Hat das Kind alle Lektionen eines Fachs mit drei Sternen, sagt Hudhud auf der Startseite «وَصَلَتْ كُلُّ رَسَائِلِي! شُكْرًا لَكَ!» (Arabisch) bzw. «أَبْحَرَتِ السَّفِينَةُ، وَالتَّاجِرُ سَعِيدٌ! شُكْرًا لَكَ!» (Mathe). **Sticker** sind Dankesgeschenke: «هَدِيَّةُ شُكْرٍ لَكَ: …». Das Naturkunde-Buch (noch gesperrt) hat bewusst kein Ziel, bis es eine eigene Geschichte bekommt.
-
-**Play danach**: öffnet die nächste noch nicht gemachte Lektion im gewählten Fach; ein kleines Abzeichen (أ / ١) zeigt, welches. **Wechseln**: Antippen einer Insel öffnet dieses Buch und macht es zum Fach für Play (goldener Rand). Ein Buch-Knopf oben spielt die Geschichte nochmals ab.
-
-## Englischer Erklär-Modus
-
-Für Erwachsene, die kein Arabisch lesen (Eltern im Ausland, Lehrkräfte, Spender, Prüfer): Wer in der Elternecke die Menüsprache auf English stellt, sieht und hört, was in der App passiert (`lib/explain.ts`, `components/Gloss.tsx`).
-
-- **Englisch, mit englischer Stimme**: alles, was Hudhud und die App sagen und zeigen: das Intro, Hudhuds Sätze auf Pfaden und am Ziel, Anweisungen, Lob und «Try again», Mathe-Fragen, Lektions- und Abschnittstitel (`content/translations/lines.ts`).
-- **Arabisch mit Übersetzung darunter**: der Lernstoff bleibt, was das Kind sieht und hört. Wörter und Lesesätze zeigen klein ihre englische Bedeutung (`content/translations/gloss.ts`), Buchstaben und Silben eine Lateinlesung («م» → «the letter mīm», «مَا» → «mā», `lib/transliterate.ts`). Gesprochen werden sie weiter mit der arabischen Stimme.
-- **Gemischte Sätze** wie «حَاوِلْ مَرَّةً أُخْرَى، مَ» werden Teil für Teil gesprochen: «Try again,» englisch, der Buchstabe arabisch.
-- Die Sprache wird vor dem ersten gesprochenen Satz geladen, damit nichts in der falschen Sprache beginnt.
-- `test-utils/explainStrings.ts` sammelt alle Texte; ein Test meldet jeden ohne Übersetzung. Die Übersetzungen sind maschinell und sollten gegengelesen werden. Hudhuds «رِسَالَة» heisst durchgehend «message», ein Buchstabe «letter».
+Zwischen den Szenen blättert die Geschichte wie ein arabisches Buch um. Die Szenen gehen weiter, sobald die Stimme fertig ist; Antippen geht sofort weiter, «تخطَّ» springt zur Wahl bzw. aus einem Kapitel oder einer Station heraus. Gespeichert in `chaptersSeen`. Alle Sätze sind einfaches Hocharabisch, zur Sprachprüfung in `docs/CONTENT_REVIEW.md`; die englischen Übersetzungen für den Erklär-Modus sind ergänzt.
 
 ## Aufbau
 
 | Bildschirm | Was das Kind sieht | Code |
 |---|---|---|
-| Start | Hudhud mit Gruss («بِسْمِ اللهِ! هَيَّا نَتَعَلَّمُ»), ein grosser Play-Knopf direkt zur nächsten Lektion, eine Insel pro Buch (أ ب ت / ١ ٢ ٣), die Qamariya des Tages, das Stickeralbum, bei fälligen Wiederholungen eine Brief-Kachel. Unten die Altstadt von Sanaa. | `app/index.tsx` |
+| Start | Hudhud mit Gruss («بِسْمِ اللهِ! هَيَّا نَتَعَلَّمُ»), ein grosser Play-Knopf direkt zur nächsten Lektion, die Karte des Jemen als Fachwahl (Sanaa mit dem Postboten: Lesen, Mokka: Mathe, jeweils mit Buchtitel und Fortschrittsbalken, das aktuelle Fach golden umrandet; Sokotra grau mit «قَرِيبًا», beim Antippen sagt Hudhud «Ich fliege bald dorthin»), Rashas Schale des Tages, das Stickeralbum, bei fälligen Wiederholungen eine Brief-Kachel. Unten die Altstadt von Sanaa. | `app/index.tsx` |
 | Buch | Die Einheiten als Stationen auf einem Weg. Ein Ring zeigt, wie viel erledigt ist; die nächste Station leuchtet, Hudhud steht mit seiner Sprechblase daneben. | `app/book/[bookId].tsx`, `components/world/PathMap.tsx` |
 | Einheit | Die Lektionen als Weg. Jede Übungsart hat ein festes Bild (Buch = Geschichte, Stift = Schreiben, Auge = Wörter …). Erledigt = gold mit Sternen, jetzt = farbig mit Lichtring, später = sandfarben, aber offen. Hudhud steht neben der nächsten Lektion und sagt das Thema der Einheit; der Pfad scrollt beim Öffnen zu ihm. Oben die Buchstaben der Einheit, die sich beim Antippen selbst sprechen. | `app/unit/[unitId].tsx`, `components/world/lessonPicture.tsx` |
 | Übung | Fortschritt als Reihe von Briefen, die in Hudhuds Posttasche fliegen (Mathe: Kaffeesäcke bis zum Schiff), statt «سؤال ١ من ٤». | `components/activities/shared/StoryProgress.tsx` |
-| Geschafft | Sterne springen einzeln auf, kurzes Konfetti in den Qamariya-Farben, Hudhud jubelt, die Qamariya des Tages, ein neuer Sticker. Drei Bildknöpfe: Karte, weiter, nochmal. | `components/LessonCompleteCard.tsx` |
+| Geschafft | Sterne springen einzeln auf, kurzes Konfetti in den Qamariya-Farben, Hudhud jubelt, Rashas Schale des Tages, ein neuer Sticker. Drei Bildknöpfe: Karte, weiter, nochmal. | `components/LessonCompleteCard.tsx` |
 | Album | Neun Sticker mit Motiven aus dem Jemen; jeder sagt seinen Namen. Ein Balken zeigt den Weg zum nächsten. | `app/album.tsx`, `lib/stickers.ts` |
-| Elternecke | Hinter einer Halten-Sperre (1,5 s): Klasse, Menüsprache, Stimme, Vibration, Fortschritt, Zurücksetzen mit zweiter Bestätigung. | `app/parents.tsx`, `context/SettingsContext.tsx` |
+| Elternecke | Hinter einer Halten-Sperre (1,5 s): Klasse, Menüsprache, Stimme, Vibration, «Geschichte neu anschauen» (setzt nur den Erzählstand zurück: Kapitel 1, die Kapitel und alle Stationen werden wieder erzählt; Fortschritt, Sterne und Sticker bleiben), Fortschritt, Zurücksetzen mit zweiter Bestätigung. | `app/parents.tsx`, `context/SettingsContext.tsx` |
 
 Hudhud spricht mit der Stimme der App; die Sprechblase zeigt nur, was gesagt wird. Antippen von Hudhud wiederholt den Satz.
 
 ## Belohnungen
 
 - **Sterne** wie bisher: 1 bis 3 pro Lektion, nur der beste Versuch zählt.
-- **Qamariya des Tages**: jede heute abgeschlossene oder verbesserte Lektion färbt ein Glasfeld; nach drei leuchtet das Fenster (`lib/daily.ts`). Am nächsten Tag beginnt es leer, ohne Strafe. Die frühere Serie (Streak) ist entfernt.
+- **Rashas Schale des Tages**: jede heute abgeschlossene oder verbesserte Lektion füllt die Tonschale ein wenig; nach drei ist sie voll und die Vögel trinken (`lib/daily.ts`, `components/world/Bowl.tsx`). Am nächsten Tag beginnt es leer, ohne Strafe. Die frühere Serie (Streak) ist entfernt.
 - **Sticker**: alle 12 Sterne einer, in fester Reihenfolge (`lib/stickers.ts`). Nie zufällig.
 
 ## Fehler ohne Beschämung
@@ -150,5 +114,5 @@ Eine falsche Karte wackelt kurz, wird grau und lässt sich nicht nochmals antipp
 - **Soundeffekte** (sanftes Glöckchen, Vogelruf, Klatschen): brauchen Audiodateien und ein Audio-Modul.
 - **Junge / Mädchen**: Arabische Anweisungen sind heute männlich formuliert (اِضْغَطْ). Eine Einstellung in der Elternecke braucht weibliche Formen aller gesprochenen Anweisungen, geprüft von einer Muttersprachlerin oder einem Muttersprachler.
 - **Sprachprüfung**: Hudhuds Geschichte, seine Sätze, Stickernamen und die Texte der Elternecke von einer jemenitischen Lehrkraft prüfen lassen.
-- **Geschichte weiterführen**: Der vollständige Brief am Ende einer Einheit könnte an einen Ort im Jemen zugestellt werden (Shibam, Aden, Sokotra …), mit einem Satz Geschichte.
+- **Langfassung der Geschichte**: Die ausführliche Fassung von Hudhuds Reise (Ma'rib, Haraz, Aden, Sokotra, die Rückkehr) könnte als Vorlesegeschichte für Eltern in die Elternecke.
 - **Klassenwahl**: Nur Klasse 1 hat Bücher; die Elternecke zeigt die anderen als «قريباً». Sobald weitere Klassen Inhalt haben, wird die Wahl dort aktiv.

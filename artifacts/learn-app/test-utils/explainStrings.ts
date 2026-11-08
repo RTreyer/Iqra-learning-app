@@ -106,18 +106,13 @@ export function collectExplainStrings(): { lines: string[]; gloss: string[] } {
           title: unit.title,
           theme: unit.theme,
           badgeLabel: unit.badgeLabel,
-          recipient: unit.recipient,
         },
         "",
         lines,
         gloss,
       );
       for (const lesson of unit.lessons) walk(lesson, "", lines, gloss);
-      const kind = story.GOAL_LINES && unit.goal;
-      if (kind) {
-        lines.add(story.finishLine(unit, kind));
-        lines.add(story.goalLine(unit, kind, true));
-      }
+      if (unit.goal) lines.add(story.finishLine(unit.id, unit.goal));
     }
   }
   for (const demo of Object.values(DEMOS)) {
@@ -126,9 +121,18 @@ export function collectExplainStrings(): { lines: string[]; gloss: string[] } {
   }
   strings([DEMO_START, DEMO_END], lines);
   strings(story.INTRO_STORY, lines);
+  strings(story.CHAPTERS, lines);
+  for (const station of Object.values(story.STATIONS))
+    for (const line of [station.where, station.ask, station.outro]) lines.add(line);
+  strings(story.MESSAGE, lines);
+  for (let done = 0; done <= 3; done++) lines.add(story.bowlLine(done, 3));
   strings(story.SUBJECT_LINES, lines);
   strings(story.GOAL_LINES, lines);
   strings(story.SUBJECT_DONE, lines);
+  // The map of Yemen at the end of chapter 1: the names of the places, who waits there.
+  strings(story.HOME_PLACE, lines);
+  strings(story.MAP_PLACES, lines);
+  lines.add(story.SOON_LINE);
   strings(ACTIVITY_INSTRUCTIONS, lines);
   for (const sticker of STICKERS) {
     lines.add(sticker.name);

@@ -5,7 +5,10 @@ import React from "react";
 import ParentsScreen from "@/app/parents";
 import { ProgressProvider } from "@/context/ProgressContext";
 import { SETTINGS_KEY, SettingsProvider } from "@/context/SettingsContext";
+import { routes } from "@/lib/routes";
 import { mockCanGoBack, renderScreen } from "@/test-utils/screens";
+
+const { router } = jest.requireMock("expo-router") as { router: { replace: jest.Mock } };
 
 const KEY = "@kidlearn_progress_v1";
 
@@ -80,4 +83,29 @@ test("resetting progress asks once more, and cancel keeps everything", async () 
   });
   expect(await AsyncStorage.getItem(KEY)).toBeNull();
   expect(screen.getByText("تم مسح التقدم")).toBeTruthy();
+});
+
+test("watching the story again forgets only what was told, not the progress", async () => {
+  const lessons = { "u1-1": { completed: true, stars: 3, completedAt: new Date().toISOString() } };
+  await AsyncStorage.setItem(
+    KEY,
+    JSON.stringify({ version: 2, lessons, items: {}, activity: { days: [] }, totalStars: 3 }),
+  );
+  await AsyncStorage.setItem(
+    SETTINGS_KEY,
+    JSON.stringify({ introSeen: true, bookId: "math-1", chaptersSeen: ["arabic", "math", "a2"] }),
+  );
+  renderParents();
+  await act(async () => {});
+  await open();
+  await act(async () => {
+    fireEvent.press(screen.getByTestId("story-restart"));
+  });
+  expect(JSON.parse((await AsyncStorage.getItem(SETTINGS_KEY))!)).toMatchObject({
+    introSeen: false,
+    chaptersSeen: [],
+  });
+  // The lessons and stars stay; home tells the story on the next play.
+  expect(JSON.parse((await AsyncStorage.getItem(KEY))!).totalStars).toBe(3);
+  expect(router.replace).toHaveBeenCalledWith(routes.home());
 });

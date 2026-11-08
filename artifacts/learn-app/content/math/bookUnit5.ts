@@ -822,7 +822,7 @@ export const mathBookUnit5: Unit = {
   theme: "الأَشْكَالُ الْهَنْدَسِيَّةُ وَالْكُسُورُ",
   emoji: "🔺",
   emblem: "shapes_window",
-  goal: "pack",
+  goal: "ship",
   color,
   badgeLabel: "أَشْكَالٌ",
   lessons: numberMathLessons(5, drafts),

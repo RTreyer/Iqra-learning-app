@@ -27,6 +27,8 @@ export type Settings = {
   introSeen: boolean;
   /** The subject (book) the child chose to help with; the play button continues there. */
   bookId: string | null;
+  /** Hudhud's jobs (content/story.ts CHAPTERS) already told: each is told once, first time. */
+  chaptersSeen: string[];
 };
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -34,6 +36,7 @@ export const DEFAULT_SETTINGS: Settings = {
   haptics: true,
   introSeen: false,
   bookId: null,
+  chaptersSeen: [],
 };
 
 type SettingsContextValue = {
@@ -61,6 +64,9 @@ export function parseSettings(raw: string | null): Settings {
       haptics: typeof value.haptics === "boolean" ? value.haptics : DEFAULT_SETTINGS.haptics,
       introSeen: value.introSeen === true,
       bookId: typeof value.bookId === "string" ? value.bookId : null,
+      chaptersSeen: Array.isArray(value.chaptersSeen)
+        ? value.chaptersSeen.filter((c): c is string => typeof c === "string")
+        : [],
     };
   } catch {
     return DEFAULT_SETTINGS;

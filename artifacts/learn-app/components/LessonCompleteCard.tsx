@@ -6,7 +6,7 @@ import { goBackOr } from "@/components/BackButton";
 import { UiText } from "@/components/UiText";
 import { Hudhud } from "@/components/world/Hudhud";
 import { Icon, StarIcon } from "@/components/world/Icon";
-import { QamariyaGoal } from "@/components/world/QamariyaGoal";
+import { BowlGoal } from "@/components/world/Bowl";
 import { StickerArt } from "@/components/world/StickerArt";
 import type { Lesson } from "@/content/types";
 import { useLanguage } from "@/context/LanguageContext";
@@ -142,8 +142,8 @@ export function LessonCompleteCard({
       {story}
 
       <View style={[styles.rewards, { flexDirection: row }]}>
-        <View style={styles.window} accessible accessibilityLabel={t("قمرية اليوم")}>
-          <QamariyaGoal filled={today} width={120} frame="#FFFFFF" />
+        <View style={styles.window} accessible accessibilityLabel={t("صحن اليوم")}>
+          <BowlGoal filled={today} width={110} />
         </View>
         {sticker ? (
           <Pressable
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 32, fontWeight: "900", color: yemen.ink },
   rewards: { alignItems: "center", gap: 14 },
   window: {
-    backgroundColor: "#3B2418",
+    backgroundColor: "#FFFFFF",
     borderRadius: 22,
     paddingHorizontal: 16,
     paddingVertical: 12,

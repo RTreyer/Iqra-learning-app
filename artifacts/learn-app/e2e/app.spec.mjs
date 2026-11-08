@@ -121,19 +121,22 @@ test.describe("navigation", () => {
   test("first play tells Hudhud's story; the chosen subject is where play continues, and an island switches it", async ({
     page,
   }) => {
+    // Chapter 1 plays every picture through (about a minute).
+    test.setTimeout(240_000);
     await seedStorage(page, { [SETTINGS_KEY]: JSON.stringify({ introSeen: false }) });
     await gotoAndWaitReady(page, "/");
     await expect(page.getByTestId("continue-card")).toHaveAttribute("aria-label", "قصة هدهد");
     await page.getByTestId("continue-card").click();
     await expect(page).toHaveURL(/\/intro$/);
     // The voice tells each scene and the story moves on by itself (speech ends at once here).
-    await expect(page.getByTestId("intro-scene-choose")).toBeVisible({ timeout: 15000 });
+    await expect(page.getByTestId("intro-scene-map")).toBeVisible({ timeout: 90000 });
     const told = await page.evaluate(() => window.__spoken);
-    expect(told).toContain(
-      "هَبَّتْ عَاصِفَةٌ قَوِيَّةٌ، فَطَارَتِ الْحُرُوفُ وَحَرَكَاتُهَا مِنْ رَسَائِلِي!",
-    );
+    // Rasha's bowl: a message Hudhud cannot read yet.
+    expect(told.some((line) => line.includes("لَا أَعْرِفُ الْقِرَاءَةَ"))).toBe(true);
     await page.getByTestId("choose-math-1").click();
-    await expect(page).toHaveURL(/\/book\/math-1$/);
+    // The seed's thread begins, then its path opens.
+    await expect(page).toHaveURL(/\/intro\?chapter=math$/);
+    await expect(page).toHaveURL(/\/book\/math-1$/, { timeout: 30000 });
 
     await gotoAndWaitReady(page, "/");
     await expect(page.getByTestId("play-subject")).toHaveText("١");
@@ -142,6 +145,9 @@ test.describe("navigation", () => {
 
     await gotoAndWaitReady(page, "/");
     await page.getByTestId("book-arabic-1").click();
+    // The first time on Rasha's trail, Hudhud tells it; Skip opens the path at once.
+    await expect(page).toHaveURL(/\/intro\?chapter=arabic$/);
+    await page.getByTestId("intro-skip").click();
     await expect(page).toHaveURL(/\/book\/arabic-1$/);
     await gotoAndWaitReady(page, "/");
     await expect(page.getByTestId("play-subject")).toHaveText("أ");

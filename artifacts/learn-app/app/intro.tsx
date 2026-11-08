@@ -1,10 +1,12 @@
 /**
- * Hudhud's story (content/story.ts): a few scenes, each told by the voice, then the child
- * chooses how to help, which picks the subject the play button continues in. Shown on the
- * first play; the home screen can play it again. A tap moves on, Skip jumps to the choice.
+ * Hudhud's story (content/story.ts), scene by scene, each told by the voice. Without a chapter:
+ * who Hudhud is (a day worker with a dream), ending in the choice of today's job, which picks
+ * the subject the play button continues in; then that job's chapter. With a chapter
+ * (`?chapter=arabic|math`): only that job, told the first time the child helps with it, then
+ * its path opens. A tap moves on; Skip jumps to the choice, or past the chapter.
  */
 
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useLine } from "@/components/Gloss";
 import React, { useEffect, useState } from "react";
 import { Animated, Easing, Pressable, StyleSheet, Text, View } from "react-native";
@@ -13,20 +15,34 @@ import { goBackOr } from "@/components/BackButton";
 import { ScreenBackground } from "@/components/ScreenBackground";
 import { UiText } from "@/components/UiText";
 import { Icon } from "@/components/world/Icon";
-import { Envelope, Sack, StoryPicture } from "@/components/world/StoryScenes";
+import { StoryPicture } from "@/components/world/StoryScenes";
+import { YemenMap } from "@/components/world/YemenMap";
+import { HudhudTalking } from "@/components/world/Hudhud";
 import { books, type Book } from "@/content";
-import { INTRO_STORY, SUBJECT_LINES } from "@/content/story";
+import {
+  CHAPTERS,
+  INTRO_STORY,
+  MAP_PLACES,
+  chapterFor,
+  stationScenes,
+  type ChapterId,
+  type StoryScene,
+} from "@/content/story";
+import { firstParam } from "@/lib/params";
+import { useLatest } from "@/components/activities/shared/useLatest";
 import { useLanguage } from "@/context/LanguageContext";
 import { useSettings } from "@/context/SettingsContext";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
 import * as haptics from "@/lib/haptics";
 import { routes } from "@/lib/routes";
 import { estimateSpeechMs, speak, stopSpeaking } from "@/lib/speech";
-import { readableFill, touchTarget, yemen } from "@/theme/tokens";
+import { touchTarget, yemen } from "@/theme/tokens";
+
+/** Milliseconds now, read in effects and timers (never during render). */
+const clock = () => Date.now();
 
 /** Pause after a line before the next scene, so a child can look at the picture. */
 const LINGER_MS = 900;
-const LAST = INTRO_STORY.length - 1;
 /** How long one scene takes to give way to the next, like turning a page. */
 const TURN_MS = 700;
 /** How far a scene glides while it comes in or goes (px). */
@@ -37,7 +53,7 @@ const GLIDE = 40;
  * keeps playing) while it fades and glides out to the right, and the new one fades and glides
  * in from the left, the way pages of an Arabic book turn.
  */
-function SceneStage({ index }: { index: number }) {
+function SceneStage({ scenes, index }: { scenes: readonly StoryScene[]; index: number }) {
   const [current, setCurrent] = useState(index);
   const [leaving, setLeaving] = useState<number | null>(null);
   const [turn] = useState(() => new Animated.Value(1));
@@ -66,7 +82,7 @@ function SceneStage({ index }: { index: number }) {
     <View style={styles.picture}>
       {turning ? (
         <Animated.View
-          key={INTRO_STORY[leaving].id}
+          key={`${leaving}-${scenes[leaving].id}`}
           pointerEvents="none"
           style={[
             styles.layer,
@@ -79,12 +95,12 @@ function SceneStage({ index }: { index: number }) {
             },
           ]}
         >
-          <StoryPicture id={INTRO_STORY[leaving].id} />
+          <StoryPicture scene={scenes[leaving]} />
         </Animated.View>
       ) : null}
       <Animated.View
-        key={INTRO_STORY[current].id}
-        testID={`intro-scene-${INTRO_STORY[current].id}`}
+        key={`${current}-${scenes[current].id}`}
+        testID={`intro-scene-${scenes[current].id}`}
         style={[
           styles.layer,
           turning
@@ -100,7 +116,7 @@ function SceneStage({ index }: { index: number }) {
             : null,
         ]}
       >
-        <StoryPicture id={INTRO_STORY[current].id} />
+        <StoryPicture scene={scenes[current]} />
       </Animated.View>
     </View>
   );
@@ -147,34 +163,57 @@ function Appear({
   );
 }
 
-/** The picture on a choice card: a message with letters, or a sack with numbers. */
-function ChoicePicture({ book }: { book: Book }) {
-  if (book.subject === "math")
-    return (
-      <View style={styles.choicePicture}>
-        <View style={styles.sackBox}>
-          <Sack x={0} size={64} />
-        </View>
-        <Text style={styles.choiceGlyph}>١ ٢ ٣</Text>
-      </View>
-    );
-  return (
-    <View style={styles.choicePicture}>
-      <Envelope size={64} />
-      <Text style={styles.choiceGlyph}>أ ب ت</Text>
-    </View>
-  );
+export default function IntroScreen() {
+  const param = firstParam(useLocalSearchParams<{ chapter?: string | string[] }>().chapter);
+  // A chapter of the story (the two threads, the end), or a unit's station.
+  const chapter = param && (param in CHAPTERS || stationScenes(param)) ? param : null;
+  // A new part is a new story: start it from its first scene.
+  return <Story key={chapter ?? "intro"} chapter={chapter} />;
 }
 
-export default function IntroScreen() {
+/** The scenes of a part of the story: chapter 1, a chapter, or a station. */
+function scenesOf(part: string | null): readonly StoryScene[] {
+  if (!part) return INTRO_STORY;
+  return CHAPTERS[part as ChapterId] ?? stationScenes(part) ?? INTRO_STORY;
+}
+
+/** Where a told part leads: a thread to its book's path, a station to its unit, the end home. */
+function afterPart(part: string, bookId: string | null) {
+  if (part === "end") return routes.home();
+  if (!(part in CHAPTERS)) return routes.unit(part);
+  const chosen = books.find((book) => book.id === bookId);
+  const book =
+    chosen && chapterFor(chosen.subject) === part
+      ? chosen
+      : books.find((b) => b.available && chapterFor(b.subject) === part);
+  return book ? routes.book(book.id) : routes.home();
+}
+
+function Story({ chapter }: { chapter: string | null }) {
   const { t, language, loaded: languageLoaded } = useLanguage();
   const line = useLine();
-  const { update } = useSettings();
+  const { settings, update } = useSettings();
   const pad = useScreenPadding();
+  const scenes = scenesOf(chapter);
+  const LAST = scenes.length - 1;
   const [index, setIndex] = useState(0);
-  const scene = INTRO_STORY[index];
-  const choosing = index === LAST;
+  const scene = scenes[index];
+  // While the voice tells the line, Hudhud's beak moves in the picture: until it is told.
+  const [toldLine, setToldLine] = useState<string | null>(null);
+  const talking = languageLoaded && toldLine !== scene.line;
+  const choosing = !chapter && index === LAST;
   const choices = books.filter((book) => book.available);
+
+  /**
+   * The part is told: remember it, then go on. A thread opens its book's path (the book the
+   * child chose, if it fits), a station its unit's path, the end goes home.
+   */
+  const finishChapter = () => {
+    if (!chapter) return;
+    update({ chaptersSeen: [...new Set([...settings.chaptersSeen, chapter])] });
+    router.replace(afterPart(chapter, settings.bookId));
+  };
+  const finishRef = useLatest(finishChapter);
 
   // Tell the scene; move on when the voice is done (or after a fallback), except on the choice.
   useEffect(() => {
@@ -182,13 +221,18 @@ export default function IntroScreen() {
     if (!languageLoaded) return;
     let moved = false;
     let linger: ReturnType<typeof setTimeout> | undefined;
-    const shownAt = Date.now();
+    const shownAt = clock();
     const done = () => {
+      setToldLine(scene.line);
       if (moved || choosing) return;
       moved = true;
       // Stay at least as long as the scene's picture needs (the storm), then a short pause.
-      const wait = Math.max(LINGER_MS, (scene.minMs ?? 0) - (Date.now() - shownAt));
-      linger = setTimeout(() => setIndex((i) => Math.min(LAST, i + 1)), wait);
+      const wait = Math.max(LINGER_MS, (scene.minMs ?? 0) - (clock() - shownAt));
+      linger = setTimeout(() => {
+        // The last scene of a chapter opens the job's path.
+        if (index === LAST) finishRef.current();
+        else setIndex((i) => Math.min(LAST, i + 1));
+      }, wait);
     };
     const fallback = setTimeout(done, estimateSpeechMs(scene.line));
     speak(scene.line, { onDone: done });
@@ -197,20 +241,22 @@ export default function IntroScreen() {
       clearTimeout(fallback);
       clearTimeout(linger);
     };
-  }, [scene.line, scene.minMs, choosing, languageLoaded]);
+  }, [scene.line, scene.minMs, choosing, languageLoaded, index, LAST]);
 
   useEffect(() => () => stopSpeaking(), []);
 
   const next = () => {
     haptics.tap();
-    setIndex((i) => Math.min(LAST, i + 1));
+    if (chapter && index === LAST) finishChapter();
+    else setIndex((i) => Math.min(LAST, i + 1));
   };
 
   const choose = (book: Book) => {
     haptics.success();
     update({ introSeen: true, bookId: book.id });
-    // The book's path greets with this subject's line (app/book/[bookId].tsx).
-    router.replace(routes.book(book.id));
+    // Today's job: its chapter is told next, then its path opens (app/book/[bookId].tsx).
+    const job = chapterFor(book.subject);
+    router.replace(job ? routes.intro(job) : routes.book(book.id));
   };
 
   return (
@@ -226,7 +272,7 @@ export default function IntroScreen() {
           <Icon name="home" size={26} color={yemen.clay} />
         </Pressable>
         <View style={styles.dots} accessible accessibilityLabel={`${index + 1} / ${LAST + 1}`}>
-          {INTRO_STORY.map((s, i) => (
+          {scenes.map((s, i) => (
             <View
               key={s.id}
               style={[styles.dot, i === index && styles.dotOn, i < index && styles.dotDone]}
@@ -240,7 +286,7 @@ export default function IntroScreen() {
             testID="intro-skip"
             accessibilityRole="button"
             accessibilityLabel={t("تخطَّ")}
-            onPress={() => setIndex(LAST)}
+            onPress={() => (chapter ? finishChapter() : setIndex(LAST))}
             style={styles.skip}
           >
             <UiText style={styles.skipText}>تخطَّ</UiText>
@@ -248,57 +294,48 @@ export default function IntroScreen() {
         )}
       </View>
 
-      <Pressable
-        testID="intro-next"
-        accessibilityRole="button"
-        accessibilityLabel={line(scene.line)}
-        disabled={choosing}
-        onPress={next}
-        style={styles.stage}
-      >
-        <SceneStage index={index} />
-        {/* A new line appears as the new scene comes in. */}
-        <Appear key={scene.id} delay={TURN_MS / 3} style={styles.bubble}>
-          <View style={styles.speaker}>
-            <Icon name="speaker" size={22} color={yemen.clay} />
-          </View>
-          <Text style={styles.line}>{line(scene.line)}</Text>
-        </Appear>
-      </Pressable>
-
-      {choosing ? (
-        <Appear
-          delay={TURN_MS}
-          rise={40}
-          style={[
-            styles.choices,
-            {
-              flexDirection: language === "en" ? "row" : "row-reverse",
-              paddingBottom: pad.bottom + 16,
-            },
-          ]}
+      <View style={styles.stageWrap}>
+        <Pressable
+          testID="intro-next"
+          accessibilityRole="button"
+          accessibilityLabel={line(scene.line)}
+          disabled={choosing}
+          onPress={next}
+          style={styles.stage}
         >
-          {choices.map((book) => (
-            <Pressable
-              key={book.id}
-              testID={`choose-${book.id}`}
-              accessibilityRole="button"
-              accessibilityLabel={`${t(book.title)}، ${SUBJECT_LINES[book.subject] ?? ""}`}
-              onPress={() => choose(book)}
-              style={({ pressed }) => [
-                styles.choice,
-                { backgroundColor: readableFill(book.color) },
-                pressed && styles.pressed,
-              ]}
-            >
-              <ChoicePicture book={book} />
-              <UiText style={styles.choiceCaption} numberOfLines={1}>
-                {book.title}
-              </UiText>
-            </Pressable>
-          ))}
-        </Appear>
-      ) : null}
+          <HudhudTalking.Provider value={talking}>
+            <SceneStage scenes={scenes} index={index} />
+          </HudhudTalking.Provider>
+          {/* A new line appears as the new scene comes in. */}
+          <Appear key={scene.id} delay={TURN_MS / 3} style={styles.bubble}>
+            <View style={styles.speaker}>
+              <Icon name="speaker" size={22} color={yemen.clay} />
+            </View>
+            <Text style={styles.line}>{line(scene.line)}</Text>
+          </Appear>
+        </Pressable>
+        {/* The choice: the places on the map of Yemen, over the map picture. */}
+        {choosing ? (
+          <View style={styles.mapPins} pointerEvents="box-none">
+            <YemenMap
+              only
+              pins={choices.flatMap((book) => {
+                const thread = chapterFor(book.subject);
+                if (!thread) return [];
+                const place = MAP_PLACES[thread];
+                return [
+                  {
+                    place: thread,
+                    testID: `choose-${book.id}`,
+                    accessibilityLabel: `${line(place.name)}: ${line(place.what)}، ${t(book.title)}`,
+                    onPress: () => choose(book),
+                  },
+                ];
+              })}
+            />
+          </View>
+        ) : null}
+      </View>
     </ScreenBackground>
   );
 }
@@ -357,20 +394,7 @@ const styles = StyleSheet.create({
     writingDirection: "rtl",
     lineHeight: 34,
   },
-  choices: { paddingHorizontal: 16, gap: 14 },
-  choice: {
-    flex: 1,
-    minHeight: 150,
-    borderRadius: 28,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-    paddingVertical: 12,
-    boxShadow: `0 7px 0 ${yemen.clayDeep}`,
-  },
-  choicePicture: { alignItems: "center", gap: 4 },
-  sackBox: { width: 64, height: 64 },
-  choiceGlyph: { fontSize: 30, fontWeight: "900", color: "#FFFFFF" },
-  choiceCaption: { fontSize: 14, fontWeight: "700", color: "#FFFFFF" },
-  pressed: { opacity: 0.88, transform: [{ scale: 0.96 }] },
+  stageWrap: { flex: 1 },
+  // Over the picture (styles.picture, inside the stage's padding): the map's places.
+  mapPins: { position: "absolute", top: 0, left: 16, right: 16, height: 300 },
 });

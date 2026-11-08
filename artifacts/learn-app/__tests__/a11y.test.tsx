@@ -82,19 +82,19 @@ beforeEach(async () => {
 });
 afterEach(() => jest.useRealTimers());
 
-test("home: play, islands, tiles, Hudhud and the parents' gear", async () => {
+test("home: play, the map's places, tiles, Hudhud and the parents' gear", async () => {
   await seed();
   withProgress(<HomeScreen />);
   await screen.findByTestId("review-card");
-  // Gear, Hudhud, play, 2 islands, today's window, album and review.
-  expectAccessiblePressables(8);
+  // Gear, Hudhud, play, the 2 subjects and Socotra on the map, today's window, album, review.
+  expectAccessiblePressables(9);
 });
 
-test("book: back button, Hudhud and the unit stations", async () => {
+test("book: back button, Hudhud, the unit stations and Rasha's bowl", async () => {
   setParams({ bookId: "arabic-1" });
   withProgress(<BookScreen />);
   await screen.findAllByTestId(/^unit-/);
-  expectAccessiblePressables(11);
+  expectAccessiblePressables(12);
 });
 
 test("unit: back button, Hudhud, the lesson stops (one completed) and Hudhud's letter", async () => {
@@ -126,8 +126,8 @@ test("parents: the gate, then every control behind it", async () => {
   await act(async () => {
     fireEvent(screen.getByTestId("parents-gate"), "longPress");
   });
-  // Back, 2 languages, voice, vibration and reset.
-  expectAccessiblePressables(6);
+  // Back, 2 languages, voice, vibration, the story again, and reset.
+  expectAccessiblePressables(7);
 });
 
 test("lesson u2-2: back button, Hudhud, help button and the activity controls", async () => {

@@ -1,29 +1,29 @@
 /**
  * What waits at the end of a unit's path in Hudhud's story (content/story.ts, GoalKind):
- * - Arabic: the writing page of the preparation unit, then Hudhud's letters, their letters (or
- *   vowel marks) coming back, each letter delivered to someone from the unit's stories;
- * - maths: the trader's market day in Mocha, one station per unit. Sort the goods into baskets,
- *   count the sacks, add the sacks the camel brings, carry sacks to the ship, pack the goods.
- *   Only after packing, at the end of the last unit, does the ship sail.
+ * - Arabic: the clue of the unit's station (a door sign, Rasha's notebook, a letter), whose
+ *   letters Hudhud learns one section after another; who holds it is shown below it;
+ * - maths: a station of the coffee trader's journey: sort the cherries into baskets, count the
+ *   sacks, add the sacks the camel brings, give coffee to the neighbours and see what is left,
+ *   load the ship with parcels of every shape.
  * Every place fills from the same state as the rest of the screen (lib/storyProgress.ts).
  */
 
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { Circle, Ellipse, Path, Rect, Svg } from "react-native-svg";
+import { Circle, Path, Polygon, Rect, Svg } from "react-native-svg";
 
 import { Picture } from "@/components/pictures/Picture";
-import { goalLine } from "@/content/story";
-import type { GoalKind, Recipient } from "@/content/types";
+import { STATIONS, goalLine } from "@/content/story";
+import type { GoalKind } from "@/content/types";
 import * as haptics from "@/lib/haptics";
 import { speak } from "@/lib/speech";
 import type { GoalState } from "@/lib/storyProgress";
 import { touchTarget, yemen } from "@/theme/tokens";
 import { LetterGoal, WritingGoal } from "./LetterGoal";
-import { StickerArt } from "./StickerArt";
+import { SackShape } from "./Voyage";
 
 type Props = {
-  unit: { letters?: string[]; recipient?: Recipient };
+  unit: { id: string; letters?: string[] };
   kind: GoalKind;
   state: GoalState;
   /** Index of the place this lesson just filled, shown shining. */
@@ -34,119 +34,126 @@ type Props = {
 };
 
 export function StoryGoal({ unit, kind, state, fresh = null, compact = false, testID }: Props) {
-  const line = goalLine(unit, kind, state.complete);
+  const line = goalLine(unit.id, kind, state.complete);
   const common = { complete: state.complete, line, fresh, compact, testID };
-  if (kind === "letters" || kind === "vowels")
+  if (kind === "letters" || kind === "vowels") {
+    const person = STATIONS[unit.id]?.person;
     return (
       <LetterGoal
         {...common}
         letters={unit.letters ?? []}
         back={state.back}
         vowels={kind === "vowels"}
-        recipient={unit.recipient?.pictures}
+        recipient={person ? [person] : undefined}
       />
     );
+  }
   if (kind === "writing") return <WritingGoal {...common} back={state.back} />;
-  return <MarketGoal {...common} kind={kind} back={state.back} />;
+  return <CoffeeGoal {...common} kind={kind} back={state.back} />;
 }
 
 const NUMBERS = ["١", "٢", "٣", "٤", "٥"];
-/** What the trader sorts into his baskets: honey, raisins, coffee. */
-const GOODS = ["🍯", "🍇", "☕"];
-/** The parcels packed for the journey, one per solid of the unit. */
-const PARCELS = ["📦", "🥫", "🎲", "⚽"];
-
-function SackIcon({ size, filled, fresh }: { size: number; filled: boolean; fresh: boolean }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 40 40">
-      {fresh ? <Circle cx={20} cy={22} r={19} fill="#F4C14B" opacity={0.55} /> : null}
-      <Path
-        d="M9 11 Q20 5 31 11 L35 35 Q20 40 5 35 Z"
-        fill={filled ? "#B58A5A" : "#EFE4D2"}
-        stroke={filled ? "#7A5530" : "#B9A58E"}
-        strokeWidth={2}
-        strokeDasharray={filled ? undefined : "3 2"}
-      />
-      <Path
-        d="M12 11 Q20 15 28 11"
-        stroke={filled ? "#7A5530" : "#B9A58E"}
-        strokeWidth={2}
-        fill="none"
-      />
-      {filled ? <Ellipse cx={14} cy={33} rx={2.4} ry={3} fill="#5E3220" /> : null}
-    </Svg>
-  );
-}
+/** Ripe red cherries, unripe green ones, and the dried beans. */
+const CHERRY_COLOURS = ["#C8402F", "#7FB14E", "#5E3220"];
+const PARCELS: ("circle" | "square" | "triangle")[] = ["square", "circle", "triangle", "square"];
 
 function Basket({
   size,
   filled,
   fresh,
-  good,
+  colour,
 }: {
   size: number;
   filled: boolean;
   fresh: boolean;
-  good: string;
+  colour: string;
 }) {
   return (
-    <View style={{ width: size, height: size, alignItems: "center", justifyContent: "flex-end" }}>
-      {filled ? (
-        <View style={styles.basketGood}>
-          <Picture emoji={good} size={size * 0.62} />
-        </View>
+    <Svg width={size} height={size * 0.8} viewBox="0 0 40 32">
+      {fresh ? (
+        <Rect x={0} y={0} width={40} height={32} rx={8} fill="#F4C14B" opacity={0.55} />
       ) : null}
-      <Svg width={size} height={size * 0.6} viewBox="0 0 40 24">
-        {fresh ? (
-          <Rect x={0} y={0} width={40} height={24} rx={8} fill="#F4C14B" opacity={0.55} />
-        ) : null}
+      {filled
+        ? [8, 14, 20, 26, 32, 11, 17, 23, 29].map((x, i) => (
+            <Circle key={i} cx={x} cy={i < 5 ? 12 : 8} r={2.8} fill={colour} />
+          ))
+        : null}
+      <Path
+        d="M3 12 H37 L33 30 H7 Z"
+        fill={filled ? "#E3B36A" : "#EFE4D2"}
+        stroke={filled ? "#9C6B2E" : "#B9A58E"}
+        strokeWidth={2}
+        strokeDasharray={filled ? undefined : "3 2"}
+      />
+      {filled ? (
         <Path
-          d="M3 4 H37 L33 22 H7 Z"
-          fill={filled ? "#E3B36A" : "#EFE4D2"}
-          stroke={filled ? "#9C6B2E" : "#B9A58E"}
+          d="M7 20 l4 -4 l4 4 l4 -4 l4 4 l4 -4 l4 4 l4 -4"
+          stroke={yemen.red}
           strokeWidth={2}
-          strokeDasharray={filled ? undefined : "3 2"}
+          fill="none"
         />
-        {filled ? (
-          <Path
-            d="M7 12 l4 -4 l4 4 l4 -4 l4 4 l4 -4 l4 4 l4 -4"
-            stroke={yemen.red}
-            strokeWidth={2}
-            fill="none"
-          />
-        ) : null}
-      </Svg>
-    </View>
+      ) : null}
+    </Svg>
   );
 }
 
-function Parcel({
+/** A sack of coffee, with its number once counted. */
+function Sack({
   size,
   filled,
   fresh,
-  item,
+  n,
 }: {
   size: number;
   filled: boolean;
   fresh: boolean;
-  item: string;
+  n?: string;
 }) {
   return (
-    <View
-      style={[
-        styles.parcel,
-        { width: size, height: size },
-        filled ? styles.parcelDone : styles.parcelOpen,
-        fresh && styles.parcelFresh,
-      ]}
-    >
-      {filled ? <Picture emoji={item} size={size * 0.78} /> : null}
+    <View style={styles.place}>
+      <Svg width={size} height={size} viewBox="0 0 24 26">
+        {fresh ? <Circle cx={12} cy={15} r={11.5} fill="#F4C14B" opacity={0.55} /> : null}
+        <SackShape empty={!filled} />
+      </Svg>
+      {n !== undefined ? (
+        <Text style={[styles.number, filled ? styles.counted : styles.uncounted]}>
+          {filled ? n : "؟"}
+        </Text>
+      ) : null}
     </View>
   );
 }
 
-/** One station of the trader's market day. */
-function MarketGoal({
+/** A parcel of coffee for the ship, wrapped in jute: a cube, a round bale, a cone. */
+function Parcel({
+  size,
+  shape,
+  placed,
+  fresh,
+}: {
+  size: number;
+  shape: "circle" | "square" | "triangle";
+  placed: boolean;
+  fresh: boolean;
+}) {
+  const paint = {
+    fill: placed ? "#C9A26B" : "#EFE4D2",
+    stroke: placed ? "#7A5418" : "#B9A58E",
+    strokeWidth: 2,
+    strokeDasharray: placed ? undefined : "3 2",
+  };
+  return (
+    <Svg width={size} height={size} viewBox="0 0 30 30">
+      {fresh ? <Circle cx={15} cy={15} r={14} fill="#F4C14B" opacity={0.55} /> : null}
+      {shape === "circle" ? <Circle cx={15} cy={15} r={10} {...paint} /> : null}
+      {shape === "square" ? <Rect x={6} y={6} width={18} height={18} rx={2} {...paint} /> : null}
+      {shape === "triangle" ? <Polygon points="15,4 26,25 4,25" {...paint} /> : null}
+    </Svg>
+  );
+}
+
+/** One station of the coffee trader's journey. */
+function CoffeeGoal({
   kind,
   back,
   complete,
@@ -163,40 +170,32 @@ function MarketGoal({
   compact: boolean;
   testID?: string;
 }) {
-  // With the camel beside them, the sacks are a little smaller so they stay in one row.
-  const size = kind === "add" ? (compact ? 17 : 20) : compact ? 22 : 26;
-  const carried = back.filter(Boolean).length;
+  const size = compact ? 22 : 26;
+  const given = back.filter(Boolean).length;
   const places = back.map((filled, i) => {
     const shine = fresh === i;
     switch (kind) {
       case "sort":
-        return <Basket key={i} size={size + 10} filled={filled} fresh={shine} good={GOODS[i]} />;
-      case "pack":
-        return <Parcel key={i} size={size + 4} filled={filled} fresh={shine} item={PARCELS[i]} />;
-      case "carry":
-        // A sack carried to the ship leaves the quay: only an outline stays.
-        return <SackIcon key={i} size={size} filled={!filled} fresh={shine} />;
+        return (
+          <Basket
+            key={i}
+            size={size + 12}
+            filled={filled}
+            fresh={shine}
+            colour={CHERRY_COLOURS[i]}
+          />
+        );
       case "count":
-        return (
-          <View key={i} style={styles.sack}>
-            <SackIcon size={size} filled={filled} fresh={shine} />
-            <Text style={[styles.sackNumber, filled ? styles.counted : styles.uncounted]}>
-              {filled ? NUMBERS[i] : "؟"}
-            </Text>
-          </View>
-        );
+        return <Sack key={i} size={size} filled={filled} fresh={shine} n={NUMBERS[i]} />;
       case "add":
-        return (
-          <View key={i} style={styles.sack}>
-            <SackIcon size={size} filled={filled} fresh={shine} />
-            <Text style={[styles.sackNumber, filled ? styles.added : styles.uncounted]}>
-              {filled ? "+" : ""}
-            </Text>
-          </View>
-        );
+        return <Sack key={i} size={size} filled={filled} fresh={shine} />;
+      case "give":
+        // A sack given away to the neighbours leaves an empty place behind.
+        return <Sack key={i} size={size + 2} filled={!filled} fresh={shine} />;
+      case "ship":
+        return <Parcel key={i} size={size + 2} shape={PARCELS[i]} placed={filled} fresh={shine} />;
     }
   });
-  const ship = kind === "carry" || kind === "pack";
   return (
     <Pressable
       testID={testID}
@@ -210,25 +209,19 @@ function MarketGoal({
       style={({ pressed }) => [styles.wrap, compact && styles.compact, pressed && styles.pressed]}
     >
       {complete ? <View style={styles.glow} /> : null}
-      <View style={[styles.market, complete ? styles.marketDone : styles.marketOpen]}>
+      <View style={[styles.box, complete ? styles.boxDone : styles.boxOpen]}>
         <View style={styles.row}>
-          {kind === "add" ? <Picture emoji="🐪" size={compact ? 26 : 28} /> : null}
+          {/* The camel brings the new sacks. */}
+          {kind === "add" ? <Picture emoji="🐪" size={compact ? 30 : 36} /> : null}
           <View style={styles.places}>{places}</View>
+          {/* The parcels go on board; with the last one the ship sails. */}
+          {kind === "ship" ? <Picture emoji="⛵" size={complete ? 40 : 32} /> : null}
         </View>
-        {ship ? (
-          <View
-            testID={kind === "pack" && complete ? "ship-sailing" : "ship-docked"}
-            style={[styles.ship, kind === "pack" && complete && styles.shipSailing]}
-          >
-            <StickerArt id="dhow" size={compact ? 48 : 58} />
-            {kind === "carry" && carried > 0 ? (
-              // The sacks already on board, on the deck.
-              <View style={styles.deck}>
-                {Array.from({ length: carried }, (_, i) => (
-                  <View key={i} style={styles.deckSack} />
-                ))}
-              </View>
-            ) : null}
+        {kind === "give" ? (
+          // The neighbours, with the coffee given to them.
+          <View style={styles.neighbours} testID="goal-neighbours">
+            <Picture emoji="🏘" size={compact ? 30 : 36} />
+            <Text style={styles.given}>{given > 0 ? `+${given}` : ""}</Text>
           </View>
         ) : null}
       </View>
@@ -248,22 +241,22 @@ const styles = StyleSheet.create({
     backgroundColor: "#F4C14B",
     opacity: 0.35,
   },
-  market: {
+  box: {
     width: "100%",
     borderRadius: 14,
     paddingHorizontal: 8,
     paddingVertical: 8,
-    gap: 2,
+    gap: 4,
     alignItems: "center",
-    backgroundColor: "#E7F0FA",
+    backgroundColor: "#EEF6E8",
   },
-  marketOpen: { borderWidth: 2, borderColor: "#B9CDE3", borderStyle: "dashed" },
-  marketDone: {
+  boxOpen: { borderWidth: 2, borderColor: "#C9DDB8", borderStyle: "dashed" },
+  boxDone: {
     borderWidth: 3,
     borderColor: yemen.gold,
     boxShadow: `0 5px 0 ${yemen.goldEdge}`,
   },
-  row: { flexDirection: "row-reverse", alignItems: "flex-end", gap: 4 },
+  row: { flexDirection: "row-reverse", alignItems: "center", gap: 4 },
   places: {
     flexDirection: "row-reverse",
     flexWrap: "wrap",
@@ -272,23 +265,10 @@ const styles = StyleSheet.create({
     gap: 2,
     flexShrink: 1,
   },
-  sack: { alignItems: "center" },
-  sackNumber: { fontSize: 15, fontWeight: "900", marginTop: -4, minHeight: 18 },
+  place: { alignItems: "center" },
+  number: { fontSize: 15, fontWeight: "900", marginTop: -4, minHeight: 18 },
   counted: { color: yemen.ink },
-  added: { color: yemen.green },
   uncounted: { color: "#A8977F" },
-  basketGood: { position: "absolute", top: -2 },
-  parcel: { borderRadius: 6, alignItems: "center", justifyContent: "center" },
-  parcelOpen: {
-    borderWidth: 2,
-    borderColor: "#B9A58E",
-    borderStyle: "dashed",
-    backgroundColor: "#EFE4D2",
-  },
-  parcelDone: { backgroundColor: "#FFFFFF" },
-  parcelFresh: { backgroundColor: "#F4C14B" },
-  ship: { alignSelf: "flex-start" },
-  shipSailing: { transform: [{ translateX: -4 }, { rotate: "-4deg" }] },
-  deck: { position: "absolute", top: 26, left: 12, flexDirection: "row", gap: 1 },
-  deckSack: { width: 6, height: 7, borderRadius: 2, backgroundColor: "#B58A5A" },
+  neighbours: { flexDirection: "row-reverse", alignItems: "center", gap: 6 },
+  given: { fontSize: 16, fontWeight: "900", color: yemen.green },
 });

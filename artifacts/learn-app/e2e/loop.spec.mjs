@@ -1,4 +1,4 @@
-// Learning loop: play button, Leitner review and today's qamariya across days, driven by page.clock.
+// Learning loop: play button, Leitner review and Rasha's daily bowl across days, driven by page.clock.
 import {
   completeQuizLesson,
   earnedStars,
@@ -82,14 +82,11 @@ test("missed letters come back tomorrow in today's review, and leave once answer
   await expect(page.getByTestId("review-card")).toHaveCount(0);
 });
 
-test("today's qamariya fills with each lesson and starts clear the next day", async ({ page }) => {
+test("Rasha's bowl fills with each lesson and starts empty the next day", async ({ page }) => {
   await page.clock.setFixedTime(DAY_1);
   await gotoAndWaitReady(page, "/");
-  const qamariya = page.getByTestId("daily-window");
-  await expect(qamariya).toHaveAttribute(
-    "aria-label",
-    "ثَلَاثَةُ دُرُوسٍ، وَتُضِيءُ الْقَمَرِيَّةُ!",
-  );
+  const bowl = page.getByTestId("daily-window");
+  await expect(bowl).toHaveAttribute("aria-label", "ثَلَاثَةُ دُرُوسٍ، وَيَمْتَلِئُ الصَّحْنُ!");
   await gotoAndWaitReady(page, "/lesson/u2-1");
   await tapAllAndFinish(page, [
     "مَامَا تُوصِلُنِي إِلَى الْمَدْرَسَةِ",
@@ -99,14 +96,11 @@ test("today's qamariya fills with each lesson and starts clear the next day", as
   ]);
   expect(await earnedStars(page)).toBe(3);
   await gotoAndWaitReady(page, "/");
-  await expect(qamariya).toHaveAttribute("aria-label", "دَرْسَانِ، وَتُضِيءُ الْقَمَرِيَّةُ!");
+  await expect(bowl).toHaveAttribute("aria-label", "دَرْسَانِ، وَيَمْتَلِئُ الصَّحْنُ!");
 
   await page.clock.setFixedTime(DAY_2);
   await page.reload();
-  await expect(qamariya).toHaveAttribute(
-    "aria-label",
-    "ثَلَاثَةُ دُرُوسٍ، وَتُضِيءُ الْقَمَرِيَّةُ!",
-  );
+  await expect(bowl).toHaveAttribute("aria-label", "ثَلَاثَةُ دُرُوسٍ، وَيَمْتَلِئُ الصَّحْنُ!");
   await gotoAndWaitReady(page, "/lesson/u2-5");
   await tapAllAndFinish(page, [
     "بَابَا يُعَلِّمُنِي",
@@ -116,6 +110,6 @@ test("today's qamariya fills with each lesson and starts clear the next day", as
   ]);
   expect(await earnedStars(page)).toBe(3);
   await gotoAndWaitReady(page, "/");
-  await expect(qamariya).toHaveAttribute("aria-label", "دَرْسَانِ، وَتُضِيءُ الْقَمَرِيَّةُ!");
+  await expect(bowl).toHaveAttribute("aria-label", "دَرْسَانِ، وَيَمْتَلِئُ الصَّحْنُ!");
   expect((await readProgress(page)).activity.days).toEqual(["2026-03-10", "2026-03-11"]);
 });
