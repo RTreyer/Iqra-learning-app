@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import fs from "node:fs";
 import { test } from "node:test";
 import {
   validateCompare,
@@ -10,7 +11,14 @@ import { books, getBook, getLesson, getUnit, unitLessonIds } from "../content/in
 
 const units = books.flatMap((book) => book.units);
 const lessons = units.flatMap((unit) => unit.lessons);
-const byType = (type) => lessons.filter((lesson) => lesson.type === type);
+// A checked type with no lessons would pass its check without testing anything.
+// Only types the catalog has no lessons of today may come back empty.
+const notInCatalog = new Set(["arithmetic"]);
+const byType = (type) => {
+  const found = lessons.filter((lesson) => lesson.type === type);
+  if (!notInCatalog.has(type)) assert.ok(found.length > 0, `no ${type} lessons in the catalog`);
+  return found;
+};
 
 test("unit and lesson IDs are globally unique", () => {
   assert.equal(new Set(units.map((u) => u.id)).size, units.length);
@@ -76,6 +84,39 @@ test("listen_pick answers are in range and are choices", () => {
       const choice = q.choices[q.correctIndex];
       assert.equal(typeof choice.word, "string", lesson.id);
       assert.ok(choice.word.length > 0, lesson.id);
+    }
+  }
+});
+
+test("listen_pick answers match the spoken word", () => {
+  // The bare letters of a word: no harakat, tatweel, punctuation or ال, one alif for every hamza form.
+  const base = (s) =>
+    s
+      .replace(/[\u064B-\u0652\u0670ـ]/g, "")
+      .replace(/[؟?،,.!:؛]/g, "")
+      .replace(/[أإآٱ]/g, "ا")
+      .split(/\s+/)
+      .map((w) => w.replace(/^ال/, ""))
+      .join(" ");
+  // A first sound round shows syllables (no emoji). A syllable fits when the word starts with it
+  // and does not cut a letter off its haraka; the answer is the longest fitting choice, so مَا
+  // and not مَـ is the first sound of مَالَ, while دِ and not دِيـ is the first sound of دِيَارُ.
+  const spoken = (s) => s.replace(/ـ/g, "");
+  const fits = (word, syllable) =>
+    word.startsWith(spoken(syllable)) &&
+    !/^[\u064B-\u0652]/.test(word.slice(spoken(syllable).length));
+  for (const lesson of byType("listen_pick")) {
+    for (const q of lesson.questions) {
+      const choice = q.choices[q.correctIndex];
+      const longestFit = (c) =>
+        fits(q.word, c.word) &&
+        q.choices.every(
+          (o) => o === c || !fits(q.word, o.word) || spoken(o.word).length < spoken(c.word).length,
+        );
+      const ok =
+        choice.word === q.word ||
+        (choice.emoji === "" ? longestFit(choice) : base(q.word).includes(base(choice.word)));
+      assert.ok(ok, `${lesson.id}: ${choice.word} is not ${q.word}`);
     }
   }
 });
@@ -213,6 +254,18 @@ test("quiz options are unique within each round", () => {
         q.choices.map((c) => c.word),
         lesson.id,
       );
+  }
+});
+
+test("every unit file is imported by the catalog", () => {
+  const catalog = fs.readFileSync(new URL("../content/catalog.ts", import.meta.url), "utf8");
+  for (const dir of ["arabic", "math", "science"]) {
+    const files = fs
+      .readdirSync(new URL(`../content/${dir}/`, import.meta.url))
+      .filter((f) => /^(unit|bookUnit)\d+\.ts$/.test(f));
+    assert.ok(files.length > 0, dir);
+    for (const f of files)
+      assert.ok(catalog.includes(`from "./${dir}/${f}"`), `${dir}/${f} is not in catalog.ts`);
   }
 });
 

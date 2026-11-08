@@ -1,19 +1,25 @@
 import { defineConfig } from "@playwright/test";
 
+// E2E_PORT lets two runs (or a run beside another server) use different ports.
+const port = Number(process.env.E2E_PORT || 8787);
+const baseURL = `http://127.0.0.1:${port}`;
+
 export default defineConfig({
   testDir: "e2e",
   testMatch: "**/*.spec.{mjs,ts}",
   timeout: 120_000,
-  reporter: "list",
+  forbidOnly: !!process.env.CI,
+  reporter: process.env.CI ? [["list"], ["html", { open: "never" }]] : "list",
   use: {
-    baseURL: "http://localhost:8787",
+    baseURL,
     viewport: { width: 420, height: 860 },
     locale: "ar",
+    trace: "retain-on-failure",
   },
   projects: [{ name: "chromium", use: { browserName: "chromium" } }],
   webServer: {
-    command: "node e2e/serve.mjs dist 8787",
-    port: 8787,
-    reuseExistingServer: true,
+    command: `node e2e/serve.mjs dist ${port}`,
+    url: baseURL,
+    reuseExistingServer: !process.env.CI,
   },
 });

@@ -98,6 +98,11 @@ function leftChoice(
   groups: [number, number][],
   prompt = `فِي أَيِّ صُورَةٍ الْبَاقِي ${NOM[left]}؟`,
 ): PictureChoiceRound {
+  const answers = groups.filter(([total, taken]) => total - taken === left);
+  if (answers.length !== 1)
+    throw new Error(
+      `leftChoice: ${answers.length} groups leave ${left}: ${JSON.stringify(groups)}`,
+    );
   return {
     prompt,
     choices: groups.map(([total, taken]) => take(pic, total, taken)),

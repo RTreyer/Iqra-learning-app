@@ -59,6 +59,12 @@ android/
 *.p12
 *.key
 *.mobileprovision
+*.keystore
+*.pem
+credentials.json
+google-services.json
+GoogleService-Info.plist
+*service-account*.json
 
 # Textbook PDFs (copyright of the Ministry of Education): local only, never committed
 /textbooks/
