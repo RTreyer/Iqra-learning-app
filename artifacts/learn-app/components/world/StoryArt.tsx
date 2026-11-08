@@ -475,3 +475,94 @@ function TruckBody() {
     </>
   );
 }
+
+/**
+ * The old postman's leather bag: more patches than leather, a flap, envelopes peeking out
+ * (`letters`, 0 to 3). An empty bag is the small one he sews for Hudhud.
+ */
+export function PostBagArt({ size = 40, letters = 2 }: { size?: number; letters?: number }) {
+  return (
+    <Svg width={size} height={(size * 60) / 50} viewBox="0 0 50 60">
+      <Path d="M38 2 Q46 18 40 30" stroke="#5E3220" strokeWidth={3} fill="none" />
+      {[0, 1, 2].slice(0, Math.max(0, Math.min(3, letters))).map((i) => (
+        <G key={i} transform={`rotate(${[-8, 4, 12][i]} ${16 + i * 9} 22)`}>
+          <Rect
+            x={9 + i * 9}
+            y={14}
+            width={15}
+            height={11}
+            fill="#FFFFFF"
+            stroke="#B9A58E"
+            strokeWidth={1}
+          />
+          <Path
+            d={`M${9 + i * 9} 14 L${16.5 + i * 9} 20 L${24 + i * 9} 14`}
+            stroke="#B9A58E"
+            strokeWidth={1}
+            fill="none"
+          />
+        </G>
+      ))}
+      <Path
+        d="M4 24 H46 V50 Q46 56 40 56 H10 Q4 56 4 50 Z"
+        fill="#9A5B2C"
+        stroke="#4E2A12"
+        strokeWidth={1.6}
+      />
+      {/* Patches, sewn on with big stitches. */}
+      <Rect
+        x={8}
+        y={38}
+        width={12}
+        height={10}
+        fill="#B9784A"
+        stroke="#4E2A12"
+        strokeWidth={0.8}
+        strokeDasharray="2 1.5"
+      />
+      <Rect
+        x={30}
+        y={42}
+        width={11}
+        height={9}
+        fill="#7E4824"
+        stroke="#4E2A12"
+        strokeWidth={0.8}
+        strokeDasharray="2 1.5"
+      />
+      <Path d="M4 24 H46 V34 Q25 42 4 34 Z" fill="#74401C" stroke="#4E2A12" strokeWidth={1.4} />
+      <Rect
+        x={22}
+        y={32}
+        width={6}
+        height={6}
+        rx={1}
+        fill="#E9A81E"
+        stroke="#9A6A00"
+        strokeWidth={0.8}
+      />
+    </Svg>
+  );
+}
+
+/** A round loaf of Yemeni flatbread, torn open a little. */
+export function BreadArt({ size = 40 }: { size?: number }) {
+  return (
+    <Svg width={size} height={(size * 30) / 40} viewBox="0 0 40 30">
+      <Path
+        d="M3 16 Q3 4 20 4 Q37 4 37 16 Q37 27 20 27 Q10 27 6 22 L12 18 L5 17 Z"
+        fill="#D9A45B"
+        stroke="#9C6B2E"
+        strokeWidth={1.2}
+      />
+      {[
+        [14, 11],
+        [24, 9],
+        [28, 18],
+        [19, 20],
+      ].map(([x, y]) => (
+        <Ellipse key={x} cx={x} cy={y} rx={2.2} ry={1.5} fill="#A8743A" opacity={0.7} />
+      ))}
+    </Svg>
+  );
+}

@@ -1,8 +1,8 @@
 /**
  * The map of Yemen at the end of chapter 1 (content/story.ts, MAP_PLACES): Hudhud's home in
- * Sana'a with Rasha's bowl, and the places he can fly to, one per thread: Mukalla on the
- * Arabian Sea, where he works as the postman (reading), and Mocha on the Red Sea, where the
- * coffee trader needs him (counting). Dotted flight paths lead from Sana'a to each.
+ * Sana'a with Rasha's bowl, and the places he can go, one per thread: Sana'a itself, where the
+ * old postman lets him carry letters (reading), and Mocha on the Red Sea, where the coffee
+ * trader needs him (counting). Dotted flight paths lead from Sana'a to the places further off.
  *
  * Socotra is on the map too, marked as coming soon (a place for a subject still to come).
  *
@@ -100,11 +100,11 @@ const LABEL_H = 44;
 const TRACK_H = 14;
 
 /**
- * Where each place's label goes, so none covers another: Mukalla's above it (over Hadramawt),
- * Mocha's beside it (it sits on the coast at the map's edge), Socotra's beside it.
+ * Where each place's label goes, so none covers another: Sana'a's beside it (towards the open
+ * land), Mocha's beside it (it sits on the coast at the map's edge), Socotra's beside it.
  */
 const LABEL_AT: Record<PlaceId, "above" | "below" | "beside"> = {
-  arabic: "above",
+  arabic: "beside",
   math: "beside",
   socotra: "beside",
 };
@@ -134,6 +134,11 @@ export function YemenMap({
     return { left: ox + x * s, top: oy + y * s };
   };
   const home = at(HOME_PLACE);
+  // A place in Sana'a itself (the postman's alley) takes the home's spot: no separate marker,
+  // no way to fly there; Rasha's bowl stands beside it.
+  const atHome = (place: PlaceId) =>
+    MAP_PLACES[place].lon === HOME_PLACE.lon && MAP_PLACES[place].lat === HOME_PLACE.lat;
+  const homeIsPlace = pins.some(({ place }) => atHome(place));
 
   return (
     <View style={[styles.box, only && styles.clear]} onLayout={onLayout} pointerEvents="box-none">
@@ -189,6 +194,7 @@ export function YemenMap({
             />
             {/* The ways Hudhud can fly, from his roof in Sana'a. */}
             {pins.map(({ place }) => {
+              if (atHome(place)) return null;
               const from = project(HOME_PLACE.lon, HOME_PLACE.lat);
               const to = project(MAP_PLACES[place].lon, MAP_PLACES[place].lat);
               const mx = (from.x + to.x) / 2;
@@ -208,14 +214,20 @@ export function YemenMap({
               );
             })}
           </Svg>
-          {/* Home: Rasha's bowl on the roof in Sana'a, and Hudhud with her note in his bag. */}
-          <View style={[styles.home, { left: home.left - 28, top: home.top - 16 }]}>
-            <BowlArt width={40} level={0} />
-            <Text style={styles.homeName}>{line(HOME_PLACE.name)}</Text>
-          </View>
+          {/* Home: Rasha's bowl on the roof in Sana'a, and Hudhud, her note under his wing. */}
+          {homeIsPlace ? (
+            <View style={[styles.home, { left: home.left - 52, top: home.top + 8 }]}>
+              <BowlArt width={34} level={0} />
+            </View>
+          ) : (
+            <View style={[styles.home, { left: home.left - 28, top: home.top - 16 }]}>
+              <BowlArt width={40} level={0} />
+              <Text style={styles.homeName}>{line(HOME_PLACE.name)}</Text>
+            </View>
+          )}
           {bird ? (
-            <View style={[styles.bird, { left: home.left - 6, top: home.top - 66 }]}>
-              <Hudhud size={58} bag={1} />
+            <View style={[styles.bird, { left: home.left - 40, top: home.top - 92 }]}>
+              <Hudhud size={58} />
             </View>
           ) : null}
         </>

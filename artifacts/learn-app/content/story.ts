@@ -7,9 +7,17 @@
  * and moved far away; the bowl stayed empty. Under it she had tucked a note. Hudhud cannot
  * read. She gave them water when they were thirsty: now it is his turn, and he sets out to find
  * her. On the way he needs to read and to count. Two threads, one per subject:
- * - Arabic: he follows Rasha's trail through the stories of the textbook (one station per
- *   unit) and learns the letters; the note under the bowl, «اِسْقِ الطُّيُورَ» signed «رَشَا»,
- *   becomes readable letter by letter (its letters come in units 2, 3, 6, 7 and 8);
+ * - Arabic: in an old alley of Sana'a he meets an old, somewhat strange man who has spent his
+ *   life carrying letters through Yemen, a bag with more patches than leather. Hudhud does not
+ *   understand why anyone takes such pains over a piece of paper. "Bread is for the hunger of
+ *   the body; letters are for another hunger, of the heart." The postman becomes his teacher,
+ *   not by explaining the world but by letting him discover it: Hudhud learns to read, to carry
+ *   the letters and to read Rasha's note. Every unit is a delivery and teaches a wisdom
+ *   (not every tear is sad; not all we carry is ours; words reach where people no longer can;
+ *   it is enough that a letter arrives; do you only sing when someone listens?). At the end a
+ *   letter comes from Rasha, and the postman gives him a small empty bag: room for many
+ *   stories. The note under the bowl, «اِسْقِ الطُّيُورَ» signed «رَشَا», becomes readable
+ *   letter by letter (its letters come in units 2, 3, 6, 7 and 8);
  * - maths: in the Haraz mountains he meets a coffee trader whose helper has gone; he cannot
  *   count his sacks, and the ship in Mocha will not wait. Hudhud helps as Rasha helped him:
  *   sort the ripe cherries, count the sacks, add what the camel brings, give to the neighbours,
@@ -35,7 +43,11 @@ export type StorySceneId =
   | "turn"
   | "flyoff"
   | "map"
-  | "post"
+  | "alley"
+  | "doors"
+  | "ask"
+  | "bread"
+  | "comewith"
   | "bowl"
   | "trader"
   | "sacks"
@@ -102,7 +114,7 @@ export const INTRO_STORY: readonly StoryScene[] = [
   },
   {
     id: "flyoff",
-    line: "وَضَعْتُ وَرَقَتَهَا فِي حَقِيبَتِي، وَطِرْتُ!",
+    line: "وَضَعْتُ وَرَقَتَهَا تَحْتَ جَنَاحِي، وَخَرَجْتُ أَبْحَثُ عَنْهَا!",
     minMs: 4400,
   },
   // The choice: the places on the map are the buttons (components/world/YemenMap).
@@ -116,15 +128,36 @@ export const INTRO_STORY: readonly StoryScene[] = [
 export type ChapterId = "arabic" | "math" | "end";
 
 export const CHAPTERS: Record<ChapterId, readonly StoryScene[]> = {
+  // Hudhud meets the old postman (Arabic): his bag, his letters, the bread, "come with me".
   arabic: [
     {
-      id: "post",
-      line: "فِي الْمُكَلَّا، قَالَ سَاعِي الْبَرِيدِ الْعَجُوزُ: اِعْمَلْ مَعِي، وَاسْأَلْ عَنْ رَشَا فِي كُلِّ بَيْتٍ!",
+      id: "alley",
+      line: "فِي زُقَاقٍ قَدِيمٍ فِي صَنْعَاءَ، رَأَيْتُ رَجُلًا عَجُوزًا يَحْمِلُ حَقِيبَةً كَبِيرَةً.",
+      minMs: 4600,
+    },
+    {
+      id: "doors",
+      line: "كَانَ يَطْرُقُ الْأَبْوَابَ. بَعْضُ النَّاسِ يَبْتَسِمُونَ، وَبَعْضُهُمْ يَبْكُونَ.",
       minMs: 4000,
     },
     {
+      id: "ask",
+      line: "سَأَلْتُهُ: مَاذَا فِي حَقِيبَتِكَ؟ قَالَ: رَسَائِلُ. كَلِمَاتٌ تُسَافِرُ.",
+      minMs: 4000,
+    },
+    {
+      id: "bread",
+      line: "أَعْطَانِي خُبْزًا، وَقَالَ: الْخُبْزُ لِجُوعِ الْبَطْنِ، وَالرَّسَائِلُ لِجُوعِ الْقَلْبِ.",
+      minMs: 4200,
+    },
+    {
+      id: "comewith",
+      line: "قَالَ: تَعَالَ مَعِي، وَتَعَلَّمِ الْقِرَاءَةَ. سَتَقْرَأُ الْأَسْمَاءَ، وَوَرَقَةَ رَشَا!",
+      minMs: 4400,
+    },
+    {
       id: "bowl",
-      line: "لِأُوصِلَ الرَّسَائِلَ، أَتَعَلَّمُ الْحُرُوفَ. وَكُلُّ حَرْفٍ يُضِيءُ فِي وَرَقَتِهَا!",
+      line: "كُلُّ حَرْفٍ نَتَعَلَّمُهُ يُضِيءُ فِي وَرَقَتِهَا!",
       minMs: 3600,
     },
   ],
@@ -191,17 +224,17 @@ export type MapPlace = {
 export const HOME_PLACE = { name: "صَنْعَاءُ", lon: 44.2, lat: 15.35 };
 
 /**
- * Where Hudhud can fly at the end of chapter 1, one place per thread: Mukalla on the Arabian
- * Sea, where he works as the postman and asks about Rasha at every door (reading), and Mocha,
+ * Where Hudhud can go at the end of chapter 1, one place per thread: his own city, Sana'a, where
+ * the old postman lets him carry letters and learn to read (reading), and Mocha,
  * the old coffee port on the Red Sea, where the coffee trader needs him (counting). Socotra is
  * on the map too, marked as coming soon. On the home screen the same map is the subject choice.
  */
 export const MAP_PLACES: Record<PlaceId, MapPlace> = {
   arabic: {
-    name: "الْمُكَلَّا",
+    name: "صَنْعَاءُ",
     what: "سَاعِي الْبَرِيدِ",
-    lon: 49.12,
-    lat: 14.54,
+    lon: 44.2,
+    lat: 15.35,
     picture: "✉",
     color: "#1F5FA8",
   },
@@ -272,11 +305,13 @@ export type Station = {
 };
 
 export const STATIONS: Record<string, Station> = {
+  // Arabic: the postman's letters, one delivery and one wisdom per unit.
   a1: {
     place: "post",
     person: "👴",
     thing: "✏",
-    where: "قَبْلَ أَنْ أَقْرَأَ، أَتَعَلَّمُ الْخُطُوطَ، مِثْلَ خُطُوطِ رَشَا.",
+    where:
+      "سَاعِي الْبَرِيدِ يَكْتُبُ عَلَى الرَّسَائِلِ. قَبْلَ أَنْ أَقْرَأَ، أَتَعَلَّمُ الْخُطُوطَ.",
     ask: "هَيَّا نَرْسُمُ الْخُطُوطَ!",
     outro: "صِرْتُ أَرْسُمُ الْخُطُوطَ! هَيَّا نَتَعَلَّمُ الْحُرُوفَ.",
   },
@@ -285,60 +320,63 @@ export const STATIONS: Record<string, Station> = {
     person: "🧕",
     feels: "wonder",
     thing: "✉",
-    where: "أَوَّلُ رِسَالَةٍ أُوصِلُهَا! عَلَى الْبَابِ اسْمٌ.",
-    ask: "هَيَّا نَتَعَلَّمُ الْحُرُوفَ، لِنَقْرَأَ الِاسْمَ!",
-    outro: "أَوْصَلْنَا الرِّسَالَةَ! قَالَتِ الْأُمُّ: سَمِعْتُ عَنْ بِنْتٍ تَسْقِي الطُّيُورَ.",
+    where: "رِسَالَةٌ لِلْأُمِّ أَمِينَةَ، مِنِ ابْنِهَا الْبَعِيدِ.",
+    ask: "هَيَّا نَتَعَلَّمُ الْحُرُوفَ، لِنَقْرَأَ اسْمَهَا!",
+    outro: "بَكَتْ مِنَ الْفَرَحِ. قَالَ سَاعِي الْبَرِيدِ: لَيْسَتْ كُلُّ دَمْعَةٍ حُزْنًا.",
   },
   a3: {
     place: "school",
     person: "👩‍🏫",
-    thing: "📓",
-    where: "الْمُعَلِّمَةُ بَيَانُ عِنْدَهَا دَفْتَرُ رَشَا.",
-    ask: "هَيَّا نَتَعَلَّمُ الْحُرُوفَ، لِنَقْرَأَ الدَّفْتَرَ!",
-    outro: "فِي الدَّفْتَرِ، كَتَبَتْ رَشَا عَنِ الطُّيُورِ!",
+    thing: "✉",
+    where: "رِسَالَةٌ لِلْمُعَلِّمَةِ بَيَانَ. أُرِيدُ أَنْ أَفْتَحَهَا!",
+    ask: "هَيَّا نَتَعَلَّمُ الْحُرُوفَ، لِنَقْرَأَ الْعُنْوَانَ!",
+    outro: "لَمْ أَفْتَحْهَا. قَالَ سَاعِي الْبَرِيدِ: لَيْسَ كُلُّ مَا نَحْمِلُهُ لَنَا.",
   },
   a4: {
     place: "beach",
     person: "👨",
     feels: "wonder",
     thing: "⛵",
-    where: "عِنْدَ الْبَحْرِ، عَلَى قَارِبِ الصَّيَّادِ اسْمٌ.",
+    where: "عِنْدَ الْبَحْرِ، عَلَى قَارِبِ الصَّيَّادِ اسْمٌ. الرِّسَالَةُ لَهُ!",
     ask: "هَيَّا نَتَعَلَّمُ الْحَرَكَاتِ، لِنَقْرَأَ الِاسْمَ!",
-    outro: "قَالَ الصَّيَّادُ: رَأَيْتُ هُنَا بِنْتًا مَعَهَا صَحْنٌ.",
+    outro:
+      "الرِّسَالَةُ مِنْ أَخِيهِ الْبَعِيدِ. الْكَلِمَاتُ تَصِلُ إِلَى حَيْثُ لَا يَصِلُ النَّاسُ.",
   },
   a5: {
     place: "road",
     person: "👮",
     thing: "🚩",
-    where: "رَجُلُ الْمُرُورِ يُشِيرُ إِلَى لَوْحَةِ الطَّرِيقِ.",
+    where:
+      "أَوَّلُ رِسَالَةٍ أَحْمِلُهَا وَحْدِي، إِلَى جِبَالِ حَرَازٍ. رَجُلُ الْمُرُورِ يُشِيرُ إِلَى اللَّوْحَةِ.",
     ask: "هَيَّا نَتَعَلَّمُ الْحَرَكَاتِ، لِنَقْرَأَ اللَّوْحَةَ!",
-    outro: "قَرَأْنَا اللَّوْحَةَ: هَذَا الطَّرِيقُ إِلَى الْجِبَالِ.",
+    outro: "وَصَلَتِ الرِّسَالَةُ، وَلَمْ يَرَنِي أَحَدٌ. يَكْفِي أَنَّهَا وَصَلَتْ.",
   },
   a6: {
     place: "garden",
     person: "🐦",
-    thing: "📄",
-    where: "فِي الْحَدِيقَةِ يُغَنِّي بُلْبُلُ صَابِرٍ. عَلَى الْغُصْنِ وَرَقَةٌ.",
-    ask: "هَيَّا نَتَعَلَّمُ الْحُرُوفَ، لِنَقْرَأَ الْوَرَقَةَ!",
-    outro: "قَالَ الْبُلْبُلُ: رَشَا كَانَتْ تُطْعِمُنِي، مِثْلَكَ!",
+    thing: "✉",
+    where: "فِي الْحَدِيقَةِ يُغَنِّي بُلْبُلٌ وَحْدَهُ. وَمَعَنَا رِسَالَةٌ لَا نَعْرِفُ لِمَنْ.",
+    ask: "هَيَّا نَتَعَلَّمُ الْحُرُوفَ، لِنَقْرَأَ الرِّسَالَةَ!",
+    outro: "قَالَ سَاعِي الْبَرِيدِ: هَلْ تُغَنِّي فَقَطْ حِينَ يَسْمَعُكَ أَحَدٌ؟",
   },
   a7: {
     place: "well",
     person: "👴",
     feels: "wonder",
     thing: "💧",
-    where: "عِنْدَ الْبِئْرِ كِتَابَةٌ قَدِيمَةٌ.",
+    where: "عِنْدَ الْبِئْرِ كِتَابَةٌ قَدِيمَةٌ، مِنْ زَمَنٍ بَعِيدٍ.",
     ask: "هَيَّا نَتَعَلَّمُ الْحُرُوفَ، لِنَقْرَأَ الْكِتَابَةَ!",
-    outro: "مِنْ هَذِهِ الْبِئْرِ، أَخَذَتْ رَشَا مَاءً لِلطُّيُورِ!",
+    outro: "كَتَبَهَا أَحَدٌ قَبْلَ سِنِينَ، وَمَا زَالَتْ تُكَلِّمُنَا!",
   },
   a8: {
-    place: "village",
+    place: "post",
     person: "👴",
     feels: "happy",
     thing: "✉",
-    where: "فِي الْقَرْيَةِ، عِنْدَ الْجَدِّ رِسَالَةٌ مِنْ رَشَا.",
+    where: "فِي حَقِيبَةِ سَاعِي الْبَرِيدِ رِسَالَةٌ جَدِيدَةٌ… مِنْ رَشَا!",
     ask: "هَيَّا نَتَعَلَّمُ الْحُرُوفَ، لِنَقْرَأَ الرِّسَالَةَ!",
-    outro: "رَشَا فِي بَيْتٍ جَدِيدٍ، وَهِيَ بِخَيْرٍ! الْآنَ أَرْجِعُ إِلَى الصَّحْنِ.",
+    outro:
+      "رَشَا بِخَيْرٍ فِي بَيْتٍ جَدِيدٍ! وَأَعْطَانِي سَاعِي الْبَرِيدِ حَقِيبَةً فَارِغَةً، لِقِصَصٍ كَثِيرَةٍ.",
   },
   "math-u1": {
     place: "market",
@@ -397,8 +435,8 @@ export function stationScenes(unitId: string): StoryScene[] | null {
 
 /** What Hudhud says when the child picks or switches a subject, by book subject. */
 export const SUBJECT_LINES: Record<string, string> = {
-  arabic: "هَيَّا نَتْبَعُ طَرِيقَ رَشَا!",
-  lughati: "هَيَّا نَتْبَعُ طَرِيقَ رَشَا!",
+  arabic: "هَيَّا نَحْمِلُ الرَّسَائِلَ مَعَ سَاعِي الْبَرِيدِ!",
+  lughati: "هَيَّا نَحْمِلُ الرَّسَائِلَ مَعَ سَاعِي الْبَرِيدِ!",
   math: "هَيَّا نُسَاعِدُ تَاجِرَ الْبُنِّ!",
   science: "هَيَّا نَتَعَلَّمُ!",
 };

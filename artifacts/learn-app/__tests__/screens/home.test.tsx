@@ -189,8 +189,8 @@ test("the subjects are places on the map of Yemen; Socotra is still to come", as
   await seed(0);
   renderHome();
   await screen.findByTestId("book-arabic-1");
-  // Reading in Mukalla, counting in Mocha: each place shows its book's title.
-  expect(screen.getByTestId("book-arabic-1")).toHaveTextContent(/الْمُكَلَّا/);
+  // Reading with the postman in Sana'a, counting in Mocha: each place shows its book's title.
+  expect(screen.getByTestId("book-arabic-1")).toHaveTextContent(/صَنْعَاءُ/);
   expect(screen.getByTestId("book-math-1")).toHaveTextContent(/الْمُخَا/);
   // Socotra is on the map but not open yet: tapping it, Hudhud says it comes soon.
   const socotra = screen.getByTestId("place-socotra");

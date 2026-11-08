@@ -145,8 +145,11 @@ test("every unit is a station on Hudhud's journey, and ends with its clue or les
       expect(goalLine(unit.id, kind, true)).toBe(station.outro);
       expect(goalLine(unit.id, kind, false)).toBe(GOAL_LINES[kind].missing);
     }
-  // Rasha's trail leads to her new home: she is well.
+  // The last letter comes from Rasha: she is well; and the postman gives Hudhud an empty bag.
   expect(STATIONS.a8.outro).toContain("بِخَيْرٍ");
+  expect(STATIONS.a8.outro).toContain("حَقِيبَةً فَارِغَةً");
+  // The postman's central wisdom: words reach where people cannot.
+  expect(Object.values(STATIONS).some((s) => s.outro.includes("الْكَلِمَاتُ تَصِلُ"))).toBe(true);
   // The trader's ship sails, and he passes Rasha's kindness on: water for the birds.
   expect(STATIONS["math-u5"].outro).toContain("صَحْنَ مَاءٍ لِلطُّيُورِ");
 });

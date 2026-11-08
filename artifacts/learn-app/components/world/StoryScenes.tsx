@@ -6,7 +6,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Animated, Easing, StyleSheet, Text, View } from "react-native";
-import { Circle, G, Path, Polygon, Rect, Svg } from "react-native-svg";
+import { Circle, Ellipse, G, Path, Polygon, Rect, Svg } from "react-native-svg";
 
 import { Art } from "@/components/art/Art";
 import { Picture } from "@/components/pictures/Picture";
@@ -26,6 +26,8 @@ import {
   JugArt,
   NightSkyArt,
   RASHA_SHOULDER,
+  BreadArt,
+  PostBagArt,
   Rasha,
   RashaArm,
   type RashaMood,
@@ -126,8 +128,6 @@ const STATION_ACTS = [[1500, "wonder"]] as const;
 
 /** At a station the person walks in to meet Hudhud, then stands. */
 const MEET_WALK = [[1300, false]] as const;
-/** The old postman steps up to Hudhud. */
-const POST_WALK = [[800, false]] as const;
 
 /** The trader as Hudhud counts his sacks: worried, amazed, then happy. */
 const SACKS_MOOD = [
@@ -961,7 +961,7 @@ function BowlScene() {
 }
 
 /**
- * He folds her note into his bag and flies off: the note slips into the bag, then Hudhud beats
+ * He tucks her note under his wing and sets out: the note slips under the wing, then Hudhud beats
  * his wings and rises over Sana'a, smaller and smaller. The empty bowl stays on the roof.
  */
 function FlyOff() {
@@ -1003,18 +1003,11 @@ function FlyOff() {
           },
         ]}
       >
-        <Animated.View style={{ opacity: at(tuck, [0, 0.9, 1], [1, 1, 0]) }}>
-          <Hudhud size={86} bag={0} hop={false} />
+        <Animated.View style={{ opacity: at(fly, [0, 0.04], [1, 0]) }}>
+          <Hudhud size={86} hop={false} />
         </Animated.View>
-        <Animated.View
-          style={[StyleSheet.absoluteFill, { opacity: at(tuck, [0, 0.9, 1], [0, 0, 1]) }]}
-        >
-          <Animated.View style={[StyleSheet.absoluteFill, { opacity: at(fly, [0, 0.04], [1, 0]) }]}>
-            <Hudhud size={86} bag={1} hop={false} />
-          </Animated.View>
-          <Animated.View style={[StyleSheet.absoluteFill, { opacity: at(fly, [0, 0.04], [0, 1]) }]}>
-            <Hudhud size={86} bag={1} flap hop={false} />
-          </Animated.View>
+        <Animated.View style={[StyleSheet.absoluteFill, { opacity: at(fly, [0, 0.04], [0, 1]) }]}>
+          <Hudhud size={86} flap hop={false} />
         </Animated.View>
       </Animated.View>
     </View>
@@ -1030,109 +1023,248 @@ function MapScene() {
   );
 }
 
-/**
- * Mukalla on the Arabian Sea: white houses at the foot of brown mountains, the sea in front,
- * a quay to stand on (fills the scene).
- */
-function Mukalla() {
+/** An old alley of Sana'a: the tower houses close by, the paved street (fills the scene). */
+function SanaaAlley({ postBox = false }: { postBox?: boolean }) {
   return (
-    <Svg width="100%" height={300} viewBox="0 0 360 300" style={StyleSheet.absoluteFill}>
-      <Path
-        d="M0 180 L36 112 L84 150 L138 76 L196 132 L246 88 L302 126 L360 98 L360 230 L0 230 Z"
-        fill="#9C6B45"
-      />
-      <Path d="M138 76 L150 96 L128 100 Z M246 88 L258 104 L236 106 Z" fill="#B88A60" />
-      {[
-        [10, 170, 46, 60],
-        [60, 182, 40, 48],
-        [104, 160, 50, 70],
-        [160, 176, 44, 54],
-        [208, 166, 52, 64],
-        [264, 180, 40, 50],
-        [308, 168, 52, 62],
-      ].map(([x, y, w, h]) => (
-        <G key={x}>
-          <Rect
-            x={x}
-            y={y}
-            width={w}
-            height={h}
-            fill="#FBF7EE"
-            stroke="#D9CDB8"
-            strokeWidth={1.5}
-          />
-          <Rect x={x + 8} y={y + 10} width={7} height={10} rx={2} fill="#5E7E9C" />
-          <Rect x={x + w - 15} y={y + 10} width={7} height={10} rx={2} fill="#5E7E9C" />
-          <Rect x={x + 8} y={y + 28} width={7} height={10} rx={2} fill="#5E7E9C" />
-        </G>
-      ))}
-      <Rect x={0} y={228} width={360} height={30} fill="#4F8FD6" />
-      <Path
-        d="M20 240 q8 -5 16 0 t16 0 M150 246 q8 -5 16 0 t16 0 M270 238 q8 -5 16 0 t16 0"
-        stroke="#FFFFFF"
-        strokeWidth={2}
-        fill="none"
-        opacity={0.7}
-      />
-      <Rect x={0} y={256} width={360} height={44} fill="#D9C7A8" />
-      {/* The post box at the post office. */}
-      <G transform="translate(176 206)">
-        <Rect x={0} y={0} width={22} height={34} rx={5} fill="#C8402F" />
-        <Rect x={4} y={8} width={14} height={4} rx={2} fill="#5E1A12" />
-        <Rect x={8} y={34} width={6} height={18} fill="#5E3220" />
-      </G>
-    </Svg>
+    <>
+      <View style={[styles.fill, { backgroundColor: "#F6E2C2" }]} />
+      <View style={styles.hills}>
+        <HillsArt />
+      </View>
+      <View style={styles.city}>
+        <Skyline />
+      </View>
+      <View style={styles.street} />
+      {postBox ? (
+        <Svg width={26} height={60} viewBox="0 0 26 60" style={styles.postBox}>
+          <Rect x={2} y={0} width={22} height={34} rx={5} fill="#C8402F" />
+          <Rect x={6} y={8} width={14} height={4} rx={2} fill="#5E1A12" />
+          <Rect x={10} y={34} width={6} height={26} fill="#5E3220" />
+        </Svg>
+      ) : null}
+    </>
+  );
+}
+
+/** The old postman: white beard, worn robe, and his patched leather bag at his side. */
+function Postman({
+  walk = false,
+  mood = "smile",
+  letters = 2,
+  size = 84,
+}: {
+  walk?: boolean;
+  mood?: PersonMood;
+  letters?: number;
+  size?: number;
+}) {
+  return (
+    <View style={{ width: size, height: size * 1.45 }}>
+      <Person emoji="👴" size={size} full walk={walk} mood={mood} />
+      <View style={{ position: "absolute", left: -size * 0.06, top: size * 0.78 }}>
+        <PostBagArt size={size * 0.46} letters={letters} />
+      </View>
+    </View>
+  );
+}
+
+/** Screenplays of the postman's chapter. */
+const ALLEY_ACTS = [
+  [1500, "wonder"],
+  [3600, "stand"],
+] as const;
+const ALLEY_WALK = [[3000, false]] as const;
+const ASK_ACTS = [[1200, "wonder"]] as const;
+const BREAD_ACTS = [
+  [1600, "stand"],
+  [2600, "cheer"],
+] as const;
+
+/**
+ * In an old alley of Sana'a: the old man with the big bag walks down the street to a door and
+ * knocks; Hudhud watches him, wondering.
+ */
+function Alley() {
+  const along = useOnce(2800, 200, Easing.linear);
+  const walking = useTimeline<boolean>(true, ALLEY_WALK);
+  const act = useTimeline<Act>("stand", ALLEY_ACTS);
+  const knock = useSwing(160, 3100);
+  return (
+    <View style={styles.scene}>
+      <SanaaAlley />
+      <View style={styles.alleyDoor}>
+        <Art art="door" size={100} />
+      </View>
+      <Animated.View
+        style={[
+          styles.alleyPostman,
+          {
+            transform: [
+              { translateX: lerp(along, 170, 0) },
+              { rotate: walking ? "0deg" : at(knock, [0, 1], ["0deg", "-4deg"]) },
+            ],
+          },
+        ]}
+      >
+        <Postman walk={walking} />
+      </Animated.View>
+      <View style={styles.watcher}>
+        <Hudhud size={70} hop={false} pose={act === "wonder" ? "wonder" : "stand"} />
+      </View>
+    </View>
   );
 }
 
 /**
- * In Mukalla the old postman gives Hudhud work: letters fly into his bag, one after another,
- * to be delivered, and at every door he can ask about Rasha.
+ * He knocks at the doors: at one, a woman smiles; at another, a man weeps. Hudhud does not
+ * understand.
  */
-function Post() {
-  const letters = useOnce(2400, 700, Easing.inOut(Easing.quad));
-  const nod = useSwing(900, 300);
-  // The old postman steps up to Hudhud, then hands him the letters.
-  const steps = useOnce(800, 0, Easing.linear);
-  const postWalk = useTimeline<boolean>(true, POST_WALK);
+function Doors() {
+  const puzzle = useSwing(700, 1400);
   return (
     <View style={styles.scene}>
-      <View style={[styles.fill, { backgroundColor: "#E7F0FA" }]} />
-      <Mukalla />
-      <Animated.View
-        style={[styles.postman, { transform: [{ rotate: at(nod, [0, 1], ["-2deg", "2deg"]) }] }]}
-      >
-        <Animated.View style={{ transform: [{ translateX: lerp(steps, -50, 0) }] }}>
-          <Person emoji="👴" size={84} full walk={postWalk} mood="happy" />
-        </Animated.View>
-      </Animated.View>
-      {[0, 1, 2].map((i) => (
-        <Animated.View
-          key={i}
-          style={[
-            styles.flyingLetter,
-            {
-              opacity: at(letters, [i / 3, i / 3 + 0.05, (i + 0.9) / 3, (i + 1) / 3], [0, 1, 1, 0]),
-              transform: [
-                { translateX: at(letters, [i / 3, (i + 1) / 3], [0, 170]) },
-                { translateY: at(letters, [i / 3, (i + 0.5) / 3, (i + 1) / 3], [0, -50, 10]) },
-              ],
-            },
-          ]}
-        >
-          <Picture emoji="✉" size={34} />
-        </Animated.View>
-      ))}
-      <View style={styles.postBird}>
-        <Animated.View style={{ opacity: at(letters, [0, 0.95, 1], [1, 1, 0]) }}>
-          <Hudhud size={88} bag={1} hop={false} pose="wonder" />
-        </Animated.View>
-        <Animated.View
-          style={[StyleSheet.absoluteFill, { opacity: at(letters, [0, 0.95, 1], [0, 0, 1]) }]}
-        >
-          <Hudhud size={88} bag={3} pose="cheer" />
-        </Animated.View>
+      <SanaaAlley />
+      <View style={styles.doorLeft}>
+        <Art art="door" size={92} />
       </View>
+      <View style={styles.doorRight}>
+        <Art art="door" size={92} />
+      </View>
+      <View style={styles.doorPersonLeft}>
+        <Person emoji="🧕" size={58} full mood="happy" />
+      </View>
+      <View style={styles.doorPersonRight}>
+        <Person emoji="👨" size={58} full mood="sad" />
+      </View>
+      <View style={styles.doorsPostman}>
+        <Postman size={70} />
+      </View>
+      <View style={styles.doorsBird}>
+        <Animated.View style={{ transform: [{ translateY: lerp(puzzle, 0, -5) }] }}>
+          <Picture emoji="❓" size={26} />
+        </Animated.View>
+        <Hudhud size={64} hop={false} pose="wonder" />
+      </View>
+    </View>
+  );
+}
+
+/**
+ * Hudhud sits on a stone before the old man and asks what is in his bag. He takes out a small
+ * envelope: words sent on a journey.
+ */
+function Ask() {
+  const out = useOnce(1200, 1000, Easing.out(Easing.back(1.4)));
+  const glow = useSwing(900, 2200);
+  const act = useTimeline<Act>("stand", ASK_ACTS);
+  return (
+    <View style={styles.scene}>
+      <SanaaAlley />
+      <View style={styles.askPostman}>
+        <Postman size={90} letters={3} />
+      </View>
+      <Animated.View
+        style={[
+          styles.askLetter,
+          {
+            opacity: at(out, [0, 0.2], [0, 1]),
+            transform: [{ translateY: lerp(out, 40, 0) }, { scale: lerp(glow, 1, 1.08) }],
+          },
+        ]}
+      >
+        <View style={styles.thingHalo} />
+        <Picture emoji="✉" size={46} />
+      </Animated.View>
+      <View style={styles.stone}>
+        <Svg width={90} height={30} viewBox="0 0 90 30">
+          <Ellipse cx={45} cy={18} rx={42} ry={12} fill="#A99A88" />
+          <Ellipse cx={40} cy={13} rx={30} ry={7} fill="#BDB0A0" />
+        </Svg>
+      </View>
+      <View style={styles.stoneBird}>
+        <Hudhud size={78} hop={false} pose={act === "wonder" ? "wonder" : "stand"} />
+      </View>
+    </View>
+  );
+}
+
+/**
+ * He shares his bread with the bird: bread for the hunger of the body; letters for another
+ * hunger, of the heart (a heart rises over an envelope).
+ */
+function Bread() {
+  const give = useOnce(1200, 400, Easing.inOut(Easing.quad));
+  const peck = useSwing(260, 1700);
+  const heart = useOnce(900, 2600, Easing.out(Easing.back(1.6)));
+  const act = useTimeline<Act>("wonder", BREAD_ACTS);
+  return (
+    <View style={styles.scene}>
+      <SanaaAlley />
+      <View style={styles.askPostman}>
+        <Postman size={90} mood="happy" />
+      </View>
+      <Animated.View
+        style={[
+          styles.breadPiece,
+          {
+            opacity: at(give, [0, 0.1, 1], [0, 1, 1]),
+            transform: [
+              { translateX: lerp(give, 0, 120) },
+              { translateY: at(give, [0, 0.5, 1], [0, -30, 20]) },
+            ],
+          },
+        ]}
+      >
+        <BreadArt size={34} />
+      </Animated.View>
+      <View style={styles.stone}>
+        <Svg width={90} height={30} viewBox="0 0 90 30">
+          <Ellipse cx={45} cy={18} rx={42} ry={12} fill="#A99A88" />
+          <Ellipse cx={40} cy={13} rx={30} ry={7} fill="#BDB0A0" />
+        </Svg>
+      </View>
+      <Animated.View
+        style={[
+          styles.stoneBird,
+          act === "stand"
+            ? { transform: [{ rotate: at(peck, [0, 1], ["0deg", "-14deg"]) }] }
+            : null,
+        ]}
+      >
+        <Hudhud
+          size={78}
+          hop={act === "cheer"}
+          pose={act === "wonder" ? "wonder" : act === "cheer" ? "cheer" : "stand"}
+        />
+      </Animated.View>
+      {/* The other hunger: a heart over a letter. */}
+      <Animated.View
+        style={[
+          styles.heartLetter,
+          { opacity: heart, transform: [{ scale: lerp(heart, 0.4, 1) }] },
+        ]}
+      >
+        <Picture emoji="✉" size={40} />
+        <View style={styles.heartOnLetter}>
+          <Picture emoji="❤" size={26} />
+        </View>
+      </Animated.View>
+    </View>
+  );
+}
+
+/** "Come with me": the old man and the bird walk down the alley together. */
+function ComeWith() {
+  const go = useOnce(4200, 400, Easing.linear);
+  return (
+    <View style={styles.scene}>
+      <SanaaAlley postBox />
+      <Animated.View style={[styles.together, { transform: [{ translateX: lerp(go, 150, -60) }] }]}>
+        <Postman walk size={84} mood="happy" />
+        <View style={styles.togetherBird}>
+          <Hudhud size={64} hop={false} walk />
+        </View>
+      </Animated.View>
     </View>
   );
 }
@@ -1472,12 +1604,12 @@ const PLACE_SKY: Record<StationPlace, string> = {
 function PlaceGround({ place }: { place: StationPlace }) {
   switch (place) {
     case "post":
-      return <Mukalla />;
+      return <SanaaAlley postBox />;
     case "door":
-      // A door in Mukalla, on Hudhud's first round as the postman.
+      // A door in an alley of Sana'a, where the postman's letters go.
       return (
         <>
-          <Mukalla />
+          <SanaaAlley />
           <View style={styles.stationArt}>
             <Art art="door" size={110} />
           </View>
@@ -1596,13 +1728,22 @@ function Station({ unit, line }: { unit?: string; line?: string }) {
           asking ? null : { transform: [{ translateX: lerp(meet, -120, 0) }] },
         ]}
       >
-        <Person
-          emoji={station.person}
-          size={80}
-          full
-          walk={!asking && meeting}
-          mood={asking ? "happy" : (station.feels ?? "smile")}
-        />
+        {station.place === "post" ? (
+          // The old postman, with his bag.
+          <Postman
+            size={80}
+            walk={!asking && meeting}
+            mood={asking ? "happy" : (station.feels ?? "smile")}
+          />
+        ) : (
+          <Person
+            emoji={station.person}
+            size={80}
+            full
+            walk={!asking && meeting}
+            mood={asking ? "happy" : (station.feels ?? "smile")}
+          />
+        )}
       </Animated.View>
       <Animated.View style={[styles.thing, { transform: [{ scale: lerp(glow, 1, 1.12) }] }]}>
         <View style={styles.thingHalo} />
@@ -1644,7 +1785,11 @@ const SCENES: Record<
   turn: Turn,
   flyoff: FlyOff,
   map: MapScene,
-  post: Post,
+  alley: Alley,
+  doors: Doors,
+  ask: Ask,
+  bread: Bread,
+  comewith: ComeWith,
   bowl: BowlScene,
   trader: Trader,
   sacks: Sacks,
@@ -1917,6 +2062,38 @@ const styles = StyleSheet.create({
   wayBird: { position: "absolute", right: 18, bottom: 22 },
   flyingHome: { position: "absolute", left: "38%", top: 40 },
   newGirlBird: { left: 236 },
+  postBox: { position: "absolute", right: 70, bottom: 54 },
+  alleyDoor: { position: "absolute", left: 16, bottom: 52 },
+  alleyPostman: { position: "absolute", left: 100, bottom: 30 },
+  watcher: { position: "absolute", right: 16, bottom: 36 },
+  doorLeft: { position: "absolute", left: 6, bottom: 52 },
+  doorRight: { position: "absolute", right: 6, bottom: 52 },
+  doorPersonLeft: { position: "absolute", left: 60, bottom: 26 },
+  doorPersonRight: { position: "absolute", right: 60, bottom: 26 },
+  doorsPostman: { position: "absolute", left: "50%", marginLeft: -35, bottom: 26 },
+  // Perched on top of the right-hand door frame, looking down.
+  doorsBird: { position: "absolute", right: 16, bottom: 138, alignItems: "center" },
+  askPostman: { position: "absolute", left: 30, bottom: 28 },
+  askLetter: {
+    position: "absolute",
+    left: 120,
+    top: 70,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  stone: { position: "absolute", right: 30, bottom: 34 },
+  stoneBird: { position: "absolute", right: 38, bottom: 50 },
+  breadPiece: { position: "absolute", left: 110, bottom: 140 },
+  heartLetter: { position: "absolute", left: "45%", top: 30, alignItems: "center" },
+  heartOnLetter: { position: "absolute", top: -14, right: -12 },
+  together: {
+    position: "absolute",
+    left: 80,
+    bottom: 26,
+    flexDirection: "row",
+    alignItems: "flex-end",
+  },
+  togetherBird: { marginLeft: -6, marginBottom: 6 },
   flyNote: { position: "absolute", left: 150, bottom: 104 },
   postman: { position: "absolute", left: 16, bottom: 18 },
   flyingLetter: { position: "absolute", left: 90, bottom: 110 },

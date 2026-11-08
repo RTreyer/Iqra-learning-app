@@ -110,17 +110,26 @@ test("Hudhud's story: Rasha, her bowl and the note he cannot read, then two thre
   for (const scene of [...INTRO_STORY, ...CHAPTERS.math, ...CHAPTERS.end])
     expect(scene.line).not.toMatch(/بِذْر|السِّدْر/);
   expect(CHAPTERS.math[0].line).toContain("تَاجِرَ بُنٍّ");
-  // He takes her note with him in his bag and flies off; then the map of Yemen.
-  expect(line("flyoff")).toContain("حَقِيبَتِي");
-  // Where he can fly: the postman's town on the Arabian Sea, the coffee port on the Red Sea.
-  expect(MAP_PLACES.arabic.name).toBe("الْمُكَلَّا");
+  // He takes her note with him (under his wing: the bag comes later, from the postman).
+  expect(line("flyoff")).toContain("جَنَاحِي");
+  // Where he can go: the old postman in his own city, the coffee port on the Red Sea.
+  expect(MAP_PLACES.arabic.name).toBe("صَنْعَاءُ");
   expect(MAP_PLACES.math.name).toBe("الْمُخَا");
-  expect(CHAPTERS.arabic[0].line).toContain(MAP_PLACES.arabic.name);
+  expect(CHAPTERS.arabic[0].line).toContain("صَنْعَاءَ");
+  // The postman teaches Hudhud to read: the names on the letters, and Rasha's note.
+  expect(CHAPTERS.arabic.map((s) => s.line).join(" ")).toContain("تَعَلَّمِ الْقِرَاءَةَ");
   expect(CHAPTERS.math[0].line).toContain(MAP_PLACES.math.name);
   // Every picture with a slow animation plays long enough to be seen.
   for (const id of ["thirst", "girl", "days", "leave", "gone"])
     expect(INTRO_STORY.find((s) => s.id === id)!.minMs).toBeGreaterThanOrEqual(3800);
-  expect(CHAPTERS.arabic.map((s) => s.id)).toEqual(["post", "bowl"]);
+  expect(CHAPTERS.arabic.map((s) => s.id)).toEqual([
+    "alley",
+    "doors",
+    "ask",
+    "bread",
+    "comewith",
+    "bowl",
+  ]);
   expect(CHAPTERS.math.map((s) => s.id)).toEqual(["trader", "sacks"]);
   expect(CHAPTERS.end.map((s) => s.id)).toEqual(["return", "newgirl", "home"]);
 });
@@ -148,7 +157,7 @@ test("skip in a chapter opens the thread's path at once", async () => {
   setParams({ chapter: "arabic" });
   renderIntro();
   await act(async () => {});
-  expect(screen.getByTestId("intro-scene-post")).toBeTruthy();
+  expect(screen.getByTestId("intro-scene-alley")).toBeTruthy();
   await act(async () => {
     fireEvent.press(screen.getByTestId("intro-skip"));
   });
