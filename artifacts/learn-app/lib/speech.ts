@@ -1,3 +1,4 @@
+import { setAudioModeAsync } from "expo-audio";
 import * as Speech from "expo-speech";
 import { Platform } from "react-native";
 
@@ -21,6 +22,17 @@ export function setSpeechMuted(value: boolean): void {
 
 export function isSpeechMuted(): boolean {
   return muted;
+}
+
+/**
+ * On iPhone the voice follows the app's audio session, which by default is muted by the
+ * ring/silent switch. Children do not know the switch, so the voice plays anyway.
+ */
+export async function prepareSpeech(): Promise<void> {
+  if (Platform.OS !== "ios") return;
+  try {
+    await setAudioModeAsync({ playsInSilentMode: true });
+  } catch {}
 }
 
 /** Rate of the English voice in the explanation mode (lib/explain.ts). */

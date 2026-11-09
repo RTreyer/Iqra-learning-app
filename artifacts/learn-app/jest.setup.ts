@@ -8,6 +8,10 @@ jest.mock("expo-speech", () => ({
   isSpeakingAsync: jest.fn(() => Promise.resolve(false)),
 }));
 
+jest.mock("expo-audio", () => ({
+  setAudioModeAsync: jest.fn(() => Promise.resolve()),
+}));
+
 jest.mock("expo-haptics", () => ({
   impactAsync: jest.fn(() => Promise.resolve()),
   notificationAsync: jest.fn(() => Promise.resolve()),

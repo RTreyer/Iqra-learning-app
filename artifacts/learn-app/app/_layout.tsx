@@ -11,6 +11,7 @@ import { ProgressProvider } from "@/context/ProgressContext";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { SettingsProvider } from "@/context/SettingsContext";
 import { useVoiceHint } from "@/hooks/useVoiceHint";
+import { prepareSpeech } from "@/lib/speech";
 import { shadow } from "@/theme/tokens";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -45,6 +46,7 @@ function WebFrame({ children }: { children: React.ReactNode }) {
 export default function RootLayout() {
   useEffect(() => {
     SplashScreen.hideAsync();
+    prepareSpeech();
   }, []);
 
   return (
