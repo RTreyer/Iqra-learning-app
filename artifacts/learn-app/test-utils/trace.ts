@@ -28,13 +28,13 @@ export function strokesOnGuide(guide: string, size = 300): Stroke[] {
 /**
  * Strokes that follow a guide the way a child traces it with a finger: along the letter's centre
  * line, from its right end (Arabic is written right to left), one stroke per connected part
- * (the body, a dot, the next letter), on a `size` × `size` pad. `wobble` (in cells) shakes the
- * finger a little.
+ * (the body, a dot, the next letter), on a `size` × `size` pad. A dot too small to have a centre
+ * line is tapped in its middle. `wobble` (in cells) shakes the finger a little.
  */
 export function strokesAlongGuide(guide: string, size = 300, wobble = 0): Stroke[] {
   const shape = traceGuides[guide];
   if (!shape) throw new Error(`No generated outline for "${guide}"`);
-  const { spine, grid } = decodeMask(shape.mask, TRACE_GRID);
+  const { spine, grid, parts } = decodeMask(shape.mask, TRACE_GRID);
   const cell = size / grid;
   const left = spine.map((i) => ({ r: Math.floor(i / grid), c: i % grid }));
   const touching = (p: { r: number; c: number }) =>
@@ -71,6 +71,13 @@ export function strokesAlongGuide(guide: string, size = 300, wobble = 0): Stroke
     strokes.push(
       path.map((p) => ({ x: (p.c + 0.5 + shake()) * cell, y: (p.r + 0.5 + shake()) * cell })),
     );
+  }
+  const onLine = new Set(spine);
+  for (const part of parts.filter((part) => !part.some((i) => onLine.has(i)))) {
+    const r = part.reduce((sum, i) => sum + Math.floor(i / grid), 0) / part.length;
+    const c = part.reduce((sum, i) => sum + (i % grid), 0) / part.length;
+    const tap = { x: (c + 0.5) * cell, y: (r + 0.5) * cell };
+    strokes.push([tap, { ...tap }]);
   }
   return strokes;
 }

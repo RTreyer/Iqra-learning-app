@@ -217,6 +217,25 @@ describe("a child tracing along the letter", () => {
     for (const guide of ["ـــ", "/", "◯", "〰"]) expect(judge(upright, guide).valid).toBe(false);
   });
 
+  it("refuses a word with its dots left out, and accepts every word with them", () => {
+    const words = Object.keys(traceGuides).filter((g) => g.replace(/ـ/g, "").length > 1);
+    const refused = words.filter(
+      (guide) => !validateOnGuide(strokesAlongGuide(guide), PAD, shape(guide), true).valid,
+    );
+    expect(refused).toEqual([]);
+    // One stroke per connected part: the dots are the short ones.
+    const noDots = strokesAlongGuide("يد").filter((stroke) => stroke.length > 4);
+    expect(noDots.length).toBeLessThan(strokesAlongGuide("يد").length);
+    // Checks 5 to 8 alone let it pass: the dots are a small share of the word.
+    expect(validateOnGuide(noDots, PAD, { ...shape("يد"), parts: [] }, true)).toEqual({
+      valid: true,
+    });
+    expect(validateOnGuide(noDots, PAD, shape("يد"), true)).toEqual({
+      valid: false,
+      msg: "أكمل كتابة الكلمة كلها 📏",
+    });
+  });
+
   it("still refuses a tiny stroke on the letter, and half of it", () => {
     const along = strokesAlongGuide("ـل").flat();
     expect(judge([along.slice(0, 4)], "ـل").valid).toBe(false);
