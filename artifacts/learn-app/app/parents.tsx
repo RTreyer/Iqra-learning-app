@@ -1,69 +1,30 @@
 /**
- * Parents' corner, behind a press-and-hold gate a young child does not open by chance:
- * grade, menu language, voice and vibration, watching Hudhud's story again, progress at a
- * glance, and resetting progress.
+ * Parents' corner, behind the parents' PIN (components/parents/ParentsLock.tsx): the children
+ * on this phone (docs/KINDERPROFILE.md), grade, menu language, voice and vibration, watching
+ * Hudhud's story again and the active child's progress at a glance.
  */
 
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
-import { Animated, Easing, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import React, { useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { BackButton } from "@/components/BackButton";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
 import { ScreenBackground } from "@/components/ScreenBackground";
 import { UiText } from "@/components/UiText";
+import { ChildrenCard } from "@/components/parents/ChildrenCard";
+import { ParentsLock, PinSetup } from "@/components/parents/ParentsLock";
+import { Avatar, profileLabel } from "@/components/world/Avatar";
 import { Icon } from "@/components/world/Icon";
 import { books, grades, unitLessonIds } from "@/content";
 import { useLanguage } from "@/context/LanguageContext";
+import { useProfiles } from "@/context/ProfilesContext";
 import { useProgress } from "@/context/ProgressContext";
 import { useSettings, type Settings } from "@/context/SettingsContext";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
 import { routes } from "@/lib/routes";
 import { STICKERS, stickersEarned } from "@/lib/stickers";
 import { readableFill, touchTarget, yemen } from "@/theme/tokens";
-
-/** How long the gate must be held. */
-const GATE_HOLD_MS = 1500;
-
-function Gate({ onOpen }: { onOpen: () => void }) {
-  const { t } = useLanguage();
-  const [fill] = useState(() => new Animated.Value(0));
-  const start = () =>
-    Animated.timing(fill, {
-      toValue: 1,
-      duration: GATE_HOLD_MS,
-      easing: Easing.linear,
-      useNativeDriver: false,
-    }).start();
-  const cancel = () => {
-    fill.stopAnimation();
-    fill.setValue(0);
-  };
-  return (
-    <View style={styles.gate}>
-      <Icon name="lock" size={56} color={yemen.lockedInk} strokeWidth={1.8} />
-      <UiText style={styles.gateText}>هذا الركن للأهل. اضغط على الزر مطوّلاً.</UiText>
-      <Pressable
-        testID="parents-gate"
-        accessibilityRole="button"
-        accessibilityLabel={t("اضغط مطوّلاً")}
-        delayLongPress={GATE_HOLD_MS}
-        onPressIn={start}
-        onPressOut={cancel}
-        onLongPress={onOpen}
-        style={styles.gateButton}
-      >
-        <Animated.View
-          style={[
-            styles.gateFill,
-            { width: fill.interpolate({ inputRange: [0, 1], outputRange: ["0%", "100%"] }) },
-          ]}
-        />
-        <UiText style={styles.gateLabel}>اضغط مطوّلاً</UiText>
-      </Pressable>
-    </View>
-  );
-}
 
 function Toggle({
   id,
@@ -100,16 +61,10 @@ export default function ParentsScreen() {
   const [open, setOpen] = useState(false);
   const { t, digits, language } = useLanguage();
   const { settings, update } = useSettings();
-  const { progress, getUnitProgress, resetProgress } = useProgress();
+  const { progress, getUnitProgress } = useProgress();
+  const { active, profiles, pinChangedAt } = useProfiles();
   const pad = useScreenPadding();
-  const [confirming, setConfirming] = useState(false);
-  const [resetDone, setResetDone] = useState(false);
-
-  useEffect(() => {
-    if (!resetDone) return;
-    const timer = setTimeout(() => setResetDone(false), 3000);
-    return () => clearTimeout(timer);
-  }, [resetDone]);
+  const [changingPin, setChangingPin] = useState(false);
 
   const row = { flexDirection: language === "en" ? "row" : "row-reverse" } as const;
   const align = { textAlign: language === "en" ? "left" : "right" } as const;
@@ -123,12 +78,16 @@ export default function ParentsScreen() {
       </View>
 
       {!open ? (
-        <Gate onOpen={() => setOpen(true)} />
+        <ScrollView contentContainerStyle={styles.lock}>
+          <ParentsLock onOpen={() => setOpen(true)} />
+        </ScrollView>
       ) : (
         <ScrollView
           testID="parents-content"
           contentContainerStyle={[styles.content, { paddingBottom: pad.bottom + 24 }]}
         >
+          <ChildrenCard />
+
           <View style={styles.card}>
             <UiText style={[styles.cardTitle, align]}>الصف</UiText>
             <View style={[styles.grades, row]}>
@@ -203,7 +162,12 @@ export default function ParentsScreen() {
           </View>
 
           <View style={styles.card}>
-            <UiText style={[styles.cardTitle, align]}>التقدم</UiText>
+            <View style={[styles.progressHead, row]}>
+              {profiles.length > 1 ? <Avatar id={active.avatar} size={32} /> : null}
+              <UiText style={[styles.cardTitle, align]}>
+                {profiles.length > 1 ? `${t("التقدم")}: ${profileLabel(active)}` : "التقدم"}
+              </UiText>
+            </View>
             {books
               .filter((book) => book.available)
               .map((book) => {
@@ -232,47 +196,31 @@ export default function ParentsScreen() {
             </View>
           </View>
 
-          {confirming ? (
-            <View style={[styles.card, styles.danger]}>
-              <UiText style={[styles.dangerText, align]}>
-                سيُمسح كل التقدم: النجوم والدروس والملصقات. لا يمكن التراجع.
-              </UiText>
-              <View style={[styles.confirmRow, row]}>
-                <Pressable
-                  testID="reset-confirm"
-                  accessibilityRole="button"
-                  accessibilityLabel={t("نعم، امسح التقدم")}
-                  onPress={async () => {
-                    await resetProgress();
-                    setConfirming(false);
-                    setResetDone(true);
-                  }}
-                  style={[styles.button, { backgroundColor: yemen.red }]}
-                >
-                  <UiText style={styles.buttonText}>نعم، امسح التقدم</UiText>
-                </Pressable>
-                <Pressable
-                  testID="reset-cancel"
-                  accessibilityRole="button"
-                  accessibilityLabel={t("إلغاء")}
-                  onPress={() => setConfirming(false)}
-                  style={[styles.button, { backgroundColor: yemen.inkSoft }]}
-                >
-                  <UiText style={styles.buttonText}>إلغاء</UiText>
-                </Pressable>
-              </View>
-            </View>
-          ) : (
-            <Pressable
-              testID="reset-progress"
-              accessibilityRole="button"
-              accessibilityLabel={t("مسح التقدم")}
-              onPress={() => setConfirming(true)}
-              style={styles.resetLink}
-            >
-              <UiText style={styles.resetText}>{resetDone ? "تم مسح التقدم" : "مسح التقدم"}</UiText>
-            </Pressable>
-          )}
+          <View style={styles.card}>
+            <UiText style={[styles.cardTitle, align]}>رمز الأهل</UiText>
+            {pinChangedAt ? (
+              <Text testID="pin-changed-at" style={[styles.note, align]}>
+                {`${t("آخر تغيير للرمز:")} ${digits(pinChangedAt.slice(0, 10))}`}
+              </Text>
+            ) : null}
+            {changingPin ? (
+              <PinSetup onSaved={() => setChangingPin(false)} />
+            ) : (
+              <Pressable
+                testID="pin-change"
+                accessibilityRole="button"
+                accessibilityLabel={t("تغيير الرمز")}
+                onPress={() => setChangingPin(true)}
+                style={({ pressed }) => [
+                  styles.button,
+                  styles.storyButton,
+                  pressed && styles.pressed,
+                ]}
+              >
+                <UiText style={styles.buttonText}>تغيير الرمز</UiText>
+              </Pressable>
+            )}
+          </View>
         </ScrollView>
       )}
     </ScreenBackground>
@@ -283,19 +231,7 @@ const styles = StyleSheet.create({
   screen: { flex: 1 },
   header: { alignItems: "center", justifyContent: "space-between", paddingHorizontal: 16 },
   title: { fontSize: 22, fontWeight: "800", color: yemen.ink },
-  gate: { flex: 1, alignItems: "center", justifyContent: "center", gap: 20, padding: 32 },
-  gateText: { fontSize: 17, color: yemen.inkSoft, textAlign: "center", lineHeight: 26 },
-  gateButton: {
-    width: 240,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: yemen.inkSoft,
-    overflow: "hidden",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  gateFill: { position: "absolute", top: 0, bottom: 0, right: 0, backgroundColor: yemen.clay },
-  gateLabel: { color: "#FFFFFF", fontSize: 19, fontWeight: "800" },
+  lock: { flexGrow: 1, justifyContent: "center", paddingBottom: 24 },
   content: { padding: 16, gap: 12 },
   card: { backgroundColor: "#FFFFFF", borderRadius: 18, padding: 14, gap: 10 },
   cardTitle: { fontSize: 17, fontWeight: "800", color: yemen.ink },
@@ -325,6 +261,7 @@ const styles = StyleSheet.create({
   },
   knobOn: { left: 3 },
   knobOff: { left: 27 },
+  progressHead: { alignItems: "center", gap: 8 },
   progressRow: { alignItems: "center", gap: 10, minHeight: 32 },
   progressName: { width: 96, fontSize: 15, fontWeight: "700", color: yemen.ink },
   progressTrack: {
@@ -335,9 +272,6 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   progressCount: { fontSize: 14, color: yemen.inkSoft, marginStart: "auto" },
-  danger: { borderWidth: 2, borderColor: yemen.red },
-  dangerText: { fontSize: 15, color: yemen.ink, lineHeight: 22 },
-  confirmRow: { gap: 10 },
   button: {
     flex: 1,
     minHeight: touchTarget,
@@ -347,16 +281,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   buttonText: { color: "#FFFFFF", fontSize: 15, fontWeight: "800", textAlign: "center" },
-  resetLink: {
-    alignSelf: "center",
-    minHeight: touchTarget,
-    justifyContent: "center",
-    paddingHorizontal: 18,
-    borderRadius: 14,
-    borderWidth: 2,
-    borderColor: yemen.red,
-  },
-  resetText: { color: yemen.red, fontSize: 15, fontWeight: "700" },
   storyButton: { flex: 0, backgroundColor: yemen.clay, gap: 8 },
   pressed: { opacity: 0.88, transform: [{ scale: 0.97 }] },
 });

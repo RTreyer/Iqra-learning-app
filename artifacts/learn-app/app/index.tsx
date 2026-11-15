@@ -7,7 +7,7 @@
  */
 
 import { router } from "expo-router";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { ScreenBackground } from "@/components/ScreenBackground";
@@ -15,6 +15,7 @@ import { StarBadge } from "@/components/StarBadge";
 import { UiText } from "@/components/UiText";
 import { Guide, Pulse } from "@/components/world/Guide";
 import { AlbumArt } from "@/components/world/AlbumArt";
+import { Avatar, profileLabel } from "@/components/world/Avatar";
 import { Icon } from "@/components/world/Icon";
 import { BowlGoal } from "@/components/world/Bowl";
 import { Skyline } from "@/components/world/Skyline";
@@ -24,6 +25,7 @@ import { books, unitLessonIds, type Book } from "@/content";
 import { SOON_LINE, SUBJECT_DONE, bowlLine, chapterFor } from "@/content/story";
 import { useLine } from "@/components/Gloss";
 import { useLanguage } from "@/context/LanguageContext";
+import { useProfiles } from "@/context/ProfilesContext";
 import { useProgress } from "@/context/ProgressContext";
 import { useSettings } from "@/context/SettingsContext";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
@@ -53,7 +55,12 @@ export default function HomeScreen() {
   const { t, digits, language, loaded: languageLoaded } = useLanguage();
   const { progress, getDueItemIds, getUnitProgress } = useProgress();
   const { settings, loaded, update } = useSettings();
+  const { profiles, active, chosen } = useProfiles();
   const line = useLine();
+  // More than one child on this phone: first ask who learns today.
+  useEffect(() => {
+    if (!chosen) router.replace(routes.profiles());
+  }, [chosen]);
   const pad = useScreenPadding();
   // The subject the child chose in the story or on an island; Arabic until then.
   const current =
@@ -97,6 +104,17 @@ export default function HomeScreen() {
       >
         <View style={styles.topBar}>
           <View style={styles.topStart}>
+            {profiles.length > 1 ? (
+              <Pressable
+                testID="profile-button"
+                accessibilityRole="button"
+                accessibilityLabel={`${t("مَنْ يَتَعَلَّمُ؟")} ${profileLabel(active)}`}
+                onPress={tap(() => router.push(routes.profiles()))}
+                style={styles.profileButton}
+              >
+                <Avatar id={active.avatar} size={48} />
+              </Pressable>
+            ) : null}
             <StarBadge stars={progress.totalStars} />
             {story ? null : (
               <Pressable
@@ -133,7 +151,7 @@ export default function HomeScreen() {
           }
           layout="stack"
           birdSize={112}
-          speakOnMount={loaded && languageLoaded}
+          speakOnMount={loaded && languageLoaded && chosen}
         />
 
         {story || next ? (
@@ -275,6 +293,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   topStart: { flexDirection: "row", alignItems: "center", gap: 8 },
+  profileButton: { borderRadius: 26, borderWidth: 2, borderColor: "#FFFFFF" },
   storyButton: {
     width: 48,
     height: 48,

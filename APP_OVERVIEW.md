@@ -40,7 +40,7 @@ Arabic Unit 1 (earlier version) uses `naming`, `listen_pick`, `behavior`, `match
 
 - Monorepo: pnpm workspaces with one package, Node 24, TypeScript 5.9.
 - App: Expo SDK 54, expo-router 6, React Native 0.81, React 19, New Architecture. Typed routes are off, a `lib/routes.ts` helper builds paths.
-- Storage: AsyncStorage only. Key `@kidlearn_progress_v1` (schema v2) for progress, `iqra_ui_language` for language, `@iqra_demo_seen_v1` for the worked examples already shown, `@iqra_settings_v1` for the parents' switches (voice, vibration), whether Hudhud's story was told and the chosen subject.
+- Storage: AsyncStorage only. Key `@kidlearn_progress_v1` (schema v2) for progress, `iqra_ui_language` for language, `@iqra_demo_seen_v1` for the worked examples already shown, `@iqra_settings_v1` for the parents' switches (voice, vibration), whether Hudhud's story was told and the chosen subject, `@iqra_profiles_v1` for the children on the phone, the active child and the hashed parents' PIN. Progress, story and worked examples are per child: the first child keeps the keys above, every other child has the same keys with `:<id>` (lib/profiles.ts).
 - Audio: expo-speech with Arabic locale. Haptics: expo-haptics.
 - Graphics and input: react-native-svg and react-native-gesture-handler (Pan) for letter tracing. No icon fonts, no `expo-font`, no custom fonts at runtime. Icons are inline SVG or emoji. Arabic trace guides are SVG outlines generated at build time from Noto Naskh Arabic (SIL OFL, `scripts/fonts/`) with HarfBuzz (`harfbuzzjs`, dev dependency): `npm run guides` writes `content/generated/traceGuides.ts`, and `test:data` fails when it is out of date.
 - Tests: jest-expo with Testing Library for unit and component tests, Node test runner for content and translation data, Playwright for web end to end.
@@ -56,7 +56,7 @@ netlify.toml                        web deploy, publishes artifacts/learn-app/di
 Start-Browser.cmd / Start-Handy.cmd Windows double click launchers
 docs/                               UI_PROPOSALS.md, CONTENT_REVIEW.md, content/, superpowers/plans/
 artifacts/learn-app/                the Expo app
-  app/                  routes: _layout, index, book/[bookId], unit/[unitId], lesson/[lessonId], review, album, parents, +not-found
+  app/                  routes: _layout, index, book/[bookId], unit/[unitId], lesson/[lessonId], review, album, parents, profiles, +not-found
   components/           shared UI: cards, badges, BackButton, UiText (auto translating Text), ErrorBoundary, ActivityHost
   components/activities/  one component per activity type, ReviewRound, shared/ (useQuiz, shuffle, ChoiceCard...), math/, trace/ (validate.ts, path.ts)
   content/generated/     traceGuides.ts: outlines and masks of the Arabic trace guides (generated, do not edit)
@@ -78,7 +78,8 @@ artifacts/learn-app/                the Expo app
 /unit/[unitId]          lessons of a unit as stops on a path, letters of the unit
 /intro                  Hudhud's story (voice, five scenes), ending with the choice of subject
 /album                  sticker album (pictures of Yemen earned with stars)
-/parents                parents' corner behind a press-and-hold gate: grade, menu language, voice, vibration, progress, reset
+/profiles               who learns today: one picture from Yemen per child (shown at the start when more than one child learns on the phone)
+/parents                parents' corner behind the parents' PIN: children (add, rename, picture, reset, remove), grade, menu language, voice, vibration, story again, progress, change PIN
 /lesson/[lessonId]      lesson (ids u1-1 .. u8-6, math-u1-1 .. math-u5-24, s1-1 .. s3-3), globally unique
 /review                 today's review session
 +not-found              fallback screen

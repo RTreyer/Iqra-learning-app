@@ -31,7 +31,7 @@ Windows: after `pnpm install`, double click `Start-Browser.cmd` (browser) or `St
 
 ## Storage
 
-Progress stays on the device. No server, no accounts. AsyncStorage key `@kidlearn_progress_v1` holds a schema v2 blob (`lessons`, `items`, `activity.days`, `totalStars`). The key keeps its legacy name so old progress survives. A corrupt blob is copied to a `@kidlearn_progress_corrupt_` backup key before anything is overwritten. The UI language is stored under `iqra_ui_language`, the parents' switches (voice, vibration), whether Hudhud's story was told and the chosen subject under `@iqra_settings_v1`.
+Progress stays on the device. No server, no accounts. AsyncStorage key `@kidlearn_progress_v1` holds a schema v2 blob (`lessons`, `items`, `activity.days`, `totalStars`). The key keeps its legacy name so old progress survives. A corrupt blob is copied to a `@kidlearn_progress_corrupt_` backup key before anything is overwritten. The UI language is stored under `iqra_ui_language`, the parents' switches (voice, vibration), whether Hudhud's story was told and the chosen subject under `@iqra_settings_v1`. Several children can learn on one phone, each with its own progress ([docs/KINDERPROFILE.md](docs/KINDERPROFILE.md)): the list of children, the active child and the hashed parents' PIN live under `@iqra_profiles_v1`. The first child keeps the keys above; every other child gets its own keys with the suffix `:<id>`.
 
 ## Content
 

@@ -17,6 +17,10 @@ export const VOICE_HINT_KEY = "@iqra_voice_hint_shown";
 export const DEMO_SEEN_KEY = "@iqra_demo_seen_v1";
 /** context/SettingsContext.tsx: parents' switches, whether Hudhud's story was told, chosen subject. */
 export const SETTINGS_KEY = "@iqra_settings_v1";
+/** context/ProfilesContext.tsx: the children on the phone, the active child and the parents' PIN. */
+export const PROFILES_KEY = "@iqra_profiles_v1";
+/** The PIN the suite's parents choose. */
+export const PARENTS_PIN = "2580";
 
 /**
  * Answers per round, taken from content/. Options are shuffled per attempt, so rounds are
@@ -129,14 +133,32 @@ export async function gotoAndWaitReady(page, path) {
   await dismissVoiceHint(page);
 }
 
-/** Opens the parents' corner by holding its gate, as a parent would. */
-export async function openParents(page) {
-  await gotoAndWaitReady(page, "/parents");
-  const box = await page.getByTestId("parents-gate").boundingBox();
+/** Holds a press-and-hold button down for `ms`, as a parent would. */
+export async function holdDown(page, testID, ms) {
+  const box = await page.getByTestId(testID).boundingBox();
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await page.mouse.down();
-  await page.waitForTimeout(1800);
+  await page.waitForTimeout(ms);
   await page.mouse.up();
+}
+
+/** Types a PIN on the parents' number pad. */
+export async function typePin(page, pin = PARENTS_PIN) {
+  for (const digit of pin) await page.getByTestId(`pin-key-${digit}`).click();
+}
+
+/**
+ * Opens the parents' corner as a parent would: the first time hold the gate and choose the PIN
+ * (typed twice), afterwards type it.
+ */
+export async function openParents(page) {
+  await gotoAndWaitReady(page, "/parents");
+  await expect(page.getByTestId("parents-gate").or(page.getByTestId("pin-dots"))).toBeVisible();
+  if (await page.getByTestId("parents-gate").isVisible()) {
+    await holdDown(page, "parents-gate", 1800);
+    await typePin(page);
+  }
+  await typePin(page);
   await expect(page.getByTestId("parents-content")).toBeVisible();
 }
 

@@ -119,15 +119,21 @@ test("album: back button, nine stickers and Hudhud", async () => {
   expectAccessiblePressables(11);
 });
 
-test("parents: the gate, then every control behind it", async () => {
+test("parents: the gate, the PIN pad, then every control behind it", async () => {
   withProgress(<ParentsScreen />);
   // Back and the hold-to-open gate.
   expectAccessiblePressables(2);
   await act(async () => {
     fireEvent(screen.getByTestId("parents-gate"), "longPress");
   });
-  // Back, 2 languages, voice, vibration, the story again, and reset.
-  expectAccessiblePressables(7);
+  // Back, ten digits and delete.
+  expectAccessiblePressables(12);
+  for (const digit of "12341234") fireEvent.press(screen.getByTestId(`pin-key-${digit}`));
+  // Back, the child and "add a child", 2 languages, voice, vibration, the story again, change PIN.
+  expectAccessiblePressables(9);
+  fireEvent.press(screen.getByTestId("child-main"));
+  // The child's form: ten pictures, save, reset (the only child cannot be removed).
+  expectAccessiblePressables(9 + 12);
 });
 
 test("lesson u2-2: back button, Hudhud, help button and the activity controls", async () => {

@@ -1,6 +1,6 @@
 # Kinderprofile: mehrere Kinder, ein Handy
 
-Status: Konzept zur Besprechung im Team, noch nicht gebaut.
+Status: gebaut (November 2026). Entscheide des Owners vom 15.11.2026: PIN ja, bei vergessener PIN ein neuer PIN ohne Einfluss auf den Fortschritt, höchstens 8 Profile, Bilder aus dem Jemen.
 
 ## Ausgangslage
 
@@ -44,9 +44,15 @@ Die Elternecke (`app/parents.tsx`, heute hinter langem Drücken) bekommt einen A
 - **Fortschritt zurücksetzen:** pro Kind, mit Bestätigung, die den Namen bzw. das Bild des Kindes nennt.
 - **Profil löschen:** mit derselben Bestätigung. Das letzte Profil lässt sich nicht löschen, nur zurücksetzen.
 
-### Eltern-PIN (Vorschlag, offen)
+### Eltern-PIN
 
-Bei vier, fünf Kindern sind ältere Geschwister dabei, die das lange Drücken schnell herausfinden. Vorschlag: Eltern können in der Elternecke eine 4-stellige PIN einschalten. Sie wird nur auf dem Handy gespeichert (als Hash). Sie schützt vor Kindern, nicht vor Angreifern; dafür reicht sie.
+Bei vier, fünf Kindern sind ältere Geschwister dabei, die das lange Drücken schnell herausfinden. Darum ist die Elternecke durch eine 4-stellige PIN geschützt (`components/parents/ParentsLock.tsx`):
+
+- **Beim ersten Öffnen:** langes Drücken (1,5 s), dann wählen die Eltern die PIN und geben sie zur Bestätigung ein zweites Mal ein.
+- **Danach:** PIN eingeben. Nach 5 falschen Versuchen wartet das Zahlenfeld 30 Sekunden.
+- **PIN vergessen:** «نسيت الرمز؟» führt zu einem Knopf, der 6 Sekunden gedrückt werden muss. Danach wählen die Eltern eine neue PIN. Kinder, Fortschritt, Sterne und Geschichte bleiben unverändert.
+- **Bemerken einer fremden Änderung:** Die Elternecke zeigt, wann die PIN zuletzt geändert wurde. Hat ein älteres Kind die PIN über «vergessen» neu gesetzt, sehen die Eltern das am Datum.
+- **Speicherung:** nur auf dem Handy, als Hash mit Salt (`lib/profiles.ts`), nie im Klartext. Die PIN schützt vor Kindern, nicht vor Angreifern; dafür reicht sie.
 
 ## Was pro Kind gilt und was für das ganze Handy
 
@@ -91,7 +97,14 @@ Kein Kind darf beim Update seinen Fortschritt verlieren:
 
 ### Bilder für die Profile
 
-8 bis 12 Zeichnungen im Stil von `components/pictures/`, je auf einer farbigen Scheibe, z. B. Gazelle, Kamel, Katze, Bülbül, Schildkröte, Fisch, Dattelpalme, Mond. Gleiche kulturelle Regeln wie in SPIELWELT.md. Keine Gesichter echter Personen, keine Fotos.
+10 Bilder aus dem Jemen, je auf einer farbigen Scheibe (`components/world/Avatar.tsx`). Sechs sind Zeichnungen aus den Übungen, vier wurden für die Profile neu gezeichnet (`components/world/avatarArt.ts`):
+
+| Bild | Herkunft |
+|---|---|
+| Kamel, Dattelpalme, Dau-Segelboot, Kaffeekirschen, Haus im Stil von Sanaa, Schildkröte | Übungsbilder (`components/pictures/`) |
+| Arabischer Leopard (Berge des Jemen), Drachenblutbaum (Sokotra), Steinbock (الوعل, altes Wahrzeichen des Jemen), Kaffeekanne (دلة) | neu |
+
+Gleiche kulturelle Regeln wie in SPIELWELT.md: keine Gesichter echter Personen, keine Fotos, keine Waffen.
 
 ## Schritte
 
@@ -108,11 +121,15 @@ Geschätzt einige Tage. Weil `SettingsContext`, `ProgressContext` und die Geschi
 - **Sicherung ohne Server:** Fortschritt eines Kindes als Datei exportieren oder per QR-Code auf ein anderes Handy übertragen.
 - **Konten im Internet** (z. B. damit Lehrer den Fortschritt einer Klasse sehen) wären ein eigenes Projekt mit eigener Sicherheitsprüfung und nicht Teil der Familien-App.
 
-## Offene Fragen
+## Entschieden
 
-1. Eltern-PIN: immer, freiwillig oder gar nicht? Und was passiert bei vergessener PIN, ohne dass ein älteres Kind sie umgehen kann?
-2. Höchstzahl der Profile: 8 genug?
-3. Name Pflicht oder freiwillig? (Vorschlag: freiwillig, das Bild genügt.)
-4. Ton und Vibration pro Kind oder für das Handy? (Vorschlag: für das Handy.)
-5. Welche Bilder für die Profile? Vorschlag oben, Entscheid durch das Team bzw. den Owner.
-6. Wer im Team baut es, und wann, ohne mit der Arbeit an der Geschichte zu kollidieren?
+1. Eltern-PIN: immer. Vergessene PIN: neue PIN nach langem Drücken, Fortschritt bleibt (siehe oben).
+2. Höchstens 8 Profile, vorerst.
+3. Name freiwillig, das Bild genügt.
+4. Ton und Vibration gelten für das ganze Handy.
+5. Bilder aus dem Jemen (siehe oben).
+
+## Noch offen
+
+- Auf einem echten Handy prüfen: Auswahl, Wechsel, PIN-Feld und Namenseingabe mit arabischer Tastatur.
+- Die neuen Zeichnungen (Leopard, Drachenblutbaum, Steinbock, Kaffeekanne) vom Team bzw. Owner abnehmen lassen.

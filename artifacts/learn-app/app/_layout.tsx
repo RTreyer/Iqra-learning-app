@@ -9,6 +9,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { VoiceHintBanner } from "@/components/VoiceHintBanner";
 import { ProgressProvider } from "@/context/ProgressContext";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { ProfilesProvider } from "@/context/ProfilesContext";
 import { SettingsProvider } from "@/context/SettingsContext";
 import { useVoiceHint } from "@/hooks/useVoiceHint";
 import { prepareSpeech } from "@/lib/speech";
@@ -53,15 +54,17 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <LanguageProvider>
         <ErrorBoundary>
-          <SettingsProvider>
-            <ProgressProvider>
-              <GestureHandlerRootView style={{ flex: 1 }}>
-                <WebFrame>
-                  <RootLayoutNav />
-                </WebFrame>
-              </GestureHandlerRootView>
-            </ProgressProvider>
-          </SettingsProvider>
+          <ProfilesProvider>
+            <SettingsProvider>
+              <ProgressProvider>
+                <GestureHandlerRootView style={{ flex: 1 }}>
+                  <WebFrame>
+                    <RootLayoutNav />
+                  </WebFrame>
+                </GestureHandlerRootView>
+              </ProgressProvider>
+            </SettingsProvider>
+          </ProfilesProvider>
         </ErrorBoundary>
       </LanguageProvider>
     </SafeAreaProvider>

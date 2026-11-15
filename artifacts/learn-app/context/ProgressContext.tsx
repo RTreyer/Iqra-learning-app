@@ -3,6 +3,8 @@
  *
  * Fully offline: progress lives in React state and is persisted to
  * AsyncStorage on the device. There is no server, login or sync.
+ * Each child on the phone has its own progress (context/ProfilesContext.tsx);
+ * switching the child loads that child's progress.
  * The state rules live in lib/progressState.ts; this file only wires
  * them to React and storage.
  *
@@ -11,6 +13,8 @@
  *   ("hydrated"). A failed read never leads to an overwrite.
  * - A corrupt blob is copied to a backup key before it can be overwritten.
  * - All writes go through one promise chain, so the last write wins.
+ * - The state remembers whose progress it is (its storage key), and is only
+ *   ever written to that key, so one child's stars never land with another.
  */
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -21,7 +25,6 @@ import React, {
   useEffect,
   useMemo,
   useReducer,
-  useState,
 } from "react";
 
 import {
@@ -37,9 +40,12 @@ import {
   type ProgressState,
   type UnitProgress,
 } from "@/lib/progressState";
+import { useProfiles } from "@/context/ProfilesContext";
 import { todayKey } from "@/lib/dates";
+import { progressKey } from "@/lib/profiles";
 import { allItems } from "@/lib/reviewItems";
 import { pickDue } from "@/lib/srs";
+import { enqueueWrite } from "@/lib/storageQueue";
 
 export type {
   LessonProgress,
@@ -50,9 +56,8 @@ export type {
 
 // ─── AsyncStorage keys ────────────────────────────────────────────────────────
 
-// Legacy name kept on purpose: renaming the key would wipe existing progress.
-// The blob itself carries `version: 2` since the schema upgrade.
-const STORAGE_KEY = "@kidlearn_progress_v1";
+// The first child keeps the legacy key "@kidlearn_progress_v1" (lib/profiles.ts progressKey):
+// renaming it would wipe existing progress. The blob carries `version: 2` since the schema upgrade.
 const CORRUPT_BACKUP_PREFIX = "@kidlearn_progress_corrupt_";
 const RETRY_DELAY_MS = 300;
 
@@ -112,10 +117,10 @@ type LoadResult =
   | { kind: "corrupt"; raw: string }
   | { kind: "error" };
 
-async function loadLocalProgress(): Promise<LoadResult> {
+async function loadLocalProgress(key: string): Promise<LoadResult> {
   let json: string | null;
   try {
-    json = await AsyncStorage.getItem(STORAGE_KEY);
+    json = await AsyncStorage.getItem(key);
   } catch {
     return { kind: "error" };
   }
@@ -132,17 +137,11 @@ function warn(message: string, err: unknown) {
   if (__DEV__) console.warn(`[progress] ${message}`, err);
 }
 
-// One chain for every write, so writes land in the order they were requested.
-let writeQueue: Promise<void> = Promise.resolve();
-
-function enqueueWrite(label: string, write: () => Promise<void>): Promise<void> {
-  writeQueue = writeQueue.then(write).catch((err) => warn(`${label} failed`, err));
-  return writeQueue;
-}
-
 // ─── Reducer ──────────────────────────────────────────────────────────────────
 
 type State = {
+  /** Whose progress this is: the storage key it was read from and is written to. */
+  key: string;
   progress: ProgressState;
   /** True once storage was read successfully; nothing is persisted before. */
   hydrated: boolean;
@@ -150,31 +149,44 @@ type State = {
   resetPending: boolean;
   /** Whether the current progress should be written; false right after a reset (the blob was removed). */
   dirty: boolean;
+  /** Loading has finished, successfully or not. */
+  loadSettled: boolean;
 };
 
 type Action =
-  | { type: "LOADED"; stored: ProgressState }
+  | { type: "SWITCH"; key: string }
+  | { type: "LOADED"; key: string; stored: ProgressState }
+  | { type: "SETTLED"; key: string }
   | { type: "COMPLETE"; lessonId: string; stars: number; now: Date }
   | { type: "ROUND_RESULT"; itemId: string; correct: boolean; now: Date }
   | { type: "REVIEW"; itemId: string; correct: boolean; now: Date }
   | { type: "RESET" };
 
-const initialState: State = {
-  progress: createEmptyState(),
-  hydrated: false,
-  resetPending: false,
-  dirty: false,
-};
+function initialState(key: string): State {
+  return {
+    key,
+    progress: createEmptyState(),
+    hydrated: false,
+    resetPending: false,
+    dirty: false,
+    loadSettled: false,
+  };
+}
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
+    case "SWITCH":
+      return action.key === state.key ? state : initialState(action.key);
+    case "SETTLED":
+      return action.key === state.key ? { ...state, loadSettled: true } : state;
     case "LOADED": {
-      if (state.hydrated) return state;
+      // A load for another child (switched meanwhile) is dropped.
+      if (state.hydrated || action.key !== state.key) return state;
       // After an early reset, keep only what happened since the reset.
       const base = state.resetPending ? createEmptyState() : action.stored;
       const progress = mergeProgress(base, state.progress);
       const dirty = !state.resetPending || state.dirty;
-      return { progress, hydrated: true, resetPending: false, dirty };
+      return { ...state, progress, hydrated: true, resetPending: false, dirty };
     }
     case "COMPLETE":
       return {
@@ -196,6 +208,7 @@ function reducer(state: State, action: Action): State {
       };
     case "RESET":
       return {
+        ...state,
         progress: createEmptyState(),
         hydrated: state.hydrated,
         resetPending: !state.hydrated,
@@ -207,23 +220,29 @@ function reducer(state: State, action: Action): State {
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
 export function ProgressProvider({ children }: { children: React.ReactNode }) {
-  const [{ progress, hydrated, dirty }, dispatch] = useReducer(reducer, initialState);
-  const [loadSettled, setLoadSettled] = useState(false);
+  const { active } = useProfiles();
+  const storageKey = progressKey(active.id);
+  const [state, dispatch] = useReducer(reducer, storageKey, initialState);
+  // Right after a switch, until the reducer has caught up, the old child's progress is not shown.
+  const current = state.key === storageKey ? state : initialState(storageKey);
+  const { progress, hydrated, loadSettled } = current;
 
   useEffect(() => {
     let cancelled = false;
     let retryTimer: ReturnType<typeof setTimeout> | undefined;
+    const key = storageKey;
+    dispatch({ type: "SWITCH", key });
 
     const hydrate = async (attempt: number) => {
-      const result = await loadLocalProgress();
+      const result = await loadLocalProgress(key);
       if (cancelled) return;
       switch (result.kind) {
         case "missing":
-          dispatch({ type: "LOADED", stored: createEmptyState() });
+          dispatch({ type: "LOADED", key, stored: createEmptyState() });
           break;
         case "ok":
           // The LOADED save below also rewrites an upgraded v1 blob as v2.
-          dispatch({ type: "LOADED", stored: result.state });
+          dispatch({ type: "LOADED", key, stored: result.state });
           break;
         case "corrupt": {
           const backupKey = `${CORRUPT_BACKUP_PREFIX}${Date.now()}`;
@@ -235,7 +254,7 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
             break;
           }
           if (cancelled) return;
-          dispatch({ type: "LOADED", stored: createEmptyState() });
+          dispatch({ type: "LOADED", key, stored: createEmptyState() });
           break;
         }
         case "error":
@@ -248,7 +267,7 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
           break;
       }
       // Loading is over, whether or not it hydrated.
-      if (!cancelled) setLoadSettled(true);
+      if (!cancelled) dispatch({ type: "SETTLED", key });
     };
 
     void hydrate(0);
@@ -256,12 +275,14 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
       cancelled = true;
       if (retryTimer) clearTimeout(retryTimer);
     };
-  }, []);
+  }, [storageKey]);
 
+  // Written to the key stored with the progress, never to the key of the child shown next.
+  const { key: savedKey, progress: toSave, hydrated: canSave, dirty } = state;
   useEffect(() => {
-    if (!hydrated || !dirty) return;
-    void enqueueWrite("save", () => AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(progress)));
-  }, [progress, hydrated, dirty]);
+    if (!canSave || !dirty) return;
+    void enqueueWrite("save", () => AsyncStorage.setItem(savedKey, JSON.stringify(toSave)));
+  }, [savedKey, toSave, canSave, dirty]);
 
   const completeLesson = useCallback((lessonId: string, stars: number) => {
     dispatch({ type: "COMPLETE", lessonId, stars, now: new Date() });
@@ -306,8 +327,8 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
 
   const resetProgress = useCallback(() => {
     dispatch({ type: "RESET" });
-    return enqueueWrite("reset", () => AsyncStorage.removeItem(STORAGE_KEY));
-  }, []);
+    return enqueueWrite("reset", () => AsyncStorage.removeItem(storageKey));
+  }, [storageKey]);
 
   const value = useMemo(
     () => ({

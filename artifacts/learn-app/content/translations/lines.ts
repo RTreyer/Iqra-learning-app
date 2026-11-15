@@ -4,6 +4,7 @@
  * test-utils/explainStrings.ts lists what must be here.
  */
 export const EN_LINES: Record<string, string> = {
+  "مَنْ يَتَعَلَّمُ الْيَوْمَ؟": "Who is learning today?",
   "أ: دَارُ الأَيْتَامِ": "أ: The orphanage",
   "أحسنت! لقد أتممت الدرس": "Well done! You finished the lesson",
   "أكمل كتابة الحرف كله 📏": "Finish writing the whole letter 📏",

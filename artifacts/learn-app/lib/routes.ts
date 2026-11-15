@@ -8,6 +8,8 @@ export const routes = {
   review: (): Href => "/review",
   album: (): Href => "/album",
   parents: (): Href => "/parents",
+  /** Who learns today: the children's pictures. */
+  profiles: (): Href => "/profiles",
   /** Hudhud's story; with a chapter, only that job (content/story.ts CHAPTERS). */
   intro: (chapter?: string): Href => (chapter ? `/intro?chapter=${chapter}` : "/intro"),
 };
