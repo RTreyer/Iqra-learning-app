@@ -60,7 +60,15 @@ export type StoryLine = { text: string; emoji: string; art?: ArtId };
 export type LetterPickRound = { targetLetter: string; letters: string[]; correctIndex: number };
 export type WordReadRound = { word: string; choices: string[]; correctIndex: number };
 export type ListenPickQuestion = { word: string; choices: Choice[]; correctIndex: number };
-export type BehaviorItem = { emoji: string; description: string; isCorrect: boolean };
+/** Pictures drawn for the behaviour exercise (components/art/behavior/BehaviorScene.tsx). */
+export type BehaviorSceneId = "reading" | "littering" | "helpmother" | "cleanschool" | "takepen";
+/** `scene` shows the deed as a picture; without it the small `emoji` picture is shown. */
+export type BehaviorItem = {
+  emoji: string;
+  description: string;
+  isCorrect: boolean;
+  scene?: BehaviorSceneId;
+};
 export type MatchPair = { left: Choice; right: Choice };
 /** `emoji` is optional decoration carried over from the legacy drawing shapes. */
 export type TraceTarget = {

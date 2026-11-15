@@ -4,6 +4,8 @@
  * test-utils/explainStrings.ts lists what must be here.
  */
 export const EN_LINES: Record<string, string> = {
+  "هٰذَا سُلُوكٌ صَحِيحٌ.": "This is good behavior.",
+  "هٰذَا سُلُوكٌ خَاطِئٌ.": "This is bad behavior.",
   "مَنْ يَتَعَلَّمُ الْيَوْمَ؟": "Who is learning today?",
   "أ: دَارُ الأَيْتَامِ": "أ: The orphanage",
   "أحسنت! لقد أتممت الدرس": "Well done! You finished the lesson",

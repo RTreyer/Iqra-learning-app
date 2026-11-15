@@ -99,22 +99,35 @@ export const unit1: Unit = {
       color: "#D97706",
       type: "behavior",
       behaviors: [
-        { emoji: "📚", description: "يَقْرَأُ الطَّالِبُ كِتَابَه", isCorrect: true },
+        {
+          emoji: "📚",
+          description: "يَقْرَأُ الطَّالِبُ كِتَابَه",
+          isCorrect: true,
+          scene: "reading",
+        },
         {
           emoji: "🗑️",
           description: "يَرْمِي الطَّالِبُ الْقُمَامَةَ فِي الشَّارِع",
           isCorrect: false,
+          scene: "littering",
         },
-        { emoji: "🤝", description: "تُسَاعِدُ الطَّالِبَةُ أُمَّهَا", isCorrect: true },
+        {
+          emoji: "🤝",
+          description: "تُسَاعِدُ الطَّالِبَةُ أُمَّهَا",
+          isCorrect: true,
+          scene: "helpmother",
+        },
         {
           emoji: "🏫",
           description: "يُحَافِظُ الطَّالِبُ عَلَى نَظَافَةِ الْمَدْرَسَة",
           isCorrect: true,
+          scene: "cleanschool",
         },
         {
           emoji: "😤",
           description: "يَأْخُذُ الطَّالِبُ قَلَمَ زَمِيلِه بِدُونِ إِذْن",
           isCorrect: false,
+          scene: "takepen",
         },
       ],
     },
@@ -144,7 +157,12 @@ export const unit1: Unit = {
       targets: [
         { guide: "ـــ", label: "خَط أُفُقِي", tts: "ارسم خطاً من اليمين إلى اليسار", emoji: "⬅️" },
         { guide: "|", label: "خَط عَمُودِي", tts: "ارسم خطاً من الأعلى إلى الأسفل", emoji: "⬇️" },
-        { guide: "/", label: "خَط مَائِل", tts: "ارسم خطاً مائلاً من الأعلى إلى الأسفل", emoji: "↙️" },
+        {
+          guide: "/",
+          label: "خَط مَائِل",
+          tts: "ارسم خطاً مائلاً من الأعلى إلى الأسفل",
+          emoji: "↙️",
+        },
         { guide: "◯", label: "دَائِرَة", tts: "ارسم دائرة كاملة", emoji: "⭕" },
         { guide: "〰", label: "خَط مُنْكَسِر", tts: "ارسم خطاً منكسراً مثل الموجة", emoji: "〰️" },
       ],

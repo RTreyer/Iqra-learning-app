@@ -137,8 +137,18 @@ export const DEMOS: { [K in LessonType]: Demo<K> } & { trace_lines: Demo<"trace"
       ...base("behavior"),
       type: "behavior",
       behaviors: [
-        { emoji: "🧹", description: "أُسَاعِدُ أُمِّي فِي الْبَيْتِ.", isCorrect: true },
-        { emoji: "🗑️", description: "أَرْمِي الْأَوْسَاخَ فِي الشَّارِعِ.", isCorrect: false },
+        {
+          emoji: "🧹",
+          description: "أُسَاعِدُ أُمِّي فِي الْبَيْتِ.",
+          isCorrect: true,
+          scene: "helpmother",
+        },
+        {
+          emoji: "🗑️",
+          description: "أَرْمِي الْأَوْسَاخَ فِي الشَّارِعِ.",
+          isCorrect: false,
+          scene: "littering",
+        },
       ],
     },
     steps: [
