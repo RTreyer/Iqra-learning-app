@@ -12,10 +12,13 @@ export function lessonOf<T extends LessonType>(id: string, type: T): Extract<Les
   return lesson as Extract<Lesson, { type: T }>;
 }
 
-/** The providers an activity needs: language for UiText, the gesture root for the trace pad. */
+/**
+ * The providers an activity needs: language for UiText, the gesture root for the trace pad.
+ * Arabic unless a test stores another language (the app itself starts in English).
+ */
 function withProviders(ui: React.ReactElement) {
   return (
-    <LanguageProvider>
+    <LanguageProvider fallback="ar">
       <GestureHandlerRootView>{ui}</GestureHandlerRootView>
     </LanguageProvider>
   );

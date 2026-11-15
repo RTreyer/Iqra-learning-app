@@ -62,6 +62,9 @@ function prepareBrowser({ demoKey, demoTypes, settingsKey }) {
   }
   try {
     localStorage.setItem("@iqra_voice_hint_shown", "1");
+    // The app starts in English; the specs read the child's Arabic view unless a test switches.
+    if (localStorage.getItem("iqra_ui_language") === null)
+      localStorage.setItem("iqra_ui_language", "ar");
     if (localStorage.getItem(demoKey) === null)
       localStorage.setItem(demoKey, JSON.stringify(demoTypes));
     // Hudhud's story already told, unless a test stored its own settings.

@@ -13,6 +13,8 @@ import { translateUi, type UiLanguage } from "@/content/ui-translations";
 import { arabicDigitsIn } from "@/lib/arabicNumbers";
 
 const LANGUAGE_KEY = "iqra_ui_language";
+/** Menu language on a fresh install, until the parents' corner stores another choice. */
+export const DEFAULT_LANGUAGE: UiLanguage = "en";
 type LanguageContextValue = {
   language: UiLanguage;
   setLanguage: (language: UiLanguage) => void;
@@ -28,15 +30,18 @@ const LanguageContext = createContext<LanguageContextValue | null>(null);
 export function LanguageProvider({
   children,
   initial,
+  fallback = DEFAULT_LANGUAGE,
 }: {
   children: ReactNode;
   /**
    * A known language to start with (tests): speech may start at once. Without it the stored
-   * choice is read first, Arabic until then.
+   * choice is read first, `fallback` until then and when nothing is stored.
    */
   initial?: UiLanguage;
+  /** Language while no choice is stored: English in the app, Arabic in tests of the child's view. */
+  fallback?: UiLanguage;
 }) {
-  const [language, updateLanguage] = useState<UiLanguage>(initial ?? "ar");
+  const [language, updateLanguage] = useState<UiLanguage>(initial ?? fallback);
   const [storageError, setStorageError] = useState(false);
   const [loaded, setLoaded] = useState(initial !== undefined);
   const changedByUser = useRef(false);

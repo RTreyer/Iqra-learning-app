@@ -75,7 +75,7 @@ test("in English mode a line is spoken in English and the letter in it in Arabic
 test("the gloss shows only in English mode", () => {
   const word = Object.keys(EN_GLOSS)[0];
   render(
-    <LanguageProvider>
+    <LanguageProvider fallback="ar">
       <Gloss text={word} />
     </LanguageProvider>,
   );

@@ -8,7 +8,7 @@ Offline-first learning app for children in Yemen, primary school grades 1 to 6. 
 
 - Curriculum: official Yemen Ministry of Education primary subjects (Arabic, Math, Islamic Education, Science, Social Studies, English from grade 4).
 - Teaching style: short playful activities, emoji based visuals, Arabic text to speech, haptic feedback, star rewards, instant quiz feedback.
-- Interface: Arabic by default. English is available for menus, buttons and the labels on book and unit cards only. Learning content always stays Arabic.
+- Interface: English by default on a fresh install (`DEFAULT_LANGUAGE` in `context/LanguageContext.tsx`), switchable to Arabic in the parents' corner; the choice is stored. English is the explanation mode for adults: menus, buttons, card labels and spoken lines in English, the learning itself (letters, syllables, words) always stays Arabic.
 
 ## 2. What exists today
 
