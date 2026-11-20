@@ -92,14 +92,20 @@ export type MapPin = {
   selected?: boolean;
   /** The subject's first letter or number, drawn large in the badge instead of the place's picture. */
   glyph?: string;
-  /** Another subject is the one the play button continues in: this place fades back. */
+  /**
+   * Another subject is the one the play button continues in: this place fades back (a caption
+   * then takes the place colour, see `faded`).
+   */
   dimmed?: boolean;
 };
 
-/** A place colour blended with white: faded, but solid, so the map does not show through. */
-function faded(hex: string): string {
+/**
+ * A place colour blended with white: faded, but solid, so the map does not show through. Its
+ * text is then written in the place colour (contrast about 5:1).
+ */
+export function faded(hex: string): string {
   const n = parseInt(hex.slice(1, 7), 16);
-  const mix = (c: number) => Math.round(c * 0.5 + 255 * 0.5);
+  const mix = (c: number) => Math.round(c * 0.18 + 255 * 0.82);
   const [r, g, b] = [mix(n >> 16), mix((n >> 8) & 255), mix(n & 255)];
   return `#${((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1)}`;
 }
@@ -328,7 +334,7 @@ function Place({
           pin.selected && styles.labelOn,
         ]}
       >
-        <Text style={styles.name}>{line(place.name)}</Text>
+        <Text style={[styles.name, pin.dimmed && { color: place.color }]}>{line(place.name)}</Text>
         {pin.caption ?? <Text style={styles.what}>{line(place.what)}</Text>}
         {pin.share !== undefined ? (
           <View style={styles.track}>

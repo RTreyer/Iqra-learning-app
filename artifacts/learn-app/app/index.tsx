@@ -22,7 +22,7 @@ import { Skyline } from "@/components/world/Skyline";
 import { StickerArt } from "@/components/world/StickerArt";
 import { YemenMap, type MapPin } from "@/components/world/YemenMap";
 import { books, unitLessonIds, type Book } from "@/content";
-import { SOON_LINE, SUBJECT_DONE, bowlLine, chapterFor } from "@/content/story";
+import { MAP_PLACES, SOON_LINE, SUBJECT_DONE, bowlLine, chapterFor } from "@/content/story";
 import { useLine } from "@/components/Gloss";
 import { useLanguage } from "@/context/LanguageContext";
 import { useProfiles } from "@/context/ProfilesContext";
@@ -210,6 +210,7 @@ export default function HomeScreen() {
               ...islands.flatMap(({ book, share }): MapPin[] => {
                 const thread = chapterFor(book.subject);
                 if (!thread) return [];
+                const dimmed = !story && book.id !== current?.id;
                 return [
                   {
                     place: thread,
@@ -221,9 +222,15 @@ export default function HomeScreen() {
                     // when in maths: each place shows its subject's first letter or number and
                     // name, and the place the play button is not in fades back.
                     glyph: subjectGlyph(book, digits),
-                    dimmed: !story && book.id !== current?.id,
+                    dimmed,
                     caption: (
-                      <UiText style={styles.placeCaption} numberOfLines={1}>
+                      <UiText
+                        style={[
+                          styles.placeCaption,
+                          dimmed && { color: MAP_PLACES[thread].color },
+                        ]}
+                        numberOfLines={1}
+                      >
                         {SUBJECT_NAME[book.subject] ?? book.title}
                       </UiText>
                     ),
