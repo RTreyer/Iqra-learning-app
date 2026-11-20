@@ -320,7 +320,7 @@ function Place({
         ]}
       >
         <View
-          testID={pin.testID ? `${pin.testID}-picture` : undefined}
+          testID={`map-picture-${id}`}
           style={pin.dimmed && styles.dimmed}
         >
           {place.sticker ? (
@@ -331,7 +331,7 @@ function Place({
         </View>
         {pin.mark ? (
           <View
-            testID={pin.testID ? `${pin.testID}-mark` : undefined}
+            testID={`map-mark-${id}`}
             style={[
               styles.mark,
               // On the side away from the label.
