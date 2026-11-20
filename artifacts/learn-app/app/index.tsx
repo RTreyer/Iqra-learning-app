@@ -202,7 +202,7 @@ export default function HomeScreen() {
           </Pulse>
         ) : null}
 
-        {/* The subjects are places on Hudhud's map; the chosen one is ringed in gold, the other faded. */}
+        {/* The subjects are places on Hudhud's map; the chosen one ringed in gold, the other pale. */}
         <View style={styles.map}>
           <YemenMap
             bird={false}
@@ -219,9 +219,10 @@ export default function HomeScreen() {
                     selected: !story && book.id === current?.id,
                     share,
                     // Parents in the user test did not see when their child was in Arabic and
-                    // when in maths: each place shows its subject's first letter or number and
-                    // name, and the place the play button is not in fades back.
-                    glyph: subjectGlyph(book, digits),
+                    // when in maths: each place carries its subject's mark (as on the play
+                    // button) and name, and the place the play button is not in fades back.
+                    mark: subjectGlyph(book, digits),
+                    markColor: readableFill(book.color),
                     dimmed,
                     caption: (
                       <UiText

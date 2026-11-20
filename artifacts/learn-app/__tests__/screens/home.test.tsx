@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { act, fireEvent, screen, within } from "@testing-library/react-native";
+import { act, fireEvent, screen } from "@testing-library/react-native";
 import React from "react";
 
 import HomeScreen, { windowLine } from "@/app/index";
@@ -116,22 +116,19 @@ test("each place shows its subject plainly; the place play is not in fades back"
   await storyTold("math-1");
   renderHome();
   await screen.findByTestId("intro-button");
-  const arabic = screen.getByTestId("book-arabic-1");
-  const math = screen.getByTestId("book-math-1");
-  expect(arabic).toHaveTextContent(/أ/);
-  expect(arabic).toHaveTextContent(/اللغة العربية/);
-  expect(math).toHaveTextContent(/١/);
-  expect(math).toHaveTextContent(/الرياضيات/);
-  // The letter of the subject play is not in fades back.
-  expect(within(arabic).getByText("أ")).toHaveStyle({ opacity: 0.55 });
-  expect(within(math).getByText("١")).not.toHaveStyle({ opacity: 0.55 });
+  // The same mark as on the play button, and the subject's name.
+  expect(screen.getByTestId("book-arabic-1-mark")).toHaveTextContent("أ");
+  expect(screen.getByTestId("book-math-1-mark")).toHaveTextContent("١");
+  expect(screen.getByTestId("book-arabic-1")).toHaveTextContent(/اللغة العربية/);
+  expect(screen.getByTestId("book-math-1")).toHaveTextContent(/الرياضيات/);
+  // The picture of the place play is not in fades back.
+  expect(screen.getByTestId("book-arabic-1-picture")).toHaveStyle({ opacity: 0.5 });
+  expect(screen.getByTestId("book-math-1-picture")).not.toHaveStyle({ opacity: 0.5 });
   await act(async () => {
-    fireEvent.press(arabic);
+    fireEvent.press(screen.getByTestId("book-arabic-1"));
   });
-  expect(within(screen.getByTestId("book-math-1")).getByText("١")).toHaveStyle({ opacity: 0.55 });
-  expect(within(screen.getByTestId("book-arabic-1")).getByText("أ")).not.toHaveStyle({
-    opacity: 0.55,
-  });
+  expect(screen.getByTestId("book-math-1-picture")).toHaveStyle({ opacity: 0.5 });
+  expect(screen.getByTestId("book-arabic-1-picture")).not.toHaveStyle({ opacity: 0.5 });
 });
 
 test("the first time on an island, Hudhud tells that job before its path opens", async () => {

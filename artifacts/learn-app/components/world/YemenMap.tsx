@@ -90,11 +90,16 @@ export type MapPin = {
   share?: number;
   /** The subject the play button continues in. */
   selected?: boolean;
-  /** The subject's first letter or number, drawn large in the badge instead of the place's picture. */
-  glyph?: string;
   /**
-   * Another subject is the one the play button continues in: this place fades back (a caption
-   * then takes the place colour, see `faded`).
+   * The subject's first letter or number, in a small round mark on the badge's edge: the same
+   * mark as on the play button, so the child sees which place it continues in.
+   */
+  mark?: string;
+  /** The mark's colour (the subject's, as on the play button). */
+  markColor?: string;
+  /**
+   * Another subject is the one the play button continues in: this place fades back, its picture
+   * paler and its label a light tint (a caption then takes the place colour, see `faded`).
    */
   dimmed?: boolean;
 };
@@ -314,15 +319,30 @@ function Place({
           soon && styles.badgeSoon,
         ]}
       >
-        {pin.glyph ? (
-          <Text style={[styles.glyph, { color: place.color }, pin.dimmed && styles.dimmed]}>
-            {pin.glyph}
-          </Text>
-        ) : place.sticker ? (
-          <StickerArt id={place.sticker} size={soon ? 32 : 40} />
-        ) : (
-          <Picture emoji={place.picture} size={36} />
-        )}
+        <View
+          testID={pin.testID ? `${pin.testID}-picture` : undefined}
+          style={pin.dimmed && styles.dimmed}
+        >
+          {place.sticker ? (
+            <StickerArt id={place.sticker} size={soon ? 32 : 40} />
+          ) : (
+            <Picture emoji={place.picture} size={36} />
+          )}
+        </View>
+        {pin.mark ? (
+          <View
+            testID={pin.testID ? `${pin.testID}-mark` : undefined}
+            style={[
+              styles.mark,
+              // On the side away from the label.
+              leftward ? styles.markRight : styles.markLeft,
+              // The mark keeps its colour also when faded: it is what tells the subjects apart.
+              { backgroundColor: pin.markColor ?? place.color },
+            ]}
+          >
+            <Text style={styles.markText}>{pin.mark}</Text>
+          </View>
+        ) : null}
       </View>
       <View
         style={[
@@ -397,9 +417,22 @@ const styles = StyleSheet.create({
   above: { flexDirection: "column-reverse" },
   besideLeft: { flexDirection: "row-reverse", gap: 4 },
   badgeOn: { borderWidth: 5, transform: [{ scale: 1.08 }] },
-  dimmed: { opacity: 0.55 },
+  dimmed: { opacity: 0.5 },
   badgeDimmed: { borderColor: yemen.sandShadow },
-  glyph: { fontSize: 30, fontWeight: "900", lineHeight: 40 },
+  mark: {
+    position: "absolute",
+    top: -8,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 3,
+    borderColor: "#FFFFFF",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  markLeft: { left: -8 },
+  markRight: { right: -8 },
+  markText: { color: "#FFFFFF", fontSize: 14, fontWeight: "900", lineHeight: 20 },
   badgeSoon: { borderStyle: "dashed", opacity: 0.85 },
   labelOn: { borderWidth: 3, borderColor: yemen.gold },
   track: {
