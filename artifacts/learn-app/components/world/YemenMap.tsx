@@ -294,12 +294,16 @@ function Place({
           styles.badge,
           { width: pinSize, height: pinSize, borderRadius: pinSize / 2 },
           { borderColor: pin.selected ? yemen.gold : place.color },
+          // Faded, the badge stays solid so the map's route does not show through it.
+          pin.dimmed && styles.badgeDimmed,
           pin.selected && styles.badgeOn,
           soon && styles.badgeSoon,
         ]}
       >
         {pin.glyph ? (
-          <Text style={[styles.glyph, { color: place.color }]}>{pin.glyph}</Text>
+          <Text style={[styles.glyph, { color: place.color }, pin.dimmed && styles.dimmed]}>
+            {pin.glyph}
+          </Text>
         ) : place.sticker ? (
           <StickerArt id={place.sticker} size={soon ? 32 : 40} />
         ) : (
@@ -311,6 +315,7 @@ function Place({
           styles.label,
           { backgroundColor: place.color, height: labelHeight },
           pin.selected && styles.labelOn,
+          pin.dimmed && styles.dimmed,
         ]}
       >
         <Text style={styles.name}>{line(place.name)}</Text>
@@ -325,7 +330,6 @@ function Place({
   );
   const style = [
     styles.place,
-    pin.dimmed && styles.dimmed,
     beside && (leftward ? styles.besideLeft : styles.beside),
     at === "above" && styles.above,
     { left, top: clampedTop, width: span },
@@ -378,6 +382,7 @@ const styles = StyleSheet.create({
   besideLeft: { flexDirection: "row-reverse", gap: 4 },
   badgeOn: { borderWidth: 5, transform: [{ scale: 1.08 }] },
   dimmed: { opacity: 0.55 },
+  badgeDimmed: { borderColor: yemen.sandShadow },
   glyph: { fontSize: 30, fontWeight: "900", lineHeight: 40 },
   badgeSoon: { borderStyle: "dashed", opacity: 0.85 },
   labelOn: { borderWidth: 3, borderColor: yemen.gold },

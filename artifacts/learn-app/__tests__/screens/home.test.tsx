@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { act, fireEvent, screen } from "@testing-library/react-native";
+import { act, fireEvent, screen, within } from "@testing-library/react-native";
 import React from "react";
 
 import HomeScreen, { windowLine } from "@/app/index";
@@ -122,13 +122,16 @@ test("each place shows its subject plainly; the place play is not in fades back"
   expect(arabic).toHaveTextContent(/اللغة العربية/);
   expect(math).toHaveTextContent(/١/);
   expect(math).toHaveTextContent(/الرياضيات/);
-  expect(arabic).toHaveStyle({ opacity: 0.55 });
-  expect(math).not.toHaveStyle({ opacity: 0.55 });
+  // The letter of the subject play is not in fades back.
+  expect(within(arabic).getByText("أ")).toHaveStyle({ opacity: 0.55 });
+  expect(within(math).getByText("١")).not.toHaveStyle({ opacity: 0.55 });
   await act(async () => {
     fireEvent.press(arabic);
   });
-  expect(screen.getByTestId("book-math-1")).toHaveStyle({ opacity: 0.55 });
-  expect(screen.getByTestId("book-arabic-1")).not.toHaveStyle({ opacity: 0.55 });
+  expect(within(screen.getByTestId("book-math-1")).getByText("١")).toHaveStyle({ opacity: 0.55 });
+  expect(within(screen.getByTestId("book-arabic-1")).getByText("أ")).not.toHaveStyle({
+    opacity: 0.55,
+  });
 });
 
 test("the first time on an island, Hudhud tells that job before its path opens", async () => {
