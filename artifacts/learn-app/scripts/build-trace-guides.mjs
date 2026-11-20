@@ -58,6 +58,9 @@ function parsePath(d) {
 function shapeText(font, text) {
   const buffer = new hb.Buffer();
   buffer.addText(text);
+  // A number is written from its first digit on the left, also in Arabic: guessed from the
+  // Arabic-Indic digits the run would be right to left, and ١٠ would be drawn as ٠١ (01).
+  if (DIGITS.test(text)) buffer.setDirection(hb.Direction.LTR);
   buffer.guessSegmentProperties();
   hb.shape(font, buffer);
   const infos = buffer.getGlyphInfos();

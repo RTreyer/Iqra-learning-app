@@ -375,7 +375,7 @@ export const EN_LINES: Record<string, string> = {
     "Is seven bigger than, smaller than, or equal to four?",
   "السَّنَابِلُ وَالأَزْهَارُ وَالْفَرَاشَاتُ":
     "The ears of wheat, the flowers and the butterflies",
-  السَّنْبُوقُ: "The dhow",
+  الْقَارِبُ: "The boat",
   "السُّلُوكُ الصَّحِيح": "The right way to behave",
   الشَّكْلُ: "Shape",
   "الشَّكْلُ وَاللَّوْنُ": "Shape and colour",
@@ -396,6 +396,7 @@ export const EN_LINES: Record<string, string> = {
   النَّمَطُ: "Pattern",
   النِّصْفُ: "Half",
   "النِّصْفُ ١/٢": "Half 1/2",
+  "النِّصْفُ وَالرُّبْعُ": "Half and quarter",
   "الْبَاقِي اثْنَانِ": "Two are left",
   "الْبَاقِي ٤، ١، ٧": "What is left: 4, 1, 7",
   "الْبَنَاتُ أَكْثَرُ أَمْ أَقَلُّ أَمْ يُسَاوِينَ الْحَقَائِبَ؟":
@@ -511,7 +512,7 @@ export const EN_LINES: Record<string, string> = {
   "تُفَّاحَةٌ حَمْرَاءُ، ثُمَّ تُفَّاحَةٌ خَضْرَاءُ. مَا التَّالِي؟":
     "A red apple, then a green apple. What comes next?",
   "تِذْكَارٌ مِنَ الرِّحْلَةِ: التَّمْرُ": "A keepsake from the journey: dates",
-  "تِذْكَارٌ مِنَ الرِّحْلَةِ: السَّنْبُوقُ": "A keepsake from the journey: the dhow",
+  "تِذْكَارٌ مِنَ الرِّحْلَةِ: الْقَارِبُ": "A keepsake from the journey: the boat",
   "تِذْكَارٌ مِنَ الرِّحْلَةِ: النَّخْلَةُ": "A keepsake from the journey: the palm tree",
   "تِذْكَارٌ مِنَ الرِّحْلَةِ: الْقَمَرِيَّةُ": "A keepsake from the journey: the qamariya window",
   "تِذْكَارٌ مِنَ الرِّحْلَةِ: بَيْتٌ مِنْ صَنْعَاءَ":

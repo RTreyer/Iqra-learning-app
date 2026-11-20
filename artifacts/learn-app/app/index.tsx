@@ -22,7 +22,7 @@ import { Skyline } from "@/components/world/Skyline";
 import { StickerArt } from "@/components/world/StickerArt";
 import { YemenMap, type MapPin } from "@/components/world/YemenMap";
 import { books, unitLessonIds, type Book } from "@/content";
-import { SOON_LINE, SUBJECT_DONE, bowlLine, chapterFor } from "@/content/story";
+import { MAP_PLACES, SOON_LINE, SUBJECT_DONE, bowlLine, chapterFor } from "@/content/story";
 import { useLine } from "@/components/Gloss";
 import { useLanguage } from "@/context/LanguageContext";
 import { useProfiles } from "@/context/ProfilesContext";
@@ -50,6 +50,9 @@ export function windowLine(done: number): string {
 function subjectGlyph(book: Book, digits: (v: string) => string): string {
   return book.subject === "math" ? digits("1") : "أ";
 }
+
+/** The subject's name under its place on the map (the child goes by the letter or number). */
+const SUBJECT_NAME: Record<string, string> = { arabic: "اللغة العربية", math: "الرياضيات" };
 
 export default function HomeScreen() {
   const { t, digits, language, loaded: languageLoaded } = useLanguage();
@@ -94,6 +97,18 @@ export default function HomeScreen() {
   const tap = (go: () => void) => () => {
     haptics.tap();
     go();
+  };
+
+  /** Into a subject: it becomes the one the play button continues in. */
+  const openBook = (book: Book) => {
+    const thread = chapterFor(book.subject);
+    // Wait for the stored settings: chaptersSeen decides where it goes.
+    if (!loaded || !thread) return;
+    update({ bookId: book.id });
+    // The first time the child helps there, Hudhud tells it first.
+    router.push(
+      !settings.chaptersSeen.includes(thread) ? routes.intro(thread) : routes.book(book.id),
+    );
   };
 
   return (
@@ -187,7 +202,7 @@ export default function HomeScreen() {
           </Pulse>
         ) : null}
 
-        {/* The subjects are places on Hudhud's map; the chosen one is ringed in gold. */}
+        {/* The subjects are places on Hudhud's map; the chosen one ringed in gold, the other pale. */}
         <View style={styles.map}>
           <YemenMap
             bird={false}
@@ -195,6 +210,7 @@ export default function HomeScreen() {
               ...islands.flatMap(({ book, share }): MapPin[] => {
                 const thread = chapterFor(book.subject);
                 if (!thread) return [];
+                const dimmed = !story && book.id !== current?.id;
                 return [
                   {
                     place: thread,
@@ -202,23 +218,25 @@ export default function HomeScreen() {
                     accessibilityLabel: `${t(book.title)}، ${t(book.subtitle)}`,
                     selected: !story && book.id === current?.id,
                     share,
+                    // Parents in the user test did not see when their child was in Arabic and
+                    // when in maths: each place carries its subject's mark (as on the play
+                    // button) and name, and the place the play button is not in fades back.
+                    mark: subjectGlyph(book, digits),
+                    markColor: readableFill(book.color),
+                    dimmed,
                     caption: (
-                      <UiText style={styles.placeCaption} numberOfLines={1}>
-                        {book.title}
+                      <UiText
+                        style={[
+                          styles.placeCaption,
+                          dimmed && { color: MAP_PLACES[thread].color },
+                        ]}
+                        numberOfLines={1}
+                      >
+                        {SUBJECT_NAME[book.subject] ?? book.title}
                       </UiText>
                     ),
                     // Choosing a place makes it the subject the play button continues in.
-                    onPress: () => {
-                      // Wait for the stored settings: chaptersSeen decides where it goes.
-                      if (!loaded) return;
-                      update({ bookId: book.id });
-                      // The first time the child helps there, Hudhud tells it first.
-                      router.push(
-                        !settings.chaptersSeen.includes(thread)
-                          ? routes.intro(thread)
-                          : routes.book(book.id),
-                      );
-                    },
+                    onPress: () => openBook(book),
                   },
                 ];
               }),

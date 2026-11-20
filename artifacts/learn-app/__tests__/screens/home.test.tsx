@@ -112,6 +112,25 @@ test("an island switches the subject: play then continues there", async () => {
   expect(JSON.parse((await AsyncStorage.getItem(SETTINGS_KEY))!).bookId).toBe("arabic-1");
 });
 
+test("each place shows its subject plainly; the place play is not in fades back", async () => {
+  await storyTold("math-1");
+  renderHome();
+  await screen.findByTestId("intro-button");
+  // The same mark as on the play button, and the subject's name.
+  expect(screen.getByTestId("map-mark-arabic")).toHaveTextContent("أ");
+  expect(screen.getByTestId("map-mark-math")).toHaveTextContent("١");
+  expect(screen.getByTestId("book-arabic-1")).toHaveTextContent(/اللغة العربية/);
+  expect(screen.getByTestId("book-math-1")).toHaveTextContent(/الرياضيات/);
+  // The picture of the place play is not in fades back.
+  expect(screen.getByTestId("map-picture-arabic")).toHaveStyle({ opacity: 0.5 });
+  expect(screen.getByTestId("map-picture-math")).not.toHaveStyle({ opacity: 0.5 });
+  await act(async () => {
+    fireEvent.press(screen.getByTestId("book-arabic-1"));
+  });
+  expect(screen.getByTestId("map-picture-math")).toHaveStyle({ opacity: 0.5 });
+  expect(screen.getByTestId("map-picture-arabic")).not.toHaveStyle({ opacity: 0.5 });
+});
+
 test("the first time on an island, Hudhud tells that job before its path opens", async () => {
   await storyTold("arabic-1", ["arabic"]);
   renderHome();

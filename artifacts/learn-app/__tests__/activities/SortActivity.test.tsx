@@ -84,3 +84,22 @@ test("a wrong box shows a danger border for a moment and keeps the item selected
   act(() => jest.advanceTimersByTime(700));
   expect(screen.getByTestId("sort-box-1")).not.toHaveStyle({ borderColor: colors.danger });
 });
+
+test("a fraction in a box label stands numerator over denominator, as in the book", () => {
+  const halves = {
+    ...lesson,
+    boxes: [
+      { label: "النِّصْفُ ١/٢", pic: { shape: "circle", color: "orange", shaded: "half" } },
+      { label: "الرُّبْعُ ١/٤", pic: { shape: "circle", color: "orange", shaded: "quarter" } },
+    ],
+  } as typeof lesson;
+  renderActivity(
+    <SortActivity lesson={halves} color="#7C3AED" attemptKey="x:1" onComplete={jest.fn()} />,
+  );
+  // In a line, ١/٢ is read from the right as two over one: the digits are stacked instead.
+  const [half, quarter] = screen.getAllByTestId("sort-fraction");
+  expect(half).toHaveTextContent(/^١\s*٢$/);
+  expect(quarter).toHaveTextContent(/^١\s*٤$/);
+  expect(screen.queryByText(/١\/٢/)).toBeNull();
+  expect(screen.getByText("النِّصْفُ")).toBeTruthy();
+});

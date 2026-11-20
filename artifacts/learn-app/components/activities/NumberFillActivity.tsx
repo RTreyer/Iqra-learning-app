@@ -30,8 +30,13 @@ function Cell({ cell, filled }: { cell: FillCell; filled: number | null }) {
         <Text style={styles.cell}>{filled === null ? "" : toArabicDigits(filled)}</Text>
       </View>
     );
-  return <Text style={styles.cell}>{typeof cell === "number" ? toArabicDigits(cell) : cell}</Text>;
+  // The minus as the book prints it (−), not the short hyphen of the data.
+  const sign = cell === "-" ? "−" : cell;
+  return <Text style={styles.cell}>{typeof cell === "number" ? toArabicDigits(cell) : sign}</Text>;
 }
+
+/** Keeps the numbers of a vertical sum in one column: the place of the sign in the other rows. */
+const SignSlot = () => <View style={styles.signSlot} />;
 
 /** The missing number in a sum, a difference or a counting row. The child reads; only the task is spoken. */
 function NumberFill({
@@ -74,14 +79,22 @@ function NumberFill({
       <ListenButton text={round.prompt} color={color} showText />
       {round.pics ? <PicGroup pics={round.pics} /> : null}
       {round.layout === "vertical" ? (
+        // As in the book, the sign stands on the right of the second number, where the child
+        // starts reading (− ٣), and every number stays in one column.
         <View style={styles.vertical} testID="number-fill-sentence">
-          <Cell cell={a} filled={filled} />
           <View style={styles.row}>
-            <Cell cell={b} filled={filled} />
+            <SignSlot />
+            <Cell cell={a} filled={filled} />
+          </View>
+          <View style={styles.row} testID="number-fill-operator-row">
             <Cell cell={op} filled={filled} />
+            <Cell cell={b} filled={filled} />
           </View>
           <View style={styles.rule} />
-          <Cell cell={c} filled={filled} />
+          <View style={styles.row}>
+            <SignSlot />
+            <Cell cell={c} filled={filled} />
+          </View>
         </View>
       ) : (
         <View style={styles.row} testID="number-fill-sentence">
@@ -116,6 +129,7 @@ const styles = StyleSheet.create({
   row: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 6 },
   rtl: { flexDirection: "row-reverse" },
   vertical: { alignItems: "flex-end", gap: 4 },
+  signSlot: { minWidth: 52 },
   rule: { height: 4, alignSelf: "stretch", backgroundColor: colors.text, borderRadius: 2 },
   cell: { fontSize: 40, fontWeight: "900", color: colors.text, minWidth: 52, textAlign: "center" },
   box: {

@@ -677,7 +677,8 @@ const drafts: MathLessonDraft[] = [
     section: s7,
     type: "sort",
     title: "نِصْفٌ أَمْ رُبْعٌ؟",
-    subtitle: "١/٢ أَوْ ١/٤",
+    // In a line, ١/٢ reads from the right as two over one: the fractions stand in the boxes.
+    subtitle: "النِّصْفُ وَالرُّبْعُ",
     emoji: "🌓",
     color,
     prompt: "أَضَعُ كُلَّ شَكْلٍ فِي مَكَانِهِ: نِصْفُهُ مُلَوَّنٌ أَمْ رُبْعُهُ مُلَوَّنٌ؟",
