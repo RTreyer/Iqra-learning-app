@@ -17,6 +17,29 @@ import { withAttemptReset } from "./shared/withAttemptReset";
 import type { ActivityProps } from "./types";
 import { useGuide } from "@/components/world/LessonGuide";
 
+/** A box label ending in a fraction ("النِّصْفُ ١/٢"): the word and the fraction. */
+const FRACTION = /^(.*?)\s*([٠-٩]+)\/([٠-٩]+)$/;
+
+/**
+ * The fraction stands as the book prints it, the numerator over the denominator. Written in a
+ * line, ١/٢ is read from the right as two over one.
+ */
+function BoxLabel({ text }: { text: string }) {
+  const parts = FRACTION.exec(text);
+  if (!parts) return <Text style={styles.boxLabel}>{text}</Text>;
+  const [, word, top, bottom] = parts;
+  return (
+    <View style={styles.labelRow}>
+      <Text style={styles.boxLabel}>{word}</Text>
+      <View testID="sort-fraction" style={styles.fraction}>
+        <Text style={styles.fractionDigit}>{top}</Text>
+        <View style={styles.fractionBar} />
+        <Text style={styles.fractionDigit}>{bottom}</Text>
+      </View>
+    </View>
+  );
+}
+
 /**
  * Tap an item, then the box it belongs in. A wrong box keeps the item in place; only an
  * item's first placement counts. The lesson ends when every item is in its box.
@@ -107,7 +130,7 @@ function Sort({ lesson, color, onComplete }: ActivityProps<"sort">) {
               ]}
             >
               {box.pic ? <MathPic pic={box.pic} decorative /> : null}
-              <Text style={styles.boxLabel}>{line(box.label)}</Text>
+              <BoxLabel text={line(box.label)} />
               <View style={styles.inBox}>
                 {lesson.items.map((item, i) =>
                   placed[i] && item.box === b ? (
@@ -165,6 +188,10 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   boxLabel: { fontSize: 20, fontWeight: "800", color: colors.text },
+  labelRow: { flexDirection: "row-reverse", alignItems: "center", gap: 10 },
+  fraction: { alignItems: "center" },
+  fractionDigit: { fontSize: 20, fontWeight: "800", color: colors.text, lineHeight: 24 },
+  fractionBar: { width: 18, height: 3, borderRadius: 2, backgroundColor: colors.text },
   inBox: { flexDirection: "row-reverse", flexWrap: "wrap", justifyContent: "center", gap: 4 },
   items: { flexDirection: "row-reverse", flexWrap: "wrap", justifyContent: "center", gap: 12 },
   item: {

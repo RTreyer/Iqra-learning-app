@@ -112,6 +112,26 @@ test("an island switches the subject: play then continues there", async () => {
   expect(JSON.parse((await AsyncStorage.getItem(SETTINGS_KEY))!).bookId).toBe("arabic-1");
 });
 
+test("subject doors: the chosen one is marked, a door opens its subject", async () => {
+  await storyTold("math-1");
+  renderHome();
+  await screen.findByTestId("intro-button");
+  expect(screen.getByTestId("door-arabic-1")).toHaveTextContent(/أ ب ت/);
+  expect(screen.getByTestId("door-math-1")).toHaveTextContent(/١ ٢ ٣/);
+  expect(screen.getByTestId("door-math-1").props.accessibilityState).toMatchObject({
+    selected: true,
+  });
+  expect(screen.getByTestId("door-arabic-1").props.accessibilityState).toMatchObject({
+    selected: false,
+  });
+  await act(async () => {
+    fireEvent.press(screen.getByTestId("door-arabic-1"));
+  });
+  expect(router.push).toHaveBeenCalledWith(routes.book("arabic-1"));
+  expect(screen.getByTestId("play-subject")).toHaveTextContent("أ");
+  expect(JSON.parse((await AsyncStorage.getItem(SETTINGS_KEY))!).bookId).toBe("arabic-1");
+});
+
 test("the first time on an island, Hudhud tells that job before its path opens", async () => {
   await storyTold("arabic-1", ["arabic"]);
   renderHome();

@@ -1,4 +1,4 @@
-import { act, fireEvent, screen } from "@testing-library/react-native";
+import { act, fireEvent, screen, within } from "@testing-library/react-native";
 import React from "react";
 import { EMPTY_BOX } from "@/components/activities/shared/strings";
 import { NumberFillActivity } from "@/components/activities/NumberFillActivity";
@@ -82,4 +82,20 @@ test("a vertical sum right aligns its rows on the units column", () => {
     />,
   );
   expect(screen.getByTestId("number-fill-sentence")).toHaveStyle({ alignItems: "flex-end" });
+});
+
+test("a vertical difference puts the minus on the right of the second number, as in the book", () => {
+  const vertical = { ...lesson, rounds: [lesson.rounds[1]] };
+  renderActivity(
+    <NumberFillActivity
+      lesson={vertical}
+      color="#7C3AED"
+      attemptKey="x:1"
+      onComplete={jest.fn()}
+    />,
+  );
+  // Read from the right: first the sign, then the number (− ٢), never ٢ −.
+  const row = screen.getByTestId("number-fill-operator-row");
+  expect(row).toHaveStyle({ flexDirection: "row-reverse" });
+  expect(within(row).getAllByText(/./).map((node) => node.props.children)).toEqual(["−", "٢"]);
 });

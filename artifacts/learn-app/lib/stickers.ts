@@ -26,7 +26,7 @@ export const STICKERS: readonly Sticker[] = [
   { id: "qamariya", name: "الْقَمَرِيَّةُ" },
   { id: "house", name: "بَيْتٌ مِنْ صَنْعَاءَ" },
   { id: "coffee", name: "قَهْوَةُ الْمُخَا" },
-  { id: "dhow", name: "السَّنْبُوقُ" },
+  { id: "dhow", name: "الْقَارِبُ" },
   { id: "honey", name: "عَسَلُ السِّدْرِ" },
   { id: "dragon_tree", name: "شَجَرَةُ دَمِ الْأَخَوَيْنِ" },
   { id: "palm", name: "النَّخْلَةُ" },

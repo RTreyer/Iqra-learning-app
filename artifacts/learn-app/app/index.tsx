@@ -1,5 +1,6 @@
 /**
- * Home: one big play button that opens the next lesson, the subjects as places on the map of
+ * Home: one big play button that opens the next lesson, two doors (Arabic, maths) that say
+ * plainly which subject the child is in, the subjects as places on the map of
  * Yemen (Hudhud's journey: Mukalla for reading, Mocha for counting, Socotra still to come),
  * today's bowl (Rasha's, filled by the day's lessons), the sticker album and, when due,
  * today's review. Hudhud speaks;
@@ -51,6 +52,14 @@ function subjectGlyph(book: Book, digits: (v: string) => string): string {
   return book.subject === "math" ? digits("1") : "أ";
 }
 
+/** On a subject's door: three letters or three numbers, seen without reading. */
+function doorGlyphs(book: Book, digits: (v: string) => string): string {
+  return book.subject === "math" ? digits("1 2 3") : "أ ب ت";
+}
+
+/** The subject's name under its door (for parents; the child goes by the letters and numbers). */
+const DOOR_NAME: Record<string, string> = { arabic: "اللغة العربية", math: "الرياضيات" };
+
 export default function HomeScreen() {
   const { t, digits, language, loaded: languageLoaded } = useLanguage();
   const { progress, getDueItemIds, getUnitProgress } = useProgress();
@@ -94,6 +103,18 @@ export default function HomeScreen() {
   const tap = (go: () => void) => () => {
     haptics.tap();
     go();
+  };
+
+  /** Into a subject: it becomes the one the play button continues in. */
+  const openBook = (book: Book) => {
+    const thread = chapterFor(book.subject);
+    // Wait for the stored settings: chaptersSeen decides where it goes.
+    if (!loaded || !thread) return;
+    update({ bookId: book.id });
+    // The first time the child helps there, Hudhud tells it first.
+    router.push(
+      !settings.chaptersSeen.includes(thread) ? routes.intro(thread) : routes.book(book.id),
+    );
   };
 
   return (
@@ -187,6 +208,37 @@ export default function HomeScreen() {
           </Pulse>
         ) : null}
 
+        {/*
+          Two doors, one per subject. Parents in the user test did not see when their child was
+          in Arabic and when in maths: the child just followed what the play button opened.
+        */}
+        <View style={[styles.doors, { flexDirection: language === "en" ? "row" : "row-reverse" }]}>
+          {islands.map(({ book }) => {
+            const chosenDoor = !story && book.id === current?.id;
+            return (
+              <Pressable
+                key={book.id}
+                testID={`door-${book.id}`}
+                accessibilityRole="button"
+                accessibilityLabel={t(DOOR_NAME[book.subject] ?? book.title)}
+                accessibilityState={{ selected: chosenDoor }}
+                onPress={tap(() => openBook(book))}
+                style={({ pressed }) => [
+                  styles.door,
+                  { backgroundColor: readableFill(book.color) },
+                  chosenDoor && styles.doorChosen,
+                  pressed && styles.pressed,
+                ]}
+              >
+                <Text style={styles.doorGlyphs}>{doorGlyphs(book, digits)}</Text>
+                <UiText style={styles.doorName} numberOfLines={1}>
+                  {DOOR_NAME[book.subject] ?? book.title}
+                </UiText>
+              </Pressable>
+            );
+          })}
+        </View>
+
         {/* The subjects are places on Hudhud's map; the chosen one is ringed in gold. */}
         <View style={styles.map}>
           <YemenMap
@@ -208,17 +260,7 @@ export default function HomeScreen() {
                       </UiText>
                     ),
                     // Choosing a place makes it the subject the play button continues in.
-                    onPress: () => {
-                      // Wait for the stored settings: chaptersSeen decides where it goes.
-                      if (!loaded) return;
-                      update({ bookId: book.id });
-                      // The first time the child helps there, Hudhud tells it first.
-                      router.push(
-                        !settings.chaptersSeen.includes(thread)
-                          ? routes.intro(thread)
-                          : routes.book(book.id),
-                      );
-                    },
+                    onPress: () => openBook(book),
                   },
                 ];
               }),
@@ -330,6 +372,22 @@ const styles = StyleSheet.create({
   },
   playSubjectText: { color: "#FFFFFF", fontSize: 22, fontWeight: "900", lineHeight: 30 },
   pressed: { opacity: 0.88, transform: [{ scale: 0.96 }] },
+  doors: { width: "100%", paddingHorizontal: 16, gap: 14 },
+  door: {
+    flex: 1,
+    minHeight: 96,
+    borderRadius: 24,
+    borderWidth: 4,
+    borderColor: "transparent",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 2,
+    paddingVertical: 10,
+    boxShadow: `0 5px 0 ${yemen.sandShadow}`,
+  },
+  doorChosen: { borderColor: "#FFFFFF", boxShadow: `0 0 0 4px ${yemen.gold}` },
+  doorGlyphs: { color: "#FFFFFF", fontSize: 34, fontWeight: "900", lineHeight: 46 },
+  doorName: { color: "#FFFFFF", fontSize: 15, fontWeight: "800", lineHeight: 22 },
   map: { width: "100%", height: 280, paddingHorizontal: 16, marginTop: 6 },
   placeCaption: { fontSize: 11, fontWeight: "700", color: "#FFFFFF", lineHeight: 16 },
   tiles: { width: "100%", paddingHorizontal: 16, gap: 14 },
