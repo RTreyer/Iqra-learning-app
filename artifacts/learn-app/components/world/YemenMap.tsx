@@ -96,6 +96,14 @@ export type MapPin = {
   dimmed?: boolean;
 };
 
+/** A place colour blended with white: faded, but solid, so the map does not show through. */
+function faded(hex: string): string {
+  const n = parseInt(hex.slice(1, 7), 16);
+  const mix = (c: number) => Math.round(c * 0.5 + 255 * 0.5);
+  const [r, g, b] = [mix(n >> 16), mix((n >> 8) & 255), mix(n & 255)];
+  return `#${((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1)}`;
+}
+
 const PIN = 58;
 /** A place still to come is drawn smaller. */
 const PIN_SOON = 46;
@@ -313,9 +321,11 @@ function Place({
       <View
         style={[
           styles.label,
-          { backgroundColor: place.color, height: labelHeight },
+          {
+            backgroundColor: pin.dimmed ? faded(place.color) : place.color,
+            height: labelHeight,
+          },
           pin.selected && styles.labelOn,
-          pin.dimmed && styles.dimmed,
         ]}
       >
         <Text style={styles.name}>{line(place.name)}</Text>
