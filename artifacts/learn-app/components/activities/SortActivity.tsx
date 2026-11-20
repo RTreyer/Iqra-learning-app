@@ -190,8 +190,9 @@ const styles = StyleSheet.create({
   boxLabel: { fontSize: 20, fontWeight: "800", color: colors.text },
   labelRow: { flexDirection: "row-reverse", alignItems: "center", gap: 10 },
   fraction: { alignItems: "center" },
-  fractionDigit: { fontSize: 20, fontWeight: "800", color: colors.text, lineHeight: 24 },
-  fractionBar: { width: 18, height: 3, borderRadius: 2, backgroundColor: colors.text },
+  // Larger than the word: the digits are what the child compares.
+  fractionDigit: { fontSize: 28, fontWeight: "800", color: colors.text, lineHeight: 34 },
+  fractionBar: { width: 24, height: 3, borderRadius: 2, backgroundColor: colors.text },
   inBox: { flexDirection: "row-reverse", flexWrap: "wrap", justifyContent: "center", gap: 4 },
   items: { flexDirection: "row-reverse", flexWrap: "wrap", justifyContent: "center", gap: 12 },
   item: {
