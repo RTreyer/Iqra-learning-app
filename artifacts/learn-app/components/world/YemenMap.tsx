@@ -90,6 +90,10 @@ export type MapPin = {
   share?: number;
   /** The subject the play button continues in. */
   selected?: boolean;
+  /** The subject's first letter or number, drawn large in the badge instead of the place's picture. */
+  glyph?: string;
+  /** Another subject is the one the play button continues in: this place fades back. */
+  dimmed?: boolean;
 };
 
 const PIN = 58;
@@ -294,7 +298,9 @@ function Place({
           soon && styles.badgeSoon,
         ]}
       >
-        {place.sticker ? (
+        {pin.glyph ? (
+          <Text style={[styles.glyph, { color: place.color }]}>{pin.glyph}</Text>
+        ) : place.sticker ? (
           <StickerArt id={place.sticker} size={soon ? 32 : 40} />
         ) : (
           <Picture emoji={place.picture} size={36} />
@@ -319,6 +325,7 @@ function Place({
   );
   const style = [
     styles.place,
+    pin.dimmed && styles.dimmed,
     beside && (leftward ? styles.besideLeft : styles.beside),
     at === "above" && styles.above,
     { left, top: clampedTop, width: span },
@@ -370,6 +377,8 @@ const styles = StyleSheet.create({
   above: { flexDirection: "column-reverse" },
   besideLeft: { flexDirection: "row-reverse", gap: 4 },
   badgeOn: { borderWidth: 5, transform: [{ scale: 1.08 }] },
+  dimmed: { opacity: 0.55 },
+  glyph: { fontSize: 30, fontWeight: "900", lineHeight: 40 },
   badgeSoon: { borderStyle: "dashed", opacity: 0.85 },
   labelOn: { borderWidth: 3, borderColor: yemen.gold },
   track: {

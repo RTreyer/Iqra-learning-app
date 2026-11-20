@@ -112,24 +112,23 @@ test("an island switches the subject: play then continues there", async () => {
   expect(JSON.parse((await AsyncStorage.getItem(SETTINGS_KEY))!).bookId).toBe("arabic-1");
 });
 
-test("subject doors: the chosen one is marked, a door opens its subject", async () => {
+test("each place shows its subject plainly; the place play is not in fades back", async () => {
   await storyTold("math-1");
   renderHome();
   await screen.findByTestId("intro-button");
-  expect(screen.getByTestId("door-arabic-1")).toHaveTextContent(/أ ب ت/);
-  expect(screen.getByTestId("door-math-1")).toHaveTextContent(/١ ٢ ٣/);
-  expect(screen.getByTestId("door-math-1").props.accessibilityState).toMatchObject({
-    selected: true,
-  });
-  expect(screen.getByTestId("door-arabic-1").props.accessibilityState).toMatchObject({
-    selected: false,
-  });
+  const arabic = screen.getByTestId("book-arabic-1");
+  const math = screen.getByTestId("book-math-1");
+  expect(arabic).toHaveTextContent(/أ/);
+  expect(arabic).toHaveTextContent(/اللغة العربية/);
+  expect(math).toHaveTextContent(/١/);
+  expect(math).toHaveTextContent(/الرياضيات/);
+  expect(arabic).toHaveStyle({ opacity: 0.55 });
+  expect(math).not.toHaveStyle({ opacity: 0.55 });
   await act(async () => {
-    fireEvent.press(screen.getByTestId("door-arabic-1"));
+    fireEvent.press(arabic);
   });
-  expect(router.push).toHaveBeenCalledWith(routes.book("arabic-1"));
-  expect(screen.getByTestId("play-subject")).toHaveTextContent("أ");
-  expect(JSON.parse((await AsyncStorage.getItem(SETTINGS_KEY))!).bookId).toBe("arabic-1");
+  expect(screen.getByTestId("book-math-1")).toHaveStyle({ opacity: 0.55 });
+  expect(screen.getByTestId("book-arabic-1")).not.toHaveStyle({ opacity: 0.55 });
 });
 
 test("the first time on an island, Hudhud tells that job before its path opens", async () => {
