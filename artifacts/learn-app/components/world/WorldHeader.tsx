@@ -77,7 +77,11 @@ export function WorldHeader({ up, picture, name, detail, color, stars, end, subj
         </Pressable>
         {end ?? (stars !== undefined ? <StarBadge stars={stars} /> : <View style={styles.spacer} />)}
       </View>
-      {subject ? <SubjectLabel book={subject} testID="header-subject" /> : null}
+      {subject ? (
+        <View style={styles.subject}>
+          <SubjectLabel book={subject} testID="header-subject" />
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -108,4 +112,5 @@ const styles = StyleSheet.create({
   },
   pressed: { opacity: 0.85, transform: [{ scale: 0.95 }] },
   spacer: { width: touchTarget },
+  subject: { marginTop: 2, marginBottom: 8 },
 });
