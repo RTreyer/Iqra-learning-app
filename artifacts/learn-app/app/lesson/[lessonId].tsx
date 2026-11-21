@@ -221,6 +221,7 @@ export default function LessonScreen() {
         name={lesson.title}
         detail={lesson.subtitle}
         color={unit.color}
+        subject={book}
         end={
           completed ? undefined : (
             <HelpButton

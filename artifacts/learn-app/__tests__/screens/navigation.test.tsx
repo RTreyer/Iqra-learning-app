@@ -53,6 +53,13 @@ test("book screen shows the units as stations with their progress", () => {
   expect(router.push).toHaveBeenCalledWith(routes.intro("a2"));
 });
 
+test("the paths carry their subject's mark on the header picture, as on the play button", () => {
+  setParams({ bookId: "math-1" });
+  renderScreen(<BookScreen />);
+  expect(screen.getByTestId("header-subject")).toHaveTextContent("١");
+  expect(screen.getByTestId("header-subject").props.accessibilityLabel).toBe("المادة: الرياضيات");
+});
+
 test("book screen shows not found for an unknown id", () => {
   setParams({ bookId: "nope" });
   renderScreen(<BookScreen />);

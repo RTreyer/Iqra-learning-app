@@ -82,12 +82,13 @@ beforeEach(async () => {
 });
 afterEach(() => jest.useRealTimers());
 
-test("home: play, the map's places, tiles, Hudhud and the parents' gear", async () => {
+test("home: play, the subject mark, the map's places, tiles, Hudhud and the gear", async () => {
   await seed();
   withProgress(<HomeScreen />);
   await screen.findByTestId("review-card");
-  // Gear, Hudhud, play, the 2 subjects and Socotra on the map, today's window, album, review.
-  expectAccessiblePressables(9);
+  // Gear, Hudhud, play and its subject mark, the 2 subjects and Socotra on the map, today's
+  // window, album, review.
+  expectAccessiblePressables(10);
 });
 
 test("book: back button, Hudhud, the unit stations and Rasha's bowl", async () => {

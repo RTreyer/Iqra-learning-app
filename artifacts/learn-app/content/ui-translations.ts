@@ -190,6 +190,17 @@ const english: Record<string, string> = {
   "إجابة صحيحة": "Correct answer",
   "إجابة خطأ": "Wrong answer",
   "ارسم بإصبعك": "Draw with your finger",
+  // The subject on every screen and the subject picker (components/world/SubjectBadge.tsx).
+  المادة: "Subject",
+  "اختر المادة": "Choose a subject",
+  إغلاق: "Close",
+  // What the child learned, per subject (parents' corner).
+  "ماذا تعلّم طفلك؟": "What did your child learn?",
+  اليوم: "Today",
+  "هذا الأسبوع": "This week",
+  "آخر درس": "Last lesson",
+  "لم يبدأ بعد": "Not started yet",
+  "دروس مكتملة": "lessons completed",
 };
 
 export function translateUi(text: string, language: UiLanguage): string {

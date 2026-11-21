@@ -131,6 +131,26 @@ test("each place shows its subject plainly; the place play is not in fades back"
   expect(screen.getByTestId("map-picture-arabic")).not.toHaveStyle({ opacity: 0.5 });
 });
 
+test("the subject mark on play opens the subject picker; a pick switches the subject", async () => {
+  await storyTold("math-1");
+  renderHome();
+  await screen.findByTestId("intro-button");
+  expect(screen.getByTestId("play-subject")).toHaveTextContent("١");
+  fireEvent.press(screen.getByTestId("play-subject"));
+  expect(screen.getByTestId("subject-picker")).toBeTruthy();
+  expect(screen.getByTestId("pick-math-1").props.accessibilityState).toMatchObject({
+    selected: true,
+  });
+  await act(async () => {
+    fireEvent.press(screen.getByTestId("pick-arabic-1"));
+  });
+  expect(screen.queryByTestId("subject-picker")).toBeNull();
+  expect(screen.getByTestId("play-subject")).toHaveTextContent("أ");
+  expect(JSON.parse((await AsyncStorage.getItem(SETTINGS_KEY))!).bookId).toBe("arabic-1");
+  // Hudhud has told both jobs already: no story, the child stays home.
+  expect(router.push).not.toHaveBeenCalled();
+});
+
 test("the first time on an island, Hudhud tells that job before its path opens", async () => {
   await storyTold("arabic-1", ["arabic"]);
   renderHome();

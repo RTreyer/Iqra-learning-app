@@ -107,6 +107,7 @@ export default function UnitScreen() {
         detail={digits(`${unit.title}، ${summary.done} / ${summary.total}`)}
         color={unit.color}
         stars={progress.totalStars}
+        subject={book}
       />
 
       {unit.letters ? (

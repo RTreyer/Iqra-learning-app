@@ -15,6 +15,7 @@ import {
   progressKey,
   type ProfilesState,
 } from "@/lib/profiles";
+import { getLesson } from "@/content";
 import { routes } from "@/lib/routes";
 import { mockCanGoBack, renderScreen } from "@/test-utils/screens";
 
@@ -288,4 +289,27 @@ test("watching the story again forgets only what was told, not the progress", as
   // The lessons and stars stay; home tells the story on the next play.
   expect(JSON.parse((await AsyncStorage.getItem(KEY))!).totalStars).toBe(3);
   expect(router.replace).toHaveBeenCalledWith(routes.home());
+});
+
+test("what the child learned: each subject today, this week and in all, and the last lesson", async () => {
+  await seedFamily();
+  const now = Date.now();
+  const at = (daysAgo: number) => new Date(now - daysAgo * 24 * 60 * 60 * 1000).toISOString();
+  const lessons = {
+    "u1-1": { completed: true, stars: 3, completedAt: at(0) },
+    "u1-2": { completed: true, stars: 2, completedAt: at(10) },
+    "math-u1-1": { completed: true, stars: 3, completedAt: at(3) },
+  };
+  await AsyncStorage.setItem(
+    KEY,
+    JSON.stringify({ version: 2, lessons, items: {}, activity: { days: [] }, totalStars: 8 }),
+  );
+  await openWithPin();
+  expect(screen.getByTestId("today-arabic-1")).toHaveTextContent(/١/);
+  expect(screen.getByTestId("week-arabic-1")).toHaveTextContent(/١/);
+  expect(screen.getByTestId("subject-row-arabic-1")).toHaveTextContent(/اللغة العربية/);
+  expect(screen.getByTestId("today-math-1")).toHaveTextContent(/٠/);
+  expect(screen.getByTestId("week-math-1")).toHaveTextContent(/١/);
+  expect(screen.getByTestId("last-lesson")).toHaveTextContent(/اللغة العربية/);
+  expect(screen.getByTestId("last-lesson")).toHaveTextContent(getLesson("u1-1")!.lesson.title);
 });
