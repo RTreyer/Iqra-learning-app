@@ -87,6 +87,7 @@ test("home: play, the map's places, tiles, Hudhud and the parents' gear", async 
   withProgress(<HomeScreen />);
   await screen.findByTestId("review-card");
   // Gear, Hudhud, play, the 2 subjects and Socotra on the map, today's window, album, review.
+  // (Before the story there is no subject yet, so no subject mark on play.)
   expectAccessiblePressables(9);
 });
 

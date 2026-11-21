@@ -1,11 +1,12 @@
 /**
  * Parents' corner, behind the parents' PIN (components/parents/ParentsLock.tsx): the children
  * on this phone (docs/KINDERPROFILE.md), grade, menu language, voice and vibration, watching
- * Hudhud's story again and the active child's progress at a glance.
+ * Hudhud's story again; right after the children, what the active child learned per subject
+ * (today, this week, in all, and the last lesson).
  */
 
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { BackButton } from "@/components/BackButton";
@@ -16,13 +17,15 @@ import { ChildrenCard } from "@/components/parents/ChildrenCard";
 import { ParentsLock, PinSetup } from "@/components/parents/ParentsLock";
 import { Avatar, profileLabel } from "@/components/world/Avatar";
 import { Icon } from "@/components/world/Icon";
-import { books, grades, unitLessonIds } from "@/content";
+import { SubjectLabel, subjectName } from "@/components/world/SubjectLabel";
+import { books, grades } from "@/content";
 import { useLanguage } from "@/context/LanguageContext";
 import { useProfiles } from "@/context/ProfilesContext";
 import { useProgress } from "@/context/ProgressContext";
 import { useSettings, type Settings } from "@/context/SettingsContext";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
 import { routes } from "@/lib/routes";
+import { lastLesson, subjectActivity } from "@/lib/subjectActivity";
 import { STICKERS, stickersEarned } from "@/lib/stickers";
 import { readableFill, touchTarget, yemen } from "@/theme/tokens";
 
@@ -61,12 +64,14 @@ export default function ParentsScreen() {
   const [open, setOpen] = useState(false);
   const { t, digits, language } = useLanguage();
   const { settings, update } = useSettings();
-  const { progress, getUnitProgress } = useProgress();
+  const { progress } = useProgress();
   const { active, profiles, pinChangedAt } = useProfiles();
   const pad = useScreenPadding();
   const [changingPin, setChangingPin] = useState(false);
 
   const row = { flexDirection: language === "en" ? "row" : "row-reverse" } as const;
+  const activity = useMemo(() => subjectActivity(progress, books), [progress]);
+  const last = useMemo(() => lastLesson(progress, books), [progress]);
   const align = { textAlign: language === "en" ? "left" : "right" } as const;
 
   return (
@@ -87,6 +92,57 @@ export default function ParentsScreen() {
           contentContainerStyle={[styles.content, { paddingBottom: pad.bottom + 24 }]}
         >
           <ChildrenCard />
+
+          {/*
+            What the child learned, per subject (as Lingokids' progress centre): parents in the
+            user test could not tell when their child was in Arabic and when in maths.
+          */}
+          <View testID="subject-progress" style={styles.card}>
+            <View style={[styles.progressHead, row]}>
+              {profiles.length > 1 ? <Avatar id={active.avatar} size={32} /> : null}
+              <UiText style={[styles.cardTitle, align]}>
+                {profiles.length > 1
+                  ? `${t("ماذا تعلّم طفلك؟")} ${profileLabel(active)}`
+                  : "ماذا تعلّم طفلك؟"}
+              </UiText>
+            </View>
+            <Text testID="last-lesson" style={[styles.note, align]}>
+              {last
+                ? `${t("آخر درس")}: ${t(subjectName(last.book))}، ${last.title}`
+                : t("لم يبدأ بعد")}
+            </Text>
+            {activity.map(({ book, today, week, done, total }) => (
+              <View key={book.id} testID={`subject-row-${book.id}`} style={styles.subjectRow}>
+                <View style={[styles.subjectHead, row]}>
+                  <SubjectLabel book={book} />
+                  <Text style={styles.progressCount}>{digits(`${done} / ${total}`)}</Text>
+                </View>
+                <View style={[styles.progressTrack, row]}>
+                  <View
+                    style={{
+                      width: `${total ? Math.round((done / total) * 100) : 0}%`,
+                      backgroundColor: readableFill(book.color),
+                      borderRadius: 6,
+                    }}
+                  />
+                </View>
+                <View style={[styles.counts, row]}>
+                  <Text testID={`today-${book.id}`} style={styles.count}>
+                    {`${t("اليوم")}: ${digits(today)}`}
+                  </Text>
+                  <Text testID={`week-${book.id}`} style={styles.count}>
+                    {`${t("هذا الأسبوع")}: ${digits(week)}`}
+                  </Text>
+                </View>
+              </View>
+            ))}
+            <View style={[styles.progressRow, row]}>
+              <UiText style={styles.progressName}>ألبوم الملصقات</UiText>
+              <Text style={styles.progressCount}>
+                {digits(`${stickersEarned(progress.totalStars)} / ${STICKERS.length}`)}
+              </Text>
+            </View>
+          </View>
 
           <View style={styles.card}>
             <UiText style={[styles.cardTitle, align]}>الصف</UiText>
@@ -159,41 +215,6 @@ export default function ParentsScreen() {
               <Icon name="book" size={22} color="#FFFFFF" />
               <UiText style={styles.buttonText}>شاهد القصة من جديد</UiText>
             </Pressable>
-          </View>
-
-          <View style={styles.card}>
-            <View style={[styles.progressHead, row]}>
-              {profiles.length > 1 ? <Avatar id={active.avatar} size={32} /> : null}
-              <UiText style={[styles.cardTitle, align]}>
-                {profiles.length > 1 ? `${t("التقدم")}: ${profileLabel(active)}` : "التقدم"}
-              </UiText>
-            </View>
-            {books
-              .filter((book) => book.available)
-              .map((book) => {
-                const p = getUnitProgress(book.units.flatMap(unitLessonIds));
-                return (
-                  <View key={book.id} style={[styles.progressRow, row]}>
-                    <UiText style={styles.progressName}>{book.title}</UiText>
-                    <View style={[styles.progressTrack, row]}>
-                      <View
-                        style={{
-                          width: `${p.total ? Math.round((p.done / p.total) * 100) : 0}%`,
-                          backgroundColor: readableFill(book.color),
-                          borderRadius: 6,
-                        }}
-                      />
-                    </View>
-                    <Text style={styles.progressCount}>{digits(`${p.done} / ${p.total}`)}</Text>
-                  </View>
-                );
-              })}
-            <View style={[styles.progressRow, row]}>
-              <UiText style={styles.progressName}>ألبوم الملصقات</UiText>
-              <Text style={styles.progressCount}>
-                {digits(`${stickersEarned(progress.totalStars)} / ${STICKERS.length}`)}
-              </Text>
-            </View>
           </View>
 
           <View style={styles.card}>
@@ -272,6 +293,10 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   progressCount: { fontSize: 14, color: yemen.inkSoft, marginStart: "auto" },
+  subjectRow: { gap: 6, paddingVertical: 4 },
+  subjectHead: { alignItems: "center", gap: 10 },
+  counts: { gap: 16 },
+  count: { fontSize: 14, fontWeight: "700", color: yemen.inkSoft },
   button: {
     flex: 1,
     minHeight: touchTarget,

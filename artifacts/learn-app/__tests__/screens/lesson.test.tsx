@@ -1,6 +1,7 @@
 import { act, fireEvent, screen } from "@testing-library/react-native";
 import React from "react";
 import LessonScreen from "@/app/lesson/[lessonId]";
+import { SUBJECT_SPOKEN } from "@/components/world/SubjectLabel";
 import { books, getLesson } from "@/content";
 import { DEMO_IDS } from "@/content/demos";
 import { instructionFor } from "@/content/instructions";
@@ -78,6 +79,8 @@ const { router } = jest.requireMock("expo-router") as {
   router: { back: jest.Mock; replace: jest.Mock };
 };
 const lesson = getLesson("u2-2")!.lesson;
+/** Each lesson starts by naming its subject, for the parents in the room. */
+const SUBJECT = SUBJECT_SPOKEN.arabic;
 const instruction = instructionFor(lesson)!;
 const letterTrace = books
   .flatMap((b) => b.units.flatMap((u) => u.lessons))
@@ -98,14 +101,14 @@ beforeEach(() => {
 });
 afterEach(() => jest.useRealTimers());
 
-test("speaks the title, then the instruction, and mounts the activity once both are spoken", () => {
+test("speaks the subject, the title, the instruction, and then mounts the activity", () => {
   const order: string[] = [];
   speech.speak.mockImplementation((text: string, options?: SpeakOptions) => {
     order.push(`speak:${text}`);
     options?.onDone?.();
   });
   renderScreen(<LessonScreen />);
-  expect(order).toEqual([`speak:${lesson.title}`, `speak:${instruction}`]);
+  expect(order).toEqual([`speak:${SUBJECT}`, `speak:${lesson.title}`, `speak:${instruction}`]);
   // The header shows the lesson as a picture; its name is spoken and announced.
   expect(screen.getByTestId("header-picture").props.accessibilityLabel).toBe(
     `${lesson.title}، ${lesson.subtitle}`,
@@ -127,6 +130,8 @@ test("waits for the instruction before mounting the activity", () => {
 
 test("mounts the activity after the fallbacks when speech never reports back", () => {
   renderScreen(<LessonScreen />);
+  expect(speech.speak).toHaveBeenCalledWith(SUBJECT, expect.anything());
+  act(() => jest.advanceTimersByTime(1500));
   expect(speech.speak).toHaveBeenCalledWith(lesson.title, expect.anything());
   expect(screen.queryByText("stub:letter_pick")).toBeNull();
   act(() => jest.advanceTimersByTime(1499));
@@ -144,18 +149,24 @@ test("a late report from the stopped title does not skip the instruction", () =>
     if (options?.onDone) callbacks.push(options.onDone);
   });
   renderScreen(<LessonScreen />);
+  // The subject, then the title: a late second report of either moves on only once.
   act(() => callbacks[0]());
   act(() => callbacks[0]());
-  expect(screen.queryByText("stub:letter_pick")).toBeNull();
   act(() => callbacks[1]());
+  act(() => callbacks[1]());
+  expect(screen.queryByText("stub:letter_pick")).toBeNull();
+  act(() => callbacks[2]());
   expect(screen.getByText("stub:letter_pick")).toBeTruthy();
 });
 
-test("maths lessons speak only the title: their rounds speak the task", () => {
+test("maths lessons speak only the subject and the title: their rounds speak the task", () => {
   speechFinishes();
   setParams({ lessonId: "math-u3-1" });
   renderScreen(<LessonScreen />);
-  expect(speech.speak).toHaveBeenCalledTimes(1);
+  expect(speech.speak.mock.calls.map((c) => c[0])).toEqual([
+    SUBJECT_SPOKEN.math,
+    getLesson("math-u3-1")!.lesson.title,
+  ]);
 });
 
 describe("worked example", () => {

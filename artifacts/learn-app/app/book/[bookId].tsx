@@ -109,6 +109,7 @@ export default function BookScreen() {
         detail={t(book.subtitle)}
         color={book.color}
         stars={progress.totalStars}
+        subject={book}
       />
       <ScrollView
         ref={scroll}

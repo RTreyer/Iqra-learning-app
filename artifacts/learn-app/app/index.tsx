@@ -7,7 +7,7 @@
  */
 
 import { router } from "expo-router";
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { ScreenBackground } from "@/components/ScreenBackground";
@@ -21,6 +21,12 @@ import { BowlGoal } from "@/components/world/Bowl";
 import { Skyline } from "@/components/world/Skyline";
 import { StickerArt } from "@/components/world/StickerArt";
 import { YemenMap, type MapPin } from "@/components/world/YemenMap";
+import {
+  SubjectLabel,
+  SubjectPicker,
+  subjectMark,
+  subjectName,
+} from "@/components/world/SubjectLabel";
 import { books, unitLessonIds, type Book } from "@/content";
 import { MAP_PLACES, SOON_LINE, SUBJECT_DONE, bowlLine, chapterFor } from "@/content/story";
 import { useLine } from "@/components/Gloss";
@@ -46,13 +52,6 @@ export function windowLine(done: number): string {
   return bowlLine(done, DAILY_GOAL);
 }
 
-/** The subject on the play button: the first letter or number the child meets there. */
-function subjectGlyph(book: Book, digits: (v: string) => string): string {
-  return book.subject === "math" ? digits("1") : "أ";
-}
-
-/** The subject's name under its place on the map (the child goes by the letter or number). */
-const SUBJECT_NAME: Record<string, string> = { arabic: "اللغة العربية", math: "الرياضيات" };
 
 export default function HomeScreen() {
   const { t, digits, language, loaded: languageLoaded } = useLanguage();
@@ -97,6 +96,16 @@ export default function HomeScreen() {
   const tap = (go: () => void) => () => {
     haptics.tap();
     go();
+  };
+
+  const [picking, setPicking] = useState(false);
+  /** From the picker: the play button continues in that subject (Hudhud tells it first, once). */
+  const pickSubject = (book: Book) => {
+    setPicking(false);
+    const thread = chapterFor(book.subject);
+    if (!loaded || !thread) return;
+    update({ bookId: book.id });
+    if (!story && !settings.chaptersSeen.includes(thread)) router.push(routes.intro(thread));
   };
 
   /** Into a subject: it becomes the one the play button continues in. */
@@ -191,15 +200,17 @@ export default function HomeScreen() {
                 <Icon name="play" size={72} color="#FFFFFF" />
               </View>
             </Pressable>
-            {!story && current ? (
-              <View
-                testID="play-subject"
-                style={[styles.playSubject, { backgroundColor: readableFill(current.color) }]}
-              >
-                <Text style={styles.playSubjectText}>{subjectGlyph(current, digits)}</Text>
-              </View>
-            ) : null}
           </Pulse>
+        ) : null}
+
+        {!story && current ? (
+          // The subject play continues in, by name, as on every screen; tapped, the picker.
+          <SubjectLabel
+            book={current}
+            size="large"
+            testID="play-subject"
+            onPress={() => setPicking(true)}
+          />
         ) : null}
 
         {/* The subjects are places on Hudhud's map; the chosen one ringed in gold, the other pale. */}
@@ -221,7 +232,7 @@ export default function HomeScreen() {
                     // Parents in the user test did not see when their child was in Arabic and
                     // when in maths: each place carries its subject's mark (as on the play
                     // button) and name, and the place the play button is not in fades back.
-                    mark: subjectGlyph(book, digits),
+                    mark: subjectMark(book, digits),
                     markColor: readableFill(book.color),
                     dimmed,
                     caption: (
@@ -232,7 +243,7 @@ export default function HomeScreen() {
                         ]}
                         numberOfLines={1}
                       >
-                        {SUBJECT_NAME[book.subject] ?? book.title}
+                        {subjectName(book)}
                       </UiText>
                     ),
                     // Choosing a place makes it the subject the play button continues in.
@@ -296,6 +307,12 @@ export default function HomeScreen() {
           <Skyline />
         </View>
       </ScrollView>
+      <SubjectPicker
+        visible={picking}
+        current={current}
+        onPick={pickSubject}
+        onClose={() => setPicking(false)}
+      />
     </ScreenBackground>
   );
 }
@@ -334,19 +351,6 @@ const styles = StyleSheet.create({
     boxShadow: `0 8px 0 ${yemen.clayDeep}`,
   },
   playIcon: { marginLeft: 10 },
-  playSubject: {
-    position: "absolute",
-    top: 0,
-    right: -4,
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-    borderWidth: 4,
-    borderColor: "#FFFFFF",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  playSubjectText: { color: "#FFFFFF", fontSize: 22, fontWeight: "900", lineHeight: 30 },
   pressed: { opacity: 0.88, transform: [{ scale: 0.96 }] },
   map: { width: "100%", height: 280, paddingHorizontal: 16, marginTop: 6 },
   placeCaption: { fontSize: 11, fontWeight: "700", color: "#FFFFFF", lineHeight: 16 },
