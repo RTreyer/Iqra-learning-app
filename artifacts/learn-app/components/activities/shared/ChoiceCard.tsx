@@ -27,6 +27,16 @@ const ICON: Record<ChoiceState, string | null> = { idle: null, correct: "✓", w
 const GLYPH: Record<ChoiceState, string | null> = { idle: null, correct: "✓", wrong: "✗" };
 const SPOKEN: Record<ChoiceState, string> = { idle: "", correct: "، صحيح", wrong: "، خطأ" };
 
+/** Letters only, without vowel marks, shadda and tatweel. */
+const baseLetters = (word: string) => word.replace(/[\u064B-\u0652\u0670\u0640\s]/g, "").length;
+
+/**
+ * A syllable on a word card (أَ, أُ, يَا) is drawn as large as a letter card: at word size its
+ * vowel marks were too small to tell أُ from أَ, and a child (and the teacher in the user test)
+ * tapped what looked right and was told it was wrong.
+ */
+export const isSyllable = (word: string) => baseLetters(word) > 0 && baseLetters(word) <= 2;
+
 export function ChoiceCard({
   index,
   word,
@@ -57,6 +67,7 @@ export function ChoiceCard({
         <Text
           style={[
             textStyles[variant],
+            variant === "word" && isSyllable(word) && styles.syllable,
             // A picture card without a picture shows a syllable or letter: make it large.
             variant === "picture" && !emoji && styles.textOnly,
             (solid ? solidText : softText)[state],
@@ -94,7 +105,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  textOnly: { fontSize: 32, fontWeight: "900", lineHeight: 48 },
+  // A syllable alone on a picture card (listen and pick): large, so its vowel mark reads.
+  textOnly: { fontSize: 40, fontWeight: "900", lineHeight: 66 },
+  syllable: { fontSize: 48, fontWeight: "900", lineHeight: 80 },
 });
 
 const iconStyles = StyleSheet.create({
@@ -134,7 +147,14 @@ const cardStyles = StyleSheet.create({
 
 const textStyles = StyleSheet.create({
   letter: { fontSize: 54, fontWeight: "900", color: colors.text, lineHeight: 74 },
-  word: { fontSize: 22, fontWeight: "800", color: colors.text, textAlign: "center" },
+  // Large enough that the vowel marks of a whole word stay readable (fatha vs damma).
+  word: {
+    fontSize: 28,
+    fontWeight: "800",
+    color: colors.text,
+    textAlign: "center",
+    lineHeight: 48,
+  },
   picture: { fontSize: 15, fontWeight: "700", color: colors.text, textAlign: "center" },
   number: { fontSize: 36, fontWeight: "800", color: colors.successText },
 });
