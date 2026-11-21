@@ -311,5 +311,7 @@ test("what the child learned: each subject today, this week and in all, and the 
   expect(screen.getByTestId("today-math-1")).toHaveTextContent(/٠/);
   expect(screen.getByTestId("week-math-1")).toHaveTextContent(/١/);
   expect(screen.getByTestId("last-lesson")).toHaveTextContent(/اللغة العربية/);
-  expect(screen.getByTestId("last-lesson")).toHaveTextContent(getLesson("u1-1")!.lesson.title);
+  expect(String(screen.getByTestId("last-lesson").props.children)).toContain(
+    getLesson("u1-1")!.lesson.title,
+  );
 });
