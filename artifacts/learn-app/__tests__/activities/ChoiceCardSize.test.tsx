@@ -3,18 +3,21 @@ import React from "react";
 import { StyleSheet } from "react-native";
 
 import { ChoiceCard, isSyllable } from "@/components/activities/shared/ChoiceCard";
+import { LanguageProvider } from "@/context/LanguageContext";
 
 const card = (word: string) =>
   render(
-    <ChoiceCard
-      index={0}
-      word={word}
-      state="idle"
-      selected={false}
-      locked={false}
-      variant="word"
-      onPick={jest.fn()}
-    />,
+    <LanguageProvider initial="ar">
+      <ChoiceCard
+        index={0}
+        word={word}
+        state="idle"
+        selected={false}
+        locked={false}
+        variant="word"
+        onPick={jest.fn()}
+      />
+    </LanguageProvider>,
   );
 
 const fontSize = (word: string) => StyleSheet.flatten(screen.getByText(word).props.style).fontSize;
