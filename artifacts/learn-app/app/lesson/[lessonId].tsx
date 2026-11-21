@@ -30,6 +30,7 @@ import { firstParam } from "@/lib/params";
 import { routes } from "@/lib/routes";
 import { starsForScore, type Score } from "@/lib/scoring";
 import { estimateSpeechMs, speak, stopSpeaking } from "@/lib/speech";
+import { SUBJECT_SPOKEN } from "@/components/world/SubjectLabel";
 import { newSticker, type Sticker } from "@/lib/stickers";
 import { StoryGoal } from "@/components/world/StoryGoal";
 import { GOAL_LINES, finishLine, giftLine } from "@/content/story";
@@ -40,12 +41,14 @@ import type { GoalKind } from "@/content/types";
 const INTRO_FALLBACK_MS = 1500;
 
 /**
- * Speaks the title, then the instruction, then reports the lesson as ready. Activities speak
+ * Speaks the subject (for the parents in the room: Arabic or maths), the title, then the
+ * instruction, then reports the lesson as ready. Activities speak
  * their own first prompt, and speak() stops current speech, so they must not mount before the
  * intro has finished. Each step moves on when speech reports back, or after a fallback timer.
  */
 function useLessonIntro(
   lessonId: string,
+  subject: string | undefined,
   title: string | undefined,
   instruction: string | undefined,
   /** The menu language is known, so the title is spoken in the right language. */
@@ -55,6 +58,7 @@ function useLessonIntro(
   useEffect(() => {
     if (!title || !languageLoaded) return;
     const steps: [string, number][] = [[title, INTRO_FALLBACK_MS]];
+    if (subject) steps.unshift([subject, INTRO_FALLBACK_MS]);
     if (instruction) steps.push([instruction, estimateSpeechMs(instruction)]);
     let settled = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
@@ -83,7 +87,7 @@ function useLessonIntro(
       clearTimeout(timer);
       stopSpeaking();
     };
-  }, [lessonId, title, instruction, languageLoaded]);
+  }, [lessonId, subject, title, instruction, languageLoaded]);
   return readyFor === lessonId;
 }
 
@@ -104,7 +108,13 @@ export default function LessonScreen() {
   // Hudhud tells the task above the activity and reacts to the child's answers.
   const guide = useGuideState();
   const { loaded: languageLoaded } = useLanguage();
-  const ready = useLessonIntro(lessonId, found?.lesson.title, instruction, languageLoaded);
+  const ready = useLessonIntro(
+    lessonId,
+    found ? SUBJECT_SPOKEN[found.book.subject] : undefined,
+    found?.lesson.title,
+    instruction,
+    languageLoaded,
+  );
 
   // Worked example: shown on the first lesson of each activity type, and again on request.
   const { seen, markSeen } = useDemoSeen();

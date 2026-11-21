@@ -22,11 +22,11 @@ import { Skyline } from "@/components/world/Skyline";
 import { StickerArt } from "@/components/world/StickerArt";
 import { YemenMap, type MapPin } from "@/components/world/YemenMap";
 import {
-  SubjectBadge,
+  SubjectLabel,
   SubjectPicker,
   subjectMark,
   subjectName,
-} from "@/components/world/SubjectBadge";
+} from "@/components/world/SubjectLabel";
 import { books, unitLessonIds, type Book } from "@/content";
 import { MAP_PLACES, SOON_LINE, SUBJECT_DONE, bowlLine, chapterFor } from "@/content/story";
 import { useLine } from "@/components/Gloss";
@@ -42,7 +42,7 @@ import { nextLesson } from "@/lib/nextLesson";
 import { routes } from "@/lib/routes";
 import { speak } from "@/lib/speech";
 import { STICKERS, stickersEarned } from "@/lib/stickers";
-import { readableFill, touchTarget, yemen } from "@/theme/tokens";
+import { readableFill, yemen } from "@/theme/tokens";
 
 const GREETING = "بِسْمِ اللهِ! هَيَّا نَتَعَلَّمُ";
 /** Before the story has been told: the play button starts it. */
@@ -200,18 +200,17 @@ export default function HomeScreen() {
                 <Icon name="play" size={72} color="#FFFFFF" />
               </View>
             </Pressable>
-            {!story && current ? (
-              // The subject, as on every screen; tapped, it opens the picker (as Duolingo's flag).
-              <View style={styles.playSubject}>
-                <SubjectBadge
-                  book={current}
-                  size={touchTarget}
-                  testID="play-subject"
-                  onPress={() => setPicking(true)}
-                />
-              </View>
-            ) : null}
           </Pulse>
+        ) : null}
+
+        {!story && current ? (
+          // The subject play continues in, by name, as on every screen; tapped, the picker.
+          <SubjectLabel
+            book={current}
+            size="large"
+            testID="play-subject"
+            onPress={() => setPicking(true)}
+          />
         ) : null}
 
         {/* The subjects are places on Hudhud's map; the chosen one ringed in gold, the other pale. */}
@@ -352,7 +351,6 @@ const styles = StyleSheet.create({
     boxShadow: `0 8px 0 ${yemen.clayDeep}`,
   },
   playIcon: { marginLeft: 10 },
-  playSubject: { position: "absolute", top: 0, right: -4 },
   pressed: { opacity: 0.88, transform: [{ scale: 0.96 }] },
   map: { width: "100%", height: 280, paddingHorizontal: 16, marginTop: 6 },
   placeCaption: { fontSize: 11, fontWeight: "700", color: "#FFFFFF", lineHeight: 16 },

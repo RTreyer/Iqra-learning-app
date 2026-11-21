@@ -17,7 +17,7 @@ import { ChildrenCard } from "@/components/parents/ChildrenCard";
 import { ParentsLock, PinSetup } from "@/components/parents/ParentsLock";
 import { Avatar, profileLabel } from "@/components/world/Avatar";
 import { Icon } from "@/components/world/Icon";
-import { SubjectBadge, subjectName } from "@/components/world/SubjectBadge";
+import { SubjectLabel, subjectName } from "@/components/world/SubjectLabel";
 import { books, grades } from "@/content";
 import { useLanguage } from "@/context/LanguageContext";
 import { useProfiles } from "@/context/ProfilesContext";
@@ -114,8 +114,7 @@ export default function ParentsScreen() {
             {activity.map(({ book, today, week, done, total }) => (
               <View key={book.id} testID={`subject-row-${book.id}`} style={styles.subjectRow}>
                 <View style={[styles.subjectHead, row]}>
-                  <SubjectBadge book={book} size={34} />
-                  <UiText style={styles.subjectName}>{subjectName(book)}</UiText>
+                  <SubjectLabel book={book} />
                   <Text style={styles.progressCount}>{digits(`${done} / ${total}`)}</Text>
                 </View>
                 <View style={[styles.progressTrack, row]}>
@@ -296,7 +295,6 @@ const styles = StyleSheet.create({
   progressCount: { fontSize: 14, color: yemen.inkSoft, marginStart: "auto" },
   subjectRow: { gap: 6, paddingVertical: 4 },
   subjectHead: { alignItems: "center", gap: 10 },
-  subjectName: { fontSize: 16, fontWeight: "800", color: yemen.ink },
   counts: { gap: 16 },
   count: { fontSize: 14, fontWeight: "700", color: yemen.inkSoft },
   button: {

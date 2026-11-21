@@ -1,8 +1,9 @@
 /**
- * Which subject the child is in, the same mark on every screen (as Duolingo keeps the course
- * flag in one place): أ for Arabic, ١ for maths, in the subject's colour. On the home screen it
- * also opens the subject picker. Parents in the user test could not tell when their child was
- * in Arabic and when in maths.
+ * Which subject the child is in, said plainly for the parents: the subject's name and a picture
+ * of it that needs no reading (letters for Arabic, a sum for maths), in the subject's colour,
+ * on every screen (as Duolingo keeps the course in one place). Hudhud also says the subject
+ * when a lesson starts. Parents in the user test could not tell when their child was in Arabic
+ * and when in maths; many mothers cannot read, hence the picture.
  */
 
 import React from "react";
@@ -14,49 +15,67 @@ import { useLanguage } from "@/context/LanguageContext";
 import * as haptics from "@/lib/haptics";
 import { readableFill, touchTarget, yemen } from "@/theme/tokens";
 
-/** The subject's name, for parents and screen readers (the child goes by the mark). */
+/** The subject's name, as parents read it. */
 export const SUBJECT_NAME: Record<string, string> = { arabic: "اللغة العربية", math: "الرياضيات" };
+/** The subject's name as Hudhud says it (fully vocalised for the voice). */
+export const SUBJECT_SPOKEN: Record<string, string> = {
+  arabic: "اللُّغَةُ الْعَرَبِيَّةُ",
+  math: "الرِّيَاضِيَّاتُ",
+};
 
 export const subjectName = (book: Book) => SUBJECT_NAME[book.subject] ?? book.title;
 
-/** The first letter or number the child meets in the subject. */
+/** The first letter or number the child meets in the subject (the mark on the map). */
 export function subjectMark(book: Book, digits: (v: string) => string): string {
   return book.subject === "math" ? digits("1") : "أ";
 }
 
-export function SubjectBadge({
+/** A picture of the subject that needs no reading: the first letters, or a sum. */
+export function subjectPicture(book: Book, digits: (v: string) => string): string {
+  return book.subject === "math" ? digits("1 + 2") : "أ ب ت";
+}
+
+export function SubjectLabel({
   book,
-  size = 46,
+  size = "small",
   testID,
   onPress,
 }: {
   book: Book;
-  size?: number;
+  size?: "small" | "large";
   testID?: string;
-  /** Without it the badge only shows (and announces) the subject. */
+  /** Without it the label only shows (and announces) the subject. */
   onPress?: () => void;
 }) {
-  const { t, digits } = useLanguage();
+  const { t, digits, language } = useLanguage();
+  const large = size === "large";
   const style = [
-    styles.badge,
-    {
-      width: size,
-      height: size,
-      borderRadius: size / 2,
-      borderWidth: size >= 40 ? 4 : 3,
-      backgroundColor: readableFill(book.color),
-    },
+    styles.label,
+    large ? styles.labelLarge : styles.labelSmall,
+    { backgroundColor: readableFill(book.color) },
+    { flexDirection: language === "en" ? "row" : "row-reverse" } as const,
   ];
-  const mark = (
-    <Text style={[styles.mark, { fontSize: size * 0.46, lineHeight: size * 0.64 }]}>
-      {subjectMark(book, digits)}
-    </Text>
+  const content = (
+    <>
+      <View style={[styles.picture, large && styles.pictureLarge]}>
+        <Text
+          style={[
+            styles.pictureText,
+            large && styles.pictureTextLarge,
+            { color: readableFill(book.color) },
+          ]}
+        >
+          {subjectPicture(book, digits)}
+        </Text>
+      </View>
+      <UiText style={[styles.name, large && styles.nameLarge]}>{subjectName(book)}</UiText>
+    </>
   );
   const label = `${t("المادة")}: ${t(subjectName(book))}`;
   if (!onPress)
     return (
       <View testID={testID} accessible accessibilityLabel={label} style={style}>
-        {mark}
+        {content}
       </View>
     );
   return (
@@ -64,14 +83,13 @@ export function SubjectBadge({
       testID={testID}
       accessibilityRole="button"
       accessibilityLabel={label}
-      hitSlop={8}
       onPress={() => {
         haptics.tap();
         onPress();
       }}
       style={({ pressed }) => [style, pressed && styles.pressed]}
     >
-      {mark}
+      {content}
     </Pressable>
   );
 }
@@ -88,8 +106,7 @@ export function SubjectPicker({
   onPick: (book: Book) => void;
   onClose: () => void;
 }) {
-  const { t, language } = useLanguage();
-  const row = { flexDirection: language === "en" ? "row" : "row-reverse" } as const;
+  const { t } = useLanguage();
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable
@@ -118,13 +135,11 @@ export function SubjectPicker({
                   }}
                   style={({ pressed }) => [
                     styles.option,
-                    row,
                     chosen && styles.optionChosen,
                     pressed && styles.pressed,
                   ]}
                 >
-                  <SubjectBadge book={book} size={52} />
-                  <UiText style={styles.optionName}>{subjectName(book)}</UiText>
+                  <SubjectLabel book={book} size="large" />
                 </Pressable>
               );
             })}
@@ -135,8 +150,29 @@ export function SubjectPicker({
 }
 
 const styles = StyleSheet.create({
-  badge: { borderColor: "#FFFFFF", alignItems: "center", justifyContent: "center" },
-  mark: { color: "#FFFFFF", fontWeight: "900" },
+  label: { alignItems: "center", alignSelf: "center", borderRadius: 999 },
+  labelSmall: { minHeight: 32, gap: 8, paddingStart: 4, paddingEnd: 12, paddingVertical: 3 },
+  labelLarge: {
+    minHeight: touchTarget,
+    gap: 10,
+    paddingStart: 6,
+    paddingEnd: 16,
+    paddingVertical: 5,
+  },
+  picture: {
+    minWidth: 26,
+    height: 26,
+    paddingHorizontal: 8,
+    borderRadius: 13,
+    backgroundColor: "#FFFFFF",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  pictureLarge: { height: 36, borderRadius: 18, paddingHorizontal: 10 },
+  pictureText: { fontSize: 14, fontWeight: "900", lineHeight: 20 },
+  pictureTextLarge: { fontSize: 18, lineHeight: 26 },
+  name: { color: "#FFFFFF", fontSize: 14, fontWeight: "800", lineHeight: 20 },
+  nameLarge: { fontSize: 18, lineHeight: 26 },
   pressed: { opacity: 0.88, transform: [{ scale: 0.96 }] },
   backdrop: {
     flex: 1,
@@ -157,14 +193,12 @@ const styles = StyleSheet.create({
   title: { fontSize: 18, fontWeight: "800", color: yemen.ink, textAlign: "center" },
   option: {
     alignItems: "center",
-    gap: 14,
+    justifyContent: "center",
     minHeight: touchTarget + 16,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    padding: 8,
     borderRadius: 18,
     borderWidth: 3,
     borderColor: yemen.sandShadow,
   },
   optionChosen: { borderColor: yemen.gold },
-  optionName: { fontSize: 18, fontWeight: "800", color: yemen.ink },
 });

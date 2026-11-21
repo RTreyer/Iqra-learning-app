@@ -1,8 +1,8 @@
 /**
  * The header of the paths and lessons, as in the design: a round picture button that goes one
  * step up (a house to home, a map to the path), the picture of where the child is (tap it to
- * hear its name) with the subject's mark on its corner, and the stars. No text to read; names are
- * spoken and announced.
+ * hear its name), and the stars. No text to read for the child; names are spoken and announced.
+ * Under it, for the parents, the subject by name (SubjectLabel).
  */
 
 import { type Href } from "expo-router";
@@ -18,7 +18,7 @@ import * as haptics from "@/lib/haptics";
 import { speak } from "@/lib/speech";
 import { readableFill, touchTarget, yemen } from "@/theme/tokens";
 import { Icon, type IconName } from "./Icon";
-import { SubjectBadge } from "./SubjectBadge";
+import { SubjectLabel } from "./SubjectLabel";
 
 type Props = {
   /** Where "up" leads, and the picture on the button. */
@@ -32,7 +32,7 @@ type Props = {
   /** Stars on the left; leave out where a help button stands instead. */
   stars?: number;
   end?: React.ReactNode;
-  /** The subject the screen belongs to: its mark sits on the picture, as on the play button. */
+  /** The subject the screen belongs to, named under the header for the parents. */
   subject?: Book;
 };
 
@@ -40,20 +40,20 @@ export function WorldHeader({ up, picture, name, detail, color, stars, end, subj
   const { t, language } = useLanguage();
   const line = useLine();
   return (
-    <View style={[styles.row, { flexDirection: language === "en" ? "row" : "row-reverse" }]}>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={t("رجوع")}
-        hitSlop={6}
-        onPress={() => {
-          haptics.tap();
-          goBackOr(up.fallback);
-        }}
-        style={({ pressed }) => [styles.round, pressed && styles.pressed]}
-      >
-        <Icon name={up.icon} size={26} color={yemen.clay} />
-      </Pressable>
-      <View>
+    <View>
+      <View style={[styles.row, { flexDirection: language === "en" ? "row" : "row-reverse" }]}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t("رجوع")}
+          hitSlop={6}
+          onPress={() => {
+            haptics.tap();
+            goBackOr(up.fallback);
+          }}
+          style={({ pressed }) => [styles.round, pressed && styles.pressed]}
+        >
+          <Icon name={up.icon} size={26} color={yemen.clay} />
+        </Pressable>
         <Pressable
           testID="header-picture"
           accessibilityRole="button"
@@ -75,13 +75,9 @@ export function WorldHeader({ up, picture, name, detail, color, stars, end, subj
         >
           {picture}
         </Pressable>
-        {subject ? (
-          <View style={styles.subject}>
-            <SubjectBadge book={subject} size={30} testID="header-subject" />
-          </View>
-        ) : null}
+        {end ?? (stars !== undefined ? <StarBadge stars={stars} /> : <View style={styles.spacer} />)}
       </View>
-      {end ?? (stars !== undefined ? <StarBadge stars={stars} /> : <View style={styles.spacer} />)}
+      {subject ? <SubjectLabel book={subject} testID="header-subject" /> : null}
     </View>
   );
 }
@@ -112,5 +108,4 @@ const styles = StyleSheet.create({
   },
   pressed: { opacity: 0.85, transform: [{ scale: 0.95 }] },
   spacer: { width: touchTarget },
-  subject: { position: "absolute", top: -8, right: -10 },
 });
