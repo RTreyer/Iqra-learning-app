@@ -141,7 +141,7 @@ test.describe("navigation", () => {
     await expect(page).toHaveURL(/\/book\/math-1$/, { timeout: 30000 });
 
     await gotoAndWaitReady(page, "/");
-    await expect(page.getByTestId("play-subject")).toHaveText("١");
+    await expect(page.getByTestId("play-subject")).toContainText("الرياضيات");
     await page.getByTestId("continue-card").click();
     await expect(page).toHaveURL(/\/lesson\/math-u1-1$/);
 
@@ -152,7 +152,7 @@ test.describe("navigation", () => {
     await page.getByTestId("intro-skip").click();
     await expect(page).toHaveURL(/\/book\/arabic-1$/);
     await gotoAndWaitReady(page, "/");
-    await expect(page.getByTestId("play-subject")).toHaveText("أ");
+    await expect(page.getByTestId("play-subject")).toContainText("اللغة العربية");
     await page.getByTestId("continue-card").click();
     await expect(page).toHaveURL(/\/lesson\/u1-1$/);
   });
