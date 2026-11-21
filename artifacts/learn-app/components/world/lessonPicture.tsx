@@ -32,21 +32,21 @@ export function lessonPicture(type: LessonType, color: string, size: number): Re
   if ("icon" in picture) return <Icon name={picture.icon} size={size} color={color} />;
   if ("gap" in picture) {
     const digit = {
-      fontSize: size * 0.62,
+      fontSize: size * 0.78,
       fontWeight: "900",
       color,
-      lineHeight: size * 0.9,
+      lineHeight: size * 1.05,
     } as const;
     return (
       <View
         testID="picture-gap"
-        style={{ flexDirection: "row-reverse", alignItems: "center", gap: size * 0.1 }}
+        style={{ flexDirection: "row-reverse", alignItems: "center", gap: size * 0.12 }}
       >
         <Text style={digit}>{picture.gap[0]}</Text>
         <View
           style={{
-            width: size * 0.42,
-            height: size * 0.56,
+            width: size * 0.46,
+            height: size * 0.66,
             borderWidth: Math.max(1.5, size * 0.07),
             borderStyle: "dashed",
             borderColor: color,
