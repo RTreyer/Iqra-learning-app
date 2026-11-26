@@ -325,7 +325,7 @@ describe("ProgressContext", () => {
     const send = (newValue: string | null) =>
       events.dispatchEvent(Object.assign(new Event("storage"), { key: KEY, newValue }));
 
-    const { result } = await renderLoaded();
+    const { result, unmount } = await renderLoaded();
     const other = JSON.stringify({
       version: 2,
       lessons: { other: { completed: true, stars: 2, completedAt: "2026-11-26T10:00:00.000Z" } },
@@ -342,6 +342,7 @@ describe("ProgressContext", () => {
     });
     expect(result.current.getLessonProgress("other").stars).toBe(0);
     expect(result.current.progress.totalStars).toBe(0);
+    unmount();
     win.addEventListener = saved.add;
     win.removeEventListener = saved.remove;
   });

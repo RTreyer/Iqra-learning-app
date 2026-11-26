@@ -326,8 +326,10 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
         // An unreadable value is left for the next load (with its backup).
       }
     };
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
+    // Keep the window this effect subscribed on, so the cleanup removes from that same one.
+    const win = window;
+    win.addEventListener("storage", onStorage);
+    return () => win.removeEventListener?.("storage", onStorage);
   }, [storageKey]);
 
   // Written to the key stored with the progress, never to the key of the child shown next.
