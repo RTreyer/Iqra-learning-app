@@ -193,10 +193,26 @@ export function mergeProgress(stored: ProgressState, local: ProgressState): Prog
   return {
     version: 2,
     lessons,
-    items: { ...stored.items, ...local.items },
+    items: mergeItems(stored.items, local.items),
     activity: { days: normalizeDays([...stored.activity.days, ...local.activity.days]) },
     totalStars: sumStars(lessons),
   };
+}
+
+/**
+ * Review items from two copies (another tab, or a load that finished late): per item the one
+ * seen last wins, so neither copy's newer answers are dropped. Ties keep the local one.
+ */
+function mergeItems(
+  stored: Record<string, ProgressItem>,
+  local: Record<string, ProgressItem>,
+): Record<string, ProgressItem> {
+  const items = { ...stored };
+  for (const [id, item] of Object.entries(local)) {
+    const other = items[id];
+    if (!other || item.lastSeenAt >= other.lastSeenAt) items[id] = item;
+  }
+  return items;
 }
 
 /** Completed count and star sum over the given lesson ids. */

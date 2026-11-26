@@ -286,4 +286,74 @@ describe("ProgressContext", () => {
     await waitFor(() => expect(result.current.loadSettled).toBe(true));
     expect(result.current.hydrated).toBe(false);
   });
+
+  it("a second tab's lessons survive this tab's next save (read and merge before writing)", async () => {
+    const { result } = await renderLoaded();
+    // Another tab finishes a lesson and stores it; this tab never saw it.
+    await AsyncStorage.setItem(
+      KEY,
+      JSON.stringify({
+        version: 2,
+        lessons: { other: { completed: true, stars: 3, completedAt: "2026-11-26T10:00:00.000Z" } },
+        items: {},
+        activity: { days: [] },
+        totalStars: 3,
+      }),
+    );
+    act(() => result.current.completeLesson("mine", 2));
+    await waitFor(async () => {
+      const s = await stored();
+      expect(s.lessons.other.stars).toBe(3);
+      expect(s.lessons.mine.stars).toBe(2);
+      expect(s.totalStars).toBe(5);
+    });
+    // And this tab now shows the other tab's lesson too.
+    await waitFor(() => expect(result.current.getLessonProgress("other").stars).toBe(3));
+  });
+
+  it("folds in another tab's saves and its reset (storage events)", async () => {
+    // The browser's window events, which the native test environment does not have.
+    const g = globalThis as unknown as { window?: Record<string, unknown> };
+    const win = (g.window ??= {}) as {
+      addEventListener?: unknown;
+      removeEventListener?: unknown;
+    };
+    const saved = { add: win.addEventListener, remove: win.removeEventListener };
+    const events = new EventTarget();
+    win.addEventListener = events.addEventListener.bind(events);
+    win.removeEventListener = events.removeEventListener.bind(events);
+    const send = (newValue: string | null) =>
+      events.dispatchEvent(Object.assign(new Event("storage"), { key: KEY, newValue }));
+
+    const { result, unmount } = await renderLoaded();
+    const other = JSON.stringify({
+      version: 2,
+      lessons: { other: { completed: true, stars: 2, completedAt: "2026-11-26T10:00:00.000Z" } },
+      items: {},
+      activity: { days: [] },
+      totalStars: 2,
+    });
+    act(() => {
+      send(other);
+    });
+    expect(result.current.getLessonProgress("other").stars).toBe(2);
+    act(() => {
+      send(null);
+    });
+    expect(result.current.getLessonProgress("other").stars).toBe(0);
+    expect(result.current.progress.totalStars).toBe(0);
+    unmount();
+    win.addEventListener = saved.add;
+    win.removeEventListener = saved.remove;
+  });
+
+  it("reports a failed save, and clears it once a save works again", async () => {
+    const { result } = await renderLoaded();
+    setItem.mockRejectedValueOnce(new Error("QuotaExceededError"));
+    act(() => result.current.completeLesson("a", 3));
+    await waitFor(() => expect(result.current.saveFailed).toBe(true));
+    act(() => result.current.completeLesson("b", 3));
+    await waitFor(() => expect(result.current.saveFailed).toBe(false));
+    await waitFor(async () => expect((await stored()).lessons.a.stars).toBe(3));
+  });
 });

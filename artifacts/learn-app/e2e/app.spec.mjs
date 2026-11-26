@@ -22,6 +22,7 @@ import {
   mathUnit1Lesson,
   openParents,
   pictureChoiceByName,
+  preparePage,
   readProgress,
   seedStorage,
   tapAllAndFinish,
@@ -535,5 +536,25 @@ test.describe("accessibility", () => {
       if (violations.serious.length) found[path] = violations.serious;
     }
     expect(found).toEqual({});
+  });
+});
+
+test.describe("two tabs", () => {
+  // A parent opens the shared link again while an old tab is still open: the old tab must not
+  // erase what was learned in the new one (it used to write its stale copy over it).
+  test("a stale second tab keeps a lesson finished in another tab", async ({ page }) => {
+    await gotoAndWaitReady(page, "/lesson/u2-29");
+    const stale = await page.context().newPage();
+    await preparePage(stale);
+    await gotoAndWaitReady(stale, "/lesson/u2-29");
+
+    expect(await completeQuizLesson(page, "u2-29", 6, { navigate: false })).toBe(3);
+    await expect.poll(async () => (await readProgress(page))?.lessons["u2-29"]?.stars).toBe(3);
+
+    await answerRound(stale, QUIZ_ROUNDS["u2-29"][0].right);
+    // The stale tab saves right after the answer.
+    await stale.waitForTimeout(1000);
+    expect((await readProgress(page))?.lessons["u2-29"]?.stars).toBe(3);
+    await stale.close();
   });
 });

@@ -323,3 +323,22 @@ describe("applyReview", () => {
     ]);
   });
 });
+
+describe("mergeProgress items", () => {
+  it("keeps, per review item, the copy seen last", () => {
+    const item = (lastSeenAt: string, box: 1 | 2 | 3 | 4 | 5) => ({
+      box,
+      dueAt: lastSeenAt,
+      lastSeenAt,
+      lapses: 0,
+    });
+    const stored = { ...createEmptyState(), items: { x: item("2026-11-02T10:00:00.000Z", 3) } };
+    const local = {
+      ...createEmptyState(),
+      items: { x: item("2026-11-01T10:00:00.000Z", 1), y: item("2026-11-01T10:00:00.000Z", 1) },
+    };
+    const merged = mergeProgress(stored, local);
+    expect(merged.items.x.box).toBe(3);
+    expect(merged.items.y.box).toBe(1);
+  });
+});
