@@ -71,7 +71,7 @@ test("the child's touches do not reach the example", async () => {
   const onDone = jest.fn();
   renderScreen(<DemoPlayer id="letter_pick" color="#2563EB" onDone={onDone} />);
   await act(async () => {
-    jest.advanceTimersByTime(100);
+    jest.advanceTimersByTime(1000);
   });
   expect(screen.getByTestId("demo-blocker").props.onStartShouldSetResponder()).toBe(true);
 });

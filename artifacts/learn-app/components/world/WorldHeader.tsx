@@ -14,6 +14,7 @@ import { goBackOr } from "@/components/BackButton";
 import { StarBadge } from "@/components/StarBadge";
 import type { Book } from "@/content";
 import { useLanguage } from "@/context/LanguageContext";
+import { useCompact } from "@/hooks/useCompact";
 import * as haptics from "@/lib/haptics";
 import { speak } from "@/lib/speech";
 import { readableFill, touchTarget, yemen } from "@/theme/tokens";
@@ -39,9 +40,13 @@ type Props = {
 export function WorldHeader({ up, picture, name, detail, color, stars, end, subject }: Props) {
   const { t, language } = useLanguage();
   const line = useLine();
+  // On a short screen the subject sits beside the picture instead of under it.
+  const compact = useCompact();
+  const direction = language === "en" ? "row" : "row-reverse";
+  const subjectLabel = subject ? <SubjectLabel book={subject} testID="header-subject" /> : null;
   return (
     <View>
-      <View style={[styles.row, { flexDirection: language === "en" ? "row" : "row-reverse" }]}>
+      <View style={[styles.row, compact && styles.rowCompact, { flexDirection: direction }]}>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t("رجوع")}
@@ -54,34 +59,34 @@ export function WorldHeader({ up, picture, name, detail, color, stars, end, subj
         >
           <Icon name={up.icon} size={26} color={yemen.clay} />
         </Pressable>
-        <Pressable
-          testID="header-picture"
-          accessibilityRole="button"
-          accessibilityLabel={
-            detail ? `${line(name)}${language === "en" ? ", " : "، "}${line(detail)}` : line(name)
-          }
-          onPress={() => {
-            haptics.tap();
-            speak(name);
-          }}
-          style={({ pressed }) => [
-            styles.picture,
-            {
-              backgroundColor: readableFill(color),
-              boxShadow: `0 4px 0 ${readableFill(color, 9)}`,
-            },
-            pressed && styles.pressed,
-          ]}
-        >
-          {picture}
-        </Pressable>
+        <View style={[styles.middle, { flexDirection: direction }]}>
+          <Pressable
+            testID="header-picture"
+            accessibilityRole="button"
+            accessibilityLabel={
+              detail ? `${line(name)}${language === "en" ? ", " : "، "}${line(detail)}` : line(name)
+            }
+            onPress={() => {
+              haptics.tap();
+              speak(name);
+            }}
+            style={({ pressed }) => [
+              styles.picture,
+              compact && styles.pictureCompact,
+              {
+                backgroundColor: readableFill(color),
+                boxShadow: `0 4px 0 ${readableFill(color, 9)}`,
+              },
+              pressed && styles.pressed,
+            ]}
+          >
+            {picture}
+          </Pressable>
+          {compact ? subjectLabel : null}
+        </View>
         {end ?? (stars !== undefined ? <StarBadge stars={stars} /> : <View style={styles.spacer} />)}
       </View>
-      {subject ? (
-        <View style={styles.subject}>
-          <SubjectLabel book={subject} testID="header-subject" />
-        </View>
-      ) : null}
+      {subjectLabel && !compact ? <View style={styles.subject}>{subjectLabel}</View> : null}
     </View>
   );
 }
@@ -93,6 +98,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
   },
+  rowCompact: { paddingVertical: 4 },
+  middle: { alignItems: "center", gap: 8, flexShrink: 1 },
   round: {
     width: 52,
     height: 52,
@@ -110,6 +117,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  pictureCompact: { width: 52, height: 52, borderRadius: 16 },
   pressed: { opacity: 0.85, transform: [{ scale: 0.95 }] },
   spacer: { width: touchTarget },
   subject: { marginTop: 2, marginBottom: 8 },

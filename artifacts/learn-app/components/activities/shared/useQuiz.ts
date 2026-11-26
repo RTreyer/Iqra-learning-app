@@ -3,6 +3,7 @@ import { Animated } from "react-native";
 import type { Lesson } from "@/content/types";
 import * as haptics from "@/lib/haptics";
 import { itemIdFor } from "@/lib/reviewItems";
+import { afterCurrentLine } from "@/lib/speech";
 import type { Score } from "@/lib/scoring";
 import type { ChoiceState } from "./ChoiceCard";
 import { useGuide } from "@/components/world/LessonGuide";
@@ -49,6 +50,7 @@ export function useQuiz({
   const tried = useRef(false);
   const finished = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const waitForVoice = useRef<() => void>(() => {});
   const guide = useGuide();
   // Timers call the latest callbacks, never a closure from the render that scheduled them.
   const callbacks = useLatest({ onComplete, onRoundResult });
@@ -56,6 +58,7 @@ export function useQuiz({
   useEffect(
     () => () => {
       if (timer.current) clearTimeout(timer.current);
+      waitForVoice.current();
     },
     [],
   );
@@ -103,8 +106,12 @@ export function useQuiz({
       setCorrectCount(count);
       if (isCorrect) haptics.success();
       else haptics.error();
+      // Move on after the delay, but never in the middle of the praise: a slow voice
+      // finishes it first, then a short pause (VOICE-04).
       if (autoAdvanceMs !== undefined)
-        timer.current = setTimeout(() => advance(count), autoAdvanceMs);
+        timer.current = setTimeout(() => {
+          waitForVoice.current = afterCurrentLine(() => advance(count));
+        }, autoAdvanceMs);
       return true;
     },
     [correctCount, wrong, lesson, roundIndex, callbacks, autoAdvanceMs, advance, retry, guide],

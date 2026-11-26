@@ -13,6 +13,9 @@
  *   ("hydrated"). A failed read never leads to an overwrite.
  * - A corrupt blob is copied to a backup key before it can be overwritten.
  * - All writes go through one promise chain, so the last write wins.
+ * - Every write first re-reads the stored blob and merges it in (mergeProgress), and the
+ *   storage events of other tabs are folded in: two tabs of the app (a parent who opens the
+ *   shared link again) can no longer erase each other's lessons.
  * - The state remembers whose progress it is (its storage key), and is only
  *   ever written to that key, so one child's stars never land with another.
  */
@@ -72,6 +75,8 @@ type ProgressContextValue = {
   hydrated: boolean;
   /** True once loading has finished, successfully or not (a failed load leaves `hydrated` false). */
   loadSettled: boolean;
+  /** The last save failed (e.g. the phone's storage is full): stars shown are not kept. */
+  saveFailed: boolean;
   /** Updates state synchronously; persistence happens asynchronously afterwards. */
   completeLesson: (lessonId: string, stars: number) => void;
   getLessonProgress: (lessonId: string) => LessonStatus;
@@ -100,6 +105,7 @@ const ProgressContext = createContext<ProgressContextValue>({
   hydrated: false,
   // Without a provider (isolated screens in tests) there is nothing to wait for.
   loadSettled: true,
+  saveFailed: false,
   completeLesson: () => {},
   getLessonProgress: () => notCompleted,
   getUnitProgress: (lessonIds) => ({ done: 0, total: lessonIds.length, stars: 0 }),
@@ -151,6 +157,8 @@ type State = {
   dirty: boolean;
   /** Loading has finished, successfully or not. */
   loadSettled: boolean;
+  /** The last save failed (e.g. storage full): what the child sees is not stored. */
+  saveFailed: boolean;
 };
 
 type Action =
@@ -160,7 +168,12 @@ type Action =
   | { type: "COMPLETE"; lessonId: string; stars: number; now: Date }
   | { type: "ROUND_RESULT"; itemId: string; correct: boolean; now: Date }
   | { type: "REVIEW"; itemId: string; correct: boolean; now: Date }
-  | { type: "RESET" };
+  | { type: "RESET" }
+  /** Another copy of this child's progress (stored by another tab, or found while saving). */
+  | { type: "SYNCED"; key: string; stored: ProgressState }
+  /** Another tab removed this child's progress (reset in the parents' corner). */
+  | { type: "CLEARED"; key: string }
+  | { type: "SAVE_RESULT"; key: string; failed: boolean };
 
 function initialState(key: string): State {
   return {
@@ -170,8 +183,13 @@ function initialState(key: string): State {
     resetPending: false,
     dirty: false,
     loadSettled: false,
+    saveFailed: false,
   };
 }
+
+/** Whether two copies of the progress hold the same lessons, items, days and stars. */
+const sameProgress = (a: ProgressState, b: ProgressState) =>
+  a === b || JSON.stringify(a) === JSON.stringify(b);
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
@@ -206,6 +224,20 @@ function reducer(state: State, action: Action): State {
         progress: applyReview(state.progress, action.itemId, action.correct, action.now),
         dirty: true,
       };
+    case "SYNCED": {
+      // Before hydration the load merges the stored progress anyway.
+      if (action.key !== state.key || !state.hydrated) return state;
+      const progress = mergeProgress(action.stored, state.progress);
+      if (sameProgress(progress, state.progress)) return state;
+      // What came in is already stored; anything of ours not yet written has its save queued.
+      return { ...state, progress };
+    }
+    case "CLEARED":
+      if (action.key !== state.key || !state.hydrated) return state;
+      return { ...state, progress: createEmptyState(), dirty: false };
+    case "SAVE_RESULT":
+      if (action.key !== state.key || action.failed === state.saveFailed) return state;
+      return { ...state, saveFailed: action.failed };
     case "RESET":
       return {
         ...state,
@@ -225,7 +257,7 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, storageKey, initialState);
   // Right after a switch, until the reducer has caught up, the old child's progress is not shown.
   const current = state.key === storageKey ? state : initialState(storageKey);
-  const { progress, hydrated, loadSettled } = current;
+  const { progress, hydrated, loadSettled, saveFailed } = current;
 
   useEffect(() => {
     let cancelled = false;
@@ -277,11 +309,51 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
     };
   }, [storageKey]);
 
+  // Another tab of the app wrote or removed this child's progress (web only): fold it in.
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof window.addEventListener !== "function") return;
+    const key = storageKey;
+    const onStorage = (event: StorageEvent) => {
+      // `key` is null when the other tab cleared all storage.
+      if (event.key !== null && event.key !== key) return;
+      if (event.key === null || event.newValue === null) {
+        dispatch({ type: "CLEARED", key });
+        return;
+      }
+      try {
+        dispatch({ type: "SYNCED", key, stored: upgradeState(JSON.parse(event.newValue)) });
+      } catch {
+        // An unreadable value is left for the next load (with its backup).
+      }
+    };
+    // Keep the window this effect subscribed on, so the cleanup removes from that same one.
+    const win = window;
+    win.addEventListener("storage", onStorage);
+    return () => win.removeEventListener?.("storage", onStorage);
+  }, [storageKey]);
+
   // Written to the key stored with the progress, never to the key of the child shown next.
+  // The stored blob is read and merged in first: another tab may have saved lessons since.
   const { key: savedKey, progress: toSave, hydrated: canSave, dirty } = state;
   useEffect(() => {
     if (!canSave || !dirty) return;
-    void enqueueWrite("save", () => AsyncStorage.setItem(savedKey, JSON.stringify(toSave)));
+    void enqueueWrite("save", async () => {
+      let merged = toSave;
+      try {
+        const json = await AsyncStorage.getItem(savedKey);
+        if (json != null) merged = mergeProgress(upgradeState(JSON.parse(json)), toSave);
+      } catch {
+        // Unreadable: write ours (a corrupt blob was backed up when it was loaded).
+      }
+      try {
+        await AsyncStorage.setItem(savedKey, JSON.stringify(merged));
+      } catch (err) {
+        dispatch({ type: "SAVE_RESULT", key: savedKey, failed: true });
+        throw err;
+      }
+      dispatch({ type: "SAVE_RESULT", key: savedKey, failed: false });
+      if (merged !== toSave) dispatch({ type: "SYNCED", key: savedKey, stored: merged });
+    });
   }, [savedKey, toSave, canSave, dirty]);
 
   const completeLesson = useCallback((lessonId: string, stars: number) => {
@@ -335,6 +407,7 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
       progress,
       hydrated,
       loadSettled,
+      saveFailed,
       completeLesson,
       getLessonProgress,
       getUnitProgress,
@@ -347,6 +420,7 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
       progress,
       hydrated,
       loadSettled,
+      saveFailed,
       completeLesson,
       getLessonProgress,
       getUnitProgress,

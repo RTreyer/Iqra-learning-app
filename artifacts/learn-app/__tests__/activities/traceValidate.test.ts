@@ -364,3 +364,40 @@ describe("digit guides", () => {
     });
   });
 });
+
+describe("dots, look-alikes and small pads (agents' report BUG-02 to BUG-04)", () => {
+  const shape = (guide: string) => decodeMask(traceGuides[guide].mask, TRACE_GRID);
+  const judge = (strokes: Stroke[], guide: string, pad = PAD) => {
+    const first = validateTracing(strokes, pad, 1, true);
+    return first.valid ? validateOnGuide(strokes, pad, shape(guide)) : first;
+  };
+  /** The letter's body alone: its longest stroke, the dots left out. */
+  const bodyOnly = (guide: string) => {
+    const strokes = strokesAlongGuide(guide);
+    return [strokes.reduce((a, b) => (b.length > a.length ? b : a))];
+  };
+
+  it("refuses a single letter with its dots left out", () => {
+    for (const guide of ["ن", "نـ", "ب", "ـت", "ج", "فـ"]) {
+      expect(strokesAlongGuide(guide).length).toBeGreaterThan(1);
+      expect(judge(strokesAlongGuide(guide), guide).valid).toBe(true);
+      expect(judge(bodyOnly(guide), guide).valid).toBe(false);
+    }
+  });
+
+  it("refuses ح written on the guide of ج, and ج on the guide of ح", () => {
+    expect(judge(bodyOnly("ج"), "ج").valid).toBe(false);
+    expect(judge(strokesAlongGuide("ج"), "ح").valid).toBe(false);
+  });
+
+  it("on a small pad, a well shaped tracing a few pixels off the line still passes", () => {
+    const small = { width: 120, height: 120 };
+    const shift = (strokes: Stroke[], dx: number, dy: number) =>
+      strokes.map((stroke) => stroke.map((p) => ({ x: p.x + dx, y: p.y + dy })));
+    for (const guide of ["تـ", "ـت", "د", "ب"]) {
+      const along = strokesAlongGuide(guide, 120);
+      expect(judge(shift(along, 5, 0), guide, small).valid).toBe(true);
+      expect(judge(shift(along, 0, 5), guide, small).valid).toBe(true);
+    }
+  });
+});

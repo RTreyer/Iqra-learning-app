@@ -22,6 +22,7 @@ import { Skyline } from "@/components/world/Skyline";
 import { StickerArt } from "@/components/world/StickerArt";
 import { YemenMap, type MapPin } from "@/components/world/YemenMap";
 import {
+  SUBJECT_SPOKEN,
   SubjectLabel,
   SubjectPicker,
   subjectMark,
@@ -55,7 +56,7 @@ export function windowLine(done: number): string {
 
 export default function HomeScreen() {
   const { t, digits, language, loaded: languageLoaded } = useLanguage();
-  const { progress, getDueItemIds, getUnitProgress } = useProgress();
+  const { progress, getDueItemIds, getUnitProgress, saveFailed } = useProgress();
   const { settings, loaded, update } = useSettings();
   const { profiles, active, chosen } = useProfiles();
   const line = useLine();
@@ -106,6 +107,8 @@ export default function HomeScreen() {
     if (!loaded || !thread) return;
     update({ bookId: book.id });
     if (!story && !settings.chaptersSeen.includes(thread)) router.push(routes.intro(thread));
+    // A child who cannot read hears what was chosen (VOICE-11).
+    else speak(SUBJECT_SPOKEN[book.subject]);
   };
 
   /** Into a subject: it becomes the one the play button continues in. */
@@ -163,6 +166,13 @@ export default function HomeScreen() {
             <Icon name="gear" size={24} color={yemen.lockedInk} strokeWidth={1.8} />
           </Pressable>
         </View>
+
+        {saveFailed ? (
+          // For the parents: stars the child sees are not kept until the phone can save again.
+          <View testID="save-failed" accessibilityRole="alert" style={styles.saveFailed}>
+            <UiText style={styles.saveFailedText}>لم يُحفظ التقدم. هل ذاكرة الهاتف ممتلئة؟</UiText>
+          </View>
+        ) : null}
 
         <Guide
           text={
@@ -352,6 +362,16 @@ const styles = StyleSheet.create({
   },
   playIcon: { marginLeft: 10 },
   pressed: { opacity: 0.88, transform: [{ scale: 0.96 }] },
+  saveFailed: {
+    marginHorizontal: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 14,
+    backgroundColor: "#FBEBEB",
+    borderWidth: 2,
+    borderColor: "#B3261E",
+  },
+  saveFailedText: { color: "#7A1A14", fontSize: 14, fontWeight: "800", textAlign: "center" },
   map: { width: "100%", height: 280, paddingHorizontal: 16, marginTop: 6 },
   placeCaption: { fontSize: 11, fontWeight: "700", color: "#FFFFFF", lineHeight: 16 },
   tiles: { width: "100%", paddingHorizontal: 16, gap: 14 },

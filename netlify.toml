@@ -10,6 +10,19 @@
 [build.environment]
   NODE_VERSION = "24"
 
+# A missing script or image is a real 404, not the app page: an old tab asking for a
+# screen of an earlier build then fails clearly (and the app reloads) instead of
+# running HTML as JavaScript.
+[[redirects]]
+  from = "/_expo/*"
+  to = "/404"
+  status = 404
+
+[[redirects]]
+  from = "/assets/*"
+  to = "/404"
+  status = 404
+
 # The app is a single-page app: every path (e.g. /lesson/u2-3) is served by
 # index.html and resolved by expo-router in the browser.
 [[redirects]]
@@ -17,13 +30,31 @@
   to = "/index.html"
   status = 200
 
+# Scripts and images of a build carry a content hash in their name: they never change,
+# so phones keep them without asking again. The service worker and the app page are
+# checked on every start, so a new build arrives.
+[[headers]]
+  for = "/_expo/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+
 # Security headers. The exported app is one script bundle and inline styles from
 # react-native-web, with no inline scripts, eval or outside origins. e2e/serve.mjs
 # sends the same headers, so the e2e tests run under this policy.
 [[headers]]
   for = "/*"
   [headers.values]
-    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; media-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; worker-src 'none'; manifest-src 'self'"
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; media-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; worker-src 'self'; manifest-src 'self'"
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "no-referrer"

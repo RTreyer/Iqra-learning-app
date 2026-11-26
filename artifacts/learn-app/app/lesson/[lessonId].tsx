@@ -26,10 +26,11 @@ import { useLessonAttempt } from "@/hooks/useLessonAttempt";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
 import { lessonsToday } from "@/lib/daily";
 import * as haptics from "@/lib/haptics";
+import { bubbleSubtitle } from "@/lib/bubble";
 import { firstParam } from "@/lib/params";
 import { routes } from "@/lib/routes";
 import { starsForScore, type Score } from "@/lib/scoring";
-import { estimateSpeechMs, speak, stopSpeaking } from "@/lib/speech";
+import { speak, speakThen, stopSpeaking } from "@/lib/speech";
 import { SUBJECT_SPOKEN } from "@/components/world/SubjectLabel";
 import { newSticker, type Sticker } from "@/lib/stickers";
 import { StoryGoal } from "@/components/world/StoryGoal";
@@ -37,14 +38,12 @@ import { GOAL_LINES, finishLine, giftLine } from "@/content/story";
 import { goalKind, storyStep, type StoryStep } from "@/lib/storyProgress";
 import type { GoalKind } from "@/content/types";
 
-/** The activity mounts when the title has been spoken, or after this at the latest. */
-const INTRO_FALLBACK_MS = 1500;
-
 /**
  * Speaks the subject (for the parents in the room: Arabic or maths), the title, then the
- * instruction, then reports the lesson as ready. Activities speak
- * their own first prompt, and speak() stops current speech, so they must not mount before the
- * intro has finished. Each step moves on when speech reports back, or after a fallback timer.
+ * instruction, then reports the lesson as ready. Activities speak their own first prompt, and
+ * speak() stops current speech, so they must not mount before the intro has finished. Each
+ * line is spoken to its real end with a short pause after it (speakThen): a slow or late voice
+ * is never cut by a fixed timer.
  */
 function useLessonIntro(
   lessonId: string,
@@ -57,34 +56,18 @@ function useLessonIntro(
   const [readyFor, setReadyFor] = useState<string | null>(null);
   useEffect(() => {
     if (!title || !languageLoaded) return;
-    const steps: [string, number][] = [[title, INTRO_FALLBACK_MS]];
-    if (subject) steps.unshift([subject, INTRO_FALLBACK_MS]);
-    if (instruction) steps.push([instruction, estimateSpeechMs(instruction)]);
-    let settled = false;
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    const next = (step: number) => {
-      if (settled) return;
-      clearTimeout(timer);
-      if (step >= steps.length) {
-        settled = true;
+    const lines = [subject, title, instruction].filter((line): line is string => !!line);
+    let cancel = () => {};
+    const next = (i: number) => {
+      if (i >= lines.length) {
         setReadyFor(lessonId);
         return;
       }
-      // speak() stops the previous utterance, which may report back late: only move on once.
-      let moved = false;
-      const done = () => {
-        if (moved) return;
-        moved = true;
-        next(step + 1);
-      };
-      const [text, fallbackMs] = steps[step];
-      timer = setTimeout(done, fallbackMs);
-      speak(text, { onDone: done });
+      cancel = speakThen(lines[i], () => next(i + 1));
     };
     next(0);
     return () => {
-      settled = true;
-      clearTimeout(timer);
+      cancel();
       stopSpeaking();
     };
   }, [lessonId, subject, title, instruction, languageLoaded]);
@@ -158,8 +141,10 @@ export default function LessonScreen() {
             ? GOAL_LINES[kind].beat
             : ""
         : "";
-    // A sticker is a thank-you gift from the people Hudhud and the child help.
-    const praise = won ? `أَحْسَنْت! ${giftLine(won.name)}` : "أحسنت! لقد أتممت الدرس";
+    // A sticker is a thank-you gift from the people Hudhud and the child help. The last
+    // round has just been praised ("أَحْسَنْت!"), so the lesson's line does not say it again
+    // (VOICE-06); it comes once that praise has ended (useQuiz waits for it).
+    const praise = won ? giftLine(won.name) : "لَقَدْ أَتْمَمْتَ الدَّرْسَ!";
     speak(
       step?.completed
         ? won
@@ -242,7 +227,10 @@ export default function LessonScreen() {
         }
       />
       {completed ? null : (
-        <LessonGuide text={guide.line ?? instruction ?? lesson.subtitle} mood={guide.mood} />
+        <LessonGuide
+          text={guide.line ?? instruction ?? bubbleSubtitle(lesson.subtitle, lesson.title)}
+          mood={guide.mood}
+        />
       )}
       <GuideProvider api={guide.api}>
         <StorySymbolContext.Provider value={book.subject === "math" ? "sack" : "letter"}>

@@ -23,6 +23,13 @@ const english: Record<string, string> = {
   "مسح التقدم": "Delete progress",
   "تم مسح التقدم": "Progress deleted",
   "شاهد القصة من جديد": "Watch the story again",
+  "الصوت العربي": "Arabic voice",
+  "الصوت العربي يعمل.": "The Arabic voice works.",
+  "لا يوجد صوت عربي على هذا الجهاز. ثبّت صوتاً عربياً من إعدادات تحويل النص إلى كلام، ثم جرّب الصوت.":
+    "This device has no Arabic voice. Install an Arabic voice in the text to speech settings, then test the voice.",
+  "اضغط «جرّب الصوت»: يجب أن تسمع هدهد.": "Tap “Test the voice”: you should hear Hudhud.",
+  "جرّب الصوت": "Test the voice",
+  "لا تُظهِر التنبيه للطفل بعد الآن": "Stop showing the warning to the child",
   // Children's profiles and the parents' PIN (docs/KINDERPROFILE.md).
   الأطفال: "Children",
   "إضافة طفل": "Add a child",
@@ -93,6 +100,8 @@ const english: Record<string, string> = {
   "العودة إلى الرئيسية": "Back to home",
   "حدث خطأ": "Something went wrong",
   "أعد تحميل التطبيق للمتابعة.": "Please reload the app to continue.",
+  "لا يوجد اتصال بالإنترنت": "No internet connection",
+  "سيعود التطبيق وحده عندما يعود الاتصال.": "The app comes back by itself when the connection returns.",
   "تفاصيل الخطأ": "Error details",
   "إغلاق تفاصيل الخطأ": "Close error details",
   "عرض تفاصيل الخطأ": "View error details",
@@ -201,6 +210,8 @@ const english: Record<string, string> = {
   "آخر درس": "Last lesson",
   "لم يبدأ بعد": "Not started yet",
   "دروس مكتملة": "lessons completed",
+  // Home, when saving progress failed (context/ProgressContext.tsx saveFailed).
+  "لم يُحفظ التقدم. هل ذاكرة الهاتف ممتلئة؟": "Progress was not saved. Is the phone's storage full?",
 };
 
 export function translateUi(text: string, language: UiLanguage): string {

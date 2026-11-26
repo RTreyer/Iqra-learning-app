@@ -5,7 +5,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import type { Lesson } from "@/content/types";
 import { toArabicDigits } from "@/lib/arabicNumbers";
 import { useLanguage } from "@/context/LanguageContext";
-import { speak } from "@/lib/speech";
+import { speak, speakLater } from "@/lib/speech";
 import { colors, touchTarget } from "@/theme/tokens";
 import { ChoiceCard } from "../shared/ChoiceCard";
 import { StoryProgress } from "../shared/StoryProgress";
@@ -59,10 +59,11 @@ export function NumberQuiz({
   );
   const { values, bounce } = useBounce(maxOptions);
   const { shown, spoken } = promptOf(quiz.roundIndex);
+  const askAgain = `${TRY_AGAIN}، ${spoken}`;
 
   useEffect(() => {
-    const t = setTimeout(() => speak(spoken), PROMPT_DELAY_MS);
-    return () => clearTimeout(t);
+    // Not after the child has already answered (or heard something else): VOICE-05.
+    return speakLater(spoken, PROMPT_DELAY_MS);
   }, [spoken, quiz.roundIndex]);
 
   const handlePick = useCallback(
@@ -73,11 +74,12 @@ export function NumberQuiz({
         speak(PRAISE);
         bounce(idx, 1.2);
       } else {
-        // Ask again rather than say the answer: the child finds it.
-        speak(TRY_AGAIN);
+        // Ask again rather than say the answer: the child finds it. The question is repeated,
+        // as a tap may have cut it (VOICE-07).
+        speak(askAgain);
       }
     },
-    [shuffled.correctIndex, pick, bounce],
+    [shuffled.correctIndex, pick, bounce, askAgain],
   );
 
   return (

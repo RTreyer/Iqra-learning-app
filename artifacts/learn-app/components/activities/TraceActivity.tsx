@@ -17,11 +17,11 @@ import { measureNode, useDemoEntry, type DemoEntry } from "@/components/demo/Dem
 import { useLanguage } from "@/context/LanguageContext";
 import * as haptics from "@/lib/haptics";
 import { readableFill } from "@/theme/tokens";
-import { speak } from "@/lib/speech";
+import { speak, speakLater } from "@/lib/speech";
 import { PRAISE } from "./shared/strings";
 import { StoryProgress } from "./shared/StoryProgress";
 import { useLatest } from "./shared/useLatest";
-import { ADVANCE_MS } from "./shared/useQuiz";
+import { ADVANCE_MS, PROMPT_DELAY_MS } from "./shared/useQuiz";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import { CONTROLS_FALLBACK, PAD_FALLBACK, PAD_GAP, PAD_MAX, trace, webPad } from "./trace/styles";
 import { densify, guidePath } from "./trace/guidePath";
@@ -119,9 +119,9 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
     [],
   );
 
-  useEffect(() => {
-    speak(target.tts);
-  }, [target.tts, targetIndex]);
+  // After a short pause, as in the other activities: the instruction before it is not cut
+  // (VOICE-09).
+  useEffect(() => speakLater(target.tts, PROMPT_DELAY_MS), [target.tts, targetIndex]);
 
   /** In a demo the hand follows the guide's centre line and the stroke appears under it. */
   const padNode = useRef<ComponentRef<typeof View> | null>(null);

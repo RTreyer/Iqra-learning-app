@@ -5,6 +5,7 @@
  * (today, this week, in all, and the last lesson).
  */
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import React, { useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -24,6 +25,9 @@ import { useProfiles } from "@/context/ProfilesContext";
 import { useProgress } from "@/context/ProgressContext";
 import { useSettings, type Settings } from "@/context/SettingsContext";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
+import { VOICE_HINT_KEY } from "@/hooks/useVoiceHint";
+import { useVoiceState, type VoiceState } from "@/hooks/useVoiceState";
+import { speak } from "@/lib/speech";
 import { routes } from "@/lib/routes";
 import { lastLesson, subjectActivity } from "@/lib/subjectActivity";
 import { STICKERS, stickersEarned } from "@/lib/stickers";
@@ -56,6 +60,68 @@ function Toggle({
           <View style={[styles.knob, value ? styles.knobOn : styles.knobOff]} />
         </View>
       </Pressable>
+    </View>
+  );
+}
+
+const VOICE_LINES: Record<VoiceState, string> = {
+  works: "الصوت العربي يعمل.",
+  missing:
+    "لا يوجد صوت عربي على هذا الجهاز. ثبّت صوتاً عربياً من إعدادات تحويل النص إلى كلام، ثم جرّب الصوت.",
+  unknown: "اضغط «جرّب الصوت»: يجب أن تسمع هدهد.",
+};
+
+/**
+ * The Arabic voice, for the parents (UX-03): whether it works, a button to hear it, and,
+ * without a voice, a way to stop the child's warning for good. Lessons are spoken, so a phone
+ * without a voice needs an adult.
+ */
+function VoiceCard() {
+  const { t, language } = useLanguage();
+  const voice = useVoiceState();
+  const [silenced, setSilenced] = useState(false);
+  const row = { flexDirection: language === "en" ? "row" : "row-reverse" } as const;
+  const align = { textAlign: language === "en" ? "left" : "right" } as const;
+  return (
+    <View style={styles.card} testID="voice-status">
+      <UiText style={[styles.cardTitle, align]}>الصوت العربي</UiText>
+      <View style={[row, styles.voiceRow]}>
+        <View
+          style={[
+            styles.voiceIcon,
+            { backgroundColor: voice === "missing" ? yemen.clay : yemen.green },
+          ]}
+        >
+          <Icon name={voice === "missing" ? "speakerOff" : "speaker"} size={24} color="#FFFFFF" />
+        </View>
+        <UiText testID={`voice-${voice}`} style={[styles.note, styles.voiceText, align]}>
+          {VOICE_LINES[voice]}
+        </UiText>
+      </View>
+      <Pressable
+        testID="voice-test"
+        accessibilityRole="button"
+        accessibilityLabel={t("جرّب الصوت")}
+        onPress={() => speak("مَرْحَبًا! أَنَا هُدْهُدٌ.")}
+        style={({ pressed }) => [styles.button, styles.storyButton, row, pressed && styles.pressed]}
+      >
+        <Icon name="speaker" size={22} color="#FFFFFF" />
+        <UiText style={styles.buttonText}>جرّب الصوت</UiText>
+      </Pressable>
+      {voice === "missing" && !silenced ? (
+        <Pressable
+          testID="voice-hint-off"
+          accessibilityRole="button"
+          accessibilityLabel={t("لا تُظهِر التنبيه للطفل بعد الآن")}
+          onPress={() => {
+            setSilenced(true);
+            AsyncStorage.setItem(VOICE_HINT_KEY, "1").catch(() => {});
+          }}
+          style={({ pressed }) => [styles.textButton, pressed && styles.pressed]}
+        >
+          <UiText style={[styles.textButtonLabel, align]}>لا تُظهِر التنبيه للطفل بعد الآن</UiText>
+        </Pressable>
+      ) : null}
     </View>
   );
 }
@@ -174,6 +240,8 @@ export default function ParentsScreen() {
             <UiText style={[styles.cardTitle, align]}>لغة القوائم</UiText>
             <LanguageSwitch />
           </View>
+
+          <VoiceCard />
 
           <View style={styles.card}>
             <Toggle
@@ -308,4 +376,15 @@ const styles = StyleSheet.create({
   buttonText: { color: "#FFFFFF", fontSize: 15, fontWeight: "800", textAlign: "center" },
   storyButton: { flex: 0, backgroundColor: yemen.clay, gap: 8 },
   pressed: { opacity: 0.88, transform: [{ scale: 0.97 }] },
+  voiceRow: { alignItems: "center", gap: 10 },
+  voiceIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  voiceText: { flex: 1, fontSize: 14, lineHeight: 22 },
+  textButton: { minHeight: touchTarget, justifyContent: "center" },
+  textButtonLabel: { fontSize: 14, fontWeight: "700", color: yemen.clay },
 });

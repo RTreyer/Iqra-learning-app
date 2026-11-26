@@ -55,13 +55,16 @@ function prepareBrowser({ demoKey, demoTypes, settingsKey }) {
   window.__spoken = [];
   const synth = window.speechSynthesis;
   if (synth) {
-    // Headless Chromium has no voices; record what would be spoken and end each utterance
-    // asynchronously, so lesson intros waiting on onDone continue without the 1500 ms fallback.
+    // Headless Chromium has no voices; record what would be spoken, then start and end each
+    // utterance asynchronously, as a voice does, so lessons go on at once (lib/speech.ts).
     synth.getVoices = () => [];
     synth.cancel = () => {};
     synth.speak = (u) => {
       window.__spoken.push(u && u.text);
-      setTimeout(() => u && u.onend && u.onend(new Event("end")), 0);
+      setTimeout(() => {
+        u?.onstart?.(new Event("start"));
+        u?.onend?.(new Event("end"));
+      }, 0);
     };
   }
   try {
@@ -88,6 +91,15 @@ function prepareBrowser({ demoKey, demoTypes, settingsKey }) {
 }
 
 /** Page fixture: stubs speech and fails the test on any console error or uncaught page error. */
+/** The suite's browser preparation (prepareBrowser), for a page the fixture did not make. */
+export async function preparePage(page) {
+  await page.addInitScript(prepareBrowser, {
+    demoKey: DEMO_SEEN_KEY,
+    demoTypes: DEMO_IDS,
+    settingsKey: SETTINGS_KEY,
+  });
+}
+
 export const test = base.extend({
   page: async ({ page }, provide) => {
     const errors = [];
@@ -95,11 +107,7 @@ export const test = base.extend({
       if (m.type() === "error") errors.push(m.text().slice(0, 300));
     });
     page.on("pageerror", (e) => errors.push(`pageerror: ${e.message.slice(0, 300)}`));
-    await page.addInitScript(prepareBrowser, {
-      demoKey: DEMO_SEEN_KEY,
-      demoTypes: DEMO_IDS,
-      settingsKey: SETTINGS_KEY,
-    });
+    await preparePage(page);
     await provide(page);
     expect(errors, "console errors during the test").toEqual([]);
   },
@@ -124,12 +132,23 @@ const READY = [
   ],
 ];
 
+/** Waits until the service worker controls the page, i.e. the whole app is stored (public/sw.js). */
+export async function waitForOfflineCopy(page) {
+  await page.waitForFunction(() => navigator.serviceWorker?.controller != null, null, {
+    timeout: 60_000,
+  });
+}
+
 /** Navigates and waits until the screen has rendered its main content. */
 export async function gotoAndWaitReady(page, path) {
   await page.goto(path);
   const ready = READY.find(([re]) => re.test(path));
   if (ready) await expect(ready[1](page)).toBeVisible();
-  else await expect(page.locator("#root")).not.toBeEmpty();
+  else {
+    // index.html's loading screen fills #root until the app first renders.
+    await expect(page.locator("#boot")).toHaveCount(0);
+    await expect(page.locator("#root")).not.toBeEmpty();
+  }
   await dismissVoiceHint(page);
 }
 

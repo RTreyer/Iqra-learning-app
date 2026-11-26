@@ -5,9 +5,10 @@ import { SUBJECT_SPOKEN } from "@/components/world/SubjectLabel";
 import { books, getLesson } from "@/content";
 import { DEMO_IDS } from "@/content/demos";
 import { instructionFor } from "@/content/instructions";
+import { bubbleSubtitle } from "@/lib/bubble";
 import { routes } from "@/lib/routes";
 import { resetDemoSeenCache } from "@/hooks/useDemoSeen";
-import { estimateSpeechMs } from "@/lib/speech";
+import { LINE_PAUSE_MS, silentLineMs } from "@/lib/speech";
 import { mockCanGoBack, renderScreen, setParams } from "@/test-utils/screens";
 
 const mockCompleteLesson = jest.fn();
@@ -86,6 +87,9 @@ const letterTrace = books
   .flatMap((b) => b.units.flatMap((u) => u.lessons))
   .find((l) => l.type === "trace" && l.id !== "u1-5")!;
 
+/** Past the pauses after the subject, the title and the instruction, each spoken at once. */
+const finishIntro = () => act(() => jest.advanceTimersByTime(3 * LINE_PAUSE_MS));
+
 /** expo-speech finishes every utterance at once. */
 const speechFinishes = () =>
   speech.speak.mockImplementation((_: string, options?: SpeakOptions) => options?.onDone?.());
@@ -108,6 +112,11 @@ test("speaks the subject, the title, the instruction, and then mounts the activi
     options?.onDone?.();
   });
   renderScreen(<LessonScreen />);
+  // A short pause after each line, so they do not run together.
+  expect(order).toEqual([`speak:${SUBJECT}`]);
+  act(() => jest.advanceTimersByTime(LINE_PAUSE_MS));
+  expect(order).toEqual([`speak:${SUBJECT}`, `speak:${lesson.title}`]);
+  finishIntro();
   expect(order).toEqual([`speak:${SUBJECT}`, `speak:${lesson.title}`, `speak:${instruction}`]);
   // The header shows the lesson as a picture; its name is spoken and announced.
   expect(screen.getByTestId("header-picture").props.accessibilityLabel).toBe(
@@ -123,23 +132,40 @@ test("waits for the instruction before mounting the activity", () => {
     else options?.onDone?.();
   });
   renderScreen(<LessonScreen />);
+  finishIntro();
   expect(screen.queryByText("stub:letter_pick")).toBeNull();
   act(() => finishInstruction?.());
+  finishIntro();
   expect(screen.getByText("stub:letter_pick")).toBeTruthy();
 });
 
-test("mounts the activity after the fallbacks when speech never reports back", () => {
+test("a slow voice that has started is never cut by a timer (VOICE-01)", () => {
+  const lines: { text: string; options: SpeakOptions & { onStart?: () => void } }[] = [];
+  speech.speak.mockImplementation((text: string, options: SpeakOptions) => {
+    lines.push({ text, options });
+  });
+  renderScreen(<LessonScreen />);
+  act(() => lines[0].options.onStart?.());
+  // The subject is still being spoken, long after any old fallback.
+  act(() => jest.advanceTimersByTime(silentLineMs(SUBJECT) + 2000));
+  expect(lines.map((l) => l.text)).toEqual([SUBJECT]);
+  act(() => lines[0].options.onDone?.());
+  act(() => jest.advanceTimersByTime(LINE_PAUSE_MS));
+  expect(lines.map((l) => l.text)).toEqual([SUBJECT, lesson.title]);
+});
+
+test("mounts the activity after the fallbacks when speech never starts", () => {
   renderScreen(<LessonScreen />);
   expect(speech.speak).toHaveBeenCalledWith(SUBJECT, expect.anything());
-  act(() => jest.advanceTimersByTime(1500));
+  act(() => jest.advanceTimersByTime(silentLineMs(SUBJECT) + LINE_PAUSE_MS));
   expect(speech.speak).toHaveBeenCalledWith(lesson.title, expect.anything());
   expect(screen.queryByText("stub:letter_pick")).toBeNull();
-  act(() => jest.advanceTimersByTime(1499));
+  act(() => jest.advanceTimersByTime(silentLineMs(lesson.title) + LINE_PAUSE_MS - 1));
   expect(speech.speak).not.toHaveBeenCalledWith(instruction, expect.anything());
   act(() => jest.advanceTimersByTime(1));
   expect(speech.speak).toHaveBeenCalledWith(instruction, expect.anything());
   expect(screen.queryByText("stub:letter_pick")).toBeNull();
-  act(() => jest.advanceTimersByTime(estimateSpeechMs(instruction)));
+  act(() => jest.advanceTimersByTime(silentLineMs(instruction) + LINE_PAUSE_MS));
   expect(screen.getByText("stub:letter_pick")).toBeTruthy();
 });
 
@@ -152,10 +178,14 @@ test("a late report from the stopped title does not skip the instruction", () =>
   // The subject, then the title: a late second report of either moves on only once.
   act(() => callbacks[0]());
   act(() => callbacks[0]());
+  act(() => jest.advanceTimersByTime(LINE_PAUSE_MS));
   act(() => callbacks[1]());
   act(() => callbacks[1]());
+  act(() => jest.advanceTimersByTime(LINE_PAUSE_MS));
+  expect(callbacks).toHaveLength(3);
   expect(screen.queryByText("stub:letter_pick")).toBeNull();
   act(() => callbacks[2]());
+  finishIntro();
   expect(screen.getByText("stub:letter_pick")).toBeTruthy();
 });
 
@@ -163,6 +193,7 @@ test("maths lessons speak only the subject and the title: their rounds speak the
   speechFinishes();
   setParams({ lessonId: "math-u3-1" });
   renderScreen(<LessonScreen />);
+  finishIntro();
   expect(speech.speak.mock.calls.map((c) => c[0])).toEqual([
     SUBJECT_SPOKEN.math,
     getLesson("math-u3-1")!.lesson.title,
@@ -174,6 +205,7 @@ describe("worked example", () => {
     resetDemoSeenCache([]);
     speechFinishes();
     renderScreen(<LessonScreen />);
+    finishIntro();
     expect(screen.getByText("demo:letter_pick:")).toBeTruthy();
     expect(screen.queryByText("stub:letter_pick")).toBeNull();
     fireEvent.press(screen.getByTestId("demo-stub"));
@@ -184,6 +216,7 @@ describe("worked example", () => {
   test("waits for the intro before it starts", () => {
     resetDemoSeenCache([]);
     renderScreen(<LessonScreen />);
+    finishIntro();
     expect(screen.queryByTestId("demo-stub")).toBeNull();
   });
 
@@ -191,9 +224,11 @@ describe("worked example", () => {
     resetDemoSeenCache([]);
     speechFinishes();
     const first = renderScreen(<LessonScreen />);
+    finishIntro();
     fireEvent.press(screen.getByTestId("demo-stub"));
     first.unmount();
     renderScreen(<LessonScreen />);
+    finishIntro();
     expect(screen.queryByTestId("demo-stub")).toBeNull();
     expect(screen.getByText("stub:letter_pick")).toBeTruthy();
   });
@@ -203,12 +238,14 @@ describe("worked example", () => {
     speechFinishes();
     setParams({ lessonId: "u2-3" });
     renderScreen(<LessonScreen />);
+    finishIntro();
     expect(screen.getByText("demo:word_read:")).toBeTruthy();
   });
 
   test("the help button replays it with the instruction, keeping the activity's place", () => {
     speechFinishes();
     renderScreen(<LessonScreen />);
+    finishIntro();
     const activity = screen.getByText("stub:letter_pick");
     fireEvent.press(screen.getByTestId("help-button"));
     expect(screen.getByText(`demo:letter_pick:${instruction}`)).toBeTruthy();
@@ -223,6 +260,7 @@ describe("worked example", () => {
 
   test("the help button waits for the intro", () => {
     renderScreen(<LessonScreen />);
+    finishIntro();
     expect(screen.getByTestId("help-button").props.accessibilityState.disabled).toBe(true);
   });
 
@@ -231,11 +269,13 @@ describe("worked example", () => {
     speechFinishes();
     setParams({ lessonId: "u1-5" });
     const first = renderScreen(<LessonScreen />);
+    finishIntro();
     expect(screen.getByText("demo:trace_lines:")).toBeTruthy();
     fireEvent.press(screen.getByTestId("demo-stub"));
     first.unmount();
     setParams({ lessonId: letterTrace.id });
     renderScreen(<LessonScreen />);
+    finishIntro();
     expect(screen.getByText("demo:trace:")).toBeTruthy();
   });
 
@@ -243,6 +283,7 @@ describe("worked example", () => {
     speechFinishes();
     setParams({ lessonId: "math-u3-1" });
     renderScreen(<LessonScreen />);
+    finishIntro();
     fireEvent.press(screen.getByTestId("help-button"));
     expect(screen.getByText(/^demo:[a-z_]+:$/)).toBeTruthy();
   });
@@ -258,6 +299,7 @@ test("stops speaking on unmount", () => {
 test("completing the activity shows the completion card with 3 stars", () => {
   speechFinishes();
   renderScreen(<LessonScreen />);
+  finishIntro();
 
   fireEvent.press(screen.getByTestId("stub-complete"));
   expect(mockCompleteLesson).toHaveBeenCalledWith("u2-2", 3);
@@ -272,6 +314,7 @@ test("completing the activity shows the completion card with 3 stars", () => {
 test("round results from the activity are recorded through the progress context", () => {
   speechFinishes();
   renderScreen(<LessonScreen />);
+  finishIntro();
   fireEvent.press(screen.getByTestId("stub-round"));
   expect(mockRecordRoundResult).toHaveBeenCalledTimes(1);
   expect(mockRecordRoundResult).toHaveBeenCalledWith("letter:ب", false);
@@ -281,6 +324,7 @@ test("back falls back to the unit when there is no history", () => {
   speechFinishes();
   mockCanGoBack(false);
   renderScreen(<LessonScreen />);
+  finishIntro();
   fireEvent.press(screen.getByLabelText("رجوع"));
   expect(router.back).not.toHaveBeenCalled();
   expect(router.replace).toHaveBeenCalledWith(routes.unit("a2"));
@@ -289,6 +333,13 @@ test("back falls back to the unit when there is no history", () => {
 test("unknown lesson id shows the not found card", () => {
   setParams({ lessonId: "nope" });
   renderScreen(<LessonScreen />);
+  finishIntro();
   expect(screen.getByTestId("not-found")).toBeTruthy();
   expect(screen.getByText("الدرس غير موجود")).toBeTruthy();
+});
+
+test("Hudhud's bubble never shows a solved example as the lesson's text (DSGN-02)", () => {
+  expect(bubbleSubtitle("٣ زَائِد ٢ يُسَاوِي ٥", "أُكْمِلُ")).toBe("أُكْمِلُ");
+  expect(bubbleSubtitle("٤ + ٣ = ٧", "أَجْمَعُ")).toBe("أَجْمَعُ");
+  expect(bubbleSubtitle("أَقْرَأُ الْمَقَاطِعَ", "x")).toBe("أَقْرَأُ الْمَقَاطِعَ");
 });

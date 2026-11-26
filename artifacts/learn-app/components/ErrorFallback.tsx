@@ -1,11 +1,12 @@
 import { reloadAppAsync } from "expo";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Circle, Path } from "react-native-svg";
 
 import { UiText } from "@/components/UiText";
 import { useLanguage } from "@/context/LanguageContext";
+import { claimAutoReload, isLoadError } from "@/lib/serviceWorker";
 import { colors, shadow } from "@/theme/tokens";
 
 export type ErrorFallbackProps = {
@@ -13,13 +14,56 @@ export type ErrorFallbackProps = {
   resetError: () => void;
 };
 
+function sessionStore(): Storage | null {
+  try {
+    return typeof sessionStorage === "undefined" ? null : sessionStorage;
+  } catch {
+    return null;
+  }
+}
+
+/** On the web without a connection, unless the service worker can serve the app page. */
+function offlineWithoutCopy() {
+  if (Platform.OS !== "web" || typeof navigator === "undefined") return false;
+  return navigator.onLine === false && !navigator.serviceWorker?.controller;
+}
+
+/**
+ * A screen's code did not download (TECH-01): online, reload once by itself; offline, say so
+ * and reload as soon as the connection is back, rather than landing on the browser's own
+ * offline page.
+ */
+function useLoadErrorRecovery(error: Error) {
+  const loadError = Platform.OS === "web" && isLoadError(error);
+  const [offline, setOffline] = useState(() => loadError && offlineWithoutCopy());
+  useEffect(() => {
+    if (!loadError || typeof window === "undefined") return;
+    if (navigator.onLine !== false && claimAutoReload(sessionStore())) {
+      window.location.reload();
+      return;
+    }
+    const back = () => window.location.reload();
+    const gone = () => setOffline(offlineWithoutCopy());
+    window.addEventListener("online", back);
+    window.addEventListener("offline", gone);
+    return () => {
+      window.removeEventListener("online", back);
+      window.removeEventListener("offline", gone);
+    };
+  }, [loadError]);
+  return offline;
+}
+
 export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
   const { t } = useLanguage();
   const insets = useSafeAreaInsets();
 
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const offline = useLoadErrorRecovery(error);
 
   const handleRestart = async () => {
+    // Reloading now would show the browser's offline page instead of the app.
+    if (offlineWithoutCopy()) return;
     try {
       await reloadAppAsync();
     } catch (restartError) {
@@ -75,10 +119,12 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
       ) : null}
 
       <View style={styles.content}>
-        <UiText style={[styles.title, { color: colors.text }]}>حدث خطأ</UiText>
+        <UiText style={[styles.title, { color: colors.text }]}>
+          {offline ? "لا يوجد اتصال بالإنترنت" : "حدث خطأ"}
+        </UiText>
 
-        <UiText style={[styles.message, { color: colors.muted }]}>
-          أعد تحميل التطبيق للمتابعة.
+        <UiText style={[styles.message, { color: colors.muted }]} testID="error-message">
+          {offline ? "سيعود التطبيق وحده عندما يعود الاتصال." : "أعد تحميل التطبيق للمتابعة."}
         </UiText>
 
         <Pressable

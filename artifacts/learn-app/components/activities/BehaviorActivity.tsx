@@ -18,7 +18,7 @@ import { useGuide } from "@/components/world/LessonGuide";
 import { useLanguage } from "@/context/LanguageContext";
 import type { BehaviorItem } from "@/content/types";
 import * as haptics from "@/lib/haptics";
-import { speak } from "@/lib/speech";
+import { speak, speakLater } from "@/lib/speech";
 import { colors, shadow, touchTarget } from "@/theme/tokens";
 
 import { ListenButton } from "./shared/ListenButton";
@@ -60,8 +60,8 @@ function Behavior({ lesson, color, onComplete }: ActivityProps<"behavior">) {
   // The first behaviour is read out once the lesson's own intro is over (the activity mounts then).
   useEffect(() => {
     if (inDemo) return;
-    const timer = setTimeout(() => speak(behaviors[0].description), PROMPT_DELAY_MS);
-    return () => clearTimeout(timer);
+    // Not after the child has already answered (or heard something else): VOICE-05.
+    return speakLater(behaviors[0].description, PROMPT_DELAY_MS);
   }, [inDemo, behaviors]);
 
   const handleAnswer = useCallback(

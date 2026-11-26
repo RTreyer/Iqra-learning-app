@@ -35,7 +35,7 @@ import { useSettings } from "@/context/SettingsContext";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
 import * as haptics from "@/lib/haptics";
 import { routes } from "@/lib/routes";
-import { estimateSpeechMs, speak, stopSpeaking } from "@/lib/speech";
+import { speakThen, stopSpeaking } from "@/lib/speech";
 import { touchTarget, yemen } from "@/theme/tokens";
 
 /** Milliseconds now, read in effects and timers (never during render). */
@@ -273,7 +273,8 @@ function Story({ chapter }: { chapter: string | null }) {
   };
   const finishRef = useLatest(finishChapter);
 
-  // Tell the scene; move on when the voice is done (or after a fallback), except on the choice.
+  // Tell the scene; move on when the voice has really finished the line (a slow voice is never
+  // cut, VOICE-02), except on the choice.
   useEffect(() => {
     // Wait for the menu language, so the first line is told in the chosen language.
     if (!languageLoaded) return;
@@ -292,11 +293,10 @@ function Story({ chapter }: { chapter: string | null }) {
         else setIndex((i) => Math.min(LAST, i + 1));
       }, wait);
     };
-    const fallback = setTimeout(done, estimateSpeechMs(scene.line));
-    speak(scene.line, { onDone: done });
+    const cancel = speakThen(scene.line, done, { pauseMs: 0 });
     return () => {
       moved = true;
-      clearTimeout(fallback);
+      cancel();
       clearTimeout(linger);
     };
   }, [scene.line, scene.minMs, choosing, languageLoaded, index, LAST]);

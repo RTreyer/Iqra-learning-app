@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from "react";
 import { View } from "react-native";
-import { speak } from "@/lib/speech";
+import { speak, speakLater } from "@/lib/speech";
 import { PRAISE } from "./shared/strings";
 import { ChoiceCard } from "./shared/ChoiceCard";
 import { DoneButton } from "./shared/DoneButton";
@@ -28,8 +28,8 @@ function WordRead({
   const { values, bounce } = useBounce(maxOptions);
 
   useEffect(() => {
-    const t = setTimeout(() => speak(round.word), PROMPT_DELAY_MS);
-    return () => clearTimeout(t);
+    // Not after the child has already answered (or heard something else): VOICE-05.
+    return speakLater(round.word, PROMPT_DELAY_MS);
   }, [round.word, quiz.roundIndex]);
 
   const handlePick = useCallback(

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { speak } from "@/lib/speech";
+import { speakLater } from "@/lib/speech";
 import { PROMPT_DELAY_MS } from "../shared/useQuiz";
 
 /**
@@ -8,7 +8,7 @@ import { PROMPT_DELAY_MS } from "../shared/useQuiz";
  */
 export function useInstruction(prompt: string): void {
   useEffect(() => {
-    const t = setTimeout(() => speak(prompt), PROMPT_DELAY_MS);
-    return () => clearTimeout(t);
+    // Not after the child has already answered (or heard something else): VOICE-05.
+    return speakLater(prompt, PROMPT_DELAY_MS);
   }, [prompt]);
 }

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from "react";
 import { View } from "react-native";
-import { speak } from "@/lib/speech";
+import { speak, speakLater } from "@/lib/speech";
 import { PRAISE } from "./shared/strings";
 import { ChoiceCard } from "./shared/ChoiceCard";
 import { StoryProgress } from "./shared/StoryProgress";
@@ -40,8 +40,8 @@ function LetterPick({
   const { values, bounce } = useBounce(maxOptions);
 
   useEffect(() => {
-    const t = setTimeout(() => speak(round.targetLetter), PROMPT_DELAY_MS);
-    return () => clearTimeout(t);
+    // Not after the child has already answered (or heard something else): VOICE-05.
+    return speakLater(round.targetLetter, PROMPT_DELAY_MS);
   }, [round.targetLetter, quiz.roundIndex]);
 
   const handlePick = useCallback(
