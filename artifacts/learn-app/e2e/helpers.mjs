@@ -88,6 +88,15 @@ function prepareBrowser({ demoKey, demoTypes, settingsKey }) {
 }
 
 /** Page fixture: stubs speech and fails the test on any console error or uncaught page error. */
+/** The suite's browser preparation (prepareBrowser), for a page the fixture did not make. */
+export async function preparePage(page) {
+  await page.addInitScript(prepareBrowser, {
+    demoKey: DEMO_SEEN_KEY,
+    demoTypes: DEMO_IDS,
+    settingsKey: SETTINGS_KEY,
+  });
+}
+
 export const test = base.extend({
   page: async ({ page }, provide) => {
     const errors = [];
@@ -95,11 +104,7 @@ export const test = base.extend({
       if (m.type() === "error") errors.push(m.text().slice(0, 300));
     });
     page.on("pageerror", (e) => errors.push(`pageerror: ${e.message.slice(0, 300)}`));
-    await page.addInitScript(prepareBrowser, {
-      demoKey: DEMO_SEEN_KEY,
-      demoTypes: DEMO_IDS,
-      settingsKey: SETTINGS_KEY,
-    });
+    await preparePage(page);
     await provide(page);
     expect(errors, "console errors during the test").toEqual([]);
   },

@@ -201,6 +201,8 @@ const english: Record<string, string> = {
   "آخر درس": "Last lesson",
   "لم يبدأ بعد": "Not started yet",
   "دروس مكتملة": "lessons completed",
+  // Home, when saving progress failed (context/ProgressContext.tsx saveFailed).
+  "لم يُحفظ التقدم. هل ذاكرة الهاتف ممتلئة؟": "Progress was not saved. Is the phone's storage full?",
 };
 
 export function translateUi(text: string, language: UiLanguage): string {
