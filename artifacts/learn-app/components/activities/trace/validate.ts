@@ -98,8 +98,8 @@ export function validateTracing(
 //     BRANCH_PASSED of each of its branches (stem, bar, hook). A thick letter is half covered
 //     by a line through part of it, so check 6 alone lets a skipped hook pass.
 //  8. Size: the drawing is at least LONG_ENOUGH as long as the letter's centre line.
-//  9. Words only: every separate part (each letter body, dot and hamza) was touched, so a
-//     word with its dots left out fails; the dots are too small to matter for checks 6 and 7.
+//  9. Every separate part (each letter body, dot and hamza) was touched, so a letter or word
+//     with its dots left out fails; the dots are too small to matter for checks 6 and 7.
 
 /** Share of drawn points that must lie on the letter. */
 export const ON_LETTER = 0.9;
@@ -117,6 +117,17 @@ export const LONG_ENOUGH = 0.6;
 const MIN_BRANCH = 4;
 /** Finger tolerance in mask cells (a cell is 2 % of the pad). */
 const REACH = 2;
+/**
+ * But never less than this many pixels: on a small phone the pad shrinks to 120 px, where two
+ * cells are under 5 px and a well shaped tracing a few pixels off the line failed (BUG-04).
+ */
+const MIN_REACH_PX = 8;
+
+/** The finger tolerance in cells for a pad of this size. */
+export function reachFor(pad: PadSize, grid: number): number {
+  const cellPx = Math.min(pad.width, pad.height) / grid;
+  return cellPx > 0 ? Math.max(REACH, Math.ceil(MIN_REACH_PX / cellPx)) : REACH;
+}
 
 /**
  * `spine` is the letter's centre line (cell indices), split into `branches` at its junctions,
@@ -152,27 +163,36 @@ export function decodeMask(mask: string, grid: number): GuideMask {
   }
   const near = new Uint8Array(grid * grid);
   forEachCell(cells, grid, (row, col) =>
-    forEachWithin(row, col, grid, (i) => {
+    forEachWithin(row, col, grid, REACH, (i) => {
       near[i] = 1;
     }),
   );
   const width = halfWidths(cells, grid);
-  const spine = centreLine(cells, grid);
-  const branches = splitBranches(spine, grid);
   const parts = connectedParts(cells, grid);
+  const spine = centreLine(cells, grid);
+  // Thinning can erase a small dot completely (ن). Keep its deepest cell on the centre line,
+  // so the demo hand (guidePath) passes it as the child must.
+  const onSpine = new Set(spine);
+  for (const part of parts) {
+    if (part.some((i) => onSpine.has(i))) continue;
+    spine.push(part.reduce((best, i) => (width[i] > width[best] ? i : best)));
+  }
+  const branches = splitBranches(spine, grid);
   const decoded = { grid, cells, near, count, spine, branches, width, parts };
   masks.set(mask, decoded);
   return decoded;
 }
 
-/** Checks 5 to 9 for a guide mask; `word` changes the wording of the hint and adds check 9. */
+/** Checks 5 to 9 for a guide mask; `word` changes the wording of the hint. */
 export function validateOnGuide(
   strokes: Stroke[],
   pad: PadSize,
   guide: GuideMask,
   word = false,
 ): ValidationResult {
-  const { grid, cells, near, count, spine, branches, width, parts } = guide;
+  const { grid, cells, count, spine, branches, width, parts } = guide;
+  const reach = reachFor(pad, grid);
+  const near = reach === REACH ? guide.near : nearWithin(guide, reach);
   const cellOf = (p: Point) => {
     const col = Math.floor((p.x / pad.width) * grid);
     const row = Math.floor((p.y / pad.height) * grid);
@@ -218,7 +238,7 @@ export function validateOnGuide(
   for (const p of points) {
     const i = cellOf(p);
     if (i < 0) continue;
-    forEachWithin(Math.floor(i / grid), i % grid, grid, (j) => {
+    forEachWithin(Math.floor(i / grid), i % grid, grid, reach, (j) => {
       if (cells[j] && !covered[j]) {
         covered[j] = 1;
         coveredCount++;
@@ -226,24 +246,47 @@ export function validateOnGuide(
     });
   }
   if (coveredCount / count < COVERED) return { valid: false, msg: COVER_MORE(word) };
-  if (word && parts.some((part) => !part.some((i) => covered[i])))
-    return { valid: false, msg: COVER_MORE(word) };
-
   const drawn = new Uint8Array(grid * grid);
   for (const p of points) {
     const i = cellOf(p);
     if (i >= 0) drawn[i] = 1;
   }
+  // Every piece (body, dot, hamza) must be touched, for single letters too: the dots are what
+  // tell ن from ں and ت from ب, and ج from ح (BUG-02, BUG-03). Touched means drawn on or right
+  // next to it, closer than the finger tolerance: a dot close under ج's body is otherwise
+  // "covered" by tracing the body alone.
+  // One cell on a normal pad; on a small pad up to half the finger tolerance.
+  const close = Math.max(1, Math.floor(reach / 2));
+  const within = (map: Uint8Array, i: number) => {
+    if (i < 0) return false;
+    const row = Math.floor(i / grid);
+    const col = i % grid;
+    for (let dr = -close; dr <= close; dr++)
+      for (let dc = -close; dc <= close; dc++) {
+        const r = row + dr;
+        const c = col + dc;
+        if (r >= 0 && r < grid && c >= 0 && c < grid && map[r * grid + c]) return true;
+      }
+    return false;
+  };
+  const touched = (i: number) => within(drawn, i);
+  if (parts.some((part) => !part.some(touched))) return { valid: false, msg: COVER_MORE(word) };
+  // And no stroke stands on its own beside the letter: an extra dot or hamza drawn where the
+  // letter has none (ج drawn on ح, بـ with ي's two dots) is a different letter.
+  if (strokes.some((stroke) => stroke.length > 0 && !stroke.some((p) => within(cells, cellOf(p)))))
+    return { valid: false, msg: ON_THE_LETTER(word) };
   const isPassed = (i: number) => {
     const row = Math.floor(i / grid);
     const col = i % grid;
-    const reach = width[i] * 0.8 + 1;
-    const span = Math.ceil(reach);
+    // On a small pad never less than the pixel tolerance allows (BUG-04).
+    const radius = Math.max(width[i] * 0.8 + 1, reach - 1);
+    const span = Math.ceil(radius);
     for (let dr = -span; dr <= span; dr++) {
       for (let dc = -span; dc <= span; dc++) {
         const r = row + dr;
         const c = col + dc;
-        if (r < 0 || r >= grid || c < 0 || c >= grid || dr * dr + dc * dc > reach * reach) continue;
+        if (r < 0 || r >= grid || c < 0 || c >= grid || dr * dr + dc * dc > radius * radius)
+          continue;
         if (drawn[r * grid + c]) return true;
       }
     }
@@ -407,11 +450,35 @@ function forEachCell(cells: Uint8Array, grid: number, fn: (row: number, col: num
   for (let i = 0; i < cells.length; i++) if (cells[i]) fn(Math.floor(i / grid), i % grid);
 }
 
-/** Calls `fn` for every cell index within REACH (a disc) of (row, col). */
-function forEachWithin(row: number, col: number, grid: number, fn: (i: number) => void) {
-  for (let dr = -REACH; dr <= REACH; dr++) {
-    for (let dc = -REACH; dc <= REACH; dc++) {
-      if (dr * dr + dc * dc > REACH * REACH) continue;
+const wider = new WeakMap<GuideMask, Map<number, Uint8Array>>();
+
+/** Every cell within `reach` of the letter, for a pad small enough to need more than REACH. */
+function nearWithin(guide: GuideMask, reach: number): Uint8Array {
+  let byReach = wider.get(guide);
+  if (!byReach) wider.set(guide, (byReach = new Map()));
+  const cached = byReach.get(reach);
+  if (cached) return cached;
+  const near = new Uint8Array(guide.grid * guide.grid);
+  forEachCell(guide.cells, guide.grid, (row, col) =>
+    forEachWithin(row, col, guide.grid, reach, (i) => {
+      near[i] = 1;
+    }),
+  );
+  byReach.set(reach, near);
+  return near;
+}
+
+/** Calls `fn` for every cell index within `reach` (a disc) of (row, col). */
+function forEachWithin(
+  row: number,
+  col: number,
+  grid: number,
+  reach: number,
+  fn: (i: number) => void,
+) {
+  for (let dr = -reach; dr <= reach; dr++) {
+    for (let dc = -reach; dc <= reach; dc++) {
+      if (dr * dr + dc * dc > reach * reach) continue;
       const r = row + dr;
       const c = col + dc;
       if (r >= 0 && r < grid && c >= 0 && c < grid) fn(r * grid + c);
