@@ -130,11 +130,12 @@ test("parents: the gate, the PIN pad, then every control behind it", async () =>
   // Back, ten digits and delete.
   expectAccessiblePressables(12);
   for (const digit of "12341234") fireEvent.press(screen.getByTestId(`pin-key-${digit}`));
-  // Back, the child and "add a child", 2 languages, voice, vibration, the story again, change PIN.
-  expectAccessiblePressables(9);
+  // Back, the child and "add a child", 2 languages, test the voice, voice, vibration, the story
+  // again, change PIN.
+  expectAccessiblePressables(10);
   fireEvent.press(screen.getByTestId("child-main"));
   // The child's form: ten pictures, save, reset (the only child cannot be removed).
-  expectAccessiblePressables(9 + 12);
+  expectAccessiblePressables(10 + 12);
 });
 
 test("lesson u2-2: back button, Hudhud, help button and the activity controls", async () => {
