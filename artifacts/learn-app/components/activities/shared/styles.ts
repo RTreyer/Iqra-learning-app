@@ -16,7 +16,10 @@ export const act = StyleSheet.create({
     minWidth: 200,
     minHeight: touchTarget,
   },
+  listenBtnCompact: { paddingVertical: 10, paddingHorizontal: 16, gap: 12, borderRadius: 16 },
+  listenTextCompact: { flexShrink: 1, alignItems: "center", gap: 2 },
   listenBtnText: { fontSize: 24, fontWeight: "900", color: colors.white, textAlign: "center" },
+  listenBtnTextCompact: { fontSize: 20, lineHeight: 32 },
   listenGloss: { color: "#FFFFFF", opacity: 0.9 },
   listenHint: { fontSize: 13, color: colors.white, fontWeight: "600" },
 
