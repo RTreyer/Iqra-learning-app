@@ -12,6 +12,7 @@ export type IconName =
   | "play"
   | "replay"
   | "speaker"
+  | "speakerOff"
   | "gear"
   | "lock"
   | "book"
@@ -78,6 +79,18 @@ export function Icon({ name, size = 24, color = "#2B1D14", strokeWidth = 2.2 }: 
           />
           <Path d="M15.5 8.5a5 5 0 0 1 0 7" {...stroke} />
           <Path d="M19 5a10 10 0 0 1 0 14" {...stroke} />
+        </>
+      ) : null}
+      {name === "speakerOff" ? (
+        <>
+          <Path
+            d="M11 5L6 9H2v6h4l5 4V5z"
+            fill={color}
+            stroke={color}
+            strokeWidth={1.5}
+            strokeLinejoin="round"
+          />
+          <Path d="M16 9l6 6M22 9l-6 6" {...stroke} />
         </>
       ) : null}
       {name === "gear" ? (

@@ -55,13 +55,16 @@ function prepareBrowser({ demoKey, demoTypes, settingsKey }) {
   window.__spoken = [];
   const synth = window.speechSynthesis;
   if (synth) {
-    // Headless Chromium has no voices; record what would be spoken and end each utterance
-    // asynchronously, so lesson intros waiting on onDone continue without the 1500 ms fallback.
+    // Headless Chromium has no voices; record what would be spoken, then start and end each
+    // utterance asynchronously, as a voice does, so lessons go on at once (lib/speech.ts).
     synth.getVoices = () => [];
     synth.cancel = () => {};
     synth.speak = (u) => {
       window.__spoken.push(u && u.text);
-      setTimeout(() => u && u.onend && u.onend(new Event("end")), 0);
+      setTimeout(() => {
+        u?.onstart?.(new Event("start"));
+        u?.onend?.(new Event("end"));
+      }, 0);
     };
   }
   try {

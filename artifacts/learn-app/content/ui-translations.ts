@@ -23,6 +23,13 @@ const english: Record<string, string> = {
   "مسح التقدم": "Delete progress",
   "تم مسح التقدم": "Progress deleted",
   "شاهد القصة من جديد": "Watch the story again",
+  "الصوت العربي": "Arabic voice",
+  "الصوت العربي يعمل.": "The Arabic voice works.",
+  "لا يوجد صوت عربي على هذا الجهاز. ثبّت صوتاً عربياً من إعدادات تحويل النص إلى كلام، ثم جرّب الصوت.":
+    "This device has no Arabic voice. Install an Arabic voice in the text to speech settings, then test the voice.",
+  "اضغط «جرّب الصوت»: يجب أن تسمع هدهد.": "Tap “Test the voice”: you should hear Hudhud.",
+  "جرّب الصوت": "Test the voice",
+  "لا تُظهِر التنبيه للطفل بعد الآن": "Stop showing the warning to the child",
   // Children's profiles and the parents' PIN (docs/KINDERPROFILE.md).
   الأطفال: "Children",
   "إضافة طفل": "Add a child",

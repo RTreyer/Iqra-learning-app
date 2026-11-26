@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { act, renderHook, waitFor } from "@testing-library/react-native";
 
-import { VOICE_HINT_KEY, useVoiceHint } from "@/hooks/useVoiceHint";
+import { VOICE_HINT_KEY, resetVoiceHintSession, useVoiceHint } from "@/hooks/useVoiceHint";
 
 const mockSpeech = jest.requireMock("expo-speech") as { getAvailableVoicesAsync: jest.Mock };
 
@@ -13,19 +13,31 @@ const settle = () =>
 beforeEach(async () => {
   jest.clearAllMocks();
   await AsyncStorage.clear();
+  resetVoiceHintSession();
 });
 
 describe("useVoiceHint", () => {
-  it("shows the hint when no Arabic voice and no flag, and dismiss stores the flag", async () => {
+  it("shows the hint when there is no Arabic voice; a child's dismiss lasts until the next start", async () => {
     mockSpeech.getAvailableVoicesAsync.mockResolvedValue([{ language: "en-US" }]);
-    const { result } = renderHook(() => useVoiceHint());
-    await waitFor(() => expect(result.current.visible).toBe(true));
+    const first = renderHook(() => useVoiceHint());
+    await waitFor(() => expect(first.result.current.visible).toBe(true));
 
     await act(async () => {
-      result.current.dismiss();
+      first.result.current.dismiss();
     });
-    expect(result.current.visible).toBe(false);
-    await waitFor(async () => expect(await AsyncStorage.getItem(VOICE_HINT_KEY)).toBe("1"));
+    expect(first.result.current.visible).toBe(false);
+    // Not stored: the parents still see it, and turn it off for good in their corner.
+    expect(await AsyncStorage.getItem(VOICE_HINT_KEY)).toBeNull();
+    first.unmount();
+    // Another screen in the same session: still hidden.
+    const again = renderHook(() => useVoiceHint());
+    await settle();
+    expect(again.result.current.visible).toBe(false);
+    again.unmount();
+    // The next start of the app: shown again.
+    resetVoiceHintSession();
+    const next = renderHook(() => useVoiceHint());
+    await waitFor(() => expect(next.result.current.visible).toBe(true));
   });
 
   it("never shows when the flag is already stored", async () => {
@@ -35,7 +47,6 @@ describe("useVoiceHint", () => {
     await waitFor(() => expect(AsyncStorage.getItem).toHaveBeenCalledWith(VOICE_HINT_KEY));
     await settle();
     expect(result.current.visible).toBe(false);
-    expect(mockSpeech.getAvailableVoicesAsync).not.toHaveBeenCalled();
   });
 
   it("never shows when an Arabic voice exists", async () => {

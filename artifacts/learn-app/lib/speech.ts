@@ -49,6 +49,34 @@ const MAX_SPEECH_MS = 8000;
 /** Each speak() call gets a number; parts of an older call stop once a newer one starts. */
 let generation = 0;
 
+/**
+ * Whether the voice works, as heard: true once a line has started, false once two lines in a
+ * row ended without ever starting (no text to speech engine, or no voice at all, which the
+ * voice list cannot tell: it is often just empty). null until then.
+ */
+let voiceWorks: boolean | null = null;
+let silentLines = 0;
+const voiceListeners = new Set<(works: boolean) => void>();
+
+function setVoiceWorks(works: boolean) {
+  if (voiceWorks === works) return;
+  voiceWorks = works;
+  for (const listener of voiceListeners) listener(works);
+}
+
+/** What the voice has shown so far: works, does not, or not known yet (null). */
+export function voiceStatus(): boolean | null {
+  return voiceWorks;
+}
+
+/** Calls `listener` whenever voiceStatus() changes; returns the unsubscribe. */
+export function onVoiceStatus(listener: (works: boolean) => void): () => void {
+  voiceListeners.add(listener);
+  return () => {
+    voiceListeners.delete(listener);
+  };
+}
+
 /** The speak() call whose voice has started and not ended yet (engines that report a start). */
 let activeLine: number | null = null;
 /** Waiting for the active line to end (afterCurrentLine). */
@@ -81,7 +109,11 @@ export function speak(text: string, options: number | SpeakOptions = {}): void {
   const mine = ++generation;
   try {
     Speech.stop();
+    let heard = false;
     const started = () => {
+      heard = true;
+      silentLines = 0;
+      setVoiceWorks(true);
       if (generation !== mine) return;
       activeLine = mine;
       onStart?.();
@@ -90,11 +122,15 @@ export function speak(text: string, options: number | SpeakOptions = {}): void {
       const part = parts[i];
       const last = i === parts.length - 1;
       let reported = false;
-      const next = () => {
+      /** `silent`: the line ended by itself (or failed) without a sound being reported. */
+      const next = (silent: boolean) => {
         // Engines may report a stopped part twice (stopped, then error): move on once.
         if (reported) return;
         reported = true;
         if (generation !== mine || last) {
+          // Two lines in a row that ended without a sound: there is no voice. A line stopped
+          // by newer speech, or blocked until the first tap, says nothing about the voice.
+          if (silent && generation === mine && !heard && ++silentLines >= 2) setVoiceWorks(false);
           lineEnded(mine);
           return onDone?.();
         }
@@ -105,9 +141,9 @@ export function speak(text: string, options: number | SpeakOptions = {}): void {
       Speech.speak(part.text, {
         ...voice,
         ...(i === 0 ? { onStart: started } : {}),
-        onDone: next,
-        onError: next,
-        onStopped: next,
+        onDone: () => next(true),
+        onError: (error: unknown) => next(!isBlocked(error)),
+        onStopped: () => next(false),
       });
     };
     say(0);
@@ -115,6 +151,18 @@ export function speak(text: string, options: number | SpeakOptions = {}): void {
     lineEnded(mine);
     onDone?.();
   }
+}
+
+/**
+ * Errors that say nothing about the voice: the browser blocks speech until the first tap
+ * ("not-allowed"), or the line was cut ("interrupted", "canceled").
+ */
+function isBlocked(error: unknown): boolean {
+  const code =
+    typeof error === "object" && error !== null && "error" in error
+      ? String((error as { error: unknown }).error)
+      : String(error ?? "");
+  return /not-allowed|interrupted|cancel/i.test(code);
 }
 
 /** Pause between two lines that follow each other, so they do not run together. */

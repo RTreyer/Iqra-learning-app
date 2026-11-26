@@ -2,6 +2,7 @@ import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { Icon } from "@/components/world/Icon";
 import { colors, radius, subjects } from "@/theme/tokens";
 
 const AR_TEXT =
@@ -18,6 +19,10 @@ export function VoiceHintBanner({ onDismiss }: { onDismiss: () => void }) {
       accessibilityRole="alert"
       accessibilityLiveRegion="polite"
     >
+      {/* A crossed out speaker: the message without reading. */}
+      <View style={styles.icon} testID="voice-hint-icon">
+        <Icon name="speakerOff" size={30} color="#FFFFFF" />
+      </View>
       <View style={styles.texts}>
         <Text style={styles.ar}>{AR_TEXT}</Text>
         <Text style={styles.en}>{EN_TEXT}</Text>
@@ -50,6 +55,14 @@ const styles = StyleSheet.create({
     backgroundColor: colors.cream,
     borderWidth: 1,
     borderColor: subjects.arabic,
+  },
+  icon: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: subjects.arabic,
   },
   texts: { flex: 1, gap: 6 },
   ar: {
