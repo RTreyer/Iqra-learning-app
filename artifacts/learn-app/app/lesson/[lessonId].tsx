@@ -26,6 +26,7 @@ import { useLessonAttempt } from "@/hooks/useLessonAttempt";
 import { useScreenPadding } from "@/hooks/useScreenPadding";
 import { lessonsToday } from "@/lib/daily";
 import * as haptics from "@/lib/haptics";
+import { bubbleSubtitle } from "@/lib/bubble";
 import { firstParam } from "@/lib/params";
 import { routes } from "@/lib/routes";
 import { starsForScore, type Score } from "@/lib/scoring";
@@ -226,7 +227,10 @@ export default function LessonScreen() {
         }
       />
       {completed ? null : (
-        <LessonGuide text={guide.line ?? instruction ?? lesson.subtitle} mood={guide.mood} />
+        <LessonGuide
+          text={guide.line ?? instruction ?? bubbleSubtitle(lesson.subtitle, lesson.title)}
+          mood={guide.mood}
+        />
       )}
       <GuideProvider api={guide.api}>
         <StorySymbolContext.Provider value={book.subject === "math" ? "sack" : "letter"}>
