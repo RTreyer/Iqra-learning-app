@@ -5,6 +5,7 @@ import { SUBJECT_SPOKEN } from "@/components/world/SubjectLabel";
 import { books, getLesson } from "@/content";
 import { DEMO_IDS } from "@/content/demos";
 import { instructionFor } from "@/content/instructions";
+import { bubbleSubtitle } from "@/lib/bubble";
 import { routes } from "@/lib/routes";
 import { resetDemoSeenCache } from "@/hooks/useDemoSeen";
 import { LINE_PAUSE_MS, silentLineMs } from "@/lib/speech";
@@ -335,4 +336,10 @@ test("unknown lesson id shows the not found card", () => {
   finishIntro();
   expect(screen.getByTestId("not-found")).toBeTruthy();
   expect(screen.getByText("الدرس غير موجود")).toBeTruthy();
+});
+
+test("Hudhud's bubble never shows a solved example as the lesson's text (DSGN-02)", () => {
+  expect(bubbleSubtitle("٣ زَائِد ٢ يُسَاوِي ٥", "أُكْمِلُ")).toBe("أُكْمِلُ");
+  expect(bubbleSubtitle("٤ + ٣ = ٧", "أَجْمَعُ")).toBe("أَجْمَعُ");
+  expect(bubbleSubtitle("أَقْرَأُ الْمَقَاطِعَ", "x")).toBe("أَقْرَأُ الْمَقَاطِعَ");
 });

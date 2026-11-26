@@ -8,7 +8,7 @@ import {
 import { lessonOf, renderActivity } from "@/test-utils/activities";
 
 const speech = jest.requireMock("expo-speech") as { speak: jest.Mock };
-// Round 1: بَيَانُ = بَ / يَا / نُ, decoy يُو. Round 2: يَدُ = يَ / دُ, decoys يُ and دَا.
+// Round 1: بَيَانُ = بَـ / يَا / نُ, decoy يُو. Round 2: يَدُ = يَـ / دُ, decoys يُ and دَا.
 const lesson = lessonOf("u3-3", "build_word");
 
 beforeEach(() => {
@@ -40,9 +40,9 @@ test("loads the syllables in reading order and says the word", () => {
   act(() => jest.advanceTimersByTime(400));
   expect(spoken()).toContain("بَيَانُ");
 
-  tap("بَ");
+  tap("بَـ");
   tap("يَا");
-  expect(screen.getByTestId("slot-0")).toHaveProp("accessibilityLabel", "بَ");
+  expect(screen.getByTestId("slot-0")).toHaveProp("accessibilityLabel", "بَـ");
   expect(screen.getByTestId("slot-2")).toHaveProp("accessibilityLabel", "؟");
   expect(screen.getByTestId("slot-1")).toHaveProp("accessibilityLabel", "يَا");
   tap("نُ");
@@ -55,16 +55,16 @@ test("loads the syllables in reading order and says the word", () => {
 
 test("a wrong tile shakes, says the needed syllable and costs the round", () => {
   const { onComplete } = render();
-  tap("يُو"); // decoy: بَ was needed
+  tap("يُو"); // decoy: بَـ was needed (spoken without its tatweel)
   expect(spoken().at(-1)).toBe("بَ");
   expect(screen.getByTestId("slot-0")).toHaveProp("accessibilityLabel", "؟");
-  tap("بَ");
+  tap("بَـ");
   tap("يَا");
   tap("نُ");
   depart();
 
   expect(screen.getByTestId("story-progress")).toHaveProp("aria-valuenow", 2);
-  for (const s of ["يَ", "دُ"]) tap(s);
+  for (const s of ["يَـ", "دُ"]) tap(s);
   depart();
   for (const s of ["يُو", "لَـ", "دُ"]) tap(s);
   depart();
