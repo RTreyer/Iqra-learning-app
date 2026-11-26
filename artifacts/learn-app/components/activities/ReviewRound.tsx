@@ -6,7 +6,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import * as haptics from "@/lib/haptics";
 import { toArabicDigits } from "@/lib/arabicNumbers";
 import type { ReviewItem } from "@/lib/reviewItems";
-import { speak } from "@/lib/speech";
+import { afterCurrentLine, speak, speakLater } from "@/lib/speech";
 import { colors, touchTarget } from "@/theme/tokens";
 import { mathStyles } from "./math/NumberQuiz";
 import { COUNT_PROMPT, answerOf, arithmeticPrompt } from "./math/prompts";
@@ -137,16 +137,18 @@ function Round({ item, attemptKey, onFirstTap, onAdvance, color = colors.success
   const locked = useRef(false);
   const tried = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const waitForVoice = useRef<() => void>(() => {});
   const latest = useLatest({ onFirstTap, onAdvance });
 
   useEffect(() => {
-    const t = setTimeout(() => speak(round.prompt), PROMPT_DELAY_MS);
-    return () => clearTimeout(t);
+    // Not after the child has already answered (or heard something else): VOICE-05.
+    return speakLater(round.prompt, PROMPT_DELAY_MS);
   }, [round.prompt]);
 
   useEffect(
     () => () => {
       if (timer.current) clearTimeout(timer.current);
+      waitForVoice.current();
     },
     [],
   );
@@ -173,7 +175,10 @@ function Round({ item, attemptKey, onFirstTap, onAdvance, color = colors.success
       guide.react("right");
       speak(PRAISE);
       bounce(idx, 1.15);
-      timer.current = setTimeout(() => latest.current.onAdvance(), ADVANCE_MS);
+      // Never in the middle of the praise (VOICE-04).
+      timer.current = setTimeout(() => {
+        waitForVoice.current = afterCurrentLine(() => latest.current.onAdvance());
+      }, ADVANCE_MS);
     },
     [shuffled.correctIndex, bounce, round.prompt, latest, wrong, guide],
   );

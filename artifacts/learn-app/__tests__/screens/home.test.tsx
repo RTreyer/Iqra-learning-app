@@ -4,6 +4,7 @@ import React from "react";
 
 import HomeScreen, { windowLine } from "@/app/index";
 import { getLesson } from "@/content";
+import { SUBJECT_SPOKEN } from "@/components/world/SubjectLabel";
 import { ProgressProvider } from "@/context/ProgressContext";
 import { SETTINGS_KEY, SettingsProvider } from "@/context/SettingsContext";
 import { SOON_LINE } from "@/content/story";
@@ -149,6 +150,8 @@ test("the subject under play opens the subject picker; a pick switches the subje
   expect(JSON.parse((await AsyncStorage.getItem(SETTINGS_KEY))!).bookId).toBe("arabic-1");
   // Hudhud has told both jobs already: no story, the child stays home.
   expect(router.push).not.toHaveBeenCalled();
+  // The child hears what was chosen.
+  expect(Speech.speak).toHaveBeenLastCalledWith(SUBJECT_SPOKEN.arabic, expect.anything());
 });
 
 test("the first time on an island, Hudhud tells that job before its path opens", async () => {

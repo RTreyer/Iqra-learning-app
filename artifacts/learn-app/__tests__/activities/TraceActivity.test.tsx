@@ -57,6 +57,8 @@ test("renders the guide and label and speaks the first target", () => {
   );
   expect(screen.getByText(lesson.targets[0].label)).toBeTruthy();
   expect(screen.getByTestId("trace-guide")).toBeTruthy(); // the letter outline
+  // Spoken after a short pause.
+  act(() => jest.advanceTimersByTime(400));
   expect(speech.speak).toHaveBeenCalledWith(lesson.targets[0].tts, expect.anything());
   expect(screen.getByLabelText("مسح")).toBeTruthy();
   expect(screen.getByLabelText("تم")).toBeTruthy();
@@ -83,6 +85,7 @@ test("valid strokes advance through every target and complete with an empty scor
   );
   layout();
   lesson.targets.forEach((target, i) => {
+    act(() => jest.advanceTimersByTime(400));
     expect(speech.speak).toHaveBeenCalledWith(target.tts, expect.anything());
     drawGuide(target.guide);
     fireEvent.press(screen.getByTestId("trace-done"));

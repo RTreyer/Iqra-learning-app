@@ -141,9 +141,9 @@ test("lesson u2-2: back button, Hudhud, help button and the activity controls", 
   resetDemoSeenCache(DEMO_IDS);
   setParams({ lessonId: "u2-2" });
   withProgress(<LessonScreen />);
-  // Past the fallbacks of the spoken title and instruction.
+  // Past the fallbacks of the spoken subject, title and instruction (a voice that never starts).
   await act(async () => {
-    jest.advanceTimersByTime(10000);
+    jest.advanceTimersByTime(30000);
   });
   expectAccessiblePressables(8);
 });
@@ -153,7 +153,7 @@ test("lesson u2-2 with its worked example: the Skip button is accessible too", a
   setParams({ lessonId: "u2-2" });
   withProgress(<LessonScreen />);
   await act(async () => {
-    jest.advanceTimersByTime(10000);
+    jest.advanceTimersByTime(30000);
   });
   expect(screen.getByTestId("demo-skip").props.accessibilityLabel).toBe("تخطَّ");
   expect(screen.getByTestId("demo-skip").props.accessibilityRole).toBe("button");

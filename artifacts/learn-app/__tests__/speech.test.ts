@@ -18,7 +18,7 @@ describe("speak", () => {
   it("stops current speech, then speaks Arabic at rate 0.8", () => {
     speak("ب");
     expect(Speech.stop).toHaveBeenCalledTimes(1);
-    expect(Speech.speak).toHaveBeenCalledWith("ب", { language: "ar", rate: 0.8 });
+    expect(Speech.speak).toHaveBeenCalledWith("ب", expect.objectContaining({ language: "ar", rate: 0.8 }));
     expect(mockSpeech.stop.mock.invocationCallOrder[0]).toBeLessThan(
       mockSpeech.speak.mock.invocationCallOrder[0],
     );
@@ -26,23 +26,26 @@ describe("speak", () => {
 
   it("passes a custom rate through", () => {
     speak("x", 0.5);
-    expect(Speech.speak).toHaveBeenCalledWith("x", { language: "ar", rate: 0.5 });
+    expect(Speech.speak).toHaveBeenCalledWith("x", expect.objectContaining({ language: "ar", rate: 0.5 }));
   });
 
   it("accepts an options object with a rate", () => {
     speak("x", { rate: 0.6 });
-    expect(Speech.speak).toHaveBeenCalledWith("x", { language: "ar", rate: 0.6 });
+    expect(Speech.speak).toHaveBeenCalledWith("x", expect.objectContaining({ language: "ar", rate: 0.6 }));
   });
 
-  it("calls onDone when speech finishes, fails or is stopped", () => {
-    const onDone = jest.fn();
-    speak("ب", { onDone });
-    const options = mockSpeech.speak.mock.calls[0][1];
-    expect(options).toMatchObject({ language: "ar", rate: 0.8 });
-    options.onDone();
-    options.onError(new Error("x"));
-    options.onStopped();
-    expect(onDone).toHaveBeenCalledTimes(3);
+  it("calls onDone once when speech finishes, fails or is stopped", () => {
+    for (const event of ["onDone", "onError", "onStopped"]) {
+      mockSpeech.speak.mockClear();
+      const onDone = jest.fn();
+      speak("ب", { onDone });
+      const options = mockSpeech.speak.mock.calls[0][1];
+      expect(options).toMatchObject({ language: "ar", rate: 0.8 });
+      options[event](new Error("x"));
+      // A stopped line may report again (stopped, then error): still one report.
+      options.onError(new Error("x"));
+      expect(onDone).toHaveBeenCalledTimes(1);
+    }
   });
 
   it("calls onDone when Speech.speak throws", () => {

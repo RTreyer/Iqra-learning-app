@@ -100,10 +100,11 @@ function PictureChoice({
         speak(PRAISE);
         bounce(idx, 1.15);
       } else {
-        speak(TRY_AGAIN);
+        // The question again, as a tap may have cut it (VOICE-07).
+        speak(`${TRY_AGAIN}، ${round.prompt}`);
       }
     },
-    [shuffled.correctIndex, pick, bounce],
+    [shuffled.correctIndex, pick, bounce, round.prompt],
   );
 
   return (

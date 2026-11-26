@@ -1,4 +1,4 @@
-import { fireEvent, screen } from "@testing-library/react-native";
+import { act, fireEvent, screen } from "@testing-library/react-native";
 import React from "react";
 import { ScrollView } from "react-native";
 import LessonScreen from "@/app/lesson/[lessonId]";
@@ -51,6 +51,8 @@ afterEach(() => jest.useRealTimers());
 
 test("a trace lesson does not scroll while drawing, but its completion card does", () => {
   renderScreen(<LessonScreen />);
+  // Past the short pauses between the intro's lines.
+  act(() => jest.advanceTimersByTime(1000));
   expect(screen.getByText("stub:trace")).toBeTruthy();
   expect(screen.UNSAFE_queryAllByType(ScrollView)).toHaveLength(0);
   fireEvent.press(screen.getByTestId("stub-complete"));

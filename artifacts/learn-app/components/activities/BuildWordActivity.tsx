@@ -7,7 +7,7 @@ import { Pressable } from "@/components/demo/DemoPressable";
 import { Circle, Path, Svg } from "react-native-svg";
 import type { BuildWordRound } from "@/content/types";
 import * as haptics from "@/lib/haptics";
-import { speak } from "@/lib/speech";
+import { speak, speakLater } from "@/lib/speech";
 import { colors, readableFill, touchTarget, withAlpha } from "@/theme/tokens";
 import { ListenButton } from "./shared/ListenButton";
 import { StoryProgress } from "./shared/StoryProgress";
@@ -105,8 +105,8 @@ function LetterRound({ round, color, seed, onDone }: RoundProps) {
   const latestDone = useLatest(onDone);
 
   useEffect(() => {
-    const t = setTimeout(() => speak(word), PROMPT_DELAY_MS);
-    return () => clearTimeout(t);
+    // Not after the child has already answered (or heard something else): VOICE-05.
+    return speakLater(word, PROMPT_DELAY_MS);
   }, [word]);
 
   useEffect(
