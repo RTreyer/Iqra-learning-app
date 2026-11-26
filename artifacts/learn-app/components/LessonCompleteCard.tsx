@@ -10,6 +10,7 @@ import { BowlGoal } from "@/components/world/Bowl";
 import { StickerArt } from "@/components/world/StickerArt";
 import type { Lesson } from "@/content/types";
 import { useLanguage } from "@/context/LanguageContext";
+import { useCompact } from "@/hooks/useCompact";
 import * as haptics from "@/lib/haptics";
 import { routes } from "@/lib/routes";
 import { speak } from "@/lib/speech";
@@ -125,51 +126,10 @@ export function LessonCompleteCard({
 }: Props) {
   const { language, t, digits } = useLanguage();
   const row = language === "en" ? "row" : "row-reverse";
-  return (
-    <View style={styles.content} testID="lesson-complete">
-      <Confetti />
-      <View
-        style={styles.starsRow}
-        accessible
-        accessibilityLabel={digits(`${stars} / ${MAX_STARS} ⭐`)}
-      >
-        {Array.from({ length: MAX_STARS }, (_, i) => (
-          <PopStar key={i} index={i} earned={i < stars} />
-        ))}
-      </View>
-      <Hudhud size={130} pose="cheer" />
-      <UiText style={styles.title}>أَحْسَنْت!</UiText>
-      {story}
-
-      <View style={[styles.rewards, { flexDirection: row }]}>
-        <View style={styles.window} accessible accessibilityLabel={t("صحن اليوم")}>
-          <BowlGoal filled={today} width={110} />
-        </View>
-        {sticker ? (
-          <Pressable
-            testID="new-sticker"
-            accessibilityRole="button"
-            accessibilityLabel={sticker.name}
-            onPress={() => {
-              haptics.tap();
-              speak(sticker.name);
-            }}
-            style={styles.sticker}
-          >
-            <StickerArt id={sticker.id} size={70} />
-            <Text style={styles.stickerName} numberOfLines={1}>
-              {sticker.name}
-            </Text>
-          </Pressable>
-        ) : null}
-      </View>
-
-      {next ? null : (
-        <UiText testID="unit-finished" style={styles.celebration}>
-          أتممت الوحدة!
-        </UiText>
-      )}
-
+  // On a short screen the way on comes right under the stars, where the child looks (UX-02).
+  const compact = useCompact();
+  const buttons = (
+    <>
       <View style={[styles.buttons, { flexDirection: row }]}>
         <Pressable
           testID="back-to-list"
@@ -208,6 +168,55 @@ export function LessonCompleteCard({
           {next.title}
         </Text>
       ) : null}
+    </>
+  );
+  return (
+    <View style={styles.content} testID="lesson-complete">
+      <Confetti />
+      <View
+        style={styles.starsRow}
+        accessible
+        accessibilityLabel={digits(`${stars} / ${MAX_STARS} ⭐`)}
+      >
+        {Array.from({ length: MAX_STARS }, (_, i) => (
+          <PopStar key={i} index={i} earned={i < stars} />
+        ))}
+      </View>
+      {compact ? buttons : null}
+      <Hudhud size={compact ? 84 : 130} pose="cheer" />
+      <UiText style={[styles.title, compact && styles.titleCompact]}>أَحْسَنْت!</UiText>
+      {story}
+
+      <View style={[styles.rewards, { flexDirection: row }]}>
+        <View style={styles.window} accessible accessibilityLabel={t("صحن اليوم")}>
+          <BowlGoal filled={today} width={110} />
+        </View>
+        {sticker ? (
+          <Pressable
+            testID="new-sticker"
+            accessibilityRole="button"
+            accessibilityLabel={sticker.name}
+            onPress={() => {
+              haptics.tap();
+              speak(sticker.name);
+            }}
+            style={styles.sticker}
+          >
+            <StickerArt id={sticker.id} size={70} />
+            <Text style={styles.stickerName} numberOfLines={1}>
+              {sticker.name}
+            </Text>
+          </Pressable>
+        ) : null}
+      </View>
+
+      {next ? null : (
+        <UiText testID="unit-finished" style={styles.celebration}>
+          أتممت الوحدة!
+        </UiText>
+      )}
+
+      {compact ? null : buttons}
     </View>
   );
 }
@@ -227,6 +236,7 @@ const styles = StyleSheet.create({
   starsRow: { flexDirection: "row", alignItems: "flex-end", gap: 4 },
   bigStar: { marginBottom: 14 },
   title: { fontSize: 32, fontWeight: "900", color: yemen.ink },
+  titleCompact: { fontSize: 26 },
   rewards: { alignItems: "center", gap: 14 },
   window: {
     backgroundColor: "#FFFFFF",
