@@ -12,6 +12,22 @@ module.exports = [
     },
   },
   {
+    // The service worker runs in the browser's worker scope; build-sw.mjs fills in __FILES__.
+    files: ["scripts/sw.template.js"],
+    languageOptions: {
+      sourceType: "script",
+      globals: {
+        self: "readonly",
+        caches: "readonly",
+        fetch: "readonly",
+        Request: "readonly",
+        Response: "readonly",
+        URL: "readonly",
+        __FILES__: "readonly",
+      },
+    },
+  },
+  {
     files: ["jest.config.js", "jest.setup.ts", "__tests__/**"],
     languageOptions: {
       globals: {

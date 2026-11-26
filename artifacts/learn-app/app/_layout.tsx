@@ -12,6 +12,7 @@ import { LanguageProvider } from "@/context/LanguageContext";
 import { ProfilesProvider } from "@/context/ProfilesContext";
 import { SettingsProvider } from "@/context/SettingsContext";
 import { useVoiceHint } from "@/hooks/useVoiceHint";
+import { registerServiceWorker } from "@/lib/serviceWorker";
 import { prepareSpeech } from "@/lib/speech";
 import { shadow } from "@/theme/tokens";
 
@@ -48,6 +49,7 @@ export default function RootLayout() {
   useEffect(() => {
     SplashScreen.hideAsync();
     prepareSpeech();
+    registerServiceWorker();
   }, []);
 
   return (

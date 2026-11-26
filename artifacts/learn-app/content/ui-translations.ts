@@ -93,6 +93,8 @@ const english: Record<string, string> = {
   "العودة إلى الرئيسية": "Back to home",
   "حدث خطأ": "Something went wrong",
   "أعد تحميل التطبيق للمتابعة.": "Please reload the app to continue.",
+  "لا يوجد اتصال بالإنترنت": "No internet connection",
+  "سيعود التطبيق وحده عندما يعود الاتصال.": "The app comes back by itself when the connection returns.",
   "تفاصيل الخطأ": "Error details",
   "إغلاق تفاصيل الخطأ": "Close error details",
   "عرض تفاصيل الخطأ": "View error details",

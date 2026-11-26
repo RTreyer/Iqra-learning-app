@@ -124,12 +124,23 @@ const READY = [
   ],
 ];
 
+/** Waits until the service worker controls the page, i.e. the whole app is stored (public/sw.js). */
+export async function waitForOfflineCopy(page) {
+  await page.waitForFunction(() => navigator.serviceWorker?.controller != null, null, {
+    timeout: 60_000,
+  });
+}
+
 /** Navigates and waits until the screen has rendered its main content. */
 export async function gotoAndWaitReady(page, path) {
   await page.goto(path);
   const ready = READY.find(([re]) => re.test(path));
   if (ready) await expect(ready[1](page)).toBeVisible();
-  else await expect(page.locator("#root")).not.toBeEmpty();
+  else {
+    // index.html's loading screen fills #root until the app first renders.
+    await expect(page.locator("#boot")).toHaveCount(0);
+    await expect(page.locator("#root")).not.toBeEmpty();
+  }
   await dismissVoiceHint(page);
 }
 
