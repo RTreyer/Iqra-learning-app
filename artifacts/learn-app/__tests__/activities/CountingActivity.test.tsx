@@ -52,7 +52,10 @@ test("shows Eastern Arabic digits, scores first taps and completes", () => {
   act(() => jest.advanceTimersByTime(900));
   fireEvent.press(screen.getByRole("button", { name: "٦" }));
   // Asked again, without saying the answer; the child finds it.
-  expect(speech.speak).toHaveBeenLastCalledWith("حَاوِلْ مَرَّةً أُخْرَى", expect.anything());
+  expect(speech.speak).toHaveBeenLastCalledWith(
+    expect.stringMatching(/^حَاوِلْ مَرَّةً أُخْرَى، ./),
+    expect.anything(),
+  );
   expect(screen.getByRole("button", { name: "٦، خطأ" })).toBeDisabled();
   fireEvent.press(screen.getByRole("button", { name: "٥" })); // found: not scored
   act(() => jest.advanceTimersByTime(900));

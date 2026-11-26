@@ -60,9 +60,10 @@ function Compare({ lesson, color, onComplete, onRoundResult }: ActivityProps<"co
     (idx: number) => {
       const correct = idx === correctIndex;
       if (!pick(idx, correct)) return;
-      speak(correct ? PRAISE : TRY_AGAIN);
+      // After a wrong tap the question again, as the tap may have cut it (VOICE-07).
+      speak(correct ? PRAISE : `${TRY_AGAIN}، ${round.prompt}`);
     },
-    [correctIndex, pick],
+    [correctIndex, pick, round.prompt],
   );
 
   return (

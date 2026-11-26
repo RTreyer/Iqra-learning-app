@@ -68,7 +68,10 @@ test("speaks the task once, scores the first tap and completes", () => {
   expect(screen.getByRole("image", { name: "🍎" })).toBeTruthy();
   fireEvent.press(screen.getByRole("button", { name: "🍌" }));
   // Wrong: the voice asks again, the round stays open until the answer is found.
-  expect(speech.speak).toHaveBeenLastCalledWith("حَاوِلْ مَرَّةً أُخْرَى", expect.anything());
+  expect(speech.speak).toHaveBeenLastCalledWith(
+    expect.stringMatching(/^حَاوِلْ مَرَّةً أُخْرَى، ./),
+    expect.anything(),
+  );
   act(() => jest.advanceTimersByTime(900));
   expect(onComplete).not.toHaveBeenCalled();
   fireEvent.press(screen.getByRole("button", { name: "🍎" }));

@@ -45,7 +45,10 @@ test("renders the equation with Arabic digits and scores the rounds", () => {
     expect.anything(),
   );
   fireEvent.press(screen.getByRole("button", { name: "٦" }));
-  expect(speech.speak).toHaveBeenLastCalledWith("حَاوِلْ مَرَّةً أُخْرَى", expect.anything());
+  expect(speech.speak).toHaveBeenLastCalledWith(
+    expect.stringMatching(/^حَاوِلْ مَرَّةً أُخْرَى، ./),
+    expect.anything(),
+  );
   expect(screen.getByRole("button", { name: "٥" })).not.toBeDisabled();
   fireEvent.press(screen.getByRole("button", { name: "٥" }));
   act(() => jest.advanceTimersByTime(900));

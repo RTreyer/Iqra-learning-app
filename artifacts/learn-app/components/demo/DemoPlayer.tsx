@@ -5,7 +5,7 @@ import { ActivityHost } from "@/components/ActivityHost";
 import { UiText } from "@/components/UiText";
 import { useLanguage } from "@/context/LanguageContext";
 import { DEMO_END, DEMO_START, demoFor, type DemoId, type DemoStep } from "@/content/demos";
-import { estimateSpeechMs, isSpeaking, speak, stopSpeaking } from "@/lib/speech";
+import { isSpeaking, speakThen, stopSpeaking } from "@/lib/speech";
 import { colors, radius, touchTarget, yemen } from "@/theme/tokens";
 import { useLatest } from "@/components/activities/shared/useLatest";
 import { Icon } from "@/components/world/Icon";
@@ -62,6 +62,7 @@ export function DemoPlayer({ id, color, preface, onDone }: Props) {
   useEffect(() => {
     let alive = true;
     let handPlaced = false;
+    let cancelLine = () => {};
     const live = async <T,>(p: Promise<T>): Promise<T> => {
       const value = await p;
       if (!alive) throw CANCELLED;
@@ -72,18 +73,12 @@ export function DemoPlayer({ id, color, preface, onDone }: Props) {
       guide.say(text);
       return sayAloud(text);
     };
+    // Each line to its real end, then a short pause (the instruction is no longer cut by
+    // "look, I'll show you", VOICE-03/10).
     const sayAloud = (text: string) =>
       live(
         new Promise<void>((resolve) => {
-          let settled = false;
-          const finish = () => {
-            if (settled) return;
-            settled = true;
-            clearTimeout(timer);
-            resolve();
-          };
-          const timer = setTimeout(finish, estimateSpeechMs(text));
-          speak(text, { onDone: finish });
+          cancelLine = speakThen(text, resolve);
         }),
       );
     const waitSilent = async () => {
@@ -195,6 +190,7 @@ export function DemoPlayer({ id, color, preface, onDone }: Props) {
     })();
     return () => {
       alive = false;
+      cancelLine();
       stopSpeaking();
       guide.say(null);
     };

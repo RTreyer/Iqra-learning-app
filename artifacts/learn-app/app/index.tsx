@@ -22,6 +22,7 @@ import { Skyline } from "@/components/world/Skyline";
 import { StickerArt } from "@/components/world/StickerArt";
 import { YemenMap, type MapPin } from "@/components/world/YemenMap";
 import {
+  SUBJECT_SPOKEN,
   SubjectLabel,
   SubjectPicker,
   subjectMark,
@@ -106,6 +107,8 @@ export default function HomeScreen() {
     if (!loaded || !thread) return;
     update({ bookId: book.id });
     if (!story && !settings.chaptersSeen.includes(thread)) router.push(routes.intro(thread));
+    // A child who cannot read hears what was chosen (VOICE-11).
+    else speak(SUBJECT_SPOKEN[book.subject]);
   };
 
   /** Into a subject: it becomes the one the play button continues in. */
