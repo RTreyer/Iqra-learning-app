@@ -8,6 +8,7 @@ export const EN_LINES: Record<string, string> = {
   "هٰذَا سُلُوكٌ خَاطِئٌ.": "This is bad behavior.",
   "مَنْ يَتَعَلَّمُ الْيَوْمَ؟": "Who is learning today?",
   "لَقَدْ أَتْمَمْتَ الدَّرْسَ!": "You finished the lesson!",
+  "مَرْحَبًا! أَنَا هُدْهُدٌ.": "Hello! I am Hudhud.",
   "أ: دَارُ الأَيْتَامِ": "أ: The orphanage",
   "أكمل كتابة الحرف كله 📏": "Finish writing the whole letter 📏",
   "أكمل كتابة الكلمة كلها 📏": "Finish writing the whole word 📏",
