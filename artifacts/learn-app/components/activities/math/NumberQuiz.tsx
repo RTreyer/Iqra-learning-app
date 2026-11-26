@@ -59,6 +59,7 @@ export function NumberQuiz({
   );
   const { values, bounce } = useBounce(maxOptions);
   const { shown, spoken } = promptOf(quiz.roundIndex);
+  const askAgain = `${TRY_AGAIN}، ${spoken}`;
 
   useEffect(() => {
     // Not after the child has already answered (or heard something else): VOICE-05.
@@ -75,10 +76,10 @@ export function NumberQuiz({
       } else {
         // Ask again rather than say the answer: the child finds it. The question is repeated,
         // as a tap may have cut it (VOICE-07).
-        speak(`${TRY_AGAIN}، ${spoken}`);
+        speak(askAgain);
       }
     },
-    [shuffled.correctIndex, pick, bounce, spoken],
+    [shuffled.correctIndex, pick, bounce, askAgain],
   );
 
   return (
