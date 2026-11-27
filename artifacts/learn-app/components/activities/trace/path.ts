@@ -27,3 +27,13 @@ export function addPoint(stroke: DrawnStroke, p: Point): boolean {
   stroke.d += ` L ${fmt(p.x)} ${fmt(p.y)}`;
   return true;
 }
+
+/** The stroke at another pad size (the pad grew or shrank): every point scaled by `factor`. */
+export function scaleStroke(stroke: DrawnStroke, factor: number): DrawnStroke {
+  const points = stroke.points.map((p) => ({ x: p.x * factor, y: p.y * factor }));
+  const [first, ...rest] = points;
+  const scaled = startStroke(first);
+  scaled.points.push(...rest);
+  scaled.d = [scaled.d, ...rest.map((p) => `L ${fmt(p.x)} ${fmt(p.y)}`)].join(" ");
+  return scaled;
+}
