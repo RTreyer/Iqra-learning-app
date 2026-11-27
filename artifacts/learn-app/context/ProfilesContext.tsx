@@ -5,6 +5,10 @@
  * Data safety, as in ProgressContext: the profile list is written only after it was read (or
  * found missing). If it cannot be read, the app works with one profile in memory and writes
  * nothing, so a passing read error never wipes the list of children.
+ *
+ * Two tabs: every change is applied again to the list as stored right now before it is
+ * written, and changes stored by another tab are taken over at once, so a stale tab never
+ * removes a child added in the other one (TECH-R2-02, FUNC-R2-02).
  */
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -106,16 +110,41 @@ export function ProfilesProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  /** Applies a rule to the state and stores the result. */
+  // Another tab stored a change: take it over.
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof window.addEventListener !== "function") return;
+    const win = window;
+    const onStorage = (event: StorageEvent) => {
+      if (event.key !== PROFILES_KEY || event.newValue == null) return;
+      try {
+        const parsed = parseProfiles(JSON.parse(event.newValue));
+        if (parsed) setStore((current) => (current ? { ...current, state: parsed } : current));
+      } catch {}
+    };
+    win.addEventListener("storage", onStorage);
+    return () => win.removeEventListener?.("storage", onStorage);
+  }, []);
+
+  /**
+   * Applies a rule to the state and stores the result. The rule is applied again to the list as
+   * stored when the write runs (another tab may have changed it), and that is what is kept.
+   */
   const change = useCallback((rule: (state: ProfilesState) => ProfilesState) => {
     setStore((current) => {
       if (!current) return current;
       const next = rule(current.state);
       if (next === current.state) return current;
       if (current.writable)
-        void enqueueWrite("profiles", () =>
-          AsyncStorage.setItem(PROFILES_KEY, JSON.stringify(next)),
-        );
+        void enqueueWrite("profiles", async () => {
+          let fresh = next;
+          try {
+            const json = await AsyncStorage.getItem(PROFILES_KEY);
+            const stored = json == null ? null : parseProfiles(JSON.parse(json));
+            if (stored) fresh = rule(stored);
+          } catch {}
+          await AsyncStorage.setItem(PROFILES_KEY, JSON.stringify(fresh));
+          if (fresh !== next) setStore((latest) => (latest ? { ...latest, state: fresh } : latest));
+        });
       return { ...current, state: next };
     });
   }, []);
