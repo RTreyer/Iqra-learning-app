@@ -89,7 +89,7 @@ export default function LessonScreen() {
   );
   // The completion card starts at the top, with the stars and the way on in view, even when the
   // child had scrolled the lesson (FUNC-R2-01, DSGN-R2-02: it opened scrolled, buttons off screen).
-  const scroller = useRef<ScrollView>(null);
+  const scroller = useRef<React.ComponentRef<typeof ScrollView>>(null);
   useEffect(() => {
     if (completed) scroller.current?.scrollTo?.({ y: 0, animated: false });
   }, [completed]);
