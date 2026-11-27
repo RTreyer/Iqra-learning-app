@@ -115,6 +115,34 @@ export const BRANCH_PASSED = 0.5;
 export const LONG_ENOUGH = 0.6;
 /** Shorter branches (in cells) are thinning noise at thick corners and are not checked. */
 const MIN_BRANCH = 4;
+/** A touch away from the letter shorter than this many cells is a stray tap, not drawing. */
+const STRAY_CELLS = 4;
+
+/** The letter's bounding box in cells, grown by `margin` cells on every side. */
+function boxOf(cells: Uint8Array, grid: number, margin: number) {
+  let r0 = grid;
+  let r1 = -1;
+  let c0 = grid;
+  let c1 = -1;
+  for (let i = 0; i < cells.length; i++) {
+    if (!cells[i]) continue;
+    const r = Math.floor(i / grid);
+    const c = i % grid;
+    if (r < r0) r0 = r;
+    if (r > r1) r1 = r;
+    if (c < c0) c0 = c;
+    if (c > c1) c1 = c;
+  }
+  return { r0: r0 - margin, r1: r1 + margin, c0: c0 - margin, c1: c1 + margin };
+}
+
+function pathLength(stroke: Stroke): number {
+  let length = 0;
+  for (let i = 1; i < stroke.length; i++)
+    length += Math.hypot(stroke[i].x - stroke[i - 1].x, stroke[i].y - stroke[i - 1].y);
+  return length;
+}
+
 /** Finger tolerance in mask cells (a cell is 2 % of the pad). */
 const REACH = 2;
 /**
@@ -204,6 +232,21 @@ export function validateOnGuide(
     const i = cellOf(p);
     return i >= 0 && near[i] === 1;
   };
+  // A short touch outside the letter's box (a tap before starting, a palm grazing the pad) is not
+  // part of the drawing and is left out, so it cannot fail a good tracing (BUG-R2-02). A longer
+  // stroke off the letter still counts against it (check 5), and a touch inside the box, where a
+  // look-alike has its dot (ج's in ح's bowl), is judged below.
+  const strayLength = (STRAY_CELLS * Math.min(pad.width, pad.height)) / grid;
+  const box = boxOf(cells, grid, reach);
+  const inBox = (p: Point) => {
+    const col = (p.x / pad.width) * grid;
+    const row = (p.y / pad.height) * grid;
+    return col >= box.c0 && col <= box.c1 + 1 && row >= box.r0 && row <= box.r1 + 1;
+  };
+  strokes = strokes.filter(
+    (stroke) =>
+      stroke.some(isNear) || stroke.some(inBox) || pathLength(stroke) > strayLength,
+  );
   const points: Point[] = [];
   let offRun = 0;
   let longestOff = 0;

@@ -1,4 +1,4 @@
-import { claimAutoReload, isLoadError } from "@/lib/serviceWorker";
+import { claimAutoReload, isLoadError, serverReachable } from "@/lib/serviceWorker";
 
 function memoryStore() {
   const data = new Map<string, string>();
@@ -31,4 +31,22 @@ test("the app reloads by itself at most once a minute, and never without storage
     setItem: () => {},
   };
   expect(claimAutoReload(broken)).toBe(false);
+});
+
+describe("serverReachable", () => {
+  const realFetch = global.fetch;
+  afterEach(() => {
+    global.fetch = realFetch;
+  });
+
+  test("true when the server answers, false when it fails or errors (one bar, no data)", async () => {
+    global.fetch = jest.fn(async () => ({ ok: true })) as unknown as typeof fetch;
+    expect(await serverReachable()).toBe(true);
+    global.fetch = jest.fn(async () => ({ ok: false })) as unknown as typeof fetch;
+    expect(await serverReachable()).toBe(false);
+    global.fetch = jest.fn(async () => {
+      throw new TypeError("Failed to fetch");
+    }) as unknown as typeof fetch;
+    expect(await serverReachable()).toBe(false);
+  });
 });

@@ -79,6 +79,8 @@ export function onVoiceStatus(listener: (works: boolean) => void): () => void {
 
 /** The speak() call whose voice has started and not ended yet (engines that report a start). */
 let activeLine: number | null = null;
+/** Its text, for how long to wait for it at most. */
+let activeText = "";
 /** Waiting for the active line to end (afterCurrentLine). */
 let lineWaiters: (() => void)[] = [];
 
@@ -110,12 +112,15 @@ export function speak(text: string, options: number | SpeakOptions = {}): void {
   try {
     Speech.stop();
     let heard = false;
+    const startedAt = Date.now();
+    const quickEnd = Math.max(QUICK_END_MS, estimateSpeechMs(text, rate) * 0.25);
     const started = () => {
       heard = true;
       silentLines = 0;
       setVoiceWorks(true);
       if (generation !== mine) return;
       activeLine = mine;
+      activeText = text;
       onStart?.();
     };
     const say = (i: number) => {
@@ -128,9 +133,13 @@ export function speak(text: string, options: number | SpeakOptions = {}): void {
         if (reported) return;
         reported = true;
         if (generation !== mine || last) {
-          // Two lines in a row that ended without a sound: there is no voice. A line stopped
-          // by newer speech, or blocked until the first tap, says nothing about the voice.
-          if (silent && generation === mine && !heard && ++silentLines >= 2) setVoiceWorks(false);
+          // Two lines in a row that ended at once without a sound: there is no voice. A line
+          // stopped by newer speech, one blocked until the first tap, or one that took as long
+          // as speaking would (a voice that does not report its start, VOICE-R2-01) says
+          // nothing about the voice.
+          const atOnce = Date.now() - startedAt < quickEnd;
+          if (silent && atOnce && generation === mine && !heard && userHasTapped())
+            if (++silentLines >= 2) setVoiceWorks(false);
           lineEnded(mine);
           return onDone?.();
         }
@@ -151,6 +160,22 @@ export function speak(text: string, options: number | SpeakOptions = {}): void {
     lineEnded(mine);
     onDone?.();
   }
+}
+
+/** A line that ends sooner than this (or a quarter of its estimate) without a sound failed. */
+const QUICK_END_MS = 300;
+
+/**
+ * Whether the page has had a tap yet. Before it, browsers block speech ("not-allowed"), and
+ * expo-speech on the web does not pass that error code on (VOICE-R2-02), so a silent line then
+ * says nothing about the voice. Elsewhere (native) speech is never blocked: true.
+ */
+function userHasTapped(): boolean {
+  const activation =
+    typeof navigator === "undefined"
+      ? undefined
+      : (navigator as { userActivation?: { hasBeenActive: boolean } }).userActivation;
+  return activation ? activation.hasBeenActive : true;
 }
 
 /**
@@ -227,7 +252,12 @@ export function speakThen(
  */
 export function afterCurrentLine(
   then: () => void,
-  { pauseMs = LINE_PAUSE_MS, maxWaitMs = MAX_SPEECH_MS } = {},
+  {
+    pauseMs = LINE_PAUSE_MS,
+    // A voice that never reports its end holds the round only about as long as the line
+    // (BUG-R2-03: "أَحْسَنْت!" held every round for 9 s).
+    maxWaitMs = Math.min(MAX_SPEECH_MS, 2 * rawSpeechMs(activeText, ARABIC_RATE) + 1000),
+  } = {},
 ): () => void {
   if (activeLine === null) {
     then();

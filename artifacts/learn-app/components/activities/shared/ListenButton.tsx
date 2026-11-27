@@ -54,7 +54,10 @@ export function ListenButton({ text, color, showText }: Props) {
         ]}
         onPress={handlePress}
       >
-        <Icon name="speaker" size={compact ? 30 : 40} color="#FFFFFF" />
+        {/* Never squeezed by a long question beside it (DSGN-R2). */}
+        <View style={act.listenIcon}>
+          <Icon name="speaker" size={compact ? 30 : 40} color="#FFFFFF" />
+        </View>
         {compact ? <View style={act.listenTextCompact}>{words}</View> : words}
         {compact ? null : <UiText style={act.listenHint}>اضغط للاستماع</UiText>}
       </Pressable>
