@@ -179,3 +179,27 @@ test("an unreadable profile list is kept, not overwritten", async () => {
   await settle();
   expect(await AsyncStorage.getItem(PROFILES_KEY)).toBe("{not json");
 });
+
+test("a stale second tab does not remove a child the first tab added (TECH-R2-02)", async () => {
+  await renderApp();
+  let badr = "";
+  act(() => {
+    badr = api.profiles.add({ name: "بدر", avatar: "ibex" })!;
+  });
+  await settle();
+  // Another tab, opened before, adds Sara to the stored list; this tab has not heard of her.
+  const other = (await stored(PROFILES_KEY)) as ProfilesState;
+  const sara = { ...other.profiles[other.profiles.length - 1], id: "sara", name: "سارة", avatar: "palm" };
+  await AsyncStorage.setItem(
+    PROFILES_KEY,
+    JSON.stringify({ ...other, profiles: [...other.profiles, sara] }),
+  );
+  // This tab now chooses Badr: Sara stays.
+  act(() => api.profiles.choose(badr));
+  await settle();
+  await settle();
+  const after = (await stored(PROFILES_KEY)) as ProfilesState;
+  expect(after.profiles.map((p) => p.name)).toContain("سارة");
+  expect(api.profiles.profiles.map((p) => p.name)).toContain("سارة");
+  expect(api.profiles.active.id).toBe(badr);
+});
