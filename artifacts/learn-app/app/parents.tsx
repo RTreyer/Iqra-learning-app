@@ -89,7 +89,10 @@ function VoiceCard() {
         <View
           style={[
             styles.voiceIcon,
-            { backgroundColor: voice === "missing" ? yemen.clay : yemen.green },
+            {
+              backgroundColor:
+                voice === "missing" ? yemen.clay : voice === "works" ? yemen.green : yemen.inkSoft,
+            },
           ]}
         >
           <Icon name={voice === "missing" ? "speakerOff" : "speaker"} size={24} color="#FFFFFF" />

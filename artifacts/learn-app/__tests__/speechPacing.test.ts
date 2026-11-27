@@ -103,6 +103,15 @@ describe("afterCurrentLine", () => {
     expect(then).toHaveBeenCalledTimes(1);
   });
 
+  test("a voice that never reports the end of short praise holds it about as long as the praise", () => {
+    speak("أَحْسَنْت!");
+    lastLine().onStart!();
+    const then = jest.fn();
+    afterCurrentLine(then);
+    jest.advanceTimersByTime(3000 + LINE_PAUSE_MS);
+    expect(then).toHaveBeenCalledTimes(1);
+  });
+
   test("cancelled, it never calls back", () => {
     speak("أَحْسَنْت!");
     lastLine().onStart!();

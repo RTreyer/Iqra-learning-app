@@ -42,3 +42,21 @@ test("no sound twice in a row means no voice; a heard line means the voice works
   unsubscribe();
   stopSpeaking();
 });
+
+test("a voice that speaks but reports no start is not taken for no voice (VOICE-R2-01)", () => {
+  jest.useFakeTimers();
+  try {
+    stopSpeaking();
+    const before = voiceStatus();
+    for (const text of ["أَقْرَأُ الْمَقَاطِع", "اِسْمَعِ الْحَرْفَ، وَابْحَثْ عَنْهُ."]) {
+      speak(text);
+      const line = last();
+      // It speaks for two seconds, then reports its end, never its start.
+      jest.advanceTimersByTime(2000);
+      line.onDone?.();
+    }
+    expect(voiceStatus()).toBe(before);
+  } finally {
+    jest.useRealTimers();
+  }
+});
