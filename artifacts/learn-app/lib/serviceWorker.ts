@@ -8,11 +8,37 @@ import { Platform } from "react-native";
 export function registerServiceWorker() {
   if (Platform.OS !== "web" || __DEV__) return;
   if (typeof navigator === "undefined" || !("serviceWorker" in navigator)) return;
-  const register = () => {
-    navigator.serviceWorker.register("/sw.js").catch(() => {});
-  };
+  // A few seconds after the page has loaded, so storing the rest does not compete with the
+  // child's first taps on a slow line (TECH-R2-03).
+  const register = () =>
+    setTimeout(() => {
+      navigator.serviceWorker.register("/sw.js").catch(() => {});
+    }, REGISTER_DELAY_MS);
   if (document.readyState === "complete") register();
   else window.addEventListener("load", register, { once: true });
+}
+
+const REGISTER_DELAY_MS = 5000;
+
+/**
+ * Whether the server answers now. A phone with one bar says it is online while no data comes
+ * through; reloading then lands on the browser's own error page (TECH-R2-01).
+ */
+export async function serverReachable(timeoutMs = 5000): Promise<boolean> {
+  if (typeof fetch === "undefined") return false;
+  const controller = typeof AbortController === "undefined" ? null : new AbortController();
+  const timer = setTimeout(() => controller?.abort(), timeoutMs);
+  try {
+    const response = await fetch(`/manifest.json?probe=${Date.now()}`, {
+      cache: "no-store",
+      signal: controller?.signal,
+    });
+    return response.ok;
+  } catch {
+    return false;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 /** A screen's code could not be downloaded: no connection, or a file of an older build. */
