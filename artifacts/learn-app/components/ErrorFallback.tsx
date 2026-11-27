@@ -6,7 +6,10 @@ import Svg, { Circle, Path } from "react-native-svg";
 
 import { UiText } from "@/components/UiText";
 import { useLanguage } from "@/context/LanguageContext";
-import { claimAutoReload, isLoadError } from "@/lib/serviceWorker";
+import { claimAutoReload, isLoadError, serverReachable } from "@/lib/serviceWorker";
+
+/** How often the app tries again while the server does not answer. */
+const RETRY_MS = 5000;
 import { colors, shadow } from "@/theme/tokens";
 
 export type ErrorFallbackProps = {
@@ -38,15 +41,32 @@ function useLoadErrorRecovery(error: Error) {
   const [offline, setOffline] = useState(() => loadError && offlineWithoutCopy());
   useEffect(() => {
     if (!loadError || typeof window === "undefined") return;
-    if (navigator.onLine !== false && claimAutoReload(sessionStore())) {
-      window.location.reload();
-      return;
-    }
-    const back = () => window.location.reload();
-    const gone = () => setOffline(offlineWithoutCopy());
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    // Reload only once the server answers: a phone with one bar says "online" while no data
+    // comes through, and a reload then shows the browser's own error page (TECH-R2-01). Until
+    // then the app says there is no connection and keeps trying.
+    const tryReload = async () => {
+      if (cancelled) return;
+      if (navigator.onLine !== false && (await serverReachable())) {
+        if (!cancelled && claimAutoReload(sessionStore())) window.location.reload();
+        return;
+      }
+      if (cancelled) return;
+      setOffline(true);
+      timer = setTimeout(tryReload, RETRY_MS);
+    };
+    void tryReload();
+    const back = () => {
+      clearTimeout(timer);
+      void tryReload();
+    };
+    const gone = () => setOffline(true);
     window.addEventListener("online", back);
     window.addEventListener("offline", gone);
     return () => {
+      cancelled = true;
+      clearTimeout(timer);
       window.removeEventListener("online", back);
       window.removeEventListener("offline", gone);
     };
@@ -64,6 +84,7 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
   const handleRestart = async () => {
     // Reloading now would show the browser's offline page instead of the app.
     if (offlineWithoutCopy()) return;
+    if (Platform.OS === "web" && isLoadError(error) && !(await serverReachable())) return;
     try {
       await reloadAppAsync();
     } catch (restartError) {
