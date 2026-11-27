@@ -401,3 +401,40 @@ describe("dots, look-alikes and small pads (agents' report BUG-02 to BUG-04)", (
     }
   });
 });
+
+describe("stray touches (round 2, BUG-R2-02)", () => {
+  const shape = (guide: string) => decodeMask(traceGuides[guide].mask, TRACE_GRID);
+  const tapAt = (x: number, y: number): Stroke => [{ x, y }];
+  /** A point of the pad at least `gap` px away from every cell of the letter. */
+  const awayFrom = (guide: string, gap: number) => {
+    const { cells, grid } = shape(guide);
+    const cell = PAD.width / grid;
+    for (let y = 10; y < PAD.height - 10; y += 5)
+      for (let x = 10; x < PAD.width - 10; x += 5) {
+        let ok = true;
+        for (let i = 0; i < cells.length && ok; i++) {
+          if (!cells[i]) continue;
+          const cx = ((i % grid) + 0.5) * cell;
+          const cy = (Math.floor(i / grid) + 0.5) * cell;
+          if (Math.hypot(cx - x, cy - y) < gap) ok = false;
+        }
+        if (ok) return { x, y };
+      }
+    throw new Error("no free spot");
+  };
+
+  it("a tap away from the letter does not fail a good tracing", () => {
+    const failing = Object.keys(traceGuides).filter((guide) => {
+      const { x, y } = awayFrom(guide, 25);
+      const strokes = [tapAt(x, y), ...strokesAlongGuide(guide)];
+      return !validateOnGuide(strokes, PAD, shape(guide)).valid;
+    });
+    expect(failing).toEqual([]);
+  });
+
+  it("a long stroke away from the letter still fails", () => {
+    const { x, y } = awayFrom("د", 30);
+    const away = Array.from({ length: 30 }, (_, k) => ({ x: x + (k % 2) * 4, y: y + k }));
+    expect(validateOnGuide([...strokesAlongGuide("د"), away], PAD, shape("د")).valid).toBe(false);
+  });
+});

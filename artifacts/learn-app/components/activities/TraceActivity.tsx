@@ -25,7 +25,7 @@ import { ADVANCE_MS, PROMPT_DELAY_MS } from "./shared/useQuiz";
 import { withAttemptReset } from "./shared/withAttemptReset";
 import { CONTROLS_FALLBACK, PAD_FALLBACK, PAD_GAP, PAD_MAX, trace, webPad } from "./trace/styles";
 import { densify, guidePath } from "./trace/guidePath";
-import { addPoint, startStroke, type DrawnStroke } from "./trace/path";
+import { addPoint, scaleStroke, startStroke, type DrawnStroke } from "./trace/path";
 import { decodeMask, validateOnGuide, validateTracing } from "./trace/validate";
 import { TRACE_GRID, traceGuides } from "@/content/generated/traceGuides";
 import type { ActivityProps } from "./types";
@@ -196,14 +196,17 @@ function Trace({ lesson, color, onComplete }: ActivityProps<"trace">) {
       height > 0 ? Math.max(PAD_MIN, height - controlsHeight.current - PAD_GAP) : Infinity;
     const next = Math.floor(Math.min(PAD_MAX, width, tall));
     if (!(next > 0) || next === measuredSize.current) return;
-    // Strokes drawn at another size would be judged against the wrong pad: start over.
-    const resized = measuredSize.current !== null;
+    // The pad can change size while a drawing is on it (Hudhud's bubble grows or shrinks by a
+    // line, the window turns): the strokes are scaled along, so nothing drawn is lost (BUG-R2-01:
+    // the worked example's line was erased before the hand tapped ✓). A stroke in progress ends.
+    const before = measuredSize.current;
     measuredSize.current = next;
     setPadSize(next);
-    if (resized) {
+    if (before !== null) {
       current.current = null;
       setLivePath("");
-      setStrokes([]);
+      const factor = next / before;
+      setStrokes((prev) => prev.map((stroke) => scaleStroke(stroke, factor)));
     }
   }, [setLivePath]);
 

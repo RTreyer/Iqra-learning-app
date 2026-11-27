@@ -110,19 +110,25 @@ test("Clear removes the drawn strokes", () => {
   expect(screen.getByTestId("trace-error")).toBeTruthy();
 });
 
-test("ignores strokes before the first layout and clears them when the pad is resized", () => {
+test("ignores strokes before the first layout", () => {
   renderActivity(
     <TraceActivity lesson={lesson} color="#7C3AED" attemptKey="t:1" onComplete={jest.fn()} />,
   );
   drawDiagonal(); // not measured yet: ignored
   fireEvent.press(screen.getByTestId("trace-done"));
   expect(screen.getByTestId("trace-error")).toHaveTextContent("اِرسم خطاً واحداً على الأقل ✏️");
+});
 
+test("keeps the drawing, scaled along, when the pad changes size (BUG-R2-01)", () => {
+  renderActivity(
+    <TraceActivity lesson={lesson} color="#7C3AED" attemptKey="t:1" onComplete={jest.fn()} />,
+  );
   layout(300);
-  drawDiagonal();
-  layout(320); // resize drops the strokes
+  drawGuide(lesson.targets[0].guide);
+  // Hudhud's bubble shrinks by a line: the pad grows. The letter drawn on it still counts.
+  layout(340);
   fireEvent.press(screen.getByTestId("trace-done"));
-  expect(screen.getByTestId("trace-error")).toHaveTextContent("اِرسم خطاً واحداً على الأقل ✏️");
+  expect(screen.queryByTestId("trace-error")).toBeNull();
 });
 
 test("pad exposes the target label and a drawing hint", () => {
