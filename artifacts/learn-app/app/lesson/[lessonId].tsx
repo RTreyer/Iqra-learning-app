@@ -4,7 +4,7 @@
 
 import { useLocalSearchParams } from "expo-router";
 import { useLanguage } from "@/context/LanguageContext";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 import { ActivityHost } from "@/components/ActivityHost";
@@ -87,6 +87,12 @@ export default function LessonScreen() {
   const { completed, stars, completeAttempt, restartAttempt, activityKey } = useLessonAttempt(
     found ? found.lesson.id : "",
   );
+  // The completion card starts at the top, with the stars and the way on in view, even when the
+  // child had scrolled the lesson (FUNC-R2-01, DSGN-R2-02: it opened scrolled, buttons off screen).
+  const scroller = useRef<ScrollView>(null);
+  useEffect(() => {
+    if (completed) scroller.current?.scrollTo?.({ y: 0, animated: false });
+  }, [completed]);
   const instruction = found ? instructionFor(found.lesson) : undefined;
   // Hudhud tells the task above the activity and reacts to the child's answers.
   const guide = useGuideState();
@@ -241,6 +247,7 @@ export default function LessonScreen() {
             </View>
           ) : (
             <ScrollView
+              ref={scroller}
               key={activityKey}
               contentContainerStyle={styles.scrollContent}
               showsVerticalScrollIndicator={false}

@@ -341,5 +341,7 @@ test("unknown lesson id shows the not found card", () => {
 test("Hudhud's bubble never shows a solved example as the lesson's text (DSGN-02)", () => {
   expect(bubbleSubtitle("٣ زَائِد ٢ يُسَاوِي ٥", "أُكْمِلُ")).toBe("أُكْمِلُ");
   expect(bubbleSubtitle("٤ + ٣ = ٧", "أَجْمَعُ")).toBe("أَجْمَعُ");
+  expect(bubbleSubtitle("٥ + ٠، ٤ + ١، ٣ + ٢", "أَجْمَعُ")).toBe("أَجْمَعُ");
+  expect(bubbleSubtitle("١، ٣، ٥، ٧، ٩", "أَعُدُّ")).toBe("أَعُدُّ");
   expect(bubbleSubtitle("أَقْرَأُ الْمَقَاطِعَ", "x")).toBe("أَقْرَأُ الْمَقَاطِعَ");
 });

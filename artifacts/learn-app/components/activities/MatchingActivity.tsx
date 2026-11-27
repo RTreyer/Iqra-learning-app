@@ -217,23 +217,24 @@ const styles = StyleSheet.create({
     minHeight: touchTarget,
   },
   /** Same pitch as the arrows column (68 high) when a card has no picture. */
-  itemTextOnly: { minHeight: 68, justifyContent: "center" },
+  itemTextOnly: { minHeight: 68, justifyContent: "center", paddingHorizontal: 6 },
   itemMatched: { backgroundColor: colors.successSoft, borderColor: colors.success, borderWidth: 2 },
   word: { fontSize: 15, fontWeight: "700", color: colors.mutedStrong, textAlign: "center" },
   /** Syllables and words without a picture are what the child reads: make them large. */
   wordOnly: { fontSize: 22, fontWeight: "800", color: colors.text, lineHeight: 34 },
+  // Three syllables side by side in a card of a 360 px phone (they wrapped 2 + 1, CONT-R2-03).
   chips: {
     flexDirection: "row-reverse",
     flexWrap: "wrap",
     justifyContent: "center",
-    gap: 6,
+    gap: 3,
   },
   chip: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "800",
     color: colors.text,
-    lineHeight: 34,
-    paddingHorizontal: 8,
+    lineHeight: 32,
+    paddingHorizontal: 4,
     borderRadius: 10,
     backgroundColor: "#FFF6DD",
     borderWidth: 1.5,
